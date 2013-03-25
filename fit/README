@@ -1,0 +1,130 @@
+================================================================================
+Example fit: 9Be(44S,44S') at 100 MeV/u with fictional gamma rays
+
+- Run the simulations:
+
+  $ source env.sh
+  $ make
+
+- Run the fit:
+
+  $ root
+
+  root [0] .L Fit.C
+  root [1] fitSpectrum()
+
+- Here's the output:
+
+ FCN=143.612 FROM MINOS     STATUS=SUCCESSFUL    120 CALLS        4888 TOTAL
+                     EDM=3.35661e-09    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  p0           4.31146e+00   4.02265e-01  -1.83918e-04  -2.55795e-03
+   2  p1          -8.28693e-03   2.67980e-03  -3.09175e-07  -6.31392e-01
+   3  p2           4.27089e+00   5.04454e-02  -5.26392e-05  -2.39611e-02
+   4  p3          -8.68213e-04   3.24851e-05  -4.22433e-08  -2.51171e+01
+   5  p4           0.00000e+00     fixed    
+   6  p5           1.02871e-03   1.76792e-04   7.76659e-09  -3.43254e-01
+   7  p6           1.92373e-03   2.73857e-04   1.51024e-07  -2.78144e-01
+   8  p7           4.45064e-03   3.88006e-04  -2.38496e-08  -2.93188e-01
+   9  p8           9.32016e-03   4.77262e-04   4.77262e-04   6.16858e-01
+                               ERR DEF= 0.5
+
+  The gamma-ray scaling factors are parameters p5-p8. Multiply the
+  scaling factor by the number of events simulated (10^6 here) to
+  get the number of gamma rays emitted in the experiment to produce
+  measured spectrum.
+
+  Conveniently, the exact scaling factors for the peaks are known,
+  because this is simulated data. They are 
+
+    p5 = 0.01
+    p6 = 0.02
+    p7 = 0.05
+    p8 = 0.1
+
+================================================================================
+The sorting code
+
+The root script UCGretinaSort.C reads gamma-ray interaction data from
+the .out into root spectra and writes them to a .root file. It
+simulates intrinsic detector resolution and thresholds based on
+parameters in the file Gretina.dat. It also applies event-by-event
+Doppler correction based on the beta value and target position in
+Gretina.dat. Several spectra are in the .root file: combined spectra
+with and without addback, spectra from individual crystals, and from
+"rings" of crystals centered at common angles with respect to the beam
+axis.
+
+================================================================================
+To set up your own fit ...
+
+- Make a copy of the fit example subdirectory.
+
+  $ cp -r fit <destination path>
+
+- Make a new set of .mac files for the beam, target, and gamma rays you
+  want to simulate.
+
+- Modify the list of targets at the top of the Makefile.
+
+- Modify Gretina.dat to reflect your resolution, thresholds, etc.
+
+- Use ./change_geometry.sh to point to the geometry files for your
+  GRETINA configuration 
+
+- Analyze the (simulated) reaction products to determine the
+  analysis beta:
+
+  The first line of the file Gretina.dat specifies the source
+  velocity (beta) to use in the Doppler reconstruction of
+  simulated spectra. Since the Doppler reconstruction is done by
+  the root script UCGretinaSort.C, this does not affect the
+  simulations themselves.
+
+  To determine the value of beta giving the best reconstruction ...
+
+  $ UCGretina example_ions.mac > example_ions.log
+
+  The ideal beta value to use in Doppler reconstruction of
+  gamma-ray spectra is the average beta of the reaction products
+  at the times they emitted gamma rays. This depends on the target
+  material and thickness and on the lifetime of the excited state
+  in question, so it is important that these parameters match
+  those you use in your gamma-ray simulation.
+
+  We don't have a way to measure source velocities directly in an
+  experiment, but the simulation can tell us what they are.
+
+  $ root
+
+  root [0] .L ions.C 
+  root [1] makeTree("example_ions.log")
+
+  This will take a while to run.
+
+  Double click on ion.betar to get the distribution of source
+  betas. The mean value in the statistics box is the analysis beta
+  that will match the rings. (The example fit: 100 MeV/u 44S in a
+  376 mg/cm^2 9Be target and a state with 0 lifetime: 0.4168)
+
+  Also double click on ion.betaf to find the average velocity of
+  the reaction products after leaving the target and make sure
+  that it agrees with the velocity you get from the S800 dta
+  spectrum.
+
+- Run the simulations:
+
+  $ source env.sh
+  $ make
+
+- Modify Fit.C: 
+
+  * Modify the function fitf() so that it adds in the correct 
+    number of simulated gamma rays
+
+  * Modify the file names (the measured spectrum and the
+    simulations) in the function fitSpectrum(). Note that the
+    simulation file names do not include extensions. This is
+    intentional, and important. 
+================================================================================

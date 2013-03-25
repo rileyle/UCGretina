@@ -1,0 +1,101 @@
+================================================================================
+Version 1.3
+================================================================================
+L. Riley  March 2013
+
+Updated Reaction.cc: The Reaction process now specifies its ProcessType
+	(Decay) and ProcessSubType (DecayExt) for compatibility with the
+	PhysicsListHelper class.
+
+Improved walls file in the GretinaGeometry tree. The hexagonal front and
+	back caps still generate convexity warnings, but they are now all
+	below the 0.1 mm level.
+
+# This is an aspiration. Unfortunately, there's a segfault issue with
+# in-beam simulations. Keeping the old lists for now.
+#
+#Updated the Physics List to use the PhysicsListHelper class. Three physics
+#	lists are present in ./src and ./include: Livermore, Penelope, and
+#	Standard_option4. These are the physics lists developed by
+#	the Low Energy Electromagnetic Physics Working Group:
+#	(https://twiki.cern.ch/twiki/bin/view/Geant4/LowePhysicsLists)
+#	Standard_option4 (selection of most accurate physics models from
+#	Standard and Low Energy sets of models) is the default.
+
+================================================================================
+Version 1.2.4
+================================================================================
+L. Riley  March 2013
+
+Positions of gamma-ray interaction points are now consolidated with an
+	energy-weighted sum in EventAction.cc. Consolidation is not done
+	by default (PositionRes = 0. mm).
+
+Added a sourceFrame "co56_2012" for the 56Co source (25mm x 25m x .4mm Fe)
+
+Added "eu152_peaks" (9 selected peaks, equal intensities) and "co56_peaks"
+	(11 selected peaks, equal intensities) source types. These are
+	useful for photopeak efficiencies.
+
+Updated Physics Lists for compatibility with future Geant4
+	releases. (Switched from SetModel to SetEmModel method.)
+
+Resolved issues with Geant4.9.6 in CConvexPolyhedron.cc. (G4Exception now
+	requires at least four arguments.)
+
+Updated Physics Lists for compatibility with future Geant4
+	releases. (Switched from SetModel to SetEmModel method.)
+================================================================================
+Version 1.2.3
+================================================================================
+L. Riley  February 2013
+
+Modified EventAction and EventAction_Messenger: interaction points can be
+	written in crystal coordinates as expected in Mode 2 data.
+	The world coordinate system can also be first rotated by Pi/2
+	about z to match the GRETINA coordinate system.
+================================================================================
+Version 1.2.2
+================================================================================
+L. Riley  February 2013
+
+Modified cluster, walls, and euler geometry files in the
+	./GretinaGeometry/NSCL tree to arrange crystals to match
+	the NSCL numbering scheme
+
+Modified EventAction.cc to write crystal ID numbers to match the NSCL
+	numbering scheme
+================================================================================
+Version 1.2.1
+================================================================================
+L. Riley  January 2013
+
+Consolidated energies and positions for each event into interaction points
+	that can be resolved by GRETINA to better simulate Mode 2 data.
+
+================================================================================
+Version 1.2
+================================================================================
+L. Riley  August 2012
+
+Migrated the GRETINA array and NSCL mounting shell from v1.1 to the
+	UCSeGA/UCCAESAR	skeleton.
+
+Implemented the NSCL target sled.
+
+================================================================================
+Version 1.1
+================================================================================
+L. Riley, B. Roberts, B. Sadler   June-July 2012
+
+Implementation of the GRETINA mounting shell used at the NSCL and the
+	cryostats/LN Dewars
+
+Improved outer wall model
+
+================================================================================
+Version 1.0
+================================================================================
+L. Riley   July 2011
+
+Initial implementation of LH target and NSCL target

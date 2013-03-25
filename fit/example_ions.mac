@@ -1,0 +1,35 @@
+# Detector parameters ==========================================================
+/Gretina/detector/enableCapsules
+/Gretina/detector/enableCryostats
+/Gretina/Shell full
+/Target/Construct
+/Target/Sled
+/BeamTube/Construct
+/Gretina/update
+# Set reaction parameters ======================================================
+/Experiment/Reaction/On
+/Target/Material Be
+/Target/Thickness 2034.6 um  # 376 mg/cm^2
+/BeamIn/A 44
+/BeamIn/Z 16
+/BeamIn/KEu 100.0 MeV
+#/BeamIn/Focus/Z 0 mm
+/BeamOut/DA 0
+/BeamOut/DZ 0
+/BeamOut/ProjectileExcitation 500 keV
+/BeamOut/seta0 1.0
+/BeamOut/seta2 0.0
+/BeamOut/seta4 0.0
+/BeamOut/tau 0 ps
+/BeamOut/AngDistSigmaA 0.012 rad
+/BeamOut/AngDistSigmaB 0.012 rad
+# Print simulation parameters to stdout ========================================
+/BeamIn/Report
+/BeamOut/Report
+/Target/Report
+/ExpHall/Report
+#
+#/GammaPrint/Track_Set
+/IonPrint/Track_Set
+/Output/Filename example_ions.out
+/run/beamOn 10000
