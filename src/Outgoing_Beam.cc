@@ -103,15 +103,17 @@ void Outgoing_Beam::setDecayProperties()
 	   << lvlSchemeFileName << G4endl;
 
     G4int nBranch;
-    G4double Elevel, meanLife, BR, Exf;
+    G4double Elevel, meanLife, BR, Exf, a0, a2, a4;
     G4ParticleDefinition* intermediateIon;
 
     openLvlSchemeFile();
 
     G4int i = 0;
     while(lvlSchemeFile >> Elevel >> nBranch >> meanLife){
+      G4cout << "Constructing decay properties for Z=" << Zin + DZ
+	     << " A=" << Ain + DA << " with excitation " << Elevel << " keV" << G4endl;
       for(G4int j = 0; j < nBranch; j++){
-	lvlSchemeFile >> BR >> Exf;
+	lvlSchemeFile >> BR >> Exf >> a0 >> a2 >> a4;
 
 	if(i == 0)
 	  intermediateIon = ion;
@@ -122,8 +124,6 @@ void Outgoing_Beam::setDecayProperties()
 		 << Zin + DZ << " " << Ain+DA << G4endl;
 	  exit(EXIT_FAILURE);
 	}
-	G4cout << "Constructing decay properties for Z=" << Zin + DZ
-	       << " A=" << Ain + DA << " with excitation " << Elevel << " keV" << G4endl;
 	intermediateIon->SetPDGStable(false);
 	intermediateIon->SetPDGLifeTime(meanLife*picosecond);
 
@@ -132,6 +132,9 @@ void Outgoing_Beam::setDecayProperties()
 	  DecTab = new G4DecayTable();
 	  intermediateIon->SetDecayTable(DecTab);
 	}
+
+	theAngularDistribution.SetCoeffs(a0,a2,a4);
+	theAngularDistribution.Report();
 
 	GamDec = new GammaDecayChannel(-1,intermediateIon,BR,(Elevel-Exf)*keV,Exf*keV,theAngularDistribution);
 	DecTab->Insert(GamDec);

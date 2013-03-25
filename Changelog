@@ -1,7 +1,14 @@
 ================================================================================
-Version 1.3
+Version 1.3.0
 ================================================================================
 L. Riley  March 2013
+
+Added an optional level scheme file specifying the portion of the
+	level scheme accessible via de-excitation of the initial
+	state. Multiple decay branches, individual level lifetimes, and
+	individual gamma-ray angular distributions are supported.
+	(Individual gamma-ray angular distributions are implemented but
+	untested.)
 
 Updated Reaction.cc: The Reaction process now specifies its ProcessType
 	(Decay) and ProcessSubType (DecayExt) for compatibility with the
@@ -10,17 +17,6 @@ Updated Reaction.cc: The Reaction process now specifies its ProcessType
 Improved walls file in the GretinaGeometry tree. The hexagonal front and
 	back caps still generate convexity warnings, but they are now all
 	below the 0.1 mm level.
-
-# This is an aspiration. Unfortunately, there's a segfault issue with
-# in-beam simulations. Keeping the old lists for now.
-#
-#Updated the Physics List to use the PhysicsListHelper class. Three physics
-#	lists are present in ./src and ./include: Livermore, Penelope, and
-#	Standard_option4. These are the physics lists developed by
-#	the Low Energy Electromagnetic Physics Working Group:
-#	(https://twiki.cern.ch/twiki/bin/view/Geant4/LowePhysicsLists)
-#	Standard_option4 (selection of most accurate physics models from
-#	Standard and Low Energy sets of models) is the default.
 
 ================================================================================
 Version 1.2.4

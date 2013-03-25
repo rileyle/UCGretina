@@ -27,8 +27,16 @@ double AngularDistribution::GetCoeff(int index) {
 }
 /***************************************************************/
 void AngularDistribution::SetCoeff(int index,double value) {
-	printf("inside SetCoeff(%i,%f)\n",index,value);
+  //	printf("inside SetCoeff(%i,%f)\n",index,value);
 	ai[index/2] = value;
+	FillPDF();
+	return;
+}
+/***************************************************************/
+void AngularDistribution::SetCoeffs(double a0, double a2, double a4) {
+	ai[0] = a0;
+	ai[1] = a2;
+	ai[2] = a4;
 	FillPDF();
 	return;
 }
@@ -42,7 +50,7 @@ void AngularDistribution::FillPDF() {
 		if(angdis[i]>angdismax) angdismax = angdis[i];
 	//	printf("angdismax = %f\n",angdismax);
 	}
-	printf("built angular distribution with coefficients (a0,a2,a4) = (%f,%f,%f)\n",ai[0],ai[1],ai[2]);
+	//	printf("built angular distribution with coefficients (a0,a2,a4) = (%f,%f,%f)\n",ai[0],ai[1],ai[2]);
 	//printf("angdismax = %f\n",angdismax);
 	return;
 }
@@ -79,3 +87,8 @@ double AngularDistribution::GetRandomAngle() {
 	r2 = (double)r2/RAND_MAX;
 	return (rbin+r2)*3.14159/1440; 
 }
+/***************************************************************/
+void AngularDistribution::Report() {
+  printf("built angular distribution with coefficients (a0,a2,a4) = (%f,%f,%f)\n",ai[0],ai[1],ai[2]);
+}
+/***************************************************************/
