@@ -11,6 +11,7 @@ Outgoing_Beam::Outgoing_Beam()
   DZ=0;
   DA=0;
   Ex=1.0*MeV;
+  lvlSchemeFileName = "";
   TarEx=547.5*keV;
   TFrac=0.;
   tau=0.0*ns;
@@ -56,6 +57,7 @@ void Outgoing_Beam::setDecayProperties()
     G4cerr << "Can not set decay properties as incoming beam has not been set" << G4endl;
     exit(EXIT_FAILURE);
   }
+
   Zin = beamIn->getZ();
   Ain = beamIn->getA();
   ion = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,Ex);
@@ -72,40 +74,34 @@ void Outgoing_Beam::setDecayProperties()
     exit(EXIT_FAILURE);
   }
 
-  G4cout << "Constructing decay properties for Z=" << Zin + DZ
-	 << " A=" << Ain + DA << " with excitation " << Ex/keV << " keV" << G4endl;
+  if (lvlSchemeFileName == ""){
+    G4cout << "Constructing decay properties for Z=" << Zin + DZ
+	   << " A=" << Ain + DA << " with excitation " << Ex/keV << " keV" << G4endl;
 
-  ion->SetPDGStable(false);
-  ion->SetPDGLifeTime(tau);
+    ion->SetPDGStable(false);
+    ion->SetPDGLifeTime(tau);
 
-  G4DecayTable *DecTab = ion->GetDecayTable(); 
-  if (DecTab == NULL) {
-    DecTab = new G4DecayTable();
-    ion->SetDecayTable(DecTab);
+    G4DecayTable *DecTab = ion->GetDecayTable(); 
+    if (DecTab == NULL) {
+      DecTab = new G4DecayTable();
+      ion->SetDecayTable(DecTab);
+    }
+    GammaDecayChannel *GamDec = new GammaDecayChannel(-1,ion,1,Ex,0.,theAngularDistribution);
+    DecTab->Insert(GamDec);
+    // DecTab->DumpInfo();
+
+    // make sure that the ion has the decay process in its manager
+    G4ProcessManager *pm = ion->GetProcessManager();
+    if (pm == NULL) {
+      G4cerr << "Could not find process manager for outgoing ion." << G4endl;
+      exit(EXIT_FAILURE);
+    }
+
+    if (pm->GetProcessActivation(&decay) == false) {
+      pm->AddProcess(&decay,1,-1,4);
+    }
+    // pm->DumpInfo();
   }
-
-  // LR: theAngular Distribution is already declared in the header
-  //	AngularDistribution theAngularDistribution(ai[0],ai[1],ai[2]);
-
-  //G4cout << "a0 = " << theAngularDistribution.GetCoeff(0)
-  //	 << "\na2 = " << theAngularDistribution.GetCoeff(2)
-  //   	 << "\na4 = " << theAngularDistribution.GetCoeff(4) << G4endl;
-
-  GammaDecayChannel *GamDec = new GammaDecayChannel(-1,ion,1,Ex,theAngularDistribution);
-  DecTab->Insert(GamDec);
-  // DecTab->DumpInfo();
-
-  // make sure that the ion has the decay process in its manager
-  G4ProcessManager *pm = ion->GetProcessManager();
-  if (pm == NULL) {
-    G4cerr << "Could not find process manager for outgoing ion." << G4endl;
-    exit(EXIT_FAILURE);
-  }
-
-  if (pm->GetProcessActivation(&decay) == false) {
-    pm->AddProcess(&decay,1,-1,4);
-  }
-  // pm->DumpInfo();
 
 }
 

@@ -1,0 +1,7 @@
+2000.        2           0.  # Ex [keV]   nBranches   tau [ps]
+0.25         1500.           # BR         Exf [keV]
+0.75         1200.           # BR         Exf [keV]
+1500.        1           0.  # Ex [keV]   nBranches   tau [ps]
+1.0          1200.           # BR         Exf [keV]
+1200.        1           0.  # Ex [keV]   nBranches   tau [ps]
+1.0          0.              # BR         Exf [keV]

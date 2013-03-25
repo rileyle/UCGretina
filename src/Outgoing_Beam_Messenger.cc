@@ -23,6 +23,11 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
   ExCmd->SetParameterName("choice",false);
   ExCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  LvlCmd = new G4UIcmdWithAString("/BeamOut/LevelSchemeFile",this);
+  LvlCmd->SetGuidance("Set the level scheme filename.");
+  LvlCmd->SetParameterName("choice",false);
+  LvlCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   TExCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/TargetExcitation",this);
   TExCmd->SetGuidance("Set target excitation energy.");
   TExCmd->SetParameterName("choice",false);
@@ -138,6 +143,7 @@ Outgoing_Beam_Messenger::~Outgoing_Beam_Messenger()
 //  delete betaCmd;
   delete tauCmd;
   delete ExCmd;
+  delete LvlCmd;
   delete TExCmd;
   delete TExFCmd;
   delete RepCmd;
@@ -173,6 +179,8 @@ void Outgoing_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamOut->setDZ(DZCmd->GetNewIntValue(newValue));}
   if( command == ExCmd )
     { BeamOut->setEx(ExCmd->GetNewDoubleValue(newValue));}
+  if( command == LvlCmd )
+    { BeamOut->setLevelSchemeFile(newValue);}
   if( command == TExCmd )
     { BeamOut->setTarEx(TExCmd->GetNewDoubleValue(newValue));}
   if( command == TExFCmd )
