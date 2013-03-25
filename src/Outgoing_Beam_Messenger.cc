@@ -180,7 +180,7 @@ void Outgoing_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
   if( command == ExCmd )
     { BeamOut->setEx(ExCmd->GetNewDoubleValue(newValue));}
   if( command == LvlCmd )
-    { BeamOut->setLevelSchemeFile(newValue);}
+    { BeamOut->setLvlSchemeFile(newValue);}
   if( command == TExCmd )
     { BeamOut->setTarEx(TExCmd->GetNewDoubleValue(newValue));}
   if( command == TExFCmd )

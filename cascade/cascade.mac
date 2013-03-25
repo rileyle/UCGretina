@@ -31,6 +31,6 @@
 /ExpHall/Report
 #
 #/GammaPrint/Track_Set
-#/IonPrint/Track_Set
+/IonPrint/Track_Set
 /Output/Filename cascade.out
-/run/beamOn 10000
+/run/beamOn 100000

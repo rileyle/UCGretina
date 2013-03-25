@@ -37,7 +37,9 @@ public:
   void setDA(G4int);
   void setDZ(G4int);
   void setEx(G4double);
-  void setLevelSchemeFile(G4String name){lvlSchemeFileName = name;}
+  void setLvlSchemeFile(G4String name){lvlSchemeFileName = name;}
+  void openLvlSchemeFile();
+  void closeLvlSchemeFile();
   void setTarEx(G4double);
   void setTFrac(G4double);
   void settau(G4double);
@@ -103,6 +105,7 @@ private:
 
   G4double Ex,TarEx,TFrac;
   G4String lvlSchemeFileName;
+  std::ifstream lvlSchemeFile;
   G4double tau;
   G4double betaDopp;
   G4int    NQ,SQ;
