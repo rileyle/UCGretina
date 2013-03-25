@@ -5,26 +5,36 @@ is specified as usual:
 
 /BeamOut/ProjectileExcitation 2000. keV
 
-but an additional command:
+but an additional command sets the name of a level scheme file:
 
 /BeamOut/LevelSchemeFile levelScheme.dat
 
-specifies a level scheme file, used to set up the decay properties of
-the reaction product.
+This file specifies the decay properties of excited states of the
+reaction product.
 
-The file levelScheme.dat specifies the level scheme. For each state,
-there must be a line giving the energy [keV], number of gamma-decay
-branches, and mean lifetime [ps], followed by a line for each branch
-with a branching ratio followed by the energy of the final state of the
-transition. For example, the first three lines in levelScheme.dat
-describe an excited state at 2000 keV which decays with zero lifetime
-either to a state at 1400 keV with BR 0.25 or to a state at 1000 keV
-with BR 0.75. 
+The level scheme file describes the portion of the level scheme
+populated by de-excitation of the initial state, including the initial
+state. (The initial state must be at the energy specified by the
+/BeamOut/ProjectileExcitation command.) The format of the level scheme
+file:
 
-In this example, we populate the 2000 keV state. The file
+<Level energy [keV]>  <Number of gamma-decay Branches>  <Lifetime [ps]>
+<BR 1>   <Final-state energy [keV]>
+<BR 2>   <Final-state energy [keV]>
+...
+<Level energy [keV]>  <Number of gamma-decay Branches>  <Lifetime [ps]>
+<BR 1>   <Final-state energy [keV]>
+<BR 2>   <Final-state energy [keV]>
+...
+
+For example, the first three lines in levelScheme.dat describe an
+excited state at 2000 keV which decays with zero lifetime either to a
+state at 1500 keV with BR 0.25 or to a state at 1200 keV with BR 0.75.
+
+In this example, we populate an initial state at 2000 keV. The file
 levelScheme.dat describes a level scheme giving two possible cascades: 
 
-2000 -> 1500 -> 1200 -> 0 and 2000->1200->0
+2000 -> 1500 -> 1200 -> 0    and    2000->1200->0
 
-The spectrum will show gamma rays at 300, 500, 800, and 1200 keV.
+The resulting spectrum will show gamma rays at 300, 500, 800, and 1200 keV.
 

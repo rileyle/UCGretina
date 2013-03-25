@@ -129,14 +129,14 @@ private:
   G4double pmax;
   G4double twopi;
 
-	// TB angular distribution coefficients for a coulex angular distribution
-	double ai[3];
-	AngularDistribution theAngularDistribution;
+  // TB angular distribution coefficients for a coulex angular distribution
+  //	double ai[3];
+  AngularDistribution theAngularDistribution;
 
   G4ThreeVector GetOutgoingMomentum();
   
   // TB angular distribution also for the target.
-  double targetai[3];
+  //  double targetai[3];
   G4ThreeVector TargetAngularDistribution();
   AngularDistribution theTargetAngularDistribution;
 

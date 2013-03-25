@@ -1,4 +1,4 @@
-all: cascade.out         cascade.root
+all:    cascade.root
 	echo "Geant4 simulations done."
 
 # Pattern rules for running Geant4 simulations and sorting the output

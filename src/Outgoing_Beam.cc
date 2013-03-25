@@ -29,12 +29,6 @@ Outgoing_Beam::Outgoing_Beam()
   twopi=8.*atan(1.);
   NQ=1;SQ=0;
   SetUpChargeStates();
-  //  ai[0] = 1.0;            // LR (no need to mirror class private data)
-  //  ai[1] = 0.0;            // LR
-  //  ai[2] = 0.0;            // LR
-  //  targetai[0] = 1.0;      // LR (no need to mirror class private data)
-  //  targetai[1] = 0.0;      // LR
-  //  targetai[2] = 0.0;      // LR
   beamIn = NULL;
 }
 
@@ -74,14 +68,13 @@ void Outgoing_Beam::setDecayProperties()
     exit(EXIT_FAILURE);
   }
 
-  G4cout << "Constructing decay properties for Z=" << Zin + DZ
-	 << " A=" << Ain + DA << " with excitation " << Ex/keV << " keV" << G4endl;
-
-  G4DecayTable *DecTab;
-  GammaDecayChannel *GamDec;
-  G4ProcessManager *pm;
+  G4DecayTable *DecTab = NULL;
+  GammaDecayChannel *GamDec = NULL;
+  G4ProcessManager *pm = NULL;
 
   if (lvlSchemeFileName == ""){
+    G4cout << "Constructing decay properties for Z=" << Zin + DZ
+	   << " A=" << Ain + DA << " with excitation " << Ex/keV << " keV" << G4endl;
     G4cout << "Direct gamma decay to the ground state." << G4endl;
 
     ion->SetPDGStable(false);
@@ -102,11 +95,9 @@ void Outgoing_Beam::setDecayProperties()
       G4cerr << "Could not find process manager for outgoing ion." << G4endl;
       exit(EXIT_FAILURE);
     }
-
-    if (pm->GetProcessActivation(&decay) == false) {
-      pm->AddProcess(&decay,1,-1,4);
-    }
+    pm->AddProcess(&decay,1,-1,4);
     // pm->DumpInfo();
+
   } else { // Set up intermediate states and decay properties
     G4cout << "Reading level scheme description from " 
 	   << lvlSchemeFileName << G4endl;
@@ -119,12 +110,9 @@ void Outgoing_Beam::setDecayProperties()
 
     G4int i = 0;
     while(lvlSchemeFile >> Elevel >> nBranch >> meanLife){
-      cout << Elevel << "  " << nBranch << "  " << meanLife << endl;
       for(G4int j = 0; j < nBranch; j++){
 	lvlSchemeFile >> BR >> Exf;
-	cout << BR << "  " << Exf << endl;
 
-	//TODO: Test whether you need to keep this array of pointers.
 	if(i == 0)
 	  intermediateIon = ion;
 	else
@@ -154,9 +142,7 @@ void Outgoing_Beam::setDecayProperties()
 	  G4cerr << "Could not find process manager for outgoing ion." << G4endl;
 	  exit(EXIT_FAILURE);
 	}
-	if (pm->GetProcessActivation(&decay) == false) {
-	  pm->AddProcess(&decay,1,-1,4);
-	}
+	pm->AddProcess(&decay,1,-1,4);
 
       }
       cout << endl;
@@ -593,16 +579,14 @@ G4double Outgoing_Beam::GetRsetKE()
 }
 //----------------------------------------------------------
 void Outgoing_Beam::SetCoeff(int index,double a) {
-  //	ai[index/2] = a; //(just use the private variable) //LR
-	theAngularDistribution.SetCoeff(index,a);
-	return;
+  theAngularDistribution.SetCoeff(index,a);
+  return;
 }
 //----------------------------------------------------------
 void Outgoing_Beam::SetTargetCoeff(int index, double a)
 {
-  //    targetai[index/2] = a; //(just use the private variable) //LR
-    theTargetAngularDistribution.SetCoeff(index, a);
-    return;
+  theTargetAngularDistribution.SetCoeff(index, a);
+  return;
 }
 //----------------------------------------------------------
 void Outgoing_Beam::openLvlSchemeFile()
