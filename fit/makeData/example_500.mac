@@ -16,8 +16,7 @@
 #/BeamIn/Focus/Z 0 mm
 /BeamOut/DA 0
 /BeamOut/DZ 0
-/BeamOut/ProjectileExcitation 2000. keV
-/BeamOut/LevelSchemeFile levelScheme.dat
+/BeamOut/ProjectileExcitation 500 keV
 /BeamOut/seta0 1.0
 /BeamOut/seta2 0.0
 /BeamOut/seta4 0.0
@@ -32,5 +31,5 @@
 #
 #/GammaPrint/Track_Set
 /IonPrint/Track_Set
-/Output/Filename cascade.out
-/run/beamOn 100000
+/Output/Filename example_500.out
+/run/beamOn 1000

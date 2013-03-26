@@ -1,4 +1,4 @@
-all:    cascade.root
+all:    parallel.root superDef.root
 	echo "Geant4 simulations done."
 
 # Pattern rules for running Geant4 simulations and sorting the output

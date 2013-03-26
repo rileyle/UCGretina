@@ -31,17 +31,18 @@ Example fit: 9Be(44S,44S') at 100 MeV/u with fictional gamma rays
                                ERR DEF= 0.5
 
   The gamma-ray scaling factors are parameters p5-p8. Multiply the
-  scaling factor by the number of events simulated (10^6 here) to
+  scaling factor by the number of events simulated (1E6 here) to
   get the number of gamma rays emitted in the experiment to produce
   measured spectrum.
 
   Conveniently, the exact scaling factors for the peaks are known,
   because this is simulated data. They are 
 
-    p5 = 0.02
-    p6 = 0.01
-    p7 = 0.02
-    p8 = 0.1
+    p5 = 0.001
+    p6 = 0.002
+    p7 = 0.005
+    p8 = 0.01
+
 ================================================================================
 The sorting code
 
@@ -51,9 +52,7 @@ simulates intrinsic detector resolution and thresholds based on
 parameters in the file Gretina.dat. It also applies event-by-event
 Doppler correction based on the beta value and target position in
 Gretina.dat. Several spectra are in the .root file: combined spectra
-with and without addback, spectra from individual crystals, and from
-"rings" of crystals centered at common angles with respect to the beam
-axis.
+with and without addback and spectra from individual crystals.
 
 ================================================================================
 To set up your own fit ...
@@ -126,4 +125,8 @@ To set up your own fit ...
     simulations) in the function fitSpectrum(). Note that the
     simulation file names do not include extensions. This is
     intentional, and important. 
+================================================================================
+./makeData
+
+The "measured" spectrum in example_spectrum.asc is fabricated here.
 ================================================================================

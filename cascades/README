@@ -1,13 +1,16 @@
-This is an example of generating events with gamma-ray multiplicity > 1
+This is an example of generating events with gamma-ray multiplicity>1
 
-In cascade.mac, the initial excitation energy of the reaction product
-is specified as usual:
+parallel.mac: a level scheme with two parallel cascades
+superDef.mac: single 10-step cascade
+
+In parallel.mac and superDef.mac, the initial excitation energy of the
+reaction product is specified as usual. For example in parallel.mac:
 
 /BeamOut/ProjectileExcitation 2000. keV
 
 but an additional command sets the name of a level scheme file:
 
-/BeamOut/LevelSchemeFile levelScheme.dat
+/BeamOut/LevelSchemeFile parallel.lvl
 
 This file specifies the decay properties of excited states of the
 reaction product.
@@ -27,7 +30,7 @@ file:
 <BR 2>   <Final-state energy [keV]>
 ...
 
-For example, the first three lines in levelScheme.dat describe an
+For example, the first three lines in parallel.lvl describe an
 excited state at 2000 keV which decays with zero lifetime either to a
 state at 1500 keV with BR 0.25 or to a state at 1200 keV with BR 0.75.
 
@@ -37,4 +40,3 @@ levelScheme.dat describes a level scheme giving two possible cascades:
 2000 -> 1500 -> 1200 -> 0    and    2000->1200->0
 
 The resulting spectrum will show gamma rays at 300, 500, 800, and 1200 keV.
-

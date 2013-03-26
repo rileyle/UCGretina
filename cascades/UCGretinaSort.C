@@ -6,7 +6,6 @@
 TH1F *sim;
 TH1F *sim_addback;
 TH1F *crystal[28];
-TH1F *ring[8];
 
 Float_t beta, zoffset;
 Float_t sigmaPar0, sigmaPar1, sigmaPar2, sigmaPar3;
@@ -100,8 +99,8 @@ void loadSim(TString fileName) {
   ifstream fp;
   fp.open(fileName);
 
-  Int_t nChannels     = 1024;
-  Int_t keVperChannel = 8;    // Match binning of the spectrum to fit
+  Int_t nChannels     = 8000;
+  Int_t keVperChannel = 1;    // Match binning of the spectrum to fit
   Int_t lo = 0;
   Int_t hi = lo+nChannels*keVperChannel;
 
@@ -113,13 +112,16 @@ void loadSim(TString fileName) {
   NameAB.Replace(NameAB.Index(".out",4,0,0),4,"_addback",8);
   sim_addback = new TH1F(NameAB,"", nChannels, float(lo), float(hi));
 
-  Int_t nCrystals = 24;
-  // Crystal ID's in the Berkeley scheme: Hole = (int)ID/4, Crystal = ID%4
-  //  Int_t crystalID[] = {24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,60,61,62,63,68,69,70,71};
-  //  Int_t crystalID[] = {20,21,22,23, 24,25,26,27, 28,29,30,31, 32,33,34,35, 56,57,58,59, 64,65,66,67};
+  Int_t nCrystals = 28;
 
-  // To match SpecTcl
-  Int_t crystalID[] = {22,20,21,23, 25,27,26,24, 29,31,30,28, 33,35,34,32, 57,59,58,56, 65,67,66,64};
+  // To match GrROOT
+  Int_t crystalID[] = {60,61,62,63,
+                       24,25,26,27,
+                       64,65,66,67,
+                       32,33,34,35,
+                       36,37,38,39,
+                       28,29,30,31,
+                       68,69,70,71};
   Int_t crystalNum[100];
 
   for(Int_t i = 0; i < nCrystals; i++){
@@ -133,17 +135,6 @@ void loadSim(TString fileName) {
     crystalName += crystalLabel;
     crystal[i] = new TH1F(crystalName,"", nChannels, float(lo), float(hi));
     crystal[i]->Sumw2();
-  }
-
-  // Initialize ring spectra
-  Int_t nRings = 8;
-  Int_t ringAngle[] = {49, 55, 64, 67, 74, 87, 93, 105};
-  for(Int_t i = 0; i < nRings; i++){
-    TString ringName = Name.Copy();
-    TString ringLabel;
-    ringLabel.Form("_%02d", ringAngle[i]);
-    ringName += ringLabel;
-    ring[i] = new TH1F(ringName,"", nChannels, float(lo), float(hi));
   }
 
   Int_t nGamma = 0;
@@ -266,52 +257,6 @@ void loadSim(TString fileName) {
   }
 
   fp.close();
-
-  // Make ring spectra by summing crystal spectra.
-  // ring_49: 2, 6, 10, 14
-
-  ring[0]->Sumw2();
-  ring[0]->Add(crystal[2], crystal[6],  1.0, 1.0);
-  ring[0]->Add(crystal[10], 1.0);
-  ring[0]->Add(crystal[14], 1.0);
-
-  // ring_55: 1, 5, 9, 13
-  ring[1]->Sumw2();
-  ring[1]->Add(crystal[1], crystal[5],  1.0, 1.0);
-  ring[1]->Add(crystal[9],  1.0);
-  ring[1]->Add(crystal[13], 1.0);
-
-  // ring_64: 3, 7, 11, 15
-  ring[2]->Sumw2();
-  ring[2]->Add(crystal[3], crystal[7],  1.0, 1.0);
-  ring[2]->Add(crystal[11], 1.0);
-  ring[2]->Add(crystal[15], 1.0);
-
-  // ring_67: 0, 4, 8, 12
-  ring[3]->Sumw2();
-  ring[3]->Add(crystal[0], crystal[4], 1.0, 1.0);
-  ring[3]->Add(crystal[8], 1.0);
-  ring[3]->Add(crystal[12], 1.0);
-
-  // ring_74: 19, 23
-  ring[4]->Sumw2();
-  ring[4]->Add(crystal[19], crystal[23], 1.0, 1.0);
-
-  // ring_87: 16, 20
-  ring[5]->Sumw2();
-  ring[5]->Add(crystal[16], crystal[20], 1.0, 1.0);
-
-  // ring_93: 18, 22
-  ring[6]->Sumw2();
-  ring[6]->Add(crystal[18], crystal[22], 1.0, 1.0);
-
-  // ring_105: 17, 21
-  ring[7]->Sumw2();
-  ring[7]->Add(crystal[17], crystal[21], 1.0, 1.0);
-
-  cout << "\r... sorted " 
-       << nGamma     << " gamma events, and " 
-       << nPhotopeak << " photopeak events ...\n" << endl;
 
   return;
 

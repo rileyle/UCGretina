@@ -115,6 +115,7 @@ void fitSpectrum() {
     simFile += ".root";
     TFile *sF = new TFile(simFile);
     sF->GetObject(simName[i],sim[i]);
+    sim[i]->Rebin(8);
   }
 
   // Check binning.
@@ -133,15 +134,15 @@ void fitSpectrum() {
 
   // Initialize fit parameter array
   Double_t par[1000];
-  par[0]  = 5;                // Exponential 1
+  par[0]  = 1;                // Exponential 1
   par[1]  = -1E-03;
-  par[2]  = 5;                // Exponential 2
+  par[2]  = 1;                // Exponential 2
   par[3]  = -1E-04;
   par[4]  = 0;                // Measured random background
-  par[5]  = 0.02;             //  500 keV
-  par[6]  = 0.01;             // 1000 keV
-  par[7]  = 0.02;             // 1500 keV
-  par[8]  = 0.1;              // 2000 keV
+  par[5]  = 0.001;             //  500 keV
+  par[6]  = 0.002;             // 1000 keV
+  par[7]  = 0.005;             // 1500 keV
+  par[8]  = 0.01;              // 2000 keV
 
   TF1 *f1 = new TF1("f1",fitf,fitMinE,fitMaxE,nPar);
   f1->SetLineColor(4); // 4 = Blue
@@ -155,7 +156,6 @@ void fitSpectrum() {
   TH1F *diff = (TH1F*)spectrum->Clone("diff");
 
   spectrum->Fit("f1","LRME");
-  //spectrum->Fit("f1","RME");
 
   // Create the difference spectrum
   for(int i=0;i<diff->GetNbinsX();i++) {

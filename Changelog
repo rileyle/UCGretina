@@ -3,12 +3,17 @@ Version 1.3.0
 ================================================================================
 L. Riley  March 2013
 
+New solid file in the GretinaGeometry with 1.5 mm back dead layer and
+	3.5 mm coaxial dead layer from a minimization of the residual
+	between simulated photopeak efficiencies (152Eu and 56Co) and
+	those measured at the NSCL in September 2012.
+
 Added an optional level scheme file specifying the portion of the
-	level scheme accessible via de-excitation of the initial
-	state. Multiple decay branches, individual level lifetimes, and
-	individual gamma-ray angular distributions are supported.
-	(Individual gamma-ray angular distributions are implemented but
-	untested.)
+	level scheme of the reaction product accessible via de-excitation
+	of the initial state. Multiple decay branches, individual level
+	lifetimes, and individual gamma-ray angular distributions are
+	supported. (Individual gamma-ray angular distributions are
+	implemented but untested.)
 
 Updated Reaction.cc: The Reaction process now specifies its ProcessType
 	(Decay) and ProcessSubType (DecayExt) for compatibility with the

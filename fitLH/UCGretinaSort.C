@@ -5,10 +5,13 @@
 
 TH1F *sim;
 TH1F *sim_addback;
+TH1F *crystal[28];
 
 Float_t beta, zoffset;
 Float_t sigmaPar0, sigmaPar1, sigmaPar2, sigmaPar3;
 Float_t ecalPar0, ecalPar1;
+Float_t threshPar0[28] = {0.0};
+Float_t threshPar1[28] = {0.0};
 
 // Read beta, target offset, and resolution parameters
 void loadGretina(TString fileName) {
@@ -34,6 +37,18 @@ void loadGretina(TString fileName) {
 
   // Energy calibration parameters
   fp >> ecalPar0  >> ecalPar1;
+  fp.getline(line,1000);  // Advance to next line.
+
+  // Threshold parameters
+  Int_t i = 0;
+  while(fp >> threshPar0[i] >> threshPar1[i]){
+    cout << "Crystal " << i << " threshold parameters: "
+	 << threshPar0[i] << ", " << threshPar1[i] << endl;
+    fp.getline(line,1000);  // Advance to next line.
+    i++;
+  }
+  if(i == 0)
+    cout << "No thresholds set!" << endl;
 
   fp.close();
 
@@ -84,8 +99,8 @@ void loadSim(TString fileName) {
   ifstream fp;
   fp.open(fileName);
 
-  Int_t nChannels     = 1024;
-  Int_t keVperChannel = 8;    // Match binning of the spectrum to fit
+  Int_t nChannels     = 8000;
+  Int_t keVperChannel = 1;    // Match binning of the spectrum to fit
   Int_t lo = 0;
   Int_t hi = lo+nChannels*keVperChannel;
 
@@ -97,6 +112,32 @@ void loadSim(TString fileName) {
   NameAB.Replace(NameAB.Index(".out",4,0,0),4,"_addback",8);
   sim_addback = new TH1F(NameAB,"", nChannels, float(lo), float(hi));
 
+  Int_t nCrystals = 28;
+
+  // To match GrROOT
+  Int_t crystalID[] = {60,61,62,63,
+                       24,25,26,27,
+                       64,65,66,67,
+                       32,33,34,35,
+                       36,37,38,39,
+                       28,29,30,31,
+                       68,69,70,71};
+  Int_t crystalNum[100];
+
+  for(Int_t i = 0; i < nCrystals; i++){
+    // Load detector ID lookup table
+    crystalNum[crystalID[i]] = i; 
+
+    // Initialize crystal spectra
+    TString crystalName = Name.Copy();
+    TString crystalLabel;
+    crystalLabel.Form("_%02d", i);
+    crystalName += crystalLabel;
+    crystal[i] = new TH1F(crystalName,"", nChannels, float(lo), float(hi));
+    crystal[i]->Sumw2();
+  }
+
+  Int_t nGamma = 0;
   Int_t nReaction = 0;
   Int_t nPhotopeak = 0;
   Int_t nGamma, nEvent;
@@ -153,7 +194,7 @@ void loadSim(TString fileName) {
 
       // No addback
       //   Hit position = first hit in crystal
-      if(Edep[detNum[i]] > 0.){
+      if(!Edep[detNum[i]] > 0.){
 	xHit[detNum[i]] = x;
 	yHit[detNum[i]] = y;
 	zHit[detNum[i]] = z;
@@ -165,23 +206,42 @@ void loadSim(TString fileName) {
     Int_t nDets = 0;
 
     if(ElabAB > 0) {
-      // Addback
-      sim_addback->Fill( DopplerE(measuredE(ElabAB), xs, ys, zs) );
-
-      // No addback
+      ElabAB = 0; // (We'll recalculate it with simulated thresholds.)
       for(Int_t i = 0; i < nHits; i++){
-	if(Edep[detNum[i]] > 0.0){
-	  sim->Fill( DopplerE(measuredE(Edep[detNum[i]]),
-			      xHit[detNum[i]],
-			      yHit[detNum[i]],
-			      zHit[detNum[i]]) );
+	Float_t E = Edep[detNum[i]];
+	if( E > 0.0 ){
+
+	  // Simulate thresholds
+	  if( gRandom->Rndm()
+	      < (1.0 + tanh((E-threshPar0[crystalNum[detNum[i]]])/threshPar1[crystalNum[detNum[i]]]))/2.0 ){
+
+	    // No addback
+	    sim->Fill( DopplerE( measuredE(E),
+				 xHit[detNum[i]],
+				 yHit[detNum[i]],
+				 zHit[detNum[i]]) );
+	    // No addback
+	    crystal[crystalNum[detNum[i]]]->Fill( DopplerE( measuredE(E),     
+							    xHit[detNum[i]],
+							    yHit[detNum[i]],
+							    zHit[detNum[i]]) );
+
+	    // Addback			
+	    ElabAB += E;
+
+	  }
+
 	  nDets++;
 	  Edep[detNum[i]] = 0.0; // Very important to zero after use.
 	  xHit[detNum[i]] = 0.;
 	  yHit[detNum[i]] = 0.;
 	  zHit[detNum[i]] = 0.;
+
 	}
       }
+
+      // Addback
+      sim_addback->Fill( DopplerE(measuredE(ElabAB), xs, ys, zs) );
 
       // Photopeak events
       if( abs(Egamma - ElabAB) < 0.02 )
@@ -197,10 +257,6 @@ void loadSim(TString fileName) {
   }
 
   fp.close();
-
-  cout << "\r... sorted " 
-       << nGamma     << " gamma events, and " 
-       << nPhotopeak << " photopeak events ...\n" << endl;
 
   return;
 
