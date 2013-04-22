@@ -1,4 +1,0 @@
-all:
-	$(MAKE) -C fit all
-	$(MAKE) -C fitLH all
-	$(MAKE) -C eu152 all

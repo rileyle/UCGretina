@@ -1,0 +1,118 @@
+================================================================================
+Example fit: 9Be(44S,44S') at 100 MeV/u with fictional gamma rays
+
+- Run the simulations:
+
+  $ make
+
+- Run the fit:
+
+  $ root
+
+  root [0] .L Fit.C
+  root [1] fitSpectrum()
+
+- Here's the output:
+
+ FCN=134.693 FROM MINOS     STATUS=SUCCESSFUL    120 CALLS        5192 TOTAL
+                     EDM=1.26929e-06    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  p0           4.13801e+00   3.80133e-01  -2.73408e-04  -2.94680e-03
+   2  p1          -7.82905e-03   2.37533e-03  -2.78092e-07  -6.14153e-01
+   3  p2           4.24775e+00   5.06430e-02  -7.14108e-05  -2.89475e-02
+   4  p3          -8.63303e-04   3.21254e-05  -3.89846e-08  -2.78091e+01
+   5  p4           0.00000e+00     fixed    
+   6  p5           1.09847e-03   2.03674e-04   1.32468e-08  -5.00742e-01
+   7  p6           2.24921e-03   2.98580e-04   2.01561e-07  -3.89616e-01
+   8  p7           4.50363e-03   4.06041e-04  -3.09030e-08  -4.45187e-01
+   9  p8           9.60921e-03   4.91574e-04   4.91574e-04   6.77142e-01
+                               ERR DEF= 0.5
+
+  The gamma-ray scaling factors are parameters p5-p8. Multiply the
+  scaling factor by the number of events simulated (1E6 here) to
+  get the number of gamma rays emitted in the experiment to produce
+  measured spectrum.
+
+  Conveniently, the exact scaling factors for the peaks are known,
+  because this is simulated data. They are 
+
+    p5 = 0.001
+    p6 = 0.002
+    p7 = 0.005
+    p8 = 0.01
+
+================================================================================
+To set up your own fit ...
+
+- Make a copy of the fit example subdirectory.
+
+  $ cp -r fit <destination path>
+
+- Make a new set of .mac files for the beam, target, and gamma rays
+  you want to simulate.
+
+- Modify the list of targets at the top of the Makefile.
+
+- Use ./change_geometry.sh to point to the geometry files for your
+  GRETINA configuration 
+
+- Modify the settings file for SimCalculate (example.set here) to specify your
+  configuration of Gretina, analysis beta, resolution parameter file,
+  and threshold parameter file
+
+- Analyze the (simulated) reaction products to determine the
+  analysis beta and the average post-target kinetic energy of your
+  reaction products:
+
+  To determine the value of beta giving the best Doppler
+  reconstruction, modify example_ions.mac to describe your beam,
+  reaction product, and target.
+
+  The ideal beta value to use in Doppler reconstruction of
+  gamma-ray spectra is the average beta of the reaction products
+  at the times they emitted gamma rays. This depends on the target
+  material and thickness and on the lifetime of the excited state
+  in question, so it is important that these parameters match
+  those you use in your gamma-ray simulation.
+
+  Run the simulation:
+
+  $ UCGretina example_ions.mac > example_ions.log
+
+  We don't have a way to measure source velocities directly in an
+  experiment, but the simulation can tell us what they are.
+
+  $ root
+
+  root [0] .L ions.C 
+  root [1] makeTree("example_ions.log")
+
+  Double click on ion.betar in the tree browser to get the
+  distribution of source betas. The mean value in the statistics box
+  is the optimal analysis beta. (For this example, 100 MeV/u 44S in a
+  376 mg/cm^2 9Be target and a state with 0 lifetime: 0.4168)
+
+  Also double click on ion.KE to find the average kinetic energy of
+  the reaction products after leaving the target. This is the kinetic 
+  energy you should specify with the /Mode2/S800KE command in your
+  macro files for calculating simulated DTA values.
+
+- Run the simulations:
+
+  $ make
+
+- Modify Fit.C: 
+
+  * Modify the function fitf() so that it adds in the correct 
+    number of simulated gamma rays
+
+  * Modify the file names (the measured spectrum and the
+    simulations) in the function fitSpectrum(). Note that the
+    simulation file names do not include extensions. This is
+    intentional, and important. 
+================================================================================
+./makeData
+
+  The "measured" spectra in example_spectrum.root are fabricated here.
+================================================================================

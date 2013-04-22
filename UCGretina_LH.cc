@@ -1,4 +1,3 @@
-//PROGRAM MPP4
 #include "G4RunManager.hh"
 #include "G4UImanager.hh"
 
@@ -13,6 +12,7 @@
 #include "PhysicsList.hh"
 #include "PrimaryGeneratorAction.hh"
 #include "PrimaryGeneratorAction_Messenger.hh"
+#include "TrackingAction.hh"
 #include "EventAction.hh"
 #include "EventAction_Messenger.hh"
 #include "RunAction.hh"
@@ -24,6 +24,10 @@
 #ifdef G4VIS_USE
 #include "VisManager.hh"
 #endif
+
+#include "G4Timer.hh"
+G4Timer Timer;
+G4Timer Timerintern;
 
 int main(int argc,char** argv) 
 {
@@ -40,28 +44,29 @@ int main(int argc,char** argv)
   cout << "... Done" << endl;
 
   // Construct incoming and outgoing beams
-  Incoming_Beam* BeamIn=new Incoming_Beam();
-  Incoming_Beam_Messenger* IncomingBeamMessenger;
-  IncomingBeamMessenger=new Incoming_Beam_Messenger(BeamIn);
+  Incoming_Beam* BeamIn = new Incoming_Beam();
+  Incoming_Beam_Messenger* IncomingBeamMessenger = new Incoming_Beam_Messenger(BeamIn);
 
   Outgoing_Beam* BeamOut=new Outgoing_Beam();
   BeamOut=new Outgoing_Beam();
   BeamOut->defaultIncomingIon(BeamIn);
   physicsList->SetOutgoingBeam(BeamOut);
-  Outgoing_Beam_Messenger* OutgoingBeamMessenger;
-  OutgoingBeamMessenger=new Outgoing_Beam_Messenger(BeamOut);
+  Outgoing_Beam_Messenger* OutgoingBeamMessenger = new Outgoing_Beam_Messenger(BeamOut);
 
   // set mandatory user action class
   EventAction* eventAction = new EventAction();
-  EventAction_Messenger* eventActionMessenger;
-  eventActionMessenger = new EventAction_Messenger(eventAction);
+  EventAction_Messenger* eventActionMessenger = new EventAction_Messenger(eventAction);
   runManager->SetUserAction(eventAction);
+
   PrimaryGeneratorAction* generatorAction= new PrimaryGeneratorAction(detector,BeamIn,BeamOut);
-  PrimaryGeneratorAction_Messenger* generatorActionMessenger;
-  generatorActionMessenger=new PrimaryGeneratorAction_Messenger(generatorAction);
+  PrimaryGeneratorAction_Messenger* generatorActionMessenger = new PrimaryGeneratorAction_Messenger(generatorAction);
+
   runManager->SetUserAction(generatorAction);
   RunAction* runAction = new RunAction(detector,BeamOut,eventAction);
   runManager->SetUserAction(runAction);
+
+  TrackingAction* trackingAction = new TrackingAction(eventAction);
+  runManager->SetUserAction(trackingAction);
 
   G4UIsession* session=0;
 

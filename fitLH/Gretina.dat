@@ -1,4 +1,0 @@
-0.4131                        // Beta for Doppler reconstruction
-0.0                           // Target z offset for Doppler reconstruction
-1.04560   2.30191e-04   3.22402e-08  0. // Resolution parameters
-0.0       1.0                           // Energy calibration parameters

@@ -2,7 +2,11 @@ DEVNOTES
 *~
 *.out
 *.log
-*.root
+*_sim.root
+*_sim_histos.root
 *.rad
 *.spe
 *.wrl
+tmp*
+*.dat
+

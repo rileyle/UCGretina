@@ -1,4 +1,3 @@
-//PROGRAM MPP4
 #include "G4RunManager.hh"
 #include "G4UImanager.hh"
 
@@ -13,6 +12,7 @@
 #include "PhysicsList.hh"
 #include "PrimaryGeneratorAction.hh"
 #include "PrimaryGeneratorAction_Messenger.hh"
+#include "TrackingAction.hh"
 #include "EventAction.hh"
 #include "EventAction_Messenger.hh"
 #include "RunAction.hh"
@@ -24,6 +24,10 @@
 #ifdef G4VIS_USE
 #include "VisManager.hh"
 #endif
+
+#include "G4Timer.hh"
+G4Timer Timer;
+G4Timer Timerintern;
 
 int main(int argc,char** argv) 
 {
@@ -60,6 +64,9 @@ int main(int argc,char** argv)
   runManager->SetUserAction(generatorAction);
   RunAction* runAction = new RunAction(detector,BeamOut,eventAction);
   runManager->SetUserAction(runAction);
+
+  TrackingAction* trackingAction = new TrackingAction(eventAction);
+  runManager->SetUserAction(trackingAction);
 
   G4UIsession* session=0;
 

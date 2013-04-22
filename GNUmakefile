@@ -3,10 +3,14 @@
 # GNUmakefile for examples module.  Gabriele Cosmo, 06/04/98.
 # --------------------------------------------------------------
 
+# Need this for writing output files larger than 2GB on 32-bit Linux
+# (untested on other systems)
+CPPFLAGS := "-D_FILE_OFFSET_BITS=64 "
+
 # Use -D to define LHTARGET macro for the C preprocesssor
 ifdef LHTARGET
   name := UCGretina_LH
-  CPPFLAGS := "-DLHTARGET "
+  CPPFLAGS += "-DLHTARGET "
 else
   name := UCGretina
 endif

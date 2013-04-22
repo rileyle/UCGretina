@@ -1,4 +1,23 @@
 ================================================================================
+Version 2.0
+================================================================================
+L. Riley April 2013
+
+Mode 2 output with decomposed gamma-ray events (GEB type 1), simulated
+    S800 events (GEB type 9), and events with energies, emission
+    positions, and emission directions of simulated gammas (GEB type
+    11). Added TrackingAction and EventInformation classes to store
+    outgoing reaction product and emitted gamma-ray information for output
+    by the EventAction class.
+
+Now reads the binary crmat file (crmat.LINUX).
+
+Added G4Timers to the main and EventAction to report on overall timing and
+	progress.
+
+Updated examples using GrROOT package for sorting.
+
+================================================================================
 Version 1.3.0
 ================================================================================
 L. Riley  March 2013

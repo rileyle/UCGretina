@@ -1,0 +1,19 @@
+# Detector parameters ==========================================================
+/Gretina/detector/enableCapsules
+/Gretina/detector/enableCryostats
+/Gretina/Shell full
+/Target/Construct
+/Target/Sled
+/BeamTube/Construct
+/Gretina/update
+# Source parameters ============================================================
+/Experiment/RunSource
+/Experiment/Source/Set eu152
+/Target/sourceFrame eu152_Z2707
+# Output parameters ============================================================
+/Mode2/PositionRes 6.0 mm
+/Mode2/crmatFile crmat.LINUX
+/Mode2/GretinaCoords
+/Mode2/Filename eu152.dat
+/run/beamOn 1000000
+

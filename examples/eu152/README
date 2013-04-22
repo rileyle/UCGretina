@@ -1,0 +1,82 @@
+================================================================================
+
+Several gamma-ray calibration sources are implemented in UCGretina. This
+example illustrates the use of the 152Eu source.
+
+================================================================================
+
+================================================================================
+152Eu
+
+o Run the simulation
+
+  - In this directory, type
+
+      $ make
+
+    to run the simulation of the 152Eu source measurement described in
+    eu152.mac. The Makefile automates the following steps:
+
+  - UCGretina writes mode 2 data to eu152.dat. (The name of the output
+    file is specified in eu152.mac.)
+
+  - SimCalculate is used to load the mode 2 data in eu152.dat into a
+    calibrated tree in eu152_sim.root
+
+  - Sim_histos is used to sort the calibrated tree into histograms
+    written to eu152_sim_histos.root
+
+o Fit a measured spectrum
+
+  - The root files ./data/run022_cal_histos.root and 
+    ./data/run007_cal_histos.root are measured 152Eu and room
+    background spectra measured with the standard NSCL configuration
+    of Gretina in September 2012.
+
+  - The root script eu152Fit.C fits the measured spectrum with a
+    linear combination of the room background and simulated
+    spectra. (The background scaling is set with a fit above 1540
+    keV.)
+
+      $ root
+      $ .L eu152Fit.C
+      $ fitSpectrum()
+
+    The simulated spectrum is the response to 1E6 gamma rays, and fit
+    parameter 1 is the scaling factor. The measured spectrum
+    corresponds to 
+
+      Run020: free running, 595.6 live seconds, 9/17/2012
+      Source activity:
+      (313100(4400) Bq on 5/1/1978)*(0.5)^(34.3819 years/13.537 years) 
+                        = 53841(754) Bq
+
+        (53841(750) Bq)*(595.6 seconds)*(1.537 gamma rays/decay) 
+                        =  4.93(7)E7 gamma rays emitted
+
+    so the scaling factor (parameter p1 in the fit results below)
+    should be 49.3(7).
+
+  - The output:
+
+ FCN=577795 FROM MINOS     STATUS=UNCHANGED       0 CALLS          64 TOTAL
+                     EDM=2.67343e-11    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  p0           5.03242e-01     fixed    
+   2  p1           4.93627e+01   1.59446e-02   1.59446e-02  -3.24280e-04
+   3  p2           0.00000e+00     fixed    
+   4  p3           1.00000e-03     fixed    
+                               ERR DEF= 0.5
+Total difference = 40010.3
+
+  - The fixed parameters p2 and p3 are threshold parameters. Freeing
+    these finds the best-fit threshold parameters for the entire
+    array. However, it is preferable to determine threshold parameters
+    crystal-by-crystal and fold in simulated crystal thresholds at the 
+    SimCalculate stage as is done here (thresholds in run020_run007.thresh).
+
+    (This only affects lab-frame energies below about 200 keV --- not
+    always worth pursuing.)
+
+================================================================================

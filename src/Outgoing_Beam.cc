@@ -182,7 +182,7 @@ G4ThreeVector Outgoing_Beam::ReactionPosition()
  
   posOut=posIn;
   posOut.setZ(posIn.getZ()+eps);
-  //  G4cout<<"Raction took place at "<<G4BestUnit(posOut.getZ(),"Length")<<G4endl;
+  //  G4cout<<"Reaction took place at "<<G4BestUnit(posOut.getZ(),"Length")<<G4endl;
 
   return posOut;
 
