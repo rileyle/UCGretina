@@ -102,9 +102,9 @@ Commands related to the incoming beam:
 > Angular divergences of the incoming beam in the dispersive and
 > nondispersive directions, respectively.
 
-    /BeamIn/Dpp <double> <unit>
+    /BeamIn/Dpp <double>
 
-> Momentum acceptance for the incoming beam
+> Momentum acceptance (dp/p) for the incoming beam
 
 Commands related to the outgoing reaction product:
 
@@ -144,13 +144,17 @@ Commands related to the outgoing reaction product:
 > scheme file:
 
 >       <Level energy [keV]>  <Number of gamma-decay Branches>  <Lifetime [ps]>
->       <BR 1>   <Final-state energy [keV]>
->       <BR 2>   <Final-state energy [keV]>
+>       <BR 1>   <Final-state energy [keV]>  <A0>  <A2>  <A4>
+>       <BR 2>   <Final-state energy [keV]>  <A0>  <A2>  <A4>
 >       ...
 >       <Level energy [keV]>  <Number of gamma-decay Branches>  <Lifetime [ps]>
->       <BR 1>   <Final-state energy [keV]>
->       <BR 2>   <Final-state energy [keV]>
+>       <BR 1>   <Final-state energy [keV]>  <A0>  <A2>  <A4>
+>       <BR 2>   <Final-state energy [keV]>  <A0>  <A2>  <A4>
 >       ...
+
+> where <BR N> are branching rations, <A0>, <A2>, <A4> are gamma-ray
+> angular distribution coefficients.
+
 
 > NOTE: This command supersedes values set with the
 > /BeamOut/seta0, /BeamOut/seta2, /BeamOut/seta4, and /BeamOut/tau
@@ -171,10 +175,15 @@ Mandatory commands
     /Experiment/Source/Set <type>
 
 > Currently implemented types: eu152, cs137, co56, co60,
-> photopeaks, eu152_peaks, co56_peaks, au, simple
+> photopeaks, eu152_peaks, co56_peaks, au, white, simple
 
 > The simple source type emits gamma rays of a single energy (set with
 > the /Experiment/Source/setEnergy command) 
+
+> The white source type emits gamma rays in a uniform energy
+> distribution between 100 keV and 10 MeV. These limits can be set
+> with the /Experiment/Source/setWhiteLowE and
+> /Experiment/Source/setWhiteHighE commands.
 
 > eu152_peaks, co56_peaks, and photopeaks sources produce selected
 > gamma-rays from 152Eu, 56Co, and both, respectively. The gamma rays
@@ -185,7 +194,12 @@ Optional commands
 
     /Experiment/Source/setEnergy <double> <unit>
 
-> Set the energy of the "simple" source
+> Set the energy of the "simple" source type
+
+    /Experiment/Source/setWhiteLowE  <double> <unit>
+    /Experiment/Source/setWhiteHighE <double> <unit>
+
+> Set the limits of the energy distribution of the "white" source type
 
     /Target/sourceFrame <frame type>
 

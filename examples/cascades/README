@@ -22,13 +22,16 @@ state. (The initial state must be at the energy specified by the
 file:
 
 <Level energy [keV]>  <Number of gamma-decay Branches>  <Lifetime [ps]>
-<BR 1>   <Final-state energy [keV]>
-<BR 2>   <Final-state energy [keV]>
+<BR 1>   <Final-state energy [keV]>  <A0>  <A2>  <A4>
+<BR 2>   <Final-state energy [keV]>  <A0>  <A2>  <A4>
 ...
 <Level energy [keV]>  <Number of gamma-decay Branches>  <Lifetime [ps]>
-<BR 1>   <Final-state energy [keV]>
-<BR 2>   <Final-state energy [keV]>
+<BR 1>   <Final-state energy [keV]>  <A0>  <A2>  <A4>
+<BR 2>   <Final-state energy [keV]>  <A0>  <A2>  <A4>
 ...
+
+where <BR N> are branching rations, <A0>, <A2>, <A4> are gamma-ray
+angular distribution coefficients.
 
 For example, the first three lines in parallel.lvl describe an
 excited state at 2000 keV which decays with zero lifetime either to a

@@ -43,11 +43,14 @@ public:
   void SetSourcePhotopeaks();
   void SetSourceAu();
   void SetSourceSimple();
+  void SetSourceWhite();
   void ReactionOn(){BeamOut->SetReactionOn();fracOn=false;}
   void ReactionOff(){BeamOut->SetReactionOff();fracOn=false;}
   void SetFraction(G4double f){fracOn=true;frac=f;}
   G4double GetSourceEnergy();
   void SetSourceEnergy(G4double);
+  void SetWhiteSourceLowE(G4double energy){sourceWhiteLoE = energy;}
+  void SetWhiteSourceHighE(G4double energy){sourceWhiteHiE = energy;}
 
 private:
 
@@ -70,6 +73,8 @@ private:
   G4ThreeVector sourcePosition;
   vector<SourceData*> TheSource;
   G4double sourceBranchingSum;
+  G4double sourceWhiteLoE;
+  G4double sourceWhiteHiE;
 };
 
 

@@ -293,7 +293,8 @@ void EventAction::EndOfEventAction(const G4Event* e)
     timerCount++;
     eventsPerSecond += 
       (((int)NTotalEvents/100)/Timerintern.GetRealElapsed() - eventsPerSecond)/timerCount;
-    G4cout << std::fixed << std::setprecision(0) << std::setw(3)
+    G4cout << std::fixed << std::setprecision(0) << std::setw(3) 
+	   << std::setfill(' ')
 	   << (float)event_id/NTotalEvents*100 << " %   "
 	   << eventsPerSecond << " events/s ";
 

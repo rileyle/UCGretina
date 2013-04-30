@@ -1,4 +1,4 @@
-all:  eu152_sim_histos.root
+all:  white_sim_histos.root
 	echo "Geant4 simulations done."
 
 # Pattern rules for running Geant4 simulations and sorting the output
@@ -7,7 +7,7 @@ all:  eu152_sim_histos.root
 	UCGretina $*.mac | tee $*.log
 
 %_sim.root : %.dat
-	SimCalculate -i $*.dat -o $*_sim.root -s eu152.set | tee $*_sim.log
+	SimCalculate -i $*.dat -o $*_sim.root -s white.set | tee $*_sim.log
 
 
 %_sim_histos.root : %_sim.root

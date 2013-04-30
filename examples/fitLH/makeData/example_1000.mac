@@ -9,7 +9,7 @@
 /BeamIn/A 44
 /BeamIn/Z 16
 /BeamIn/KEu 100.0 MeV
-#/BeamIn/Focus/Z 0 mm
+/BeamIn/Dpp 0.02
 /BeamIn/Focus/DX 4. mm
 /BeamIn/Focus/DY 4. mm
 /BeamOut/DA 0
@@ -19,8 +19,8 @@
 /BeamOut/seta2 0.0
 /BeamOut/seta4 0.0
 /BeamOut/tau 0 ps
-/BeamOut/AngDistSigmaA 0.012 rad
-/BeamOut/AngDistSigmaB 0.012 rad
+/BeamOut/AngDistSigmaA 0.006 rad
+/BeamOut/AngDistSigmaB 0.006 rad
 # Print simulation parameters to stdout ========================================
 /BeamIn/Report
 /BeamOut/Report

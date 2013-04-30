@@ -25,8 +25,10 @@ private:
   G4UIdirectory*               PGADir;
   G4UIdirectory*               SrcDir;
   G4UIdirectory*               RctDir;
-  G4UIcmdWithAString*          SrcCmd;    //LR
-  G4UIcmdWithADoubleAndUnit*   SrcECmd;   //LR
+  G4UIcmdWithAString*          SrcCmd;
+  G4UIcmdWithADoubleAndUnit*   SrcECmd;
+  G4UIcmdWithADoubleAndUnit*   SrcWLECmd;
+  G4UIcmdWithADoubleAndUnit*   SrcWHECmd;
   G4UIcmdWithADoubleAndUnit*   SrcXCmd;
   G4UIcmdWithADoubleAndUnit*   SrcYCmd;
   G4UIcmdWithADoubleAndUnit*   SrcZCmd;

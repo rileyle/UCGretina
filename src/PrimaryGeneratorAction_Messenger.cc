@@ -21,14 +21,24 @@ PrimaryGeneratorAction_Messenger::PrimaryGeneratorAction_Messenger(PrimaryGenera
   PGABCmd->SetGuidance("Select in-beam simulations.");
 
   SrcCmd  = new G4UIcmdWithAString("/Experiment/Source/Set",this);          //LR
-  SrcCmd->SetGuidance("Set source type (eu152, eu152_peaks (9 peaks, equal intensities), cs137, co56, co56_peaks (11 peaks, equal intensities), co60, photopeaks, au, or simple)");  //LR
+  SrcCmd->SetGuidance("Set source type (eu152, eu152_peaks (9 peaks, equal intensities), cs137, co56, co56_peaks (11 peaks, equal intensities), co60, photopeaks, au, white, or simple)");  //LR
   SrcCmd->SetParameterName("Source type",false);                            //LR
   SrcCmd->AvailableForStates(G4State_PreInit,G4State_Idle);                 //LR
 
-  SrcECmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/setEnergy",this); //LR
-  SrcECmd->SetGuidance("Set gamma-ray energy for the source");                  //LR
-  SrcECmd->SetParameterName("Source Energy",false);                             //LR
-  SrcECmd->AvailableForStates(G4State_PreInit,G4State_Idle);                    //LR
+  SrcECmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/setEnergy",this);
+  SrcECmd->SetGuidance("Set gamma-ray energy for the simple source type");
+  SrcECmd->SetParameterName("Source Energy",false);
+  SrcECmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  SrcWLECmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/setWhiteLowE",this);
+  SrcWLECmd->SetGuidance("Set lower gamma-ray energy limit for the white source");
+  SrcWLECmd->SetParameterName("White Source Lower Energy Limit",false);
+  SrcWLECmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  SrcWHECmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/setWhiteHighE",this);
+  SrcWHECmd->SetGuidance("Set upper gamma-ray energy limit for the white source");
+  SrcWHECmd->SetParameterName("White Source Upper Energy Limit",false);
+  SrcWHECmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   SrcXCmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/setX",this);
   SrcXCmd->SetGuidance("Set X position for the source");
@@ -78,8 +88,10 @@ PrimaryGeneratorAction_Messenger::~PrimaryGeneratorAction_Messenger()
   delete RctDir;
   delete PGASCmd;
   delete PGABCmd;
-  delete SrcCmd;  //LR
-  delete SrcECmd; //LR
+  delete SrcCmd;
+  delete SrcECmd;
+  delete SrcWLECmd;
+  delete SrcWHECmd;
   delete SrcXCmd;
   delete SrcYCmd;
   delete SrcZCmd;
@@ -103,11 +115,17 @@ void PrimaryGeneratorAction_Messenger::SetNewValue(G4UIcommand* command,G4String
   if( command == PGABCmd )
     {PGA ->SetInBeam();}
 
-  if( command == SrcCmd )            //LR
-    {PGA ->SetSourceType(newValue);} //LR
+  if( command == SrcCmd )
+    {PGA ->SetSourceType(newValue);}
 
   if( command == SrcECmd )
     {PGA ->SetSourceEnergy(SrcECmd->GetNewDoubleValue(newValue));}
+
+  if( command == SrcWLECmd )
+    {PGA ->SetWhiteSourceLowE(SrcECmd->GetNewDoubleValue(newValue));}
+
+  if( command == SrcWHECmd )
+    {PGA ->SetWhiteSourceHighE(SrcECmd->GetNewDoubleValue(newValue));}
 
   if( command == SrcXCmd )
     {PGA ->SetSourceX(SrcXCmd->GetNewDoubleValue(newValue));}

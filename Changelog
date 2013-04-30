@@ -1,4 +1,15 @@
 ================================================================================
+Version 2.1 (In progress)
+================================================================================
+
+Added the "white" source type (uniform energy distribution between user-set
+	limits; default: 100 keV ... 10 MeV).
+
+TrackingAction now writes dta in % (for GrROOT compatibility).
+
+Fine-tuning of examples.
+
+================================================================================
 Version 2.0
 ================================================================================
 L. Riley April 2013

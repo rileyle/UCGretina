@@ -69,8 +69,8 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
       eventInfo->SetATA( asin(-pDir.getY()/pDir.mag())/mrad );
       // BTA is the non-dispersive angle, South is + in NSL coords = -x in Geant4 coords
       eventInfo->SetBTA( asin(-pDir.getX()/pDir.mag())/mrad );
-      // DTA is dT/T with T = kinetic energy corresponding to the center of the S800 acceptance
-      eventInfo->SetDTA((aTrack->GetKineticEnergy() - eventAction->GetS800KE()) / eventAction->GetS800KE() ); 
+      // DTA is dT/T in % with T = kinetic energy corresponding to the center of the S800 acceptance
+      eventInfo->SetDTA((aTrack->GetKineticEnergy() - eventAction->GetS800KE()) / eventAction->GetS800KE() * 100. ); 
     } else if ( aTrack->GetCreatorProcess()->GetProcessName() == "Reaction" ) {
       // YTA is horizontal position on target, South is + in NSCL coords = -x in Geant4 coords
       eventInfo->SetYTA( -aTrack->GetStep()->GetPreStepPoint()->GetPosition().getX()/mm );

@@ -12,6 +12,8 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction *detector, I
   particleGun = new G4ParticleGun(n_particle);
   fracOn=false;
   frac=0;
+  sourceWhiteLoE = 100.*keV;
+  sourceWhiteHiE = 10000.*keV;
 }
 
 PrimaryGeneratorAction::~PrimaryGeneratorAction()
@@ -143,6 +145,8 @@ void PrimaryGeneratorAction::SetSourceType(G4String name) //LR
     SetSourceCo56Peaks();
   } else if (name == "au") {
     SetSourceAu();
+  } else if (name == "white") {
+    SetSourceWhite();
   } else if (name == "simple") {
     SetSourceSimple();
   }
@@ -151,6 +155,8 @@ void PrimaryGeneratorAction::SetSourceType(G4String name) //LR
 //-------------------------------------------------------------
 void PrimaryGeneratorAction::SetSourceEu152()
 {
+  sourceType = "eu152";
+
   G4double e;
   sourceBranchingSum=0.;
 
@@ -212,6 +218,8 @@ void PrimaryGeneratorAction::SetSourceEu152()
 //-------------------------------------------------------------
 void PrimaryGeneratorAction::SetSourceEu152Peaks()
 {
+  sourceType = "eu152_peaks";
+
   G4double e;
   sourceBranchingSum=0.;
 
@@ -245,6 +253,8 @@ void PrimaryGeneratorAction::SetSourceEu152Peaks()
 //-------------------------------------------------------------
 void PrimaryGeneratorAction::SetSourceCs137()
 {
+  sourceType = "cs137";
+
   G4double e;
   sourceBranchingSum=0.;
 
@@ -262,6 +272,8 @@ void PrimaryGeneratorAction::SetSourceCs137()
 //-------------------------------------------------------------
 void PrimaryGeneratorAction::SetSourceCo56()
 {
+  sourceType = "co56";
+
   G4double e;
   sourceBranchingSum=0.;
 
@@ -309,6 +321,8 @@ void PrimaryGeneratorAction::SetSourceCo56()
 //-------------------------------------------------------------
 void PrimaryGeneratorAction::SetSourceCo56Peaks()
 {
+  sourceType = "co56_peaks";
+
   G4double e;
   sourceBranchingSum=0.;
 
@@ -346,6 +360,8 @@ void PrimaryGeneratorAction::SetSourceCo56Peaks()
 //-------------------------------------------------------------
 void PrimaryGeneratorAction::SetSourceCo60()
 {
+  sourceType = "co60";
+
   G4double e;
   sourceBranchingSum=0.;
 
@@ -365,6 +381,8 @@ void PrimaryGeneratorAction::SetSourceCo60()
 //-------------------------------------------------------------
 void PrimaryGeneratorAction::SetSourcePhotopeaks()
 {
+  sourceType = "photopeaks";
+
   G4double e;
   sourceBranchingSum=0.;
 
@@ -421,6 +439,8 @@ void PrimaryGeneratorAction::SetSourcePhotopeaks()
 //-------------------------------------------------------------
 void PrimaryGeneratorAction::SetSourceAu()
 {
+  sourceType = "au";
+
   G4double e;
   sourceBranchingSum=0.;
 
@@ -438,6 +458,8 @@ void PrimaryGeneratorAction::SetSourceAu()
 //-------------------------------------------------------------
 void PrimaryGeneratorAction::SetSourceSimple()
 {
+  sourceType = "simple";
+
   G4double e;
   sourceBranchingSum=0.;
 
@@ -453,17 +475,41 @@ void PrimaryGeneratorAction::SetSourceSimple()
   TheSource.push_back(new SourceData(e,sourceBranchingSum));
 }
 //-------------------------------------------------------------------------
+void PrimaryGeneratorAction::SetSourceWhite()
+{
+  sourceType = "white";
+
+  G4double e;
+  sourceBranchingSum=0.;
+
+  // start from the beginning of the array
+  vector<SourceData*>::iterator itPos = TheSource.begin();
+  // clear all elements from the array
+  for(; itPos < TheSource.end(); itPos++)
+    delete *itPos;    // free the element from memory
+   // finally, clear all elements from the array
+  TheSource.clear();
+
+}
+//-------------------------------------------------------------------------
 G4double PrimaryGeneratorAction::GetSourceEnergy()
 {
  
   G4double rand;
+  if(sourceType != "white"){
 
-  rand=G4UniformRand()*sourceBranchingSum;
+    rand=G4UniformRand()*sourceBranchingSum;
 
-  vector<SourceData*>::iterator itPos = TheSource.begin();
+    vector<SourceData*>::iterator itPos = TheSource.begin();
 
-  for(; itPos < TheSource.end(); itPos++)
-    if(rand<(*itPos)->b) return (*itPos)->e;
+    for(; itPos < TheSource.end(); itPos++)
+      if(rand<(*itPos)->b) return (*itPos)->e;
+
+  } else {
+    
+    return sourceWhiteLoE + G4UniformRand()*(sourceWhiteHiE - sourceWhiteLoE);
+
+  }
 
   cout << "******** Oops!!!!" << endl;
 
@@ -480,3 +526,4 @@ void PrimaryGeneratorAction::SetSourceEnergy(G4double energy)
     G4cout << "Warning: /Experiment/Source/setEnergy has no effect unless the source type is set to \"simple\"" << G4endl;
   }
 }
+//-------------------------------------------------------------------------
