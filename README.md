@@ -1,15 +1,29 @@
 ## Compile and install UCGretina ##
 
-    $ source <G4INSTALL>/share/Geant4-9.6.1/geant4make/geant4make.sh
-    $ make
+Install the latest version of the Geant4 libraries from
+http://geant4.web.cern.ch/geant4/support/download.shtml. You will need
+the data files for low energy electromagnetic processes. 
 
-Here, the file env.sh comes from your local installation of geant4. 
+Set up your environment (consider adding this to your .bashrc):
+
+    $ source <G4INSTALL>/share/Geant4-9.6.1/geant4make/geant4make.sh
+
+Compile:
+
+    $ make
 
 To use the liquid hydrogen target:
 
     $ make LHTARGET=1
 
-produces the binary UCGretina_LH
+(produces the binary UCGretina_LH)
+
+The executables UCGretina and UCGretina_LH are automatically installed
+in 
+
+    $G4WORKDIR/bin/$G4SYSTEM
+
+(which is added to your path when you source geant4make.sh)
 
 ## Examples ##
 
@@ -81,20 +95,21 @@ Commands related to the incoming beam:
 
     /BeamIn/Focus/X <double> <unit>
     /BeamIn/Focus/Y <double> <unit>
-    /BeamIn/Focus/Z <double> <unit>
 
-> Offsets of the focus of the incoming beam 
+> Offsets of the emission point of the incoming beam. (Z defaults to
+>  -50 cm. If you change this, make sure it is upstream of the target!)
 
     /BeamIn/Focus/DX <double> <unit>
     /BeamIn/Focus/DY <double> <unit>
 
-> Horizontal and vertical widths of the beam spot on target
+> Horizontal and vertical widths of the beam spot at the emission
+> point (not on target) 
 
     /BeamIn/Focus/Ata0 <double> <unit>
     /BeamIn/Focus/Bta0 <double> <unit>
 
-> Direction of the incoming beam on target (dispersive and 
-> nondispersive angles, respectively)
+> Direction of the incoming beam (dispersive and nondispersive angles,
+> respectively)
 
     /BeamIn/Focus/maxAta <double> <unit>
     /BeamIn/Focus/maxBta <double> <unit>

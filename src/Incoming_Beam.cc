@@ -179,6 +179,7 @@ G4ThreeVector Incoming_Beam::getPosition()
   x=fcX+r*cos(phi)*fcDX/2.;
   y=fcY+r*sin(phi)*fcDY/2.;
 
+  //At emission point!!! (Macro file command names are misleading.)
   position.setX(x);
   position.setY(y);
   position.setZ(fcZ);

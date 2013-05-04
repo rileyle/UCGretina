@@ -76,12 +76,12 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
   AphTCmd->SetParameterName("choice",false);
   AphTCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
     // TB added sigma_a and sigma_b instead of just sigma
-  DistSigACmd = new G4UIcmdWithADouble("/BeamOut/AngDistSigmaA",this); //LR
+  DistSigACmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/AngDistSigmaA",this); //LR
   DistSigACmd->SetGuidance("Set sigma coefficient for Gaussian distribution of ions scattered on the target"); //LR
   DistSigACmd->SetParameterName("choice",false); //LR
   DistSigACmd->AvailableForStates(G4State_PreInit,G4State_Idle); //LR
 
-  DistSigBCmd = new G4UIcmdWithADouble("/BeamOut/AngDistSigmaB",this); //LR
+  DistSigBCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/AngDistSigmaB",this); //LR
   DistSigBCmd->SetGuidance("Set sigma coefficient for Gaussian distribution of ions scattered on the target"); //LR
   DistSigBCmd->SetParameterName("choice",false); //LR
   DistSigBCmd->AvailableForStates(G4State_PreInit,G4State_Idle); //LR
@@ -151,6 +151,8 @@ Outgoing_Beam_Messenger::~Outgoing_Beam_Messenger()
   delete DACmd;
   delete ThMTCmd;
   delete AphTCmd;
+  delete DistSigACmd;
+  delete DistSigBCmd;
   delete QDir;
   delete NQCmd;
   delete SQCmd;

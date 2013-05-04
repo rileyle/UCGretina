@@ -316,9 +316,12 @@ void EventAction::EndOfEventAction(const G4Event* e)
       G4cout << std::setfill(' ');
     }
     seconds = fmod(time,60.0);
-    if(seconds>0)
-      G4cout << std::setprecision(2) << std::setw(4) << seconds;
-
+    if(seconds>0){
+      G4cout << std::setprecision(0) << std::setw(2) << seconds;
+      G4cout << std::setfill('0');
+    } else {
+      G4cout << std::setfill(' ');
+    }
     G4cout << " remaining       "
 	   << "\r"<<std::flush;
     Timerintern.Start();

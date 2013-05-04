@@ -22,9 +22,9 @@ Outgoing_Beam::Outgoing_Beam()
 
   reacted=false;
   alpha=20.;
-  sigma_a=0.02*rad; //TB
-  sigma_b=0.02*rad; //TB
-  theta_max=3.*deg;
+  sigma_a=0.;
+  sigma_b=0.;
+  theta_max=-1.;
   Calc_pmax();
   twopi=8.*atan(1.);
   NQ=1;SQ=0;
@@ -250,12 +250,32 @@ G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
     return ppOut;
   }
   ax.rotate(pIn,G4UniformRand()*twopi);
+
   theta=GetDTheta();
+  //  G4cout << std::setprecision(3) << std::setw(10)
+  //	 << "Theta_0 = " << theta/deg << G4endl;
+  //If an angle cut is specified ...
+  if(theta_max > 0.)
+    while(theta > theta_max){
+      theta=GetDTheta();
+      //      G4cout << std::setprecision(3) << std::setw(10)
+      //	     << "***Theta_1 = " << theta/deg << G4endl;
+
+    }
+
   
   if (ax.mag2() == 0.) {
     return ppOut;
   }
   ppOut.rotate(ax,theta);
+
+  //  G4cout << std::setprecision(3) << std::setw(10)
+  //	 << "ppOut.theta() = " << ppOut.theta()/deg 
+  //	 << "  ata = " << -asin(ppOut.getY()/ppOut.mag())/mrad
+  //	 << "  bta = " << -asin(ppOut.getX()/ppOut.mag())/mrad
+  //	 << G4endl;
+  
+
   return ppOut;
 }
 

@@ -9,6 +9,11 @@ TrackingAction now writes dta in % (for GrROOT compatibility).
 
 Fine-tuning of examples.
 
+Minor fixes to macro file commands (and documentation) for the incoming
+	and outgoing beams.
+
+Target is now visible if not made of G4_Galactic.
+
 ================================================================================
 Version 2.0
 ================================================================================

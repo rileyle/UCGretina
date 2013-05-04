@@ -99,7 +99,19 @@ void Target::setMaterial(G4String materialName)
   // search the material by its name 
   TargetMaterial = materials->FindMaterial(materialName);  
   Target_log->SetMaterial(TargetMaterial);
-  G4cout<<"----> Target material set to     "<<Target_log->GetMaterial()->GetName()<< G4endl;                 
+  G4cout<<"----> Target material set to     "<<Target_log->GetMaterial()->GetName()<< G4endl;        
+
+  G4Colour red (1.0,0.0, 0.0); 
+  G4VisAttributes* Vis_6 = new G4VisAttributes(red);
+  if(TargetMaterial->GetName() == "G4_Galactic"){
+    Vis_6->SetVisibility(false);
+  } else {
+    Vis_6->SetVisibility(true);
+    Vis_6->SetForceSolid(true);
+  }
+
+  Target_log->SetVisAttributes(Vis_6);
+         
 }
 //-------------------------------------------------------------------
 void Target::setTargetReactionDepth(G4double depth)

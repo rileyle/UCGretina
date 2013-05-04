@@ -40,8 +40,8 @@ class Outgoing_Beam_Messenger: public G4UImessenger
     G4UIcmdWithoutParameter*   RepCmd;
     G4UIcmdWithADoubleAndUnit* ThMTCmd;
     G4UIcmdWithADouble*        AphTCmd;
-    G4UIcmdWithADouble*        DistSigACmd;
-    G4UIcmdWithADouble*        DistSigBCmd;
+    G4UIcmdWithADoubleAndUnit*        DistSigACmd;
+    G4UIcmdWithADoubleAndUnit*        DistSigBCmd;
     G4UIcmdWithAnInteger*      NQCmd;    
     G4UIcmdWithAnInteger*      SQCmd;  
     G4UIcmdWithAnInteger*      SCCmd;  
