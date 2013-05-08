@@ -30,10 +30,12 @@ class EventAction : public G4UserEventAction
     void BeginOfEventAction(const G4Event*);
     void EndOfEventAction(const G4Event*);
     void SetOutFile(G4String);
+    G4String GetOutFileName(){return outFileName;}
     G4bool EvOut(){return evOut;}
     void openEvfile();
     void closeEvfile();
     void SetMode2File(G4String);
+    G4String GetMode2FileName(){return mode2FileName;}
     G4bool Mode2Out(){return mode2Out;}
     void openMode2file();
     void closeMode2file();
@@ -56,6 +58,8 @@ class EventAction : public G4UserEventAction
 
     void SetNTotalevents(G4int n){NTotalEvents = n;}
     G4int GetNTotalevents(){return NTotalEvents;}
+    void SetEveryNEvents(G4int n){everyNevents = n;}
+    G4int GetEveryNEvents(){return everyNevents;}
 
   private:
     G4int ionCollectionID;
@@ -78,6 +82,7 @@ class EventAction : public G4UserEventAction
     G4int NTotalEvents;
 
     G4int timerCount;
+    G4int everyNevents;
     G4double eventsPerSecond;
 };
 

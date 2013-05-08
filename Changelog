@@ -1,6 +1,11 @@
 ================================================================================
-Version 2.1 (In progress)
+Version 2.1
 ================================================================================
+
+Added macro file commands to set LH target parameters: cell type, window
+	bulge thickness, and tilt angle.
+
+Added thin LH target (50 mg/cm^2 nominal) and empty target cell body.
 
 Added the "white" source type (uniform energy distribution between user-set
 	limits; default: 100 keV ... 10 MeV).
@@ -12,7 +17,7 @@ Fine-tuning of examples.
 Minor fixes to macro file commands (and documentation) for the incoming
 	and outgoing beams.
 
-Target is now visible if not made of G4_Galactic.
+Target is now invisible if made of G4_Galactic.
 
 ================================================================================
 Version 2.0

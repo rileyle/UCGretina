@@ -222,7 +222,7 @@ G4ThreeVector Outgoing_Beam::TargetAngularDistribution()
     //TB allow a coulex angular distribution for target excitation (coulex on gold)
     G4ThreeVector direction = G4RandomDirection();
     direction.setTheta(theTargetAngularDistribution.GetRandomAngle());
-    G4cout<<direction.getTheta()<<G4endl;
+    //G4cout<<direction.getTheta()<<G4endl;
     return direction;
 }
 //---------------------------------------------------------

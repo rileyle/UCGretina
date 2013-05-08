@@ -134,11 +134,11 @@ void TrackerIonSD::EndOfEvent(G4HCofThisEvent* HCE)
             << " hits for ion tracking: " << G4endl;
 
       G4cout << std::setw(2) << "ID" <<" "
-	     << std::setw(12)<< "   PID"<<" "
+	     << std::setw(13)<< "   PID"<<" "
 	     << std::setprecision(4)<<std::fixed
 	     << "KE [GeV]"<<" "<<std::setprecision(6)
 	     << "  beta"<< " "
-	     <<std::setprecision(4)<<std::setw(7)<<std::right
+	     <<std::setprecision(4)<<std::setw(10)<<std::right
 	     <<"th[mrad]"<<" "<<std::setw(10)<<std::right
 	     <<"phi [mrad]"<<" "<<std::setw(9)<<std::right	 
 	     <<"X [mm]" <<" "<<std::setw(9)<<std::right
@@ -146,8 +146,9 @@ void TrackerIonSD::EndOfEvent(G4HCofThisEvent* HCE)
 	     <<"Z [mm]"<<" "<<std::setw(9)<<std::right
 	     <<"tau [ps]"<<" "<<std::setw(9)<<std::right
 	     <<"t [ps]"<<" "<<std::setw(9)<<std::right
-	     <<"T [ps]"<<" "<<std::setw(8)<<std::right
-	     <<"  Ed [MeV]" <<" Step Length [mm]"<< G4endl;
+	     <<"T [ps]"<<" "<<std::setw(9)<<std::right
+	     <<"  Ed [MeV]" <<" Step Length [mm]"
+	     << G4endl;
 
            for (i=0;i<NbHits;i++) (*ionCollection)[i]->Print();
 	   

@@ -20,6 +20,12 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   G4cout<<" Begining of run "<<G4endl;
 
   evaction->SetNTotalevents(run->GetNumberOfEventToBeProcessed());
+  if(run->GetNumberOfEventToBeProcessed() > 1000)
+    evaction->SetEveryNEvents((int)run->GetNumberOfEventToBeProcessed()/1000);
+  else if(run->GetNumberOfEventToBeProcessed() > 100)
+    evaction->SetEveryNEvents((int)run->GetNumberOfEventToBeProcessed()/100);
+  else
+    evaction->SetEveryNEvents(1);
 
   if(BeamOut->ReactionOn()) {
     G4cout<<" Simulating " << run->GetNumberOfEventToBeProcessed()
@@ -30,6 +36,12 @@ void RunAction::BeginOfRunAction(const G4Run* run)
 	  << " source events "<<G4endl;
     evaction->SetInBeam(false);
   }
+  if(evaction->EvOut())
+    G4cout << " Writing ASCII output to " 
+	   << evaction->GetOutFileName() << G4endl;
+  if(evaction->Mode2Out())
+    G4cout << " Writing Mode 2 output to " 
+	   << evaction->GetMode2FileName() << G4endl;
 
   Timer.Start();
 }
@@ -68,7 +80,7 @@ void RunAction::EndOfRunAction(const G4Run*)
   }
   seconds = fmod(time,60.0);
   if(seconds>0)
-    G4cout << std::setprecision(2) << std::setw(4) << seconds;
+    G4cout << std::setprecision(2) << std::setw(5) << seconds;
   G4cout << std::setfill(' ');
 
   G4cout << "   System time: ";
@@ -90,7 +102,7 @@ void RunAction::EndOfRunAction(const G4Run*)
   }
   seconds = fmod(time,60.0);
   if(seconds>0)
-    G4cout << std::setprecision(2) << std::setw(4) << seconds;
+    G4cout << std::setprecision(2) << std::setw(5) << seconds;
   G4cout << std::setfill(' ');
 
   G4cout << "   User time: ";

@@ -74,11 +74,37 @@ Optional commands for including Gretina-related dead material:
 
     /Gretina/detector/enableCryostats
 
-    /Gretina/Shell <full || north || south>
+    /Gretina/Shell < full || north || south >
 
 Mandatory command after setting any GRETINA parameters:
 
     /Gretina/update
+
+### LH Target Geometry ###
+
+(UCGretina_LH only) 
+
+Optional commands for setting LH target parameters (must precede /Target/Construct):
+
+    /Target/Cell < thick || thin || empty >
+
+> The "empty" type is the cell body with no window frames. (To construct an empty cell with frames, set "thick" or "thin" and set the target material to vacuum.)
+
+    /Target/Bulge <double> <unit>
+
+> Set the maximum target thickness (at the center) added to the target by the window bulge. (This increases the total target thickness along the beam axis by twice the bulge thickness.)
+
+    /Target/Angle <double> <unit>
+
+> Set the angle of tilt about the beam axis of the entire target assembly (30 degrees for Gretina at the NSCL).
+
+    /Target/Material <material>
+
+> Only "vacuum" or "G4_Galactic" are allowed with the LH target. (This is provided to enable source simulations with an empty cell with window frames installed.)
+
+Mandatory command for building the LH target (UCGretina_LH):
+
+    /Target/Construct
 
 ### In-beam Simulations ###
 

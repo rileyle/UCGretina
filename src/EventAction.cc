@@ -21,6 +21,8 @@ EventAction::EventAction()
   fisInBeam = false;
   Timerintern.Start();
   timerCount = 0;
+  eventsPerSecond = 0;
+  everyNevents = 1000;
 }
 
 
@@ -200,7 +202,8 @@ void EventAction::EndOfEventAction(const G4Event* e)
       // Write the event with consolidated interaction points to the
       // output file. 
       if(evOut)
-	evfile << "$   " << NMeasured << "   " 
+	evfile << "$   " << std::setw(4) << NMeasured << "   " 
+	       << std::fixed << std::setprecision(2) << std::setw(12) << std::right
 	       << totalEdep << "   "
 	       << event_id
 	       << endl;
@@ -288,18 +291,21 @@ void EventAction::EndOfEventAction(const G4Event* e)
   if(mode2Out)
     writeSim(timestamp, eventInfo);
 
-  if(event_id%((int)NTotalEvents/100)==0) {
+  //  if(event_id%((int)NTotalEvents/everyNevents)==0) {
+  if(event_id%everyNevents == 0 && event_id > 0) {
     Timerintern.Stop();
     timerCount++;
     eventsPerSecond += 
-      (((int)NTotalEvents/100)/Timerintern.GetRealElapsed() - eventsPerSecond)/timerCount;
+      ((double)everyNevents/Timerintern.GetRealElapsed() - eventsPerSecond)/timerCount;
+      //      (((int)NTotalEvents/everyNevents)/Timerintern.GetRealElapsed() - eventsPerSecond)/timerCount;
     G4cout << std::fixed << std::setprecision(0) << std::setw(3) 
 	   << std::setfill(' ')
 	   << (float)event_id/NTotalEvents*100 << " %   "
 	   << eventsPerSecond << " events/s ";
 
     G4double hours, minutes, seconds;
-    G4double time = (float)(NTotalEvents - event_id)*100/NTotalEvents*Timerintern.GetRealElapsed();
+    //    G4double time = (float)(NTotalEvents - event_id)*everyNevents/NTotalEvents*Timerintern.GetRealElapsed();
+    G4double time = (float)(NTotalEvents - event_id)/eventsPerSecond;
     hours = floor(time/3600.0);
     if(hours>0){
       G4cout << std::setprecision(0) << std::setw(2) 
@@ -316,12 +322,9 @@ void EventAction::EndOfEventAction(const G4Event* e)
       G4cout << std::setfill(' ');
     }
     seconds = fmod(time,60.0);
-    if(seconds>0){
+    if(seconds>0)
       G4cout << std::setprecision(0) << std::setw(2) << seconds;
-      G4cout << std::setfill('0');
-    } else {
-      G4cout << std::setfill(' ');
-    }
+    G4cout << std::setfill(' ');
     G4cout << " remaining       "
 	   << "\r"<<std::flush;
     Timerintern.Start();

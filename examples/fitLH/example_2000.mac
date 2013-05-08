@@ -2,6 +2,9 @@
 /Gretina/detector/enableCapsules
 /Gretina/detector/enableCryostats
 /Gretina/Shell north
+/Target/Cell thick
+/Target/Bulge 1.0 mm
+/Target/Angle 30. deg
 /Target/Construct
 /Gretina/update
 # Set reaction parameters ======================================================
