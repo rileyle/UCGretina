@@ -10,6 +10,7 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
   // G4cout << "> PreUserTrackingAction" << G4endl;
   // G4cout << "> Event ID = " << eventAction->GetEvent()->GetEventID() << G4endl;
   // G4cout << "> TrackID = "       << aTrack->GetTrackID() << G4endl;
+  // G4cout << std::fixed << std::setprecision(3) << std::setw(12);
   // G4cout << "> KineticEnergy = " << aTrack->GetKineticEnergy() << G4endl;
   // G4cout << "> TotalEnergy = "   << aTrack->GetTotalEnergy() << G4endl;
   // G4cout << "> Position = "      << aTrack->GetPosition() << G4endl;
@@ -31,8 +32,9 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 
   // Emitted gamma
   if( aTrack->GetParticleDefinition()->GetParticleName() == "gamma" &&
-      ( aTrack->GetParentID() ==0 ||
-	aTrack->GetCreatorProcess()->GetProcessName() == "Decay" ) ){
+      ( aTrack->GetParentID() == 0 ||
+	aTrack->GetCreatorProcess()->GetProcessName() == "Decay" ||
+	aTrack->GetCreatorProcess()->GetProcessName() == "Reaction" ) ){
     G4ThreeVector pos = aTrack->GetPosition();
     G4ThreeVector dir = aTrack->GetMomentumDirection();
     eventInfo->AddEmittedGamma(aTrack->GetKineticEnergy(), 
