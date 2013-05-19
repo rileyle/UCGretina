@@ -43,6 +43,7 @@ class Target
   void setTargetCell(G4String type){ targetCellType = type; }
   G4String getTargetCell(){ return targetCellType; }
   void setBulgeThickness(G4double t){ BulgeDz = t; }
+  void SetDensity(G4double d){targetDensity = d*mg/cm3;}
   void setTargetAngle(G4double a){ targetAngle = a; }
   void setX(G4double);
   void setY(G4double);
@@ -56,9 +57,10 @@ class Target
   G4UnionSolid* GetTarget(){return aTarget;}
   G4VPhysicalVolume* GetTargetPlacement(){return Target_phys;}
   void setTargetReactionDepth(G4double);
-  void ScaleDensity(G4double);
   void SetPositionZ(G4double);
   G4double GetTargetThickness(){return Target_thickness;}
+  G4double GetDensity(){return targetDensity;}
+  G4double GetTargetCellDz(){return TargetDz;}
   G4ThreeVector* GetPos(){return Pos;}
 
 private:
@@ -141,6 +143,7 @@ private:
   G4String sourceFrame;
 
   G4double targetAngle;
+  G4double targetDensity;
 
 };
 

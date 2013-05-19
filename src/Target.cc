@@ -145,7 +145,7 @@ void Target::ScaleDensity(G4double scale)
   G4cout<<"----> Target material set to     "<<Target_log->GetMaterial()->GetName()<< G4endl;  
   G4cout<<"----> Target Z set to            "<<Target_log->GetMaterial()->GetZ()<< G4endl;  
   G4cout<<"----> Target mole mass set to       "<<Target_log->GetMaterial()->GetA()/g*mole<<" g/mole"<< G4endl;  
-  G4cout<<"----> Target density set to         "<<Target_log->GetMaterial()->GetDensity()/g*cm3<<" g/cm3"<< G4endl;     
+  G4cout<<"----> Target density set to         "<<Target_log->GetMaterial()->GetDensity()/g*cm3<<" g/cm3"<< G4endl;    
              
 }
 //---------------------------------------------------------------------

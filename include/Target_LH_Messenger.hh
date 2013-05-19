@@ -27,7 +27,7 @@ private:
   G4UIcmdWithADoubleAndUnit* BCmd;
   G4UIcmdWithADoubleAndUnit* ACmd;
   G4UIcmdWithAString*        MatCmd;  
-  G4UIcmdWithADouble*        ScDTarCmd;
+  G4UIcmdWithADouble*        SDTarCmd;
   G4UIcmdWithAnInteger*      NSCmd;
   G4UIcmdWithAString*        sFCmd; 
   G4UIcmdWithoutParameter*   sledCmd; 

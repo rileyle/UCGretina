@@ -28,10 +28,10 @@ Target_Messenger::Target_Messenger(Target* Tar)
   MatCmd->SetParameterName("choice",false);
   MatCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  ScDTarCmd = new G4UIcmdWithADouble("/Target/ScaleDensity",this);
-  ScDTarCmd->SetGuidance("Scale target density/stopping powers.");
-  ScDTarCmd->SetParameterName("choice",false);
-  ScDTarCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  SDTarCmd = new G4UIcmdWithADouble("/Target/SetDensity",this);
+  SDTarCmd->SetGuidance("Set target density in mg/cc.");
+  SDTarCmd->SetParameterName("choice",false);
+  SDTarCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   NSCmd = new G4UIcmdWithAnInteger("/Target/NStep",this);
   NSCmd->SetGuidance("Select the number of steps in the target");
@@ -60,7 +60,7 @@ Target_Messenger::~Target_Messenger()
   delete BCmd;
   delete ACmd;
   delete MatCmd;
-  delete ScDTarCmd;
+  delete SDTarCmd;
   delete NSCmd;
   delete sFCmd;
   delete sledCmd;
@@ -78,8 +78,8 @@ void Target_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
     { aTarget->setTargetAngle(ACmd->GetNewDoubleValue(newValue)); }
   if( command == MatCmd )
    { aTarget->setMaterial(newValue);} 
-  if( command == ScDTarCmd )
-    { aTarget->ScaleDensity(ScDTarCmd->GetNewDoubleValue(newValue)); }
+  if( command == SDTarCmd )
+    { aTarget->SetDensity(SDTarCmd->GetNewDoubleValue(newValue)); }
   if( command == NSCmd )
     { aTarget->setNStep(NSCmd->GetNewIntValue(newValue)); }
   if( command == sFCmd )

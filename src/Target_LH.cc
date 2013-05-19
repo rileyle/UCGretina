@@ -17,6 +17,7 @@ Target::Target(G4LogicalVolume* experimentalHall_log,Materials* mat)
   Pos = new G4ThreeVector(0.,0.,0.);
   NoRot = G4RotationMatrix::IDENTITY;
   TargetMaterial = lH2;
+  targetDensity = 72.42*mg/cm3; // lH2 @ 19 K
   targetAngle = 30.0*deg;
 
   // Beam tube
@@ -27,7 +28,6 @@ Target::Target(G4LogicalVolume* experimentalHall_log,Materials* mat)
   BeamTeeRmax = 2.0*2.54*cm;
   BeamTeeRmin = BeamTeeRmax - 0.065*2.54*cm;
   BeamTeeDz   = 24.2*cm/2.;
-  //  BeamTeeDz   = (16.3*cm + BeamTubeRmax)/2.0;  // approx, pending drawing
 
   BulgeDz = 1.0*mm;
 
@@ -129,7 +129,25 @@ void Target::ConstructBeamTube(){
 
   // Bellows ===========================
 
-  // (Coming real soon now.)
+  // DIMENSIONS APPROXIMATE
+  G4Tubs* BellowsFlange = new G4Tubs("BellowsFlange",
+				     4.*2.54/2*cm, 9.*2.54/2*cm, 
+				     0.5*2.54/2*cm, 0.*deg, 360.*deg); 
+
+  G4LogicalVolume* BellowsFlange_log
+    = new G4LogicalVolume(BellowsFlange, StainlessSteel, "BellowsFlange_log", 0, 0, 0);
+
+  G4RotationMatrix BellowsFlangeRot = NoRot;
+  BellowsFlangeRot.rotateX(-90.0*deg);
+
+  G4ThreeVector BellowsFlangePos = G4ThreeVector(0., 
+						 24.2*cm + 1.194*cm
+						 +0.75/2*cm,
+						 0.);
+
+  LHTarget->AddPlacedVolume(BellowsFlange_log, 
+			    BellowsFlangePos, 
+			    &BellowsFlangeRot);
 
 }
 //-----------------------------------------------------------------------------
@@ -147,7 +165,7 @@ G4VPhysicalVolume* Target::Construct200mgCell(){
 
   TargetDz = 3.0/2.*cm;
   BulgeR  = 1.9*cm;
-  Target_thickness = TargetDz + 2*BulgeDz;
+  Target_thickness = 2*TargetDz + 2*BulgeDz;
 
   const G4double TzPlane[6] = {0.,     0.75*cm, 0.75*cm, 2.25*cm, 
 			       2.25*cm, 3.0*cm};
@@ -168,7 +186,13 @@ G4VPhysicalVolume* Target::Construct200mgCell(){
 			     G4Transform3D(NoRot,
 					   G4ThreeVector(0., 0., 2*TargetDz)));
 
-  Target_log = new G4LogicalVolume(aTarget,lH2,"target_log",0,0,0);
+  // The standard lH2 density doesn't apply here, so we have to set it.
+  G4String name=TargetMaterial->GetName();
+  G4double Z=TargetMaterial->GetZ();
+  G4double A=TargetMaterial->GetA();
+  TargetMaterial=new G4Material(name, Z,A,targetDensity);
+
+  Target_log = new G4LogicalVolume(aTarget,TargetMaterial,"target_log",0,0,0);
   target_limits= new G4UserLimits();
   target_limits->SetMaxAllowedStep(Target_thickness/NStep);
   Target_log->SetUserLimits(target_limits);
@@ -225,7 +249,7 @@ G4VPhysicalVolume* Target::Construct50mgCell(){
 
   TargetDz = 0.695*cm/2.;
   BulgeR  = 1.59*cm;
-  Target_thickness = TargetDz + 2*BulgeDz;
+  Target_thickness = 2*TargetDz + 2*BulgeDz;
 
   G4Tubs* Target0 = new G4Tubs("Target0", 0., 2.0*cm, TargetDz,
 			       0., 360.*deg);
@@ -622,7 +646,7 @@ void Target::Report()
   G4cout<<"----> Target bulge thickness set to " << BulgeDz/mm << " mm." << G4endl;
   G4cout<<"----> Target angle set to " << targetAngle/deg << " deg." << G4endl;
   G4cout<<"----> Target material set to  "<<Target_log->GetMaterial()->GetName()<< G4endl;   
-  G4cout<<"----> Target density:         "<<Target_log->GetMaterial()->GetDensity()<< G4endl;   
+  G4cout<<"----> Target density:         "<<Target_log->GetMaterial()->GetDensity()/mg*cm3 << " mg/cm^3" << G4endl;   
   G4cout<<"----> Number of simulation steps in the target is set to "<<NStep<<G4endl;
 }
 //---------------------------------------------------------------------
@@ -654,23 +678,6 @@ void Target::setTargetReactionDepth(G4double depth)
 void Target::SetPositionZ(G4double d)
 {
    G4cout<<"----> Warning: User can't set Z position of LH Target. Ignoring Target::setPositionZ("<< d << ")."<<G4endl;
-}
-//---------------------------------------------------------------------
-void Target::ScaleDensity(G4double scale)
-{
-  // search the material by its name 
-  G4String name=TargetMaterial->GetName();
-  G4double Z=TargetMaterial->GetZ();
-  G4double A=TargetMaterial->GetA();
-  G4double density=TargetMaterial->GetDensity();
-  density*=scale;
-  TargetMaterial=new G4Material(name, Z,A,density);
-  Target_log->SetMaterial(TargetMaterial);
-  G4cout<<"----> Target material set to     "<<Target_log->GetMaterial()->GetName()<< G4endl;  
-  G4cout<<"----> Target Z set to            "<<Target_log->GetMaterial()->GetZ()<< G4endl;  
-  G4cout<<"----> Target mole mass set to       "<<Target_log->GetMaterial()->GetA()/g*mole<<" g/mole"<< G4endl;  
-  G4cout<<"----> Target density set to         "<<Target_log->GetMaterial()->GetDensity()/g*cm3<<" g/cm3"<< G4endl;     
-             
 }
 //---------------------------------------------------------------------
 void Target::setSourceFrame(G4String sF)
