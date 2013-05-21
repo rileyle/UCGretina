@@ -38,11 +38,13 @@ class Target
   G4VPhysicalVolume *Construct200mgCell();
   G4VPhysicalVolume *Construct50mgCell();
   G4VPhysicalVolume *ConstructEmptyCell();
+  void ConstructWindows();
   void ConstructCryo();
 
   void setTargetCell(G4String type){ targetCellType = type; }
   G4String getTargetCell(){ return targetCellType; }
   void setBulgeThickness(G4double t){ BulgeDz = t; }
+  void setWindows(){ windows = true; }
   void SetDensity(G4double d){targetDensity = d*mg/cm3;}
   void setTargetAngle(G4double a){ targetAngle = a; }
   void setX(G4double);
@@ -71,6 +73,9 @@ private:
   G4double BulgeR;
   G4double BulgeDz;
 
+  G4bool windows;
+  G4double windowThickness;
+
   // LH target beam tube dimensions
   G4double BeamTubeRmin;
   G4double BeamTubeRmax;
@@ -95,6 +100,7 @@ private:
   G4Material* Aluminum;
   G4Material* Copper;
   G4Material* StainlessSteel;
+  G4Material* Kapton;
   G4Material* TargetMaterial;
   G4Material* frameMaterial;
   G4Material* tapeMaterial;

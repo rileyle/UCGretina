@@ -13,6 +13,7 @@ Target::Target(G4LogicalVolume* experimentalHall_log,Materials* mat)
   Aluminum       = materials->FindMaterial("Al");
   Copper         = materials->FindMaterial("Cu");
   StainlessSteel = materials->FindMaterial("ssteel");
+  Kapton         = materials->FindMaterial("Kapton");
 
   Pos = new G4ThreeVector(0.,0.,0.);
   NoRot = G4RotationMatrix::IDENTITY;
@@ -31,6 +32,9 @@ Target::Target(G4LogicalVolume* experimentalHall_log,Materials* mat)
 
   BulgeDz = 1.0*mm;
 
+  windowThickness = 125.*um;
+  windows = false;
+
   NStep=20;
   
   sourceFrame = "";
@@ -44,7 +48,7 @@ G4VPhysicalVolume* Target::Construct()
 {
   LHTarget = new G4AssemblyVolume();
 
-#if(1)
+#if(0)
   ConstructBeamTube();
 #endif
 
@@ -58,7 +62,7 @@ G4VPhysicalVolume* Target::Construct()
   else
     G4cout << "Target_LH: unknown target cell type!" << G4endl;
 
-#if(1)
+#if(0)
   ConstructCryo();
 #endif
 
@@ -198,11 +202,11 @@ G4VPhysicalVolume* Target::Construct200mgCell(){
   Target_log->SetUserLimits(target_limits);
 
   G4Colour blue (0.0,0.0,1.0); 
-  G4VisAttributes* Vis_6 = new G4VisAttributes(blue);
-  Vis_6->SetVisibility(true);
-  Vis_6->SetForceSolid(true);
+  G4VisAttributes* Vis = new G4VisAttributes(blue);
+  Vis->SetVisibility(true);
+  Vis->SetForceSolid(true);
 
-  Target_log->SetVisAttributes(Vis_6);
+  Target_log->SetVisAttributes(Vis);
 
   G4ThreeVector Pos0 = *Pos;
   G4ThreeVector TargetPos = G4ThreeVector(0., 0., -TargetDz);
@@ -211,6 +215,37 @@ G4VPhysicalVolume* Target::Construct200mgCell(){
   Target_phys = new G4PVPlacement(G4Transform3D(NoRot,TargetPos),
 				  Target_log,"target",expHall_log,false,0);
 
+  // Cell windows
+  if(windows){
+    G4SubtractionSolid* UpstreamWindow 
+      = new G4SubtractionSolid("UpstreamWindow", Bulge, Bulge,
+			       G4Transform3D(NoRot,
+					     G4ThreeVector(0., 
+							   0., 
+							   windowThickness)));
+
+    G4LogicalVolume* UpstreamWindow_log
+      = new G4LogicalVolume(UpstreamWindow, Kapton, "UpstreamWindow_log", 
+			    0, 0, 0);
+    G4ThreeVector USwindowPos = G4ThreeVector(0., 0.,
+					      -TargetDz-windowThickness);
+    LHTarget->AddPlacedVolume(UpstreamWindow_log, USwindowPos, &NoRot);
+
+    G4SubtractionSolid* DnstreamWindow 
+      = new G4SubtractionSolid("DnstreamWindow", Bulge, Bulge,
+			       G4Transform3D(NoRot,
+					     G4ThreeVector(0., 
+							   0., 
+							   -windowThickness)));
+    G4LogicalVolume* DnstreamWindow_log
+      = new G4LogicalVolume(DnstreamWindow, Kapton, "DnstreamWindow_log", 
+			    0, 0, 0);
+    G4ThreeVector DSwindowPos = G4ThreeVector(0., 0., 
+					      TargetDz+windowThickness);
+    LHTarget->AddPlacedVolume(DnstreamWindow_log, DSwindowPos, &NoRot);
+
+  }
+#if(1)
   // Target Cell
   //
   // The window frames and clamp rings have inner radius 1.9 cm over
@@ -230,7 +265,7 @@ G4VPhysicalVolume* Target::Construct200mgCell(){
   G4ThreeVector TargetCellPos = G4ThreeVector(0., 0., -3.7*cm/2.);
 
   LHTarget->AddPlacedVolume(TargetCell_log, TargetCellPos, &NoRot);
-
+#endif
   return Target_phys;
 
 }
@@ -270,15 +305,54 @@ G4VPhysicalVolume* Target::Construct50mgCell(){
   Target_log->SetUserLimits(target_limits);
 
   G4Colour blue (0.0,0.0,1.0); 
-  G4VisAttributes* Vis_6 = new G4VisAttributes(blue);
-  Vis_6->SetVisibility(true);
-  Vis_6->SetForceSolid(true);
+  G4VisAttributes* Vis = new G4VisAttributes(blue);
+  Vis->SetVisibility(true);
+  Vis->SetForceSolid(true);
 
-  Target_log->SetVisAttributes(Vis_6);
+  Target_log->SetVisAttributes(Vis);
 
   Target_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos),
 				  Target_log,"target",expHall_log,false,0);
 
+  // Cell windows
+  if(windows){
+    G4SubtractionSolid* UpstreamWindow 
+      = new G4SubtractionSolid("UpstreamWindow", Bulge, Bulge,
+			       G4Transform3D(NoRot,
+					     G4ThreeVector(0., 
+							   0., 
+							   windowThickness)));
+
+    G4LogicalVolume* UpstreamWindow_log
+      = new G4LogicalVolume(UpstreamWindow, Kapton, "UpstreamWindow_log", 
+			    0, 0, 0);
+
+    G4Colour red (1.0,0.0,0.0); 
+    G4VisAttributes* Vis2 = new G4VisAttributes(red);
+    Vis2->SetVisibility(true);
+    UpstreamWindow_log->SetVisAttributes(Vis2);
+
+    G4ThreeVector USwindowPos = G4ThreeVector(0., 0.,
+					      -TargetDz-windowThickness);
+
+    LHTarget->AddPlacedVolume(UpstreamWindow_log, USwindowPos, &NoRot);
+
+    G4SubtractionSolid* DnstreamWindow 
+      = new G4SubtractionSolid("DnstreamWindow", Bulge, Bulge,
+			       G4Transform3D(NoRot,
+					     G4ThreeVector(0., 
+							   0., 
+							   -windowThickness)));
+    G4LogicalVolume* DnstreamWindow_log
+      = new G4LogicalVolume(DnstreamWindow, Kapton, "DnstreamWindow_log", 
+			    0, 0, 0);
+    DnstreamWindow_log->SetVisAttributes(Vis2);
+    G4ThreeVector DSwindowPos = G4ThreeVector(0., 0., 
+					      TargetDz+windowThickness);
+    LHTarget->AddPlacedVolume(DnstreamWindow_log, DSwindowPos, &NoRot);
+
+  }
+#if(1)
   // Target Cell
   //
   // The window frames and clamp rings have inner radius 1.59 cm over
@@ -302,7 +376,7 @@ G4VPhysicalVolume* Target::Construct50mgCell(){
   G4ThreeVector TargetCellPos = G4ThreeVector(0., 0., -3.0*cm/2.);
 
   LHTarget->AddPlacedVolume(TargetCell_log, TargetCellPos, &NoRot);
-
+#endif
   return Target_phys;
 
 }

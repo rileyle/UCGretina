@@ -62,7 +62,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	}
 
       if(BeamOut->ReactionOn())
-	{
+      	{
 
 	  G4double TT;
 	  G4double TC;

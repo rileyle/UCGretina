@@ -42,6 +42,7 @@ private:
   G4Material* G10;
   G4Material* polyethylene;
   G4Material* polypropylene;
+  G4Material* kapton;
   G4Material* CD2;
   G4Material* ssteel;
   G4Material* CsI;
@@ -56,7 +57,6 @@ private:
   G4Material* Si;
   G4Material* Be;
   G4Material* Bi;
-  //  G4Material* LH;
   G4Material* lH2;
 };
 

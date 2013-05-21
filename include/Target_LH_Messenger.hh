@@ -25,6 +25,7 @@ private:
   G4UIdirectory*             TargetDir;
   G4UIcmdWithAString*        CCmd; 
   G4UIcmdWithADoubleAndUnit* BCmd;
+  G4UIcmdWithoutParameter*   WCmd; 
   G4UIcmdWithADoubleAndUnit* ACmd;
   G4UIcmdWithAString*        MatCmd;  
   G4UIcmdWithADouble*        SDTarCmd;

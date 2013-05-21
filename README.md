@@ -94,9 +94,17 @@ Optional commands for setting LH target parameters (must precede /Target/Constru
 
 > Set the maximum target thickness (at the center) added to the target by the window bulge. (This increases the total target thickness along the beam axis by twice the bulge thickness.)
 
+    /Target/Windows
+
+> Include the Kapton cell windows (125 micron).
+
     /Target/Angle <double> <unit>
 
 > Set the angle of tilt about the beam axis of the entire target assembly (30 degrees for Gretina at the NSCL).
+
+    /Target/SetDensity <double>
+
+> Set target density in mg/cc.
 
     /Target/Material <material>
 

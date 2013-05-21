@@ -41,6 +41,12 @@
   ssteel->AddElement(elementFe, 0.88);
   ssteel->AddElement(elementCo, 0.08);
 
+  kapton = new G4Material("Kapton", 1.42*g/cm3, 4);
+  kapton->AddElement(elementC, 0.691099);
+  kapton->AddElement(elementN, 0.073298);
+  kapton->AddElement(elementO, 0.209424);
+  kapton->AddElement(elementH, 0.026178);
+
   // define materials from the G4 NIST database
   NISTman = G4NistManager::Instance();
 
@@ -50,6 +56,7 @@
   polyethylene  = NISTman->FindOrBuildMaterial("G4_POLYETHYLENE");
   polypropylene = NISTman->FindOrBuildMaterial("G4_POLYPROPYLENE");
   lH2           = NISTman->FindOrBuildMaterial("G4_lH2");
+
 
   Be = new G4Material("Be",  4., 9.012182*g/mole,  1.84*g/cm3);
   C  = new G4Material("C",   6., 12.011*g/mole,    2.15*g/cm3);

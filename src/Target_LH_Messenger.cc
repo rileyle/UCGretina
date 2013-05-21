@@ -18,6 +18,9 @@ Target_Messenger::Target_Messenger(Target* Tar)
   BCmd->SetParameterName("choice",false);
   BCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  WCmd = new G4UIcmdWithoutParameter("/Target/Windows",this);
+  WCmd->SetGuidance("Construct the Kapton windows.)");
+
   ACmd = new G4UIcmdWithADoubleAndUnit("/Target/Angle",this);
   ACmd->SetGuidance("Set the angle of tilt of the target.)");
   ACmd->SetParameterName("choice",false);
@@ -58,6 +61,7 @@ Target_Messenger::~Target_Messenger()
   delete TargetDir;
   delete CCmd;
   delete BCmd;
+  delete WCmd;
   delete ACmd;
   delete MatCmd;
   delete SDTarCmd;
@@ -74,6 +78,8 @@ void Target_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
     { aTarget->setTargetCell(newValue); }
   if( command == BCmd )
     { aTarget->setBulgeThickness(BCmd->GetNewDoubleValue(newValue)); }
+  if( command == WCmd )
+    { aTarget->setWindows(); }
   if( command == ACmd )
     { aTarget->setTargetAngle(ACmd->GetNewDoubleValue(newValue)); }
   if( command == MatCmd )
