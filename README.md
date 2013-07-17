@@ -256,6 +256,26 @@ Optional commands
 
 > Currently implemented frames: eu152_Z2707, cs137_E2879, and co56_2012
 
+### Background Simulations (see also ./examples/background) ###
+
+Mandatory commands for running background simulations
+
+    /Experiment/RunSource
+    /Experiment/Source/Set <background || muons>
+
+> The background source type emits several gamma rays from a solid spherical shell surrounding GRETINA. The muon source type emits 4.0 GeV muons vertically from obove GRETINA.
+
+Optional commands describing the spherical shell surrounding GRETINA from which background gamma-rays are emitted.
+
+    /BackgroundSphere/Material <material name>
+
+> Set material for the background sphere (default: G4_Galactic).
+
+    /BackgroundSphere/R_min <double> <unit>
+    /BackgroundSphere/R_max <double> <unit>
+
+> Set the inner and outer radii of the background sphere (default: 3.0 m, 3.4 m).
+
 ## Mode 2 Output ##
 
 Mode 2 output from in-beam simulations contains S800 tracking events

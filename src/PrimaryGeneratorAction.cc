@@ -27,18 +27,59 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   particleTable = G4ParticleTable::GetParticleTable();
   BeamOut->SetReactionFlag(-1);
 
-  // G4cout<<" +++++ In Generate Primaries "<<G4endl;
   if(source)
     {
-      // G4cout<<" +++++ Shooting gammas "<<G4endl;
-        particleGun->SetParticleDefinition(particleTable->FindParticle("gamma"));
-     
-        particleGun->SetParticleMomentumDirection(G4RandomDirection());
-        particleGun->SetParticlePosition(sourcePosition);
-	particleGun->SetParticleEnergy(GetSourceEnergy());
+
+      if(sourceType == "muon")
+	{
+	  if(G4UniformRand()<0.5)
+	    particleGun->SetParticleDefinition(particleTable->FindParticle("mu+"));
+	  else
+	    particleGun->SetParticleDefinition(particleTable->FindParticle("mu-"));
+	}
+      else
+	{
+	  particleGun->SetParticleDefinition(particleTable->FindParticle("gamma"));
+	}
+      
+      if(background)
+	{
+	  if(sourceType == "muon") // Cosmic-ray background
+	    {
+	      // Cosmic rays with a uniform distribution on a
+	      // circle with diameter covering the crystals. 
+	      // Maybe.
+	      G4double x = 28.*cm*(1.0 - 2*G4UniformRand());
+	      G4double z = sqrt(28.*cm*28.*cm - x*x)*(1.0 - 2*G4UniformRand());
+	      particleGun->SetParticlePosition(G4ThreeVector(x, myDetector->GetBGSphereRmin(), z));
+	      // Vertical for now. Eventually implement cos^2 distribution
+	      particleGun->SetParticleMomentumDirection(G4ThreeVector(0,-1,0));
+	    }
+	  else // Room background
+	    {
+	      G4ThreeVector v1, v2;
+	      // Inside the background sphere walls.
+	      G4double bgRmin = myDetector->GetBGSphereRmin();
+	      G4double bgRmax = myDetector->GetBGSphereRmax();
+	      v1 = G4RandomDirection()*(bgRmin + 20.0*cm +
+					G4UniformRand()*(bgRmax -
+							 bgRmin - 20.0*cm));  
+	      // Inside the outer surface of the Gretina mounting sphere
+	      v2 = G4RandomDirection()*G4UniformRand()*1.276/2.*m;  
+	      particleGun->SetParticlePosition(v1);
+	      particleGun->SetParticleMomentumDirection(v2-v1);
+	    }
+	}
+      else
+	{
+	  particleGun->SetParticleMomentumDirection(G4RandomDirection());
+	  particleGun->SetParticlePosition(sourcePosition);
+	}
+
+      particleGun->SetParticleEnergy(GetSourceEnergy());
 
     }
-  if(inbeam)
+  else if(inbeam)
     {
 
       ion =  particleTable->GetIon(BeamIn->getZ(),BeamIn->getA(),BeamIn->getEx());
@@ -93,7 +134,6 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	}
 
     }
-
 
   // G4cout<<" +++++ Generating an event "<<G4endl;
   particleGun->GeneratePrimaryVertex(anEvent);
@@ -158,6 +198,10 @@ void PrimaryGeneratorAction::SetSourceType(G4String name) //LR
     SetSourceAu();
   } else if (name == "white") {
     SetSourceWhite();
+  } else if (name == "background") {
+    SetSourceBG();
+  } else if (name == "muon") {
+    SetSourceMuon();
   } else if (name == "simple") {
     SetSourceSimple();
   }
@@ -445,7 +489,6 @@ void PrimaryGeneratorAction::SetSourcePhotopeaks()
   TheSource.push_back(new SourceData(e,sourceBranchingSum));
   e=3548.270*keV; sourceBranchingSum+= 1.;
   TheSource.push_back(new SourceData(e,sourceBranchingSum));
-
 }
 //-------------------------------------------------------------
 void PrimaryGeneratorAction::SetSourceAu()
@@ -500,6 +543,70 @@ void PrimaryGeneratorAction::SetSourceWhite()
     delete *itPos;    // free the element from memory
    // finally, clear all elements from the array
   TheSource.clear();
+}
+//-------------------------------------------------------------------------
+void PrimaryGeneratorAction::SetSourceBG()
+{
+  background = true;
+
+  G4double e;
+  sourceBranchingSum=0.;
+
+  // start from the beginning of the array
+  vector<SourceData*>::iterator itPos = TheSource.begin();
+  // clear all elements from the array
+  for(; itPos < TheSource.end(); itPos++)
+    delete *itPos;    // free the element from memory
+  // finally, clear all elements from the array
+  TheSource.clear();
+
+  // 232Th, 238U relative intensities from:
+  // Gordon R. Gilmore,
+  // Practical Gamma-Ray Spectrometry, 2nd Edition, Wiley
+  // Published Online: 21 APR 2008
+  e=185.72*keV;sourceBranchingSum+=57.2;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=238.63*keV;sourceBranchingSum+=43.6;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=295.22*keV;sourceBranchingSum+=18.5;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=351.93*keV;sourceBranchingSum+=35.6;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=583.19*keV;sourceBranchingSum+=30.6;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=609.31*keV;sourceBranchingSum+=45.49;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=911.20*keV;sourceBranchingSum+=25.8;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=968.97*keV;sourceBranchingSum+=15.8;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1460.82*keV;sourceBranchingSum+=100.; // NSCL S3 Vault June 2013
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1764.49*keV;sourceBranchingSum+=15.28;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=2614.51*keV;sourceBranchingSum+=35.38;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+}
+//-------------------------------------------------------------------------
+void PrimaryGeneratorAction::SetSourceMuon()
+{
+  sourceType = "muon";
+  background = true;
+
+  G4double e;
+  sourceBranchingSum=0.;
+
+  // start from the beginning of the array
+  vector<SourceData*>::iterator itPos = TheSource.begin();
+  // clear all elements from the array
+  for(; itPos < TheSource.end(); itPos++)
+    delete *itPos;    // free the element from memory
+   // finally, clear all elements from the array
+  TheSource.clear();
+
+  // Approximate average ground level muon energy according to the PDG.
+  e=4.0*GeV;sourceBranchingSum+=100.;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
 
 }
 //-------------------------------------------------------------------------

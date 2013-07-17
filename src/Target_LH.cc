@@ -48,7 +48,7 @@ G4VPhysicalVolume* Target::Construct()
 {
   LHTarget = new G4AssemblyVolume();
 
-#if(0)
+#if(1)
   ConstructBeamTube();
 #endif
 
@@ -62,7 +62,7 @@ G4VPhysicalVolume* Target::Construct()
   else
     G4cout << "Target_LH: unknown target cell type!" << G4endl;
 
-#if(0)
+#if(1)
   ConstructCryo();
 #endif
 

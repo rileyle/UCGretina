@@ -58,6 +58,8 @@ private:
   G4Material* Be;
   G4Material* Bi;
   G4Material* lH2;
+  G4Material* concrete;
+  G4Material* air;
 };
 
 #endif

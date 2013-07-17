@@ -1,6 +1,8 @@
 /Gretina/detector/enableCapsules
 /Gretina/detector/enableCryostats
 /Gretina/Shell north
+/Target/Cell thick
+/Target/Angle 30. deg
 /Target/Construct
 /Gretina/update
 

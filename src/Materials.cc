@@ -56,7 +56,8 @@
   polyethylene  = NISTman->FindOrBuildMaterial("G4_POLYETHYLENE");
   polypropylene = NISTman->FindOrBuildMaterial("G4_POLYPROPYLENE");
   lH2           = NISTman->FindOrBuildMaterial("G4_lH2");
-
+  concrete      = NISTman->FindOrBuildMaterial("G4_CONCRETE");
+  air           = NISTman->FindOrBuildMaterial("G4_AIR");
 
   Be = new G4Material("Be",  4., 9.012182*g/mole,  1.84*g/cm3);
   C  = new G4Material("C",   6., 12.011*g/mole,    2.15*g/cm3);

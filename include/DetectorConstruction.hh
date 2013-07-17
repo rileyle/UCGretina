@@ -5,6 +5,8 @@
 #include "Materials.hh"
 #include "Experimental_Hall.hh"
 #include "Experimental_Hall_Messenger.hh"
+#include "Background_Sphere.hh"
+#include "Background_Sphere_Messenger.hh"
 #ifndef LHTARGET
   #include "Beam_Tube.hh"
   #include "Beam_Tube_Messenger.hh"
@@ -49,6 +51,9 @@ public:
   G4LogicalVolume*   HallLog(){return ExpHall_log;}
   G4VPhysicalVolume* HallPhys(){return ExpHall_phys;}
 
+  G4double GetBGSphereRmin(){return BackgroundSphere->GetRmin();}
+  G4double GetBGSphereRmax(){return BackgroundSphere->GetRmax();}
+
   void DefineMaterials();
 
   void SetTargetStatus(G4bool s){targetStatus = s;}
@@ -69,6 +74,8 @@ private:
   G4bool targetStatus;
   Target* aTarget;
 
+  Background_Sphere* BackgroundSphere;
+
 #ifndef LHTARGET
   G4bool beamTubeStatus;
   Beam_Tube* BeamTube;
@@ -86,6 +93,7 @@ private:
 
   Experimental_Hall_Messenger* ExperimentalHallMessenger;
   Target_Messenger*    TargetMessenger;
+  Background_Sphere_Messenger* BackgroundSphereMessenger;
   TrackerGammaSD* TrackerGamma;
   TrackerGammaSD_Messenger* TrackerGammaSDMessenger;
   TrackerIonSD* TrackerIon;

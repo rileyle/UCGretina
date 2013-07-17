@@ -21,6 +21,8 @@ void PhysicsList::ConstructParticle()
   G4Gamma::GammaDefinition();
   G4Electron::ElectronDefinition();
   G4Positron::PositronDefinition();
+  G4MuonMinus::MuonMinusDefinition();
+  G4MuonPlus::MuonPlusDefinition();
   //  ions
   G4IonConstructor iConstructor;
   iConstructor.ConstructParticle();
@@ -95,6 +97,15 @@ void PhysicsList::ConstructEM()
       pmanager->AddProcess(new G4eIonisation,       -1,2,2);
       pmanager->AddProcess(new G4eBremsstrahlung,   -1,3,3);     
       pmanager->AddProcess(new G4eplusAnnihilation,  0,-1,4); 
+
+    }
+    else if (particleName == "mu+" || 
+               particleName == "mu-"    ) {
+
+      pmanager->AddProcess(new G4MuMultipleScattering,-1, 1,1);
+      pmanager->AddProcess(new G4MuIonisation,      -1, 2,2);
+      pmanager->AddProcess(new G4MuBremsstrahlung,  -1, 3,3);
+      pmanager->AddProcess(new G4MuPairProduction,  -1, 4,4);       
 
     }
     else if( particleName == "GenericIon" ) {

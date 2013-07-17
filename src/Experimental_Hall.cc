@@ -9,7 +9,6 @@ Experimental_Hall::Experimental_Hall(Materials* mat)
 
   ExperimentalHallMaterial = materials->FindMaterial("G4_Galactic");
 
-
 }
 
 Experimental_Hall::~Experimental_Hall()
@@ -25,7 +24,7 @@ G4VPhysicalVolume* Experimental_Hall::Construct()
                                              ExperimentalHallMaterial,"expHall_log",0,0,0);
 
   ExperimentalHall_phys = new G4PVPlacement(0,G4ThreeVector(),
-                                      ExperimentalHall_log,"expHall",0,false,0);
+					    ExperimentalHall_log,"expHall",0,false,0);
 
   ExperimentalHall_log-> SetVisAttributes (G4VisAttributes::Invisible);
   

@@ -53,6 +53,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4RunManager* runManager = G4RunManager::GetRunManager();
   runManager->DefineWorldVolume( ExpHall_phys );
 
+  // Background sphere
+
+  BackgroundSphere = new Background_Sphere(ExpHall_log,materials);
+  BackgroundSphereMessenger = new Background_Sphere_Messenger(BackgroundSphere);
+  BackgroundSphere->Construct();
+
 #ifndef LHTARGET
   // Beam Tube
 

@@ -17,6 +17,12 @@
 #include "G4eMultipleScattering.hh"
 #include "G4eplusAnnihilation.hh"
 
+//mu+/mu-
+#include "G4MuMultipleScattering.hh"
+#include "G4MuIonisation.hh"
+#include "G4MuBremsstrahlung.hh"
+#include "G4MuPairProduction.hh"
+
 // Livermore Low Energy EM Models
 #include "G4LivermorePhotoElectricModel.hh"
 #include "G4LivermoreComptonModel.hh"

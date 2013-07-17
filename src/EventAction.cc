@@ -119,6 +119,8 @@ void EventAction::EndOfEventAction(const G4Event* e)
 
       for(G4int i = 1; i < Nhits; i++){
 
+	NCons[i] = -1; // Initialize!
+
 	totalEdep += (*gammaCollection)[i]->GetEdep()/keV;
 
 	// Compare hit i with existing "measured" interaction points.
@@ -202,7 +204,7 @@ void EventAction::EndOfEventAction(const G4Event* e)
       // Write the event with consolidated interaction points to the
       // output file. 
       if(evOut)
-	evfile << "$   " << std::setw(4) << NMeasured << "   " 
+	evfile << "$   " << std::setw(4) << NGammaHits << "   " 
 	       << std::fixed << std::setprecision(2) << std::setw(12) << std::right
 	       << totalEdep << "   "
 	       << event_id

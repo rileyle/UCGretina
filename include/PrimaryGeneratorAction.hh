@@ -25,8 +25,9 @@ public:
   
 public:
   void GeneratePrimaries(G4Event* anEvent);
-  void SetSource(){source=true;inbeam=false;};
-  void SetInBeam(){source=false;inbeam=true;};
+  void SetSource(){source=true;inbeam=false;background=false;}
+  void SetInBeam(){source=false;inbeam=true;background=false;}
+  void SetBackground(){source=false;inbeam=false;background=true;}
   void SetSourceX(G4double x){sourcePosition.setX(x);}
   void SetSourceY(G4double y){sourcePosition.setY(y);}
   void SetSourceZ(G4double z){sourcePosition.setZ(z);}
@@ -44,6 +45,8 @@ public:
   void SetSourceAu();
   void SetSourceSimple();
   void SetSourceWhite();
+  void SetSourceBG();
+  void SetSourceMuon();
   void ReactionOn(){BeamOut->SetReactionOn();fracOn=false;}
   void ReactionOff(){BeamOut->SetReactionOff();fracOn=false;}
   void SetFraction(G4double f){fracOn=true;frac=f;}
@@ -68,13 +71,15 @@ private:
   G4double frac;
   G4bool   fracOn;
   // source stuff
-  G4bool source,inbeam; 
-  G4String sourceType;  //LR
+  G4bool source,inbeam,background; 
+  G4String sourceType;
   G4ThreeVector sourcePosition;
   vector<SourceData*> TheSource;
   G4double sourceBranchingSum;
   G4double sourceWhiteLoE;
   G4double sourceWhiteHiE;
+  G4double bgSphereRmin;
+  G4double bgSphereRmax;
 };
 
 
