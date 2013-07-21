@@ -4,6 +4,7 @@
 
 #include "G4VSensitiveDetector.hh"
 #include "TrackerGammaHit.hh"
+#include "G4RunManager.hh"
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -11,7 +12,6 @@ using namespace std;
 
 class G4Step;
 class G4HCofThisEvent;
-
 
 class TrackerGammaSD : public G4VSensitiveDetector
 {

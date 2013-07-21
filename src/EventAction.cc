@@ -8,7 +8,7 @@ EventAction::EventAction()
 { 
   ionCollectionID=-1;
   gammaCollectionID=-1;
-  positionRes = 0.*mm;
+  packingRes = 0.*mm;
   S800KE = 1.0;
   outFileName = "";
   evOut = false;
@@ -94,20 +94,21 @@ void EventAction::EndOfEventAction(const G4Event* e)
 
     if(Nhits>0) {
 
-      // Consolidate total each gamma-ray interaction with its children 
-      // based on proximity. 
+      // Packing: consolidate interaction points within segments based on proximity. 
 
       G4int detNum[1000];
+      G4int segNum[1000];
       G4double measuredEdep[1000];
       G4double measuredX[1000];
       G4double measuredY[1000];
       G4double measuredZ[1000];
       G4int NCons[1000];
-      G4double positionRes2 = positionRes*positionRes;
+      G4double packingRes2 = packingRes*packingRes;
 
       // Initialize the first "measured" interaction point.
 
       detNum[0] = (*gammaCollection)[0]->GetDetNumb();
+      segNum[0] = (*gammaCollection)[0]->GetSegNumb();
       measuredEdep[0] = (*gammaCollection)[0]->GetEdep()/keV;
       measuredX[0] = (*gammaCollection)[0]->GetPos().getX()/mm;
       measuredY[0] = (*gammaCollection)[0]->GetPos().getY()/mm;
@@ -137,9 +138,10 @@ void EventAction::EndOfEventAction(const G4Event* e)
 
 	  G4double prox2 = (x - measuredX[j])*(x - measuredX[j]) + (y - measuredY[j])*(y - measuredY[j]) + (z - measuredZ[j])*(z - measuredZ[j]);
 
-	  if( prox2 < positionRes2                                   // proximal
-	     && (*gammaCollection)[i]->GetDetNumb() == detNum[j] // same crystal
-	     && !consolidated ){                          // not already counted
+	  if( prox2 < packingRes2                                   // proximal
+	      && (*gammaCollection)[i]->GetDetNumb() == detNum[j] // same crystal
+	      && (*gammaCollection)[i]->GetSegNumb() == segNum[j] // same segment
+	      && !consolidated ){                          // not already counted
 
 	    // Energy-weighted average
 	    measuredX[j] = (measuredEdep[j]*measuredX[j] + e*x)/(measuredEdep[j] + e);
@@ -160,6 +162,7 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	if(!consolidated){
 
 	  detNum[NMeasured] = (*gammaCollection)[i]->GetDetNumb();
+	  segNum[NMeasured] = (*gammaCollection)[i]->GetSegNumb();
 	  measuredEdep[NMeasured] = e;
 	  measuredX[NMeasured] = x;
 	  measuredY[NMeasured] = y;
@@ -172,7 +175,7 @@ void EventAction::EndOfEventAction(const G4Event* e)
 
       }
 
-      // Consolidate the "measured" gamma-ray interaction points.
+      // Packing, second pass: Consolidate the "measured" gamma-ray interaction points. 
       // (In some cases, the tracks of secondary particles blur the
       // distinction between initial gamma-ray hits.) 
       G4int NGammaHits = NMeasured;
@@ -182,8 +185,9 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	  if( ( (measuredX[i] - measuredX[j])*(measuredX[i] - measuredX[j])
 		   + (measuredY[i] - measuredY[j])*(measuredY[i] - measuredY[j])
 		   + (measuredZ[i] - measuredZ[j])*(measuredZ[i] - measuredZ[j])
-		   < positionRes2 )                                  // proximal
+		   < packingRes2 )                                  // proximal
 	      && detNum[i] == detNum[j]                          // same crystal
+	      && segNum[i] == segNum[j]                          // same segment
 	      &&  (NCons[i] > 0 && NCons[j] > 0) ){  // not already consolidated
 
 	    // Energy-weighted average

@@ -22,8 +22,8 @@ EventAction_Messenger::EventAction_Messenger(EventAction* EA):theEventAction(EA)
   coordsCmd = new G4UIcmdWithoutParameter("/Mode2/GretinaCoords",this);
   coordsCmd->SetGuidance("Write interaction points in GRETINA coordinate system --- x down, z beam (standard for Mode2 data).");
 
-  PosResCmd = new G4UIcmdWithADoubleAndUnit("/Mode2/PositionRes",this);
-  PosResCmd->SetGuidance("Position resolution for simulating Mode2 data.");
+  PackResCmd = new G4UIcmdWithADoubleAndUnit("/Mode2/PackingRes",this);
+  PackResCmd->SetGuidance("Packing resolution for simulating Mode2 data.");
 
   S800KECmd = new G4UIcmdWithADoubleAndUnit("/Mode2/S800KE",this);
   S800KECmd->SetGuidance("Average KE for computing dta for writing S800 events.");
@@ -45,7 +45,7 @@ EventAction_Messenger::~EventAction_Messenger()
   delete Mode2FileCmd;
   delete crmatCmd;
   delete coordsCmd;
-  delete PosResCmd;
+  delete PackResCmd;
   delete S800KECmd;
   delete printCmd;
 
@@ -64,10 +64,10 @@ void EventAction_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
     {theEventAction->SetCrmatFile(newValue);}
   if( command == coordsCmd )
     {theEventAction->SetGretinaCoords();}
-  if( command == PosResCmd )
-    {theEventAction->SetPosRes(PosResCmd->GetNewDoubleValue(newValue));}
+  if( command == PackResCmd )
+    {theEventAction->SetPackRes(PackResCmd->GetNewDoubleValue(newValue));}
   if( command == S800KECmd )
-    {theEventAction->SetS800KE(PosResCmd->GetNewDoubleValue(newValue));}
+    {theEventAction->SetS800KE(S800KECmd->GetNewDoubleValue(newValue));}
   if( command == printCmd )
     {theEventAction->SetPrint();}
 

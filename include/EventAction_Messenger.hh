@@ -29,7 +29,7 @@ class EventAction_Messenger: public G4UImessenger
     G4UIcmdWithAString*        Mode2FileCmd;
     G4UIcmdWithAString*        crmatCmd;
     G4UIcmdWithoutParameter*   coordsCmd;
-    G4UIcmdWithADoubleAndUnit* PosResCmd;
+    G4UIcmdWithADoubleAndUnit* PackResCmd;
     G4UIcmdWithADoubleAndUnit* S800KECmd;
     G4UIcmdWithoutParameter*   printCmd;
 };

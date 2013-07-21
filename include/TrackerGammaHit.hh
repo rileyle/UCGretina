@@ -28,27 +28,33 @@ class TrackerGammaHit : public G4VHit
 
   public:
   
-      void SetTrackID  (G4int track)      { trackID = track; };
-      void SetParticleID (G4String particle)      { particleID = particle; };
+      void SetTrackID  (G4int track)         { trackID = track; };
+      void SetParticleID (G4String particle) { particleID = particle; };
+      void SetProcess (G4String proc)        { process = proc; };
       void SetDetNumb(G4int num) {detNumb=num;};
+      void SetSegNumb(G4int num) {segNumb=num;};
       void SetEdep     (G4double de)      { edep = de; };
-      void SetTotalEnergy(G4double te)      { etotal = te; }; //LR
+      void SetTotalEnergy(G4double te)      { etotal = te; };
       void SetPos      (G4ThreeVector xyz){ pos = xyz; };
       
-      G4int GetTrackID()    { return trackID; };
-      G4String GetParticleID() {return particleID;};
-      G4int  GetDetNumb() {return detNumb;};
-      G4double GetEdep()    { return edep; };
-      G4double GetTotalEnergy() { return etotal; }; //LR
-      G4ThreeVector GetPos(){ return pos; };
+      G4int GetTrackID()        { return trackID; };
+      G4String GetParticleID()  { return particleID; };
+      G4String GetProcess()     { return process; };
+      G4int  GetDetNumb()       { return detNumb; };
+      G4int  GetSegNumb()       { return segNumb; };
+      G4double GetEdep()        { return edep; };
+      G4double GetTotalEnergy() { return etotal; };
+      G4ThreeVector GetPos()    { return pos; };
       
   private:
   
       G4int         trackID;
       G4String      particleID;
+      G4String      process;
       G4int         detNumb;
+      G4int         segNumb;
       G4double      edep;
-      G4double      etotal; //LR
+      G4double      etotal;
       G4ThreeVector pos;
 };
 

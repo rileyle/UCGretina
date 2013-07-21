@@ -52,6 +52,8 @@ void Gretina_Array::InitData()
   cryostatRouter[5]  = 165.*mm;
   cryostatRouter[6]  = 165.*mm;
 
+  readOut            = false;
+
   matCryst           = NULL;
   matWalls           = NULL;
   matBackWalls       = NULL;
@@ -81,6 +83,8 @@ void Gretina_Array::InitData()
   nClAng             = 0;
   clustFile          = iniPath + "aclust";
   
+  sliceFile          = iniPath + "aslice";
+    
   nDets              = 0;
   iCMin              = 0;
   iGMin              = 0;
@@ -149,6 +153,7 @@ void Gretina_Array::Placement()
   ReadClustFile();
   ReadWallsFile();
   ReadEulerFile();
+  ReadSliceFile();
   
   if( FindMaterials() )
     return;
@@ -170,6 +175,31 @@ void Gretina_Array::Placement()
 
   ConstructTheClusters();
   PlaceTheClusters();
+
+  if( readOut ) {
+    // delete old structures
+    nSegments.clear();
+    
+    pgSegLl.clear();
+    pgSegLu.clear();
+    pgSegRl.clear();
+    pgSegRu.clear();
+    
+    segVolume.clear();
+    segCenter.clear();
+
+    nSegments.resize(nPgons);
+    tSegments.resize(nPgons);
+    totSegments = 0;
+
+    for(G4int ii = 0; ii < nPgons; ii++){
+      G4int nn = CalculateSegments(ii);
+      nSegments[ii] = nn;
+      tSegments[ii] = totSegments;
+      totSegments  += nn;
+    }
+    ConstructSegments();
+  }
 
 }
 
@@ -781,6 +811,134 @@ void Gretina_Array:: ReadEulerFile()
   G4cout << nEuler << " Euler angles read." << G4endl;
 }
 
+// This method reads the file with the slice planes
+void Gretina_Array:: ReadSliceFile()
+{
+  FILE      *fp;
+  char      line[256];
+  G4int     ns, npts, sameSlice, nSlices;
+  float     zz1, ZZ1;
+  G4double  zz, ZZ;
+  CpolyhPoints *pPg;
+
+  maxSec = 1; // When data file is missing only 1 sector is considered (non-segmented)
+  maxSli = 1; // When data file is missing only 1 slice is considered
+  
+  if( (fp = fopen(sliceFile, "r")) == NULL) {
+    G4cout << "\nError opening data file " << sliceFile << G4endl;
+    G4cout << " Warning! No segmentation will be considered." << G4endl;
+    readOut = false;
+    // When data file is missing only 1 slice is considered
+    return;
+  }
+  
+  G4cout << " Reading slice planes from file " << sliceFile << G4endl;
+  readOut = true;
+  
+  // Initializes arrays assuming one slice
+  // zSliceI[i] is the z coordinate of the i-th plane
+  // zSliceI[0] = 1st face,..., zSliceI[nSlice] = 2nd face
+  // so that zSliceI.size() = nslice+1
+  G4int nPg;
+  for(nPg = 0; nPg < nPgons; nPg++) {
+    pPg = &pgons[nPg];
+    npts = pPg->npoints;;
+    pPg->zSliceI.clear();
+    pPg->zSliceO.clear();
+    pPg->zSliceI.push_back( pPg->zFace1 );
+    pPg->zSliceO.push_back( pPg->zFace1 );
+    pPg->zSliceI.push_back( pPg->zFace2 );
+    pPg->zSliceO.push_back( pPg->zFace2 );
+    pPg->nslice = 1;
+  }
+
+  G4cout << "\nReading slicing planes from data file " << sliceFile << G4endl;
+
+  // first line gives the format
+  sameSlice = -1;
+  while( fgets(line, 255, fp) ) {
+    if(line[0] == '#') continue;
+    sscanf( line, "%d", &sameSlice);
+    break;
+  }
+  if(sameSlice < 0) {
+    G4cout << "\nError reading slice type in file " << sliceFile << G4endl;
+    G4cout << " Warning! Considering only one slice per solid." << G4endl;
+    return;
+  }
+
+  if( sameSlice == 0 ) {
+    // second line gives number of slices
+    nSlices = -1;
+    while( fgets(line, 255, fp) ) {
+      if(line[0] == '#') continue;
+      sscanf( line, "%d", &nSlices);
+      if(nSlices < 1) break;
+      if(nSlices > maxSli) maxSli = nSlices;
+      // fills the arrays
+      for(nPg = 0; nPg < nPgons; nPg++) {
+        pPg = &pgons[nPg];
+        G4double zz = pPg->zFace1;
+        G4double dz = (pPg->zFace2 - pPg->zFace1)/nSlices;
+        pPg->zSliceI.clear();
+        pPg->zSliceO.clear();
+        for(G4int kk=0; kk<nSlices; kk++) {
+          pPg->zSliceI.push_back( zz + kk * dz );
+          pPg->zSliceO.push_back( zz + kk * dz );
+        }
+        pPg->zSliceI.push_back( pPg->zFace2 );
+        pPg->zSliceO.push_back( pPg->zFace2 );
+        pPg->nslice = nSlices;
+	if( pPg->npoints/2 > maxSec ) maxSec = pPg->npoints/2;
+      }
+      break;
+    }
+    if(nSlices < 1) {
+      G4cout << "\nError reading number of slices in file " << sliceFile << G4endl;
+      G4cout << " Warning! Considering only one slice per solid." << G4endl;
+    }
+    fclose(fp);
+    return;
+  }
+
+  // variable slices
+  while( fgets(line, 255, fp) ) {
+    if(line[0] == '#') continue;
+//    if( sscanf(line,"%d %lf %lf", &ns, &zz, &ZZ) == 2 )
+    if( sscanf(line,"%d %f %f", &ns, &zz1, &ZZ1) == 2 )
+      ZZ1 = zz1;
+    zz = (G4double)zz1;
+    ZZ = (G4double)ZZ1;
+    if(ns < 0 || ns > maxPgons) { // needed to avoid problems in case the minimum index in pgons is not zero
+      G4cout << " Warning! Solid " << ns << " out of range: ignoring  slice  " << zz  << " -- " << ZZ << G4endl;
+      continue;
+    }
+    for(nPg = 0; nPg < nPgons; nPg++) {
+      pPg = &pgons[nPg];
+      if(pPg->whichGe != ns) continue; // looks for the right solid
+      G4double z2 = pPg->zSliceI[pPg->nslice-1];
+      G4double Z2 = pPg->zSliceO[pPg->nslice-1];
+      z2 += zz * mm;
+      Z2 += ZZ * mm;
+      if(z2 > pPg->zFace2 || Z2 > pPg->zFace2) {
+        G4cout << " Warning! Slice " << zz << " -- " << ZZ << " of solid " << ns << " exceeds length of solid "
+               << "( " << z2 << " -- " << Z2 << "   > " << pPg->zFace2 - pPg->zFace1 << " )" << G4endl;
+        continue;
+      }
+      pPg->zSliceI.back() = z2;
+      pPg->zSliceO.back() = Z2;
+      pPg->zSliceI.push_back(pPg->zFace2);
+      pPg->zSliceO.push_back(pPg->zFace2);
+      pPg->nslice++;
+      if( pPg->npoints/2 > maxSec ) maxSec = pPg->npoints/2;
+      if( pPg->nslice    > maxSli ) maxSli = pPg->nslice;
+      break;
+    }
+  }  
+  fclose(fp);
+  return;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////// methods to construct and place the actual volumes
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1361,6 +1519,256 @@ void Gretina_Array::ConstructTheClusters()
   }
 }
 
+
+// This method calculates the vertexes of the segments for poly nn
+// To allow the thickness at the detector axis to be different from the geometrical (outer) slice
+// the segments are decomposed into 4 parts: first they are cut into Left and Right of the reference edge.
+// Each half is then split into a lower pyramide (quadrangolar base on the external face, tip at z_inner) 
+// and an upper tetrahedron (based on the upper pyramide-side-face, tip at Z_inner) 
+
+// Warning! these solids are not centered on zero! This avoids a further translation when placing the volumes.
+
+G4int Gretina_Array::CalculateSegments(G4int iPg)
+{
+  G4int sector, slice;
+
+  CpolyhPoints *ppg  = &pgons[iPg];
+  
+  if( ppg-> isPlanar ) return 0;
+
+  G4int npoints  = ppg->npoints;
+  G4int nsides   = npoints/2;
+  G4int nslices  = ppg->nslice;
+  G4int nsegs    = nsides * nslices;
+   
+  // vertices of inner and outer face of crystal
+  G4Point3DVector vertexF1;
+  G4Point3DVector vertexF2;
+  vertexF1.resize(nsides);
+  vertexF2.resize(nsides);
+
+  // for consistency, the points taken directly from CConvexPolyhedron
+  for( sector=0; sector<nsides; sector++ ) {
+    vertexF1[sector] = ppg->pPoly->GetPoints(sector       );
+    vertexF2[sector] = ppg->pPoly->GetPoints(sector+nsides);
+    
+  }
+  // center (at cylinder axis) of inner and outer face of crystal
+  // tubX, tubY should be zero!
+  G4Point3D centerF1(ppg->tubX, ppg->tubY, ppg->zFace1);
+  G4Point3D centerF2(ppg->tubX, ppg->tubY, ppg->zFace2);
+
+  G4Plane3D xyPlane;          // a plane normal to zAxis
+  G4Plane3D zzPlane;          // a plane passing through the zAxis
+  G4Point3D pz, p1, pm, p2;   // the points on the lower segment-face
+  G4Point3D PZ, P1, PM, P2;   // the points on the upper segment-face
+  CpolyhPoints *ppsl, *ppsu;  // pointers to the lower & upper decomposition of half-segment
+  nsegs = 0;
+  G4int isA, isB;
+  for( slice=0; slice<nslices; slice++ ) {
+    for( sector=0; sector<nsides; sector++, nsegs++) {
+      isA = sector;
+      for(int n = 0; n < 2; n++) {              // loop on the two faces of the edge
+        if(n == 0) {
+          isB = (isA + nsides - 1)%nsides;      // first towards the previous edge
+          pgSegLl.push_back( CpolyhPoints() );
+          pgSegLu.push_back( CpolyhPoints() );
+          ppsl = &pgSegLl.back();
+          ppsu = &pgSegLu.back();
+        }
+        else {
+          isB = (isA + 1)%nsides;               // than towards the next edge
+          pgSegRl.push_back( CpolyhPoints() );
+          pgSegRu.push_back( CpolyhPoints() );
+          ppsl = &pgSegRl.back();
+          ppsu = &pgSegRu.back();
+        }
+        ppsl->whichGe = iPg;
+        ppsu->whichGe = iPg;
+
+        xyPlane = G4Plane3D(0., 0., 1., -ppg->zSliceI[slice]);        // xy-plane at inner lower-level
+        pz = XPlaneLine(xyPlane, centerF1, centerF2);             // inner lower-point
+        xyPlane = G4Plane3D(0., 0., 1., -ppg->zSliceO[slice]);        // plane at outer lower-level
+        p1 = XPlaneLine(xyPlane, vertexF1[isA], vertexF2[isA]);   // intercept edge
+        p2 = XPlaneLine(xyPlane, vertexF1[isB], vertexF2[isB]);   // intercept next/previous edge
+        pm = (p1 + p2) / 2;                                       // midpoint at lower-level
+
+        xyPlane = G4Plane3D(0., 0., 1., -ppg->zSliceI[slice+1]);      // plane at inner upper-level
+        PZ = XPlaneLine(xyPlane, centerF1, centerF2);             // inner upper-point
+        xyPlane = G4Plane3D(0., 0., 1., -ppg->zSliceO[slice+1]);      // plane at outer upper-level
+        P1 = XPlaneLine(xyPlane, vertexF1[isA], vertexF2[isA]);   // intercept edge
+        P2 = XPlaneLine(xyPlane, vertexF1[isB], vertexF2[isB]);   // intercept next/previous edge
+        PM = (P1 + P2) / 2;                                       // midpoint at loupper-level
+
+        // the points of the lower part
+        ppsl->vertex.resize(5);
+        ppsl->npoints = 5;
+        ppsl->vertex[0] = pz;
+        ppsl->vertex[1] = p1;
+        ppsl->vertex[2] = pm;
+        ppsl->vertex[3] = PM;
+        ppsl->vertex[4] = P1;
+	
+        // description of the pyramide
+        ppsl->ifaces.clear();
+        ppsl->nfaces = 0;
+        ppsl->ifaces.push_back(4);      // the quadrangular basis
+        ppsl->ifaces.push_back(1);
+        ppsl->ifaces.push_back(2);
+        ppsl->ifaces.push_back(3);
+        ppsl->ifaces.push_back(4);
+        ppsl->nfaces++;
+        ppsl->ifaces.push_back(3);      // the 4 side triangular faces
+        ppsl->ifaces.push_back(0);
+        ppsl->ifaces.push_back(1);
+        ppsl->ifaces.push_back(2);
+        ppsl->nfaces++;
+        ppsl->ifaces.push_back(3);
+        ppsl->ifaces.push_back(0);
+        ppsl->ifaces.push_back(2);
+        ppsl->ifaces.push_back(3);
+        ppsl->nfaces++;
+        ppsl->ifaces.push_back(3);
+        ppsl->ifaces.push_back(0);
+        ppsl->ifaces.push_back(3);
+        ppsl->ifaces.push_back(4);
+        ppsl->nfaces++;
+        ppsl->ifaces.push_back(3);
+        ppsl->ifaces.push_back(0);
+        ppsl->ifaces.push_back(4);
+        ppsl->ifaces.push_back(1);
+        ppsl->nfaces++;
+        ppsl->ifaces.push_back(-1);
+
+        // the points of the upper part
+        ppsu->vertex.resize(4);
+        ppsu->npoints = 4;
+        ppsu->vertex[0] = pz;
+        ppsu->vertex[1] = P1;
+        ppsu->vertex[2] = PM;
+        ppsu->vertex[3] = PZ;
+
+        // description of the tetrahedron
+        ppsu->ifaces.clear();
+        ppsu->nfaces  = 0;
+        ppsu->ifaces.push_back(3);      // the "upper" face
+        ppsu->ifaces.push_back(1);
+        ppsu->ifaces.push_back(2);
+        ppsu->ifaces.push_back(3);
+        ppsu->nfaces++;
+        ppsu->ifaces.push_back(3);      // the 3 "side" faces
+        ppsu->ifaces.push_back(0);
+        ppsu->ifaces.push_back(1);
+        ppsu->ifaces.push_back(2);
+        ppsu->nfaces++;
+        ppsu->ifaces.push_back(3);
+        ppsu->ifaces.push_back(0);
+        ppsu->ifaces.push_back(2);
+        ppsu->ifaces.push_back(3);
+        ppsu->nfaces++;
+        ppsu->ifaces.push_back(3);
+        ppsu->ifaces.push_back(0);
+        ppsu->ifaces.push_back(3);
+        ppsu->ifaces.push_back(1);
+        ppsu->nfaces++;
+        ppsu->ifaces.push_back(-1);
+
+      }
+    }
+  }
+  return nsegs;
+}
+
+
+void Gretina_Array::ConstructSegments()
+{
+  char sName1[50], sName2[50];
+  G4int nGe;
+  G4int iPg, sector, slice;
+
+  G4cout << G4endl << "Generating segments for the ReadOut geometry... " << G4endl;
+  
+  G4VisAttributes* segVA[4];
+  segVA[0] = new G4VisAttributes(G4Colour(1.0,0.0,0.0));
+  segVA[1] = new G4VisAttributes(G4Colour(0.0,1.0,0.0));
+  segVA[2] = new G4VisAttributes(G4Colour(0.0,0.0,1.0));
+  segVA[3] = new G4VisAttributes(G4Colour(1.0,0.0,1.0));
+  
+  G4VisAttributes* altVA = new G4VisAttributes(G4Colour(0.1,0.1,0.1));
+  altVA->SetForceWireframe(true);
+
+  G4int indexS;  // index of segment in pgSeg...
+  CpolyhPoints *ppgerm;  
+  CpolyhPoints *ppseg = NULL;
+  nSeg = 0;
+  G4int *iSeg = new G4int[nPgons];
+  memset(iSeg, 0, nPgons*sizeof(G4int));
+   
+  for( iPg=0; iPg<nPgons; iPg++ ) {
+    ppgerm = &pgons[iPg];
+    
+    if( ppgerm->isPlanar ) continue;
+    
+    indexS = tSegments[iPg];
+    G4cout << " Crystal type " << iPg << ": ";
+    for( slice=0; slice<ppgerm->nslice; slice++ ) {
+      for( sector=0; sector<ppgerm->npoints/2; sector++, indexS++) { 
+        nGe = 100 * iPg + 10 * slice + sector;     // --> PPPSs (P=CrystalShape, S =Slice, s=sector) 
+        // the four parts composing the segment
+        for(int ss = 0; ss < 4; ss++) {
+          switch (ss) {
+          case 0:
+            ppseg = &pgSegLl[indexS];                   // the lower segment at the left
+            sprintf(sName1, "SegmLl_%5.5d", nGe ); 
+            sprintf(sName2, "SegmLl_L_%5.5d", nGe);
+            break;
+          case 1:
+            ppseg = &pgSegLu[indexS];                   // the upper segment at the left
+            sprintf(sName1, "SegmLu_%5.5d", nGe ); 
+            sprintf(sName2, "SegmLu_L_%5.5d", nGe);
+            break;
+          case 2:
+            ppseg = &pgSegRl[indexS];                   // the lower segment at the right
+            sprintf(sName1, "SegmRl_%5.5d", nGe ); 
+            sprintf(sName2, "SegmRl_L_%5.5d", nGe);
+            break;
+          case 3:
+            ppseg = &pgSegRu[indexS];                   // the upper segment at the right
+            sprintf(sName1, "SegmRu_%5.5d", nGe ); 
+            sprintf(sName2, "SegmRu_L_%5.5d", nGe);
+            break;
+          }
+          ppseg->pPoly  = new CConvexPolyhedron( G4String(sName1), ppseg->vertex, ppseg->nfaces, ppseg->ifaces);
+          ppseg->pDetL  = new G4LogicalVolume( ppseg->pPoly, matCryst, G4String(sName2), 0, 0, 0 ); 
+          ppseg->pDetL->SetVisAttributes( segVA[(indexS)%4] );      // in this way they get also the same color
+          if( drawReadOut ) {
+            new G4PVPlacement( 0, G4ThreeVector(), ppseg->pDetL, G4String(sName2), ppgerm->pDetL, false, 0);
+            ppgerm->pDetL->SetVisAttributes( altVA );
+          }
+          nSeg++;
+          iSeg[iPg]++;
+        }
+      }
+    }
+    G4cout << iSeg[iPg] << " segments" << G4endl;
+  }
+  G4cout << " --> Total number of generated sub-segments (4 sub-segments per segment) is " << nSeg << " [ ";
+  for(iPg = 0; iPg < nPgons; iPg++)
+    G4cout << iSeg[iPg] << " ";
+  G4cout << "]" << G4endl;
+
+  
+  G4cout << G4endl << "Checking consistency of segments ..." << G4endl;
+  G4int nproblems = 0;
+  for(iPg = 0; iPg < nPgons; iPg++) {
+    nproblems += CheckOverlap(iPg, tSegments[iPg], nSegments[iPg]);
+  }
+  if(nproblems)
+    G4cout << nproblems << " points with problems" << G4endl;
+  else
+    G4cout << "all OK" <<  G4endl;
+}
+
 void Gretina_Array::PlaceTheClusters()
 {
   G4int    nGe, nCl, nEa, nCa, nPg, nSol, nPt, indexP;
@@ -1577,6 +1985,10 @@ void Gretina_Array::ShowStatus()
   G4cout << " Description of clusters                 read from " << clustFile << G4endl;
   G4cout << " Euler angles for clusters               read from " << eulerFile << G4endl;
   
+  if( readOut ) {
+    G4cout << " Slicing planes for read out of segments read from " << sliceFile << G4endl;
+    G4cout << " Generated " << nSeg << " sub-segments " << G4endl;
+  }
   if( makeCapsule )
     G4cout << " The capsules have been generated with the proper thickness and spacing." << G4endl;
   else
@@ -1607,15 +2019,20 @@ void Gretina_Array::ShowStatus()
 void Gretina_Array::WriteHeader(std::ofstream &outFileLMD, G4double unit)
 {
   char line[128];
-  FILE *fp1, *fp2, *fp3, *fp4; 
+  FILE *fp1, *fp2, *fp3, *fp4, *fp5; 
 
   outFileLMD << "GRETINA" << G4endl;
   outFileLMD << "SUMMARY "    << arrayRmin/unit << "  "  << arrayRmax/unit  << "  "
                               << nDets        << "  "  << nPgons        << " ";
                              
-  for( G4int i=0; i<nPgons; i++ )
-    outFileLMD << "1 1 ";
-
+  if( readOut ) {
+    for( G4int ii=0; ii<nPgons; ii++ )
+      outFileLMD << pgons[ii].nslice << " " << pgons[ii].npoints/2 << " ";
+  }
+  else {
+    for( G4int i=0; i<nPgons; i++ )
+      outFileLMD << "1 1 ";
+  }
   outFileLMD << G4endl; 
   
 //  sprintf(line, "TRANSFORMATION %7.3lf %7.3lf %7.3lf %7.3lf %7.3lf\n",
@@ -1686,6 +2103,18 @@ void Gretina_Array::WriteHeader(std::ofstream &outFileLMD, G4double unit)
       fclose(fp4);
     }
 
+    if( readOut ) {
+      outFileLMD << "SLICES " << sliceFile << G4endl;
+      if( (fp5 = fopen(sliceFile, "r")) == NULL) {
+        outFileLMD << "ENDSLICES" << G4endl;
+      }
+      else {
+        while( fgets(line,128,fp5) )
+          outFileLMD << line;
+        outFileLMD << "ENDSLICES" << G4endl;
+        fclose(fp5);
+      }  
+    }
     // writes out LUT for crystal types
     G4int prec = outFileLMD.precision(3);
     outFileLMD.setf(ios::fixed);
@@ -1765,7 +2194,14 @@ void Gretina_Array::WritePositions(std::ofstream &outFileLMD, G4double unit)
   outFileLMD << "POSITION_CRYSTALS" << G4endl;
   WriteCrystalPositions( outFileLMD );
   outFileLMD << "ENDPOSITION_CRYSTALS" << G4endl;
+  
+  
 
+  if( readOut ) {
+    outFileLMD << "POSITION_SEGMENTS" << G4endl;
+    WriteSegmentPositions( outFileLMD );
+    outFileLMD << "ENDPOSITION_SEGMENTS" << G4endl;
+  }
 }
 
 void Gretina_Array::WriteCrystalPositions(std::ofstream &outFileLMD, G4double unit)
@@ -1938,6 +2374,104 @@ void Gretina_Array::WriteCrystalAngles( G4String file )
 }
 
 
+void Gretina_Array::WriteSegmentPositions(std::ofstream &outFileLMD, G4double unit)
+{
+  G4int nGe, nPh, nCl;
+  G4int iPg, iCa, ne, nSol, sector, slice;
+  G4double  step = 1.*mm / ((G4double)stepFactor);   // integration step for CalculateVolumeAndCenter()
+
+  if( (segVolume.size() == 0) || stepHasChanged ) {
+    G4cout << "Calculating volume and center of segments (with step = " << step/mm << "mm ) ..." << G4endl;
+    segVolume.resize(totSegments);
+    segCenter.resize(totSegments);
+    for(iPg = 0; iPg < nPgons; iPg++) {
+      CalculateVolumeAndCenter(iPg, tSegments[iPg], nSegments[iPg], step);
+    }
+    stepHasChanged = false;
+  }
+  
+  CeulerAngles   *peA;
+  CeulerAngles   *peA1;
+  CclusterAngles *pcA;
+  CpolyhPoints   *ppG;  
+  G4int indexS;         // index of segment in segCenter
+  char line[128]; 
+  
+  G4RotationMatrix rm, rm1, radd, rmP;
+  G4ThreeVector    trasl, trasl1;
+  G4Point3D        centreSeg, rotatedPos;
+  G4Transform3D    clusterToWorld, crystalToCluster, crystalToWorld;
+  
+  for(ne = 0; ne < nEuler; ne++) {
+
+    peA = &euler[ne];
+    nCl = peA->whichGe;
+    if(nCl < 0) continue;
+    nPh = peA->numPhys * maxSolids;
+
+    trasl = peA->trasl + posShift;
+    rm = peA->rotMat;
+
+    if( (thetaShift*phiShift!=0.) || (thetaShift+phiShift!=0.) ) {
+      radd.set(0, 0, 0 );
+      radd.rotateY( thetaShift );
+      radd.rotateZ( phiShift );
+      trasl = radd( trasl );
+      rm = radd * rm;
+    }
+
+    if(thetaPrisma!=0.) {
+      rmP.set(0, 0, 0);
+      rmP.rotateX( thetaPrisma );
+      rm    = rmP * rm;
+      trasl = rmP(trasl);
+    }
+
+    clusterToWorld = G4Transform3D( rm, trasl );
+    
+    for( iCa = 0; iCa<nClAng; iCa++ ) {
+      pcA = &clust[iCa];
+      if( pcA->whichClus != nCl ) continue;
+      
+      for( nSol = 0; nSol<pcA->nsolids; nSol++ ) {
+        peA1 = &pcA->solids[nSol];
+        nGe  = peA1->whichGe;
+        if( nGe < 0 ) continue;
+        
+        rm1 = peA1->rotMat;
+
+        trasl1 = peA1->trasl;
+
+        crystalToCluster = G4Transform3D( rm1, trasl1 );
+        
+        crystalToWorld = clusterToWorld * crystalToCluster;
+        
+        for(iPg = 0; iPg < nPgons; iPg++) {
+          ppG = &pgons[iPg];
+          if(ppG->whichGe != nGe) continue; // looks for the right solid
+          indexS = tSegments[iPg];
+          
+          for( slice=0; slice<ppG->nslice; slice++ ) {
+            for( sector=0; sector<ppG->npoints/2; sector++, indexS++ ) {
+            
+              centreSeg  = G4Point3D(segCenter[indexS]);
+              
+              //rotatedPos  = rm( rm1( centreSeg ) + trasl1 ) + trasl; // old style!
+              // could be: rotatedPos = clusterToWorld * (crystalToCluster*centreSeg)
+              rotatedPos = crystalToWorld * centreSeg;
+
+              sprintf( line, " %3d %2d %2d %10.5f %10.5f %10.5f  %10.5f\n", 
+                       nPh, slice, sector, rotatedPos.x()/unit, rotatedPos.y()/unit, rotatedPos.z()/unit, segVolume[indexS]/unit*unit*unit );
+              outFileLMD << line;
+	    }
+          }
+          
+          nPh++;
+        }  
+      }
+    } 
+  }
+}
 
 void Gretina_Array::WriteCrystalTransformations(std::ofstream &outFileLMD, G4double unit)
 {
@@ -2025,6 +2559,165 @@ void Gretina_Array::WriteCrystalTransformations(std::ofstream &outFileLMD, G4dou
   outFileLMD << "ENDTRANSFORMATION_CRYSTALS" << G4endl;
 }
 
+void Gretina_Array::WriteSegmentAngles( G4String name, G4int format )
+{
+  if( format < 0  ){
+    G4cout << " Illegal format value!!!" << G4endl;
+    return;
+  }
+  if( format > 2  ){
+    G4cout << " Illegal format value!!!" << G4endl;
+    return;
+  }
+  if( !readOut ) {
+    G4cout << " Segments have not been defined, aborting ..." << G4endl;
+    return;
+  }
+  
+  G4int nGe, nPh, nCl;
+  G4int iPg, iCa, ne, nSol, sector, slice;
+  G4double  step = 1.*mm / ((G4double)stepFactor);   // integration step for CalculateVolumeAndCenter()
+
+  if( (segVolume.size() == 0) || stepHasChanged ) {
+    G4cout << "Calculating volume and center of segments (with step = " << step/mm << "mm ) ..." << G4endl;
+    segVolume.resize(totSegments);
+    segCenter.resize(totSegments);
+    for(iPg = 0; iPg < nPgons; iPg++) {
+      CalculateVolumeAndCenter(iPg, tSegments[iPg], nSegments[iPg], step);
+    }
+    stepHasChanged = false;
+  }
+  
+  CeulerAngles   *peA;
+  CeulerAngles   *peA1;
+  CclusterAngles *pcA;
+  CpolyhPoints   *ppG;  
+  G4int indexS;         // index of segment in segCenter
+  
+  G4RotationMatrix rm, rm1, radd, rmP;
+  G4ThreeVector    trasl, trasl1;
+  G4Point3D        centreSeg, rotatedPos;
+  G4Transform3D    clusterToWorld, crystalToCluster, crystalToWorld;
+  
+  FILE *agatanumber;
+  if( (agatanumber = fopen(name, "w")) == NULL ) {
+    G4cout << "\nCould not open " << name
+           << ", will not write angles for the segments!" << G4endl;
+    return;
+  }
+  
+  switch( format ) {
+    case 0:
+      G4cout << " Writing out segment angles in GSORT format to " << name << " ..." << G4endl;
+      break;
+    case 1:
+      G4cout << " Writing out segment positions in POLAR COORDINATES format to " << name << " ..." << G4endl;
+      break;
+    case 2:
+      G4cout << " Writing out segment positions in CARTESIAN COORDINATES format to " << name << " ..." << G4endl;
+      break;
+  }
+  
+  for(ne = 0; ne < nEuler; ne++) {
+
+    peA = &euler[ne];
+    nCl = peA->whichGe;
+    if(nCl < 0) continue;
+    nPh = peA->numPhys * maxSolids;
+
+    rm = peA->rotMat;
+    trasl = peA->trasl + posShift;
+
+    if( (thetaShift*phiShift!=0.) || (thetaShift+phiShift!=0.) ) {
+      radd.set(0, 0, 0 );
+      radd.rotateY( thetaShift );
+      radd.rotateZ( phiShift );
+      trasl = radd( trasl );
+      rm = radd * rm;
+    }
+
+    if(thetaPrisma!=0.) {
+      rmP.set(0, 0, 0);
+      rmP.rotateX( thetaPrisma );
+      rm    = rmP * rm;
+      trasl = rmP(trasl);
+    }
+      
+
+    clusterToWorld = G4Transform3D( rm, trasl );
+    
+    for( iCa = 0; iCa<nClAng; iCa++ ) {
+      pcA = &clust[iCa];
+      if( pcA->whichClus != nCl ) continue;
+      
+      for( nSol = 0; nSol<pcA->nsolids; nSol++ ) {
+        peA1 = &pcA->solids[nSol];
+        nGe  = peA1->whichGe;
+        if( nGe < 0 ) continue;
+        
+        rm1 = peA1->rotMat;
+
+        trasl1 = peA1->trasl;
+
+        crystalToCluster = G4Transform3D( rm1, trasl1 );
+        
+        crystalToWorld = clusterToWorld * crystalToCluster;
+        
+        for(iPg = 0; iPg < nPgons; iPg++) {
+          ppG = &pgons[iPg];
+          if(ppG->whichGe != nGe) continue; // looks for the right solid
+          indexS = tSegments[iPg];
+          
+          for( slice=0; slice<ppG->nslice; slice++ ) {
+            for( sector=0; sector<ppG->npoints/2; sector++, indexS++ ) {
+            
+              centreSeg  = G4Point3D(segCenter[indexS]);
+              
+              //rotatedPos  = rm( rm1( centreSeg ) + trasl1 ) + trasl; // old style!
+              // could be: rotatedPos = clusterToWorld * (crystalToCluster*centreSeg)
+              rotatedPos = crystalToWorld * centreSeg;
+
+	      switch( format ) {
+	        case 0:
+//		  fprintf(agatanumber," %3d %9d %9.4lf %9.4lf\n",
+		  fprintf(agatanumber,"  Riv#%4.1d %9.1d    Theta= %9.4f        Phi= %9.4f\n",
+		      nPh, slice*10+sector, rotatedPos.theta()/deg,
+		      ((rotatedPos.phi()>0.) ? (rotatedPos.phi()/deg) : (rotatedPos.phi()/deg + 360.)));
+	          break;
+	        case 1:
+//		  fprintf(agatanumber," %3d %9d %9.4lf %9.4lf %9.4lf\n",
+		  fprintf(agatanumber," %3d %9d %9.4f %9.4f %9.4f\n",
+		      nPh, slice*10+sector, rotatedPos.mag()/mm, rotatedPos.theta()/deg,
+		      ((rotatedPos.phi()>0.) ? (rotatedPos.phi()/deg) : (rotatedPos.phi()/deg + 360.)));
+	          break;
+	        case 2:
+//		  fprintf(agatanumber," %3d %9d %9.4lf %9.4lf %9.4lf\n",
+		  fprintf(agatanumber," %3d %9d %9.4f %9.4f %9.4f\n",
+		      nPh, slice*10+sector, rotatedPos.x()/mm, rotatedPos.y()/mm, rotatedPos.z()/mm);
+	          break;
+	      }
+	    }
+          }
+          
+          nPh++;
+        }  
+      }
+    } 
+  }
+  fclose(agatanumber);
+  switch( format ) {
+    case 0:
+      G4cout << " Segment angles successfully written out to " << name << G4endl;
+      break;
+    case 1:
+      G4cout << " Segment positions successfully written out to " << name << G4endl;
+      break;
+    case 2:
+      G4cout << " Segment positions successfully written out to " << name << G4endl;
+      break;
+  }
+}
+
 
 // plane vv = (a,b,c,d)  pV=(a,b,c)
 // line A-->B = AB
@@ -2093,6 +2786,102 @@ G4int Gretina_Array::CheckOverlap(G4int iPg, G4int start, G4int nsegs)
   }
   delete [] ppsegs;
   return nproblems;
+}
+
+G4int Gretina_Array::GetSegmentNumber( G4int offset, G4int nGe, G4ThreeVector position )
+{
+  if( !readOut )
+    return 0;
+  //  else if( planarLUT[nGe%1000] )
+  //    return GetPlanSegmentNumber( nGe, position );
+  else    
+    return GetCoaxSegmentNumber( nGe, position );
+
+  return 0;
+}
+
+G4int Gretina_Array::GetCoaxSegmentNumber( G4int nGe, G4ThreeVector position )
+{
+  EInside inside;
+
+  CeulerAngles   *pEa = NULL;
+  CclusterAngles *pCa = NULL;
+  CpolyhPoints   *ppgerm = NULL;
+  CpolyhPoints   *ppseg  = NULL;
+
+  G4int detNum   = nGe%1000;
+  G4int cluNum   = nGe/1000;
+  G4int subIndex = detNum%maxSolids;
+  
+  //  G4cout << " nGe, det, clu, ind " << nGe << " " << detNum<< " " << cluNum << " " << subIndex << G4endl;
+  
+  G4int slice=0, sector=0, ss, nCa, nPg, indexS, whichGe;
+  
+  
+  G4int whichClus = -100;
+  
+  for( nCa=0; nCa<(G4int)(euler.size()); nCa++ ) {
+    pEa = &euler[nCa];
+    //    G4cout << nCa << " " << pEa->numPhys << " " << pEa->whichGe << G4endl;
+    if( pEa->numPhys == cluNum ) {
+      whichClus = pEa->whichGe;
+      break;
+    }   
+  }
+  
+  if( whichClus < 0 ) {
+    G4cout << " Warning! Could not find any detector containing this point: " << position/cm
+                                                                            << " cm" << G4endl;
+    return -1;  
+  }
+
+  for( nCa=0; nCa<nClAng; nCa++ ) {
+    pCa = &clust[nCa];
+    if( pCa->whichClus != whichClus ) continue;
+
+    whichGe = pCa->solids[subIndex].whichGe;
+    //    G4cout << " whichGe " << whichGe << G4endl;
+
+    for( nPg=0; nPg<nPgons; nPg++ ) {
+      ppgerm = &pgons[nPg];
+      if( ppgerm->whichGe != whichGe ) continue;
+      //      G4cout << " ppgerm->whichGe " << nGe << " " << whichGe << " " << ppgerm->whichGe << " " << position/mm << G4endl;
+      indexS = tSegments[nPg];
+      for( slice=0; slice<ppgerm->nslice; slice++ ) {
+        for( sector=0; sector<ppgerm->npoints/2; sector++, indexS++ ) { 
+          // the four parts composing the segment
+          for( ss = 0; ss < 4; ss++ ) {
+            switch (ss) {
+            case 0:
+              ppseg = &pgSegLl[indexS];                   // the lower segment at the left
+              break;
+            case 1:
+              ppseg = &pgSegLu[indexS];                   // the upper segment at the left
+              break;
+            case 2:
+              ppseg = &pgSegRl[indexS];                   // the lower segment at the right
+              break;
+            case 3:
+              ppseg = &pgSegRu[indexS];                   // the upper segment at the right
+              break;
+            }
+            inside = ppseg->pPoly->Inside( position );
+            if( inside != kOutside ){
+	      //	      G4cout << "slice = " << slice << "   sector = " << sector << G4endl;
+              return 10*slice+sector;
+	    }
+          }
+        }
+      }
+
+      G4cout << " Warning! Could not find any segment containing this point: " << position/cm
+                                                                               << " cm" << G4endl;
+      return -1;  
+    }
+  }
+  G4cout << " Warning! Could not find any detector containing this point: " << position/cm
+                                                                            << " cm" << G4endl;
+  return -1;  
 }
 
 void Gretina_Array::CalculateVolumeAndCenter(G4int iPg, G4int start, G4int nsegs, G4double step)
@@ -2274,6 +3063,23 @@ void Gretina_Array::SetClustFile(G4String nome)
   G4cout << " ----> The cluster descriptions are read from "
              << clustFile << G4endl;
 }
+
+void Gretina_Array::SetSliceFile(G4String nome)
+{
+  if( nome(0) == '/' )
+    sliceFile = nome;
+  else {
+    if( nome.find( "./", 0 ) != string::npos ) {
+      G4int position = nome.find( "./", 0 );
+      if( position == 0 )
+        nome.erase( position, 2 );
+    }  
+    sliceFile = iniPath + nome;
+  }  
+  
+  G4cout << " ----> The slice planes are read from "
+             << sliceFile << G4endl;
+}
   
 void Gretina_Array::SetDetMate(G4String materialName)
 {
@@ -2421,7 +3227,6 @@ void Gretina_Array::SetPosShift( G4ThreeVector shift )
 Gretina_Array_Messenger::Gretina_Array_Messenger(Gretina_Array* pTarget)
 :myTarget(pTarget)
 { 
-
   const char *aLine;
   G4String commandName;
   G4String directoryName;
@@ -2608,6 +3413,7 @@ Gretina_Array_Messenger::~Gretina_Array_Messenger()
   delete SetAngleCmd;
   delete SetWallsCmd;
   delete SetClustCmd;
+  delete SetSliceCmd;
   delete EnableCylCmd;
   delete DisableCylCmd;
   delete EnablePassiveCmd;
@@ -2672,6 +3478,20 @@ void Gretina_Array_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
   }
   if( command == DisablePassiveCmd ) {
     myTarget->SetUsePassive( DisablePassiveCmd->GetNewBoolValue(newValue) );
+  }
+  if( command == WriteAnglesCmd ) {
+    G4int length = newValue.length();
+    G4int position = 0;
+    G4int format;
+    G4String name;
+    G4String formato;
+    if( newValue.find(" ", position) != string::npos ) {
+      position = newValue.find(" ", position);
+      name = newValue.substr(0, position);
+      formato = newValue.substr(position, length);
+      sscanf( formato.c_str(), "%d", &format);
+      myTarget->WriteSegmentAngles(G4String(name), format);
+    }  
   }
   if( command == WriteCryAnglesCmd ) {
     myTarget->WriteCrystalAngles(newValue);

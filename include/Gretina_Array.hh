@@ -56,6 +56,7 @@ class Gretina_Array
     G4String                    iniPath;     //> directory where the files are located
     G4String                    eulerFile;   //> angles and positions to place the clusters into space
     G4String                    solidFile;   //> shape of the crystals
+    G4String                    sliceFile;   //> segmentation
     G4String                    wallsFile;   //> cryostats
     G4String                    clustFile;   //> arrangement of the crystals and cryostats within a cluster
     
@@ -177,12 +178,13 @@ class Gretina_Array
   /// some flags 
   //////////////// 
   private:
-    G4bool                      usePassive;   //> true: passive areas of the crystals will be generated
-    G4bool                      drawReadOut;  //> true: segments will be visualized
-    G4bool                      useAncillary; //> true: ancillary detectors will be constructed
-    G4bool                      makeCapsule;  //> true: encapsulation will be generated
-    G4bool                      useCylinder;  //> true: the intersection with the cylinder will be considered
-    G4bool                      cryostatStatus;  //> true: include cryostats behind clusters //LR
+    G4bool                      usePassive;     //> true: passive areas of the crystals will be generated
+    G4bool                      drawReadOut;    //> true: segments will be visualized
+    G4bool                      useAncillary;   //> true: ancillary detectors will be constructed
+    G4bool                      makeCapsule;    //> true: encapsulation will be generated
+    G4bool                      useCylinder;    //> true: the intersection with the cylinder will be considered
+    G4bool                      cryostatStatus; //> true: include cryostats behind clusters //LR
+    G4bool    readOut;                          //> true: a segmentation have been defined  
 
   //////////////////////////////
   ///////// Methods  ///////////
@@ -196,6 +198,7 @@ class Gretina_Array
   private:
     void      ReadEulerFile();
     void      ReadSolidFile();
+    void      ReadSliceFile();
     void      ReadWallsFile();
     void      ReadClustFile();
   
@@ -225,6 +228,14 @@ class Gretina_Array
   //////////////////////////////////
   
   private:
+    //////////////////////////////
+    /// Construct the segments
+    //////////////////////////////
+    void      ConstructSegments        ();
+    /////////////////////////////////////////////////////////////////////////////////
+    /// Calculate the vertexes of the segments starting from the original polyhedra
+    /////////////////////////////////////////////////////////////////////////////////
+    G4int     CalculateSegments        ( G4int );
     ///////////////////////////////////
     /// Checks for possible overlaps
     //////////////////////////////////
@@ -240,12 +251,14 @@ class Gretina_Array
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// Calculates segment number (corresponding to a given detector and position relative to the crystal)
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    G4int     GetCoaxSegmentNumber         ( G4int, G4ThreeVector );      
 
   //////////////////////////////////
   /// writes out the information
   /////////////////////////////////
   private:
     void WritePositions               ( std::ofstream &outFileLMD, G4double=1.*mm );
+    void WriteSegmentPositions        ( std::ofstream &outFileLMD, G4double=1.*mm );
     void WriteCrystalPositions        ( std::ofstream &outFileLMD, G4double=1.*mm );
     void WriteCrystalTransformations  ( std::ofstream &outFileLMD, G4double=1.*mm );
   
@@ -259,12 +272,14 @@ class Gretina_Array
   /// public interface to the private method!
   ////////////////////////////////////////////////
   public:
+    G4int     GetSegmentNumber         ( G4int, G4int, G4ThreeVector );    
   
   //////////////////////////////////
   /// writes out the information
   /////////////////////////////////
   public:
     void WriteHeader                  ( std::ofstream &outFileLMD, G4double=1.*mm );
+    void WriteSegmentAngles           ( G4String, G4int = 0 );
     void WriteCrystalAngles           ( G4String );
 
   //////////////////////////////////////////////////
@@ -274,6 +289,7 @@ class Gretina_Array
     void SetSolidFile           ( G4String );
     void SetWallsFile           ( G4String );
     void SetAngleFile           ( G4String );
+    void SetSliceFile           ( G4String );
     void SetClustFile           ( G4String );
 
   public:       
@@ -291,6 +307,7 @@ class Gretina_Array
     void SetUseCylinder         ( G4bool );
     void SetUsePassive          ( G4bool );
     void SetDrawReadOut         ( G4bool );
+    void SetWriteSegments       ( G4bool );
     
   public:       
     void SetStep                ( G4int  ); 
@@ -308,6 +325,7 @@ class Gretina_Array
   public:
     inline G4String              GetEulerFile       () { return eulerFile;   };
     inline G4String              GetSolidFile       () { return solidFile;   };
+    inline G4String              GetSliceFile       () { return sliceFile;   };
     inline G4String              GetWallsFile       () { return wallsFile;   };
     
   public:
@@ -339,6 +357,7 @@ class Gretina_Array_Messenger: public G4UImessenger
     G4UIcmdWithAString*        SetAngleCmd;
     G4UIcmdWithAString*        SetWallsCmd;
     G4UIcmdWithAString*        SetClustCmd;
+    G4UIcmdWithAString*        SetSliceCmd;
     G4UIcmdWithAString*        DetMatCmd;
     G4UIcmdWithAString*        WalMatCmd;
     G4UIcmdWithAString*        RotateArrayCmd;

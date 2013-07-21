@@ -47,7 +47,7 @@ class EventAction : public G4UserEventAction
     void closeCrmatFile();
     void SetCrmatFile(G4String);
     void SetGretinaCoords();
-    void SetPosRes(G4double res) { positionRes = res; }
+    void SetPackRes(G4double res) { packingRes = res; }
     void SetS800KE(G4double ke) { S800KE = ke; }
     G4double GetS800KE() { return S800KE; }
     const G4Event* GetEvent() { return evt; }
@@ -74,7 +74,7 @@ class EventAction : public G4UserEventAction
     G4bool mode2Out;  
     G4float crmat[MAXDETPOS][MAXCRYSTALNO][4][4];
     G4bool gretinaCoords;
-    G4double positionRes;
+    G4double packingRes;
     G4double S800KE;
     const G4Event* evt;
     G4bool print;

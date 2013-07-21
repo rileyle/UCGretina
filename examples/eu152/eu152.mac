@@ -11,7 +11,7 @@
 /Experiment/Source/Set eu152
 /Target/sourceFrame eu152_Z2707
 # Output parameters ============================================================
-/Mode2/PositionRes 6.0 mm
+/Mode2/PackingRes 6.0 mm
 /Mode2/crmatFile crmat.LINUX
 /Mode2/GretinaCoords
 /Mode2/Filename eu152.dat

@@ -12,7 +12,7 @@
 /Experiment/Source/setWhiteLowE     10. keV
 /Experiment/Source/setWhiteHighE 20000. keV
 # Output parameters ============================================================
-/Mode2/PositionRes 6.0 mm
+/Mode2/PackingRes 6.0 mm
 /Mode2/crmatFile crmat.LINUX
 /Mode2/GretinaCoords
 /Mode2/Filename white.dat

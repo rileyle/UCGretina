@@ -1,5 +1,7 @@
 
 #include "TrackerGammaSD.hh"
+#include "G4RunManager.hh"
+#include "DetectorConstruction.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4Step.hh"
 #include "G4ThreeVector.hh"
@@ -18,7 +20,6 @@ TrackerGammaSD::TrackerGammaSD(G4String name)
   G4String HCname;
   collectionName.insert(HCname="gammaCollection");
   print=false; //LR (formerly not initialized)
-
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -40,32 +41,62 @@ void TrackerGammaSD::Initialize(G4HCofThisEvent*)
 
 G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
 {
-
-  G4double DE = aStep->GetTotalEnergyDeposit();
-  if(DE<0.001*eV) return false;
-
-  G4double edep = aStep->GetTotalEnergyDeposit();
-
-  G4double etotal = aStep->GetTrack()->GetVertexKineticEnergy(); 
-
   G4String name = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
-
-  G4int detCode = aStep->GetPreStepPoint()->GetTouchable()->GetReplicaNumber(depth);
-  G4int detNum  = detCode%1000;
 
   if(name.substr(0,5)=="geCap")
     {
+      G4RunManager* runManager = G4RunManager::GetRunManager();
+      DetectorConstruction* theDetector = (DetectorConstruction*)runManager->GetUserDetectorConstruction();
+
+      G4double DE = aStep->GetTotalEnergyDeposit();
+      if(DE<0.001*eV) return false;
+
+      G4double edep = aStep->GetTotalEnergyDeposit();
+
+      G4double etotal = aStep->GetTrack()->GetVertexKineticEnergy(); 
+
+      G4int detCode = aStep->GetPreStepPoint()->GetTouchable()->GetReplicaNumber(depth);
+      G4int detNum  = detCode%1000;
+
+      G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();
+
+      ////////////////////////////////////////////////////////////////////
+      /// Position of the interaction point in the solid reference frame
+      ///////////////////////////////////////////////////////////////////
+      G4StepPoint* preStepPoint = aStep->GetPreStepPoint();
+      G4TouchableHandle theTouchable = preStepPoint->GetTouchableHandle();
+      G4VPhysicalVolume* topVolume = theTouchable->GetVolume(depth);
+  
+      G4ThreeVector frameTrans = topVolume->GetFrameTranslation();
+                                  
+      const G4RotationMatrix* rot = topVolume->GetFrameRotation();
+                                  
+      G4RotationMatrix frameRot;
+      if( rot )
+	frameRot = *rot;
+  
+      G4ThreeVector posSol = frameRot( position );
+      posSol += frameRot( frameTrans );
+    
+      //////////////////////
+      /// Segment number
+      //////////////////////
+      G4int segCode = 0;
+
+      segCode = theDetector->GetGretina()->GetSegmentNumber( 0, detCode, posSol );
 
       TrackerGammaHit* newHit = new TrackerGammaHit();
 
       newHit->SetTrackID  (aStep->GetTrack()->GetTrackID());
 
       newHit->SetParticleID(aStep->GetTrack()->GetDefinition()->GetParticleName());
+      newHit->SetProcess(aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName());
 
       newHit->SetDetNumb(detNum);
+      newHit->SetSegNumb(segCode);
       newHit->SetEdep     (edep);
       newHit->SetTotalEnergy(etotal);
-      newHit->SetPos      (aStep->GetPostStepPoint()->GetPosition());
+      newHit->SetPos      (position);
 
       gammaCollection->insert( newHit );
       newHit->Draw();
