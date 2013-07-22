@@ -26,7 +26,6 @@ TrackerGammaHit::TrackerGammaHit(const TrackerGammaHit& right)
   detNumb   = right.detNumb;
   segNumb   = right.segNumb;
   edep      = right.edep;
-  etotal    = right.etotal;
   pos       = right.pos;
 }
 
@@ -40,7 +39,6 @@ const TrackerGammaHit& TrackerGammaHit::operator=(const TrackerGammaHit& right)
   detNumb   = right.detNumb;
   segNumb   = right.segNumb;
   edep      = right.edep;
-  etotal    = right.etotal;
   pos       = right.pos;
   return *this;
 }

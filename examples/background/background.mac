@@ -12,6 +12,10 @@
 /BackgroundSphere/R_max 3.4 m
 /Experiment/RunSource
 /Experiment/Source/Set background
+# Tracking parameters ==========================================================
+/Tracking/Method 0
+#/GammaPrint/Track_Set
+#/IonPrint/Track_Set
 # Output parameters ============================================================
 /Mode2/PackingRes 6.0 mm
 /Mode2/crmatFile crmat.LINUX

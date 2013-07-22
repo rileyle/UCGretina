@@ -50,10 +50,12 @@ public:
   void ReactionOn(){BeamOut->SetReactionOn();fracOn=false;}
   void ReactionOff(){BeamOut->SetReactionOff();fracOn=false;}
   void SetFraction(G4double f){fracOn=true;frac=f;}
-  G4double GetSourceEnergy();
   void SetSourceEnergy(G4double);
   void SetWhiteSourceLowE(G4double energy){sourceWhiteLoE = energy;}
   void SetWhiteSourceHighE(G4double energy){sourceWhiteHiE = energy;}
+
+  G4double GetSourceEnergy();
+  G4bool GetInBeam(){return inbeam;}
 
 private:
 

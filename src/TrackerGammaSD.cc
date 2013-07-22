@@ -20,6 +20,8 @@ TrackerGammaSD::TrackerGammaSD(G4String name)
   G4String HCname;
   collectionName.insert(HCname="gammaCollection");
   print=false; //LR (formerly not initialized)
+  trackingMethod = 0;
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -31,10 +33,18 @@ TrackerGammaSD::~TrackerGammaSD(){ }
 void TrackerGammaSD::Initialize(G4HCofThisEvent*)
 {
 
-
   gammaCollection = new TrackerGammaHitsCollection
                           (SensitiveDetectorName,collectionName[0]); 
- 
+  annihilationHappened = false; 
+  residualEnergy = 0.;  
+
+  G4RunManager* runManager = G4RunManager::GetRunManager();
+  if(runManager->GetCurrentEvent()->GetPrimaryVertex()->GetPrimary()->GetG4code()->GetParticleName()
+     == "gamma")
+    primaryGammaID = 0; // Source and background simulations
+  else
+    primaryGammaID = 2; // In-beam simulations
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -48,12 +58,113 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
       G4RunManager* runManager = G4RunManager::GetRunManager();
       DetectorConstruction* theDetector = (DetectorConstruction*)runManager->GetUserDetectorConstruction();
 
-      G4double DE = aStep->GetTotalEnergyDeposit();
-      if(DE<0.001*eV) return false;
+      // Code for trackingMethod case 1 adopted from the 2009 release of the AGATA simulation code.
+      G4double edep = 0.;
+      G4double additionalEnergy = 0.;
+      G4double deltaEnergy = 0.;
+      G4String ChiEStato;
+      G4String ilProcesso;
+      G4String ilGeneratore = " ";
+      G4int padre;
 
-      G4double edep = aStep->GetTotalEnergyDeposit();
+      switch(trackingMethod){
+      case 1:
+	///////////////////////////////////////////////////////////////////
+	//// Idea: primary gamma is followed
+	//// store the position where an e+ annihilated
+	//// accept only secondary gammas coming from that position!!!
+	///////////////////////////////////////////////////////////////////
 
-      G4double etotal = aStep->GetTrack()->GetVertexKineticEnergy(); 
+	/// Consider only gammas and positrons
+	ChiEStato = aStep->GetTrack()->GetDefinition()->GetParticleName();
+	ilProcesso = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
+	//	G4cout << ChiEStato << " interacted through a " << ilProcesso << G4endl;
+	/// positrons: just store the position!!!
+	if( ChiEStato == "e+" && ilProcesso == "annihil" ) {
+	  positionOfAnnihilation = aStep->GetPostStepPoint()->GetPosition();
+	  /// some positron decays in flight, should correct for that ...
+	  ///////////////residualEnergy = -1.*(aStep->GetDeltaEnergy());
+	  residualEnergy = aStep->GetTrack()->GetKineticEnergy();
+	  annihilationHappened = true;
+	  //	  G4cout << " e+ annihilated at " << positionOfAnnihilation/mm << G4endl; 
+	  //	  G4cout << " e+ residual energy is " << residualEnergy/keV << G4endl;
+	  if( residualEnergy ) {
+	    //	    G4cout << ChiEStato << " interacted through a " << ilProcesso << G4endl;
+	    //	    G4cout << " e+ residual energy is " << residualEnergy/keV << G4endl;
+	    G4int ii = gammaCollection->entries();
+	    //	    G4cout << " number of entries is " << ii << G4endl;
+	    if( ii ) {
+	      //	      G4cout << " Deposited energy was " << (*gammaCollection)[ii-1]->GetEdep()/keV << G4endl;
+	      edep = (*gammaCollection)[ii-1]->GetEdep() - residualEnergy;
+	      if( edep <= 0. ) edep = 0.;
+	      (*gammaCollection)[ii-1]->SetEdep(edep);
+	      //	      G4cout << " Deposited energy now is " << (*gammaCollection)[ii-1]->GetEdep()/keV << G4endl;
+	      residualEnergy = 0.;
+	    }
+	  }
+	}
+	if( ChiEStato != "gamma" ) return false;
+   
+
+	///////////////////////////////////////////////
+	///////// Treatment of secondary gammas
+	///////////////////////////////////////////////
+
+	padre = aStep->GetTrack()->GetParentID();
+	//	G4cout << "ParentID = " << padre << G4endl;
+
+	// LR: Primary gammas from in-beam simulation have ParentID = 2. 
+	//     In source simulations, primaries have ParentID = 0.
+	if( padre > primaryGammaID ) {
+	  ////////////////////////////////////////////////////////////////////////
+	  //// Should not count very-low-energy gammas from photoelectric
+	  ///  or bremsstrahlung
+	  ////////////////////////////////////////////////////////////////////////
+	  if( aStep->GetTrack()->GetCreatorProcess() )
+	    ilGeneratore = aStep->GetTrack()->GetCreatorProcess()->GetProcessName();
+	  if( ilGeneratore != "annihil" )
+	    return false;
+
+	  ////////////////////////////////////////////////////////////////////////
+	  //// Only secondary gammas from annihilation vertexes!!!
+	  ////////////////////////////////////////////////////////////////////////
+	  if( annihilationHappened ) {
+	    G4ThreeVector originOfTrack = aStep->GetTrack()->GetVertexPosition();
+	    //G4cout << " originOfTrack is " << originOfTrack/mm << G4endl;
+	    if( (positionOfAnnihilation-originOfTrack).mag() > 0.0001*mm ) return false;
+	  }
+	}
+	///////////////////////////////////////////////////////////////////
+	/////// Should take care of in-flight annihilations!
+	//////////////////////////////////////////////////////////////////
+	if( ilProcesso == "conv" || ilProcesso == "LowEnConversion" ) {
+	  additionalEnergy = residualEnergy;
+	  //if( additionalEnergy )
+	  //G4cout << " additionalEnergy is " << additionalEnergy << G4endl;
+	}
+
+	// LR: G4Step->GetDeltaEnergy() has been made obsolete, so now we do it "by hand."
+	//	G4cout << std::fixed << std::setprecision(4) << std::setw(10)
+	//	       << "aStep->GetDeltaEnergy() = " << aStep->GetDeltaEnergy() 
+	//	       << "   deltaEnergy = " << deltaEnergy << G4endl;
+
+	deltaEnergy = aStep->GetPostStepPoint()->GetKineticEnergy() - aStep->GetPreStepPoint()->GetKineticEnergy();
+	if( ilProcesso != "conv" && ilProcesso != "LowEnConversion" )
+	  edep  = -1.*deltaEnergy; // This gives the total energy deposited by the gamma and its secondaries.
+	else {      // pair production
+	  edep  =  -1.*deltaEnergy - 2. * electron_mass_c2 - additionalEnergy;  // E_gamma - 2 m_e
+	  if( edep < 0. ) edep = 0.;
+	}
+
+	if(edep==0.)
+	  return false;
+	break;
+
+      default:
+	// Track everything (the primary gamma, all secondary electrons, and all secondary gammas).
+	edep = aStep->GetTotalEnergyDeposit();
+	if(edep<0.001*eV) return false;
+      }
 
       G4int detCode = aStep->GetPreStepPoint()->GetTouchable()->GetReplicaNumber(depth);
       G4int detNum  = detCode%1000;
@@ -95,7 +206,6 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
       newHit->SetDetNumb(detNum);
       newHit->SetSegNumb(segCode);
       newHit->SetEdep     (edep);
-      newHit->SetTotalEnergy(etotal);
       newHit->SetPos      (position);
 
       gammaCollection->insert( newHit );
@@ -123,13 +233,16 @@ void TrackerGammaSD::EndOfEvent(G4HCofThisEvent* HCE)
    G4int NbHits = gammaCollection->entries();
 
         if (NbHits>0&&print) 
-	   { 
+	  { 
+
+	    G4RunManager* runManager = G4RunManager::GetRunManager();
 	    
-	   G4cout << "\n--------> " << NbHits << " hits for gamma tracking: " << G4endl;
+	    G4cout << "\n--------> event " << runManager->GetCurrentEvent()->GetEventID() << ", "
+		   << NbHits << " hits for gamma tracking: " << G4endl;
 
-	   for (i=0;i<NbHits;i++) (*gammaCollection)[i]->Print();
+	    for (i=0;i<NbHits;i++) (*gammaCollection)[i]->Print();
 
-	   }
+	  }
 
 
   static G4int HCID = -1;

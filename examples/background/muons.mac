@@ -9,6 +9,10 @@
 # Source parameters ============================================================
 /Experiment/RunSource
 /Experiment/Source/Set muon
+# Tracking parameters ==========================================================
+/Tracking/Method 0
+#/GammaPrint/Track_Set
+#/IonPrint/Track_Set
 # Output parameters ============================================================
 /Mode2/PackingRes 6.0 mm
 /Mode2/crmatFile crmat.LINUX

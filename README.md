@@ -275,6 +275,19 @@ Optional commands describing the spherical shell surrounding GRETINA from which 
     /BackgroundSphere/R_max <double> <unit>
 
 > Set the inner and outer radii of the background sphere (default: 3.0 m, 3.4 m).
+## Tracking ##
+
+    /Tracking/Method < 0 | 1 >
+
+> Set the tracking method. 0: Track the primary particle and all associated secondary particles. 1: Track only the interactions of the primary gamma-ray and secondary gammas produced by associated e+ annihilation events. The default is option 0. Option 1 should not be used with muon background simulations.
+
+    /GammaPrint/Track_Set
+
+> Print gamma-ray tracking information to standard output.
+
+    /IonPrint/Track_Set
+
+> Print ion tracking information to standard output.
 
 ## Mode 2 Output ##
 
@@ -311,10 +324,10 @@ Energies are expressed in keV, and positions are expressed in mm.
 > Interaction points are expressed in the Geant4 coordinate system 
 > (y = up, z = beam) by default. 
 
-    /Mode2/PositionRes <float> <unit>
+    /Mode2/PackingRes <float> <unit>
 
-> The PositionRes parameter determines the closest spacing of
-> gamma-ray interaction points within each event that GRETINA can
+> The PackingRes parameter determines the closest spacing of
+> gamma-ray interaction points within each segment that GRETINA can
 > resolve. Simulated interaction points are consolidated
 > accordingly. Specify a zero position resolution to turn off
 > consolidation.
