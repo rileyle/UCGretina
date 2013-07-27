@@ -355,11 +355,13 @@ The output file contains gamma-ray information for each event that
 deposited energy in GRETINA. For each event there is a header line
 beginning with '$':
 
-    $ nHits Egamma Event#
+    $ nHits Egamma fullEnergy Event#
 
 where nHits is the number of interaction ponts, Egamma is the total
-energy of the event, and Event# is the event number. The header line
-is followed by nHits lines describing the hits with the format:
+energy of the event, fullEnergy is 1 for events in which the full energy
+of the emitted gamma ray is deposited and 0 otherwise, and Event# is
+the event number. The header line is followed by nHits lines
+describing the hits with the format:
 
     detNum Edep x y z
 

@@ -96,88 +96,147 @@ void EventAction::EndOfEventAction(const G4Event* e)
 
       // Packing: consolidate interaction points within segments based on proximity. 
 
+      G4int trackID[1000];
       G4int detNum[1000];
       G4int segNum[1000];
       G4double measuredEdep[1000];
       G4double measuredX[1000];
       G4double measuredY[1000];
       G4double measuredZ[1000];
+      G4double X0[1000];
+      G4double Y0[1000];
+      G4double Z0[1000];
       G4int NCons[1000];
       G4double packingRes2 = packingRes*packingRes;
 
-      // Initialize the first "measured" interaction point.
+      G4int NMeasured = 0;
+      G4double totalEdep = 0;
+      G4int NDetsHit = 0;
 
-      detNum[0] = (*gammaCollection)[0]->GetDetNumb();
-      segNum[0] = (*gammaCollection)[0]->GetSegNumb();
-      measuredEdep[0] = (*gammaCollection)[0]->GetEdep()/keV;
-      measuredX[0] = (*gammaCollection)[0]->GetPos().getX()/mm;
-      measuredY[0] = (*gammaCollection)[0]->GetPos().getY()/mm;
-      measuredZ[0] = (*gammaCollection)[0]->GetPos().getZ()/mm;
-      NCons[0] = 1;
-      G4int NMeasured = 1;
+      for(G4int i = 0; i < Nhits; i++){
 
-      G4double totalEdep = (*gammaCollection)[0]->GetEdep()/keV;
+	G4double x  = (*gammaCollection)[i]->GetPos().getX()/mm;
+	G4double y  = (*gammaCollection)[i]->GetPos().getY()/mm;
+	G4double z  = (*gammaCollection)[i]->GetPos().getZ()/mm;
+	G4double e  = (*gammaCollection)[i]->GetEdep()/keV;
+	totalEdep += e;
 
-      for(G4int i = 1; i < Nhits; i++){
+	NCons[i] = -1;
+	G4bool processed = false;	
 
-	NCons[i] = -1; // Initialize!
+	// Initialize a new interaction point for each gamma-ray hit.
+	if((*gammaCollection)[i]->GetParticleID() == "gamma"){
 
-	totalEdep += (*gammaCollection)[i]->GetEdep()/keV;
+	  trackID[NMeasured]      = (*gammaCollection)[i]->GetTrackID();
+	  detNum[NMeasured]       = (*gammaCollection)[i]->GetDetNumb();
+	  segNum[NMeasured]       = (*gammaCollection)[i]->GetSegNumb();
 
-	// Compare hit i with existing "measured" interaction points.
-	// Only consolidate within single crystals.
+          // This becomes the total energy deposit associated with this interaction.
+	  measuredEdep[NMeasured] = e; 
 
-	G4double x = (*gammaCollection)[i]->GetPos().getX()/mm;
-	G4double y = (*gammaCollection)[i]->GetPos().getY()/mm;
-	G4double z = (*gammaCollection)[i]->GetPos().getZ()/mm;
-	G4double e = (*gammaCollection)[i]->GetEdep()/keV;
+	  // This becomes the barycenter of all energy depositions associated with
+	  // this interaction.
+	  measuredX[NMeasured]    = x;
+	  measuredY[NMeasured]    = y;
+	  measuredZ[NMeasured]    = z;
+	  trackID[NMeasured]      = (*gammaCollection)[i]->GetTrackID();
 
-	G4bool consolidated = false;
-
-	for(G4int j = 0; j < NMeasured; j++){
-
-	  G4double prox2 = (x - measuredX[j])*(x - measuredX[j]) + (y - measuredY[j])*(y - measuredY[j]) + (z - measuredZ[j])*(z - measuredZ[j]);
-
-	  if( prox2 < packingRes2                                   // proximal
-	      && (*gammaCollection)[i]->GetDetNumb() == detNum[j] // same crystal
-	      && (*gammaCollection)[i]->GetSegNumb() == segNum[j] // same segment
-	      && !consolidated ){                          // not already counted
-
-	    // Energy-weighted average
-	    measuredX[j] = (measuredEdep[j]*measuredX[j] + e*x)/(measuredEdep[j] + e);
-	    measuredY[j] = (measuredEdep[j]*measuredY[j] + e*y)/(measuredEdep[j] + e);
-	    measuredZ[j] = (measuredEdep[j]*measuredZ[j] + e*z)/(measuredEdep[j] + e);
-	    measuredEdep[j] += e;
-
-	    NCons[j]++;
-	    consolidated = true;
-
-	  }
-
-	}
-
-	// If hit i cannot be consolidated with an existing gamma-ray 
-	// interaction point, add a new one. 
-
-	if(!consolidated){
-
-	  detNum[NMeasured] = (*gammaCollection)[i]->GetDetNumb();
-	  segNum[NMeasured] = (*gammaCollection)[i]->GetSegNumb();
-	  measuredEdep[NMeasured] = e;
-	  measuredX[NMeasured] = x;
-	  measuredY[NMeasured] = y;
-	  measuredZ[NMeasured] = z;
+	  // Position of the initial interaction. We use position to identify the 
+	  // tracks produced by this interaction.
+	  X0[NMeasured]           = x;
+	  Y0[NMeasured]           = y;
+	  Z0[NMeasured]           = z;
 
 	  NCons[NMeasured] = 1;
 	  NMeasured++;
+	  processed = true;
+
+	// Combine secondary-particle hits with their parent interaction points.
+	} else {
+
+	  // Compare hit i with existing "measured" interaction points.
+	  for(G4int j = 0; j < NMeasured; j++){
+
+	    G4double x0 = (*gammaCollection)[i]->GetTrackOrigin().getX()/mm;
+	    G4double y0 = (*gammaCollection)[i]->GetTrackOrigin().getY()/mm;
+	    G4double z0 = (*gammaCollection)[i]->GetTrackOrigin().getZ()/mm;
+
+	    // G4cout << "(*gammaCollection)[" << i << "]->GetParentTrackID() = "
+	    // 	   << (*gammaCollection)[i]->GetParentTrackID()
+	    // 	   << "   trackID[j] = " << trackID[j]
+	    // 	   << "   (x0 - X0[" << j << "]) = " << (x0 - X0[j])
+	    // 	   << "   (y0 - Y0[" << j << "]) = " << (y0 - Y0[j])
+	    // 	   << "   (z0 - Z0[" << j << "]) = " << (z0 - Z0[j])
+	    // 	   << "   (*gammaCollection)[" << i << "]->GetDetNumb()" 
+	    // 	   << (*gammaCollection)[i]->GetDetNumb()
+	    // 	   << "   detNum[" << j << "] = " << detNum[j] << G4endl;
+
+	    if( (*gammaCollection)[i]->GetParentTrackID() == trackID[j]  // correct parent
+		&& (x0 - X0[j])*(x0 - X0[j]) < 0.001*mm*0.001*mm
+		&& (y0 - Y0[j])*(y0 - Y0[j]) < 0.001*mm*0.001*mm
+		&& (z0 - Z0[j])*(z0 - Z0[j]) < 0.001*mm*0.001*mm // correct interaction point
+		&& (*gammaCollection)[i]->GetDetNumb() == detNum[j]){        // same crystal
+	      //		     && (*gammaCollection)[i]->GetSegNumb() == segNum[j]        // same segment
+	      //		     && !processed ){                                   // not already counted
+
+	      // Energy-weighted average position (barycenter)
+	      measuredX[j] = (measuredEdep[j]*measuredX[j] + e*x)/(measuredEdep[j] + e);
+	      measuredY[j] = (measuredEdep[j]*measuredY[j] + e*y)/(measuredEdep[j] + e);
+	      measuredZ[j] = (measuredEdep[j]*measuredZ[j] + e*z)/(measuredEdep[j] + e);
+	      measuredEdep[j] += e;
+
+	      NCons[j]++;
+	      processed = true;
+	      
+	    }
+	  }
+	}
+
+	// If hit i is not a gamma-ray hit and cannot be consolidated with 
+	// an existing gamma-ray interaction point, it's a positron or an
+	// electron multiple-scattering event that isn't associated with 
+	// energy deposition in the sensitive volume of GRETINA by a gamma 
+	// ray. (The gamma-ray interaction happened in dead material.)
+	// We'll initialize a new interaction point and treat it as a 
+	// gamma-ray interaction.
+	if(!processed){
+
+	  // G4cout << "Warning: Could not find a home for hit " << i
+	  // 	 << " of event " << event_id << ".\n Assigning it a new interaction point."
+	  // 	 << G4endl;
+
+	  trackID[NMeasured]      = (*gammaCollection)[i]->GetTrackID();
+	  detNum[NMeasured]       = (*gammaCollection)[i]->GetDetNumb();
+	  segNum[NMeasured]       = (*gammaCollection)[i]->GetSegNumb();
+	  measuredEdep[NMeasured] = e;
+	  measuredX[NMeasured]    = x;
+	  measuredY[NMeasured]    = y;
+	  measuredZ[NMeasured]    = z;
+
+	  // This is not a gamma ray. We need to trick its siblings into 
+	  // treating it as the parent gamma.
+	  trackID[NMeasured]      = (*gammaCollection)[i]->GetParentTrackID();
+	  X0[NMeasured] = (*gammaCollection)[i]->GetTrackOrigin().getX()/mm;
+	  Y0[NMeasured] = (*gammaCollection)[i]->GetTrackOrigin().getY()/mm;
+	  Z0[NMeasured] = (*gammaCollection)[i]->GetTrackOrigin().getZ()/mm;
+
+	  NCons[NMeasured] = 1;
+	  NMeasured++;
+	  processed = true;
 
 	}
 
+	if(!processed)
+	  G4cout << "Warning: Could not find a home for hit " << i
+		 << " of event " << event_id 
+		 << G4endl;
+
       }
 
-      // Packing, second pass: Consolidate the "measured" gamma-ray interaction points. 
-      // (In some cases, the tracks of secondary particles blur the
-      // distinction between initial gamma-ray hits.) 
+
+      // Packing: Consolidate the "measured" gamma-ray interaction points
+      // within a single segment that are closer than the PackingRes 
+      // parameter.
       G4int NGammaHits = NMeasured;
       for(G4int i = 0; i < NMeasured; i++){
 	for(G4int j = i+1; j < NMeasured; j++){
@@ -205,12 +264,18 @@ void EventAction::EndOfEventAction(const G4Event* e)
 
       }
 
+      G4bool fullEnergy = false;
+      if( (totalEdep - eventInfo->GetEmittedGammaEnergy(0))
+	  *(totalEdep - eventInfo->GetEmittedGammaEnergy(0)) 
+	  < 0.001*keV*0.001*keV )
+	fullEnergy = true;
+
       // Write the event with consolidated interaction points to the
       // output file. 
       if(evOut)
 	evfile << "$   " << std::setw(4) << NGammaHits << "   " 
 	       << std::fixed << std::setprecision(2) << std::setw(12) << std::right
-	       << totalEdep << "   "
+	       << totalEdep << "   " << fullEnergy << "   "
 	       << event_id
 	       << endl;
 

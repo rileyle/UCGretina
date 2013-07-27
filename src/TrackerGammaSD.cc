@@ -266,7 +266,11 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
 
 	// Track everything (the primary gamma, all secondary electrons, and all secondary gammas).
 	edep = aStep->GetTotalEnergyDeposit();
-	if(edep<0.001*eV) return false;
+
+	// Keep the gamma parent of pair-production tracks for hit processing.
+	if(edep<0.001*eV
+	    && aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() != "conv") 
+	  return false;
 
       }
 
