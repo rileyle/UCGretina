@@ -1,0 +1,12 @@
+############ Segmentation ################
+## format: 
+## 0 --> all solids the same number of slices
+## nSlices
+#########################################
+## alt. format:
+## 1 --> keep reading!
+## nsolid nslices nslice z
+######################################
+   0
+   6
+###########################

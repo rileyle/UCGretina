@@ -9,7 +9,7 @@ Target_Messenger::Target_Messenger(Target* Tar)
   TargetDir->SetGuidance("Target control.");
   
   CCmd = new G4UIcmdWithAString("/Target/Cell",this);
-  CCmd->SetGuidance("Select the target cell (thick: 200 mg/cm^2, thin: 50 mg/cm^2, empty: cell body, no windows)");
+  CCmd->SetGuidance("Select the target cell (thick: 200 mg/cm^2, thin: 50 mg/cm^2, empty: cell body, no windows), notarget: beam pipe only");
   CCmd->SetParameterName("choice",false);
   CCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 

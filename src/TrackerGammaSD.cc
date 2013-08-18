@@ -304,6 +304,23 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
 
       segCode = theDetector->GetGretina()->GetSegmentNumber( 0, detCode, posSol );
 
+      // Modify sector number to match GRETINA data stream
+      G4int slice  = segCode/10;
+      G4int sector = segCode%10;
+      // Type B crystal (offset -1)
+      if(sector>0) 
+        sector--;
+      else
+        sector=5;
+      // Type A crystal (offset -2)
+      if(detNum % 2){
+	if(sector>0) 
+	  sector--;
+	else
+	  sector=5;
+      }
+      segCode = sector + 6 * slice;
+
       TrackerGammaHit* newHit = new TrackerGammaHit();
 
       newHit->SetTrackID  (aStep->GetTrack()->GetTrackID());

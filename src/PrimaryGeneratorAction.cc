@@ -188,12 +188,16 @@ void PrimaryGeneratorAction::SetSourceType(G4String name) //LR
     SetSourceCo56();
   } else if (name == "co60") {
     SetSourceCo60();
+  } else if (name == "ra226") {
+    SetSourceRa226();
   } else if (name == "photopeaks") {
     SetSourcePhotopeaks();
   } else if (name == "eu152_peaks") {
     SetSourceEu152Peaks();
   } else if (name == "co56_peaks") {
     SetSourceCo56Peaks();
+  } else if (name == "ra226_peaks") {
+    SetSourceRa226Peaks();
   } else if (name == "au") {
     SetSourceAu();
   } else if (name == "white") {
@@ -411,6 +415,112 @@ void PrimaryGeneratorAction::SetSourceCo56Peaks()
   TheSource.push_back(new SourceData(e,sourceBranchingSum));
   e=3548.27*keV; sourceBranchingSum+=1.;
   TheSource.push_back(new SourceData(e,sourceBranchingSum));
+}
+//-------------------------------------------------------------
+void PrimaryGeneratorAction::SetSourceRa226()
+{
+  sourceType = "ra226";
+
+  G4double e;
+  sourceBranchingSum=0.;
+
+  // start from the beginning of the array
+  vector<SourceData*>::iterator itPos = TheSource.begin();
+  // clear all elements from the array
+  for(; itPos < TheSource.end(); itPos++)
+    delete *itPos;    // free the element from memory
+   // finally, clear all elements from the array
+  TheSource.clear();
+
+  e=186.211*keV;sourceBranchingSum+=0.03533;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=241.997*keV;sourceBranchingSum+=0.0719;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=295.224*keV;sourceBranchingSum+=0.1828;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=351.932*keV;sourceBranchingSum+=0.3534;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=609.316*keV;sourceBranchingSum+=0.4516;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=665.453*keV;sourceBranchingSum+=0.01521;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=768.367*keV;sourceBranchingSum+=0.0485;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=806.185*keV;sourceBranchingSum+=0.01255;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=934.061*keV;sourceBranchingSum+=0.03074;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1120.287*keV;sourceBranchingSum+=0.1478;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1155.190*keV;sourceBranchingSum+=0.01624;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1238.110*keV;sourceBranchingSum+=0.05785;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1280.960*keV;sourceBranchingSum+=0.01425;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1377.669*keV;sourceBranchingSum+=0.03954;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1401.516*keV;sourceBranchingSum+=0.01324;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1407.993*keV;sourceBranchingSum+=0.02369;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1509.217*keV;sourceBranchingSum+=0.02108;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1620.740*keV;sourceBranchingSum+=0.0151;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1661.316*keV;sourceBranchingSum+=0.01037;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1729.640*keV;sourceBranchingSum+=0.02817;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1764.539*keV;sourceBranchingSum+=0.1517;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1847.420*keV;sourceBranchingSum+=0.0200;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=2118.536*keV;sourceBranchingSum+=0.01148;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=2204.071*keV;sourceBranchingSum+=0.0489;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=2447.673*keV;sourceBranchingSum+=0.01536;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+
+}
+//-------------------------------------------------------------
+void PrimaryGeneratorAction::SetSourceRa226Peaks()
+{
+  sourceType = "ra226_peaks";
+
+  G4double e;
+  sourceBranchingSum=0.;
+
+  // start from the beginning of the array
+  vector<SourceData*>::iterator itPos = TheSource.begin();
+  // clear all elements from the array
+  for(; itPos < TheSource.end(); itPos++)
+    delete *itPos;    // free the element from memory
+   // finally, clear all elements from the array
+  TheSource.clear();
+
+  e=186.211*keV;sourceBranchingSum+=1.;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=241.997*keV;sourceBranchingSum+=1.;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=295.224*keV;sourceBranchingSum+=1.;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=351.932*keV;sourceBranchingSum+=1.;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=609.316*keV;sourceBranchingSum+=1.;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=768.367*keV;sourceBranchingSum+=1.;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1120.287*keV;sourceBranchingSum+=1.;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=1764.539*keV;sourceBranchingSum+=1.;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=2204.071*keV;sourceBranchingSum+=1.;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=2447.673*keV;sourceBranchingSum+=1.;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+
 }
 //-------------------------------------------------------------
 void PrimaryGeneratorAction::SetSourceCo60()

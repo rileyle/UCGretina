@@ -86,9 +86,9 @@ Mandatory command after setting any GRETINA parameters:
 
 Optional commands for setting LH target parameters (must precede /Target/Construct):
 
-    /Target/Cell < thick || thin || empty >
+    /Target/Cell < thick || thin || empty || notarget >
 
-> The "empty" type is the cell body with no window frames. (To construct an empty cell with frames, set "thick" or "thin" and set the target material to vacuum.)
+> The "empty" type is the cell body with no window frames. (To construct an empty cell with frames, set "thick" or "thin" and set the target material to vacuum.) The "notarget" type constructs only the LH-target beam pipe without the target assembly.
 
     /Target/Bulge <double> <unit>
 

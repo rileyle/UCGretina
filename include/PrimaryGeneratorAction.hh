@@ -41,6 +41,8 @@ public:
   void SetSourceCo56();
   void SetSourceCo56Peaks();
   void SetSourceCo60();
+  void SetSourceRa226();
+  void SetSourceRa226Peaks();
   void SetSourcePhotopeaks();
   void SetSourceAu();
   void SetSourceSimple();

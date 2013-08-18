@@ -66,7 +66,9 @@ void EventAction::EndOfEventAction(const G4Event* e)
   if(print){
     G4cout << "-------->Mode2 data, event " << event_id << G4endl;
     if(fisInBeam)
-      G4cout << " ata = " << eventInfo->GetATA()
+      G4cout << std::fixed << std::setprecision(4) 
+	     << std::setw(12) << std::right
+	     << " ata = " << eventInfo->GetATA()
 	     << " bta = " << eventInfo->GetBTA()
 	     << " dta = " << eventInfo->GetDTA()
 	     << " yta = " << eventInfo->GetYTA()
@@ -84,7 +86,7 @@ void EventAction::EndOfEventAction(const G4Event* e)
 
   //  G4cout<<"+++++ End of event "<<evt->GetEventID()<<G4endl;
  
-  // Write event information to the output file.
+  // Analyze hits and write event information to the output file.
   G4HCofThisEvent * HCE = evt->GetHCofThisEvent();
   if(HCE) {
 
@@ -100,6 +102,7 @@ void EventAction::EndOfEventAction(const G4Event* e)
       G4int detNum[1000];
       G4int segNum[1000];
       G4double measuredEdep[1000];
+      G4double segmentEdep[1000];
       G4double measuredX[1000];
       G4double measuredY[1000];
       G4double measuredZ[1000];
@@ -111,7 +114,6 @@ void EventAction::EndOfEventAction(const G4Event* e)
 
       G4int NMeasured = 0;
       G4double totalEdep = 0;
-      G4int NDetsHit = 0;
 
       for(G4int i = 0; i < Nhits; i++){
 
@@ -264,6 +266,23 @@ void EventAction::EndOfEventAction(const G4Event* e)
 
       }
 
+      // Calculate the total energy deposited in each segment.
+      for(G4int i = 0; i < NMeasured; i++) // initialize
+	if(NCons[i] > 0)
+	  segmentEdep[i] = measuredEdep[i];
+
+      for(G4int i = 0; i < NMeasured; i++){
+	for(G4int j = i+1; j < NMeasured; j++){
+	  if(NCons[i] > 0 && NCons[j] > 0
+	     && detNum[i] == detNum[j]    // same crystal
+	     && segNum[i] == segNum[j]){ // same segment
+	    segmentEdep[i] += measuredEdep[j];
+	    segmentEdep[j] += measuredEdep[i];
+	  }
+	}
+      }
+
+      // Identify full-energy events. 
       G4bool fullEnergy = false;
       if( (totalEdep - eventInfo->GetEmittedGammaEnergy(0))
 	  *(totalEdep - eventInfo->GetEmittedGammaEnergy(0)) 
@@ -271,7 +290,7 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	fullEnergy = true;
 
       // Write the event with consolidated interaction points to the
-      // output file. 
+      // output file(s). 
       if(evOut)
 	evfile << "$   " << std::setw(4) << NGammaHits << "   " 
 	       << std::fixed << std::setprecision(2) << std::setw(12) << std::right
@@ -322,8 +341,11 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	  if(evOut)
 	    evfile
 	      << std::setw(3) << detNum[i]+4  // +4 to match measured data stream
+	      << std::setw(3) << segNum[i]
 	      << std::fixed << std::setprecision(2) << std::setw(12) << std::right
 	      << measuredEdep[i]
+	      //	      << std::fixed << std::setprecision(2) << std::setw(12) << std::right
+	      //	      << segmentEdep[i]
 	      << std::setw(10) << std::right
 	      << measuredX[i]
 	      << std::setw(10) << std::right
@@ -348,9 +370,9 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	// Write decomposed gamma event(s) to the Mode 2 output file
         writeDecomp(timestamp, 
 		    NMeasured, 
-		    detNum, NCons, 
+		    detNum, segNum, NCons, 
 		    measuredX, measuredY, measuredZ, 
-		    measuredEdep);
+		    measuredEdep, segmentEdep);
       }
 
     }
@@ -470,8 +492,9 @@ void EventAction::writeS800(long long int ts, G4double a, G4double b, G4double d
 // --------------------------------------------------
 void EventAction::writeDecomp(long long int ts, 
 			      G4int NMeasured, 
-			      G4int detNum[], G4int NCons[],
-			      G4double x[], G4double y[], G4double z[], G4double e[])
+			      G4int detNum[], G4int segNum[], G4int NCons[],
+			      G4double x[], G4double y[], G4double z[], 
+			      G4double e[], G4double se[])
 {
   G4int siz;
   GEBDATA gd;
@@ -507,9 +530,18 @@ void EventAction::writeDecomp(long long int ts,
       crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].y = y[i];
       crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].z = z[i];
       crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].e = e[i];
-      crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].seg = -1;
-      crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].seg_ener = -1;
+      crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].seg = segNum[i];
+      crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].seg_ener = se[i];
       Processed[i] = true;
+
+      for(G4int j = i+1; j < MAX_INTPTS; j++){ // Clear the interaction points
+	  crys_ips[Ndecomp].ips[j].x        = 0.;
+	  crys_ips[Ndecomp].ips[j].y        = 0.;
+	  crys_ips[Ndecomp].ips[j].z        = 0.;
+	  crys_ips[Ndecomp].ips[j].e        = 0.;
+	  crys_ips[Ndecomp].ips[j].seg      = 0;
+	  crys_ips[Ndecomp].ips[j].seg_ener = 0.;
+      }
 
       for(G4int j = i+1; j < NMeasured; j++){ // Get other interactions with this crystal
 	if(NCons[j] > 0 && 
@@ -520,8 +552,8 @@ void EventAction::writeDecomp(long long int ts,
 	  crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].y = y[j];
 	  crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].z = z[j];
 	  crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].e = e[j];
-	  crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].seg = -1;
-	  crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].seg_ener = -1;
+	  crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].seg = segNum[j];
+	  crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].seg_ener = se[j];
 	  crys_ips[Ndecomp].num++;
 	  Processed[j] = true;
 	}

@@ -59,12 +59,14 @@ G4VPhysicalVolume* Target::Construct()
     Target_phys = Construct50mgCell();
   else if(targetCellType == "empty")
     Target_phys = ConstructEmptyCell();
+  else if(targetCellType == "notarget")
+    Target_phys = ConstructNoCell();
   else
-    G4cout << "Target_LH: unknown target cell type!" << G4endl;
+    G4cout << "Target_LH: unknown target cell type: "
+	   << targetCellType << G4endl;
 
-#if(1)
-  ConstructCryo();
-#endif
+  if(targetCellType != "notarget")
+    ConstructCryo();
 
   // Place the target system.
   G4RotationMatrix LHTargetRot = NoRot;
@@ -427,6 +429,49 @@ G4VPhysicalVolume* Target::ConstructEmptyCell(){
     = new G4LogicalVolume(TargetCell, Aluminum, "TargetCell_log", 0, 0, 0);
 
   LHTarget->AddPlacedVolume(TargetCell_log, *Pos, &NoRot);
+
+  return Target_phys;
+
+}
+//-----------------------------------------------------------------------------
+G4VPhysicalVolume* Target::ConstructNoCell(){
+
+  // Set these to dummy values. They aren't used in this context.
+  TargetDz = 1.*cm/2.;
+  BulgeR  = 2.*cm;
+  Target_thickness = TargetDz + 2*BulgeDz;
+
+  // G4_Galactic target volume (the code needs a G4PhysicalVolume,
+  // even for source simulations).
+
+  G4Tubs* Target0 = new G4Tubs("Target0", 0., 2.0*cm, TargetDz,
+			       0., 360.*deg);
+			       
+  G4Ellipsoid* Bulge = new G4Ellipsoid("Bulge",BulgeR,BulgeR,BulgeDz);
+  G4UnionSolid* Target1 =
+    new G4UnionSolid("target1", Target0, Bulge,
+		     G4Transform3D(NoRot,
+				   G4ThreeVector(0., 0., -TargetDz)));
+
+  aTarget = new G4UnionSolid("target1", Target1, Bulge,
+			     G4Transform3D(NoRot,
+					   G4ThreeVector(0., 0., TargetDz)));
+
+  Target_log = new G4LogicalVolume(aTarget,vacuum,"target_log",0,0,0);
+  target_limits= new G4UserLimits();
+  target_limits->SetMaxAllowedStep(Target_thickness/NStep);
+  Target_log->SetUserLimits(target_limits);
+
+  G4Colour blue (0.0,0.0,1.0); 
+  G4VisAttributes* Vis = new G4VisAttributes(blue);
+  Vis->SetVisibility(false);
+
+  Target_log->SetVisAttributes(Vis);
+
+  Target_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos),
+				  Target_log,"target",expHall_log,false,0);
+
+  return Target_phys;
 
 }
 //-----------------------------------------------------------------------------
@@ -808,8 +853,121 @@ void Target::setSourceFrame(G4String sF)
 //-------------------------------------------------------------------
 void Target::setSled()
 {
+  if(targetCellType != "notarget")
+    G4cout<<"----> Warning: target sled specified with LH target. Proceeding with no sled. "<< G4endl;
+  else{
+    sledMaterial = materials->FindMaterial("G10");
 
-  G4cout<<"----> Warning: target sled specified with LH target. Proceeding with no sled. "<< G4endl;                 
+    G4double tolerance = 0.1*mm;
+
+    sledFrameThickness  = 0.02*2.54*cm;
+    sledFrameRmin       = 2.5*2.54/2.0*cm;
+    sledFrameRmax       = 3.0*2.54/2.0*cm;
+
+    sledRunnerThickness = 0.031*2.54*cm;
+    sledRunnerLength    = 4.5*2.54*cm;
+    sledRunnerHeight    = 1.5*2.54*cm;
+    sledRunnerRmin      = 1.3*2.54*cm;
+    sledRunnerRmax      = 2.942*2.54*cm;
+
+    sledBarThickness = 0.25*2.54*cm;
+    sledBarLength    = 3.375*2.54*cm;
+    sledBarLA        = 0.5*2.54*cm;
+    sledBarHA        = 0.75*2.54*cm;
+    sledBarLB        = sledBarLength - 2*sledBarLA;
+    sledBarHBC        = 0.25*2.54*cm;
+    sledBarLC        = 0.25*2.54*cm;
+
+    sledFrame = new G4Tubs("sledFrame", sledFrameRmin, sledFrameRmax, sledFrameThickness/2.0, 0., 360.*deg);
+
+    sledFrame_log = new G4LogicalVolume(sledFrame, sledMaterial, "sledFrame_log", 0, 0, 0);
+
+    G4ThreeVector   *Pos0 = new G4ThreeVector(0., 0., 
+					      Target_thickness/2.0 
+					      + sledFrameThickness/2.0 
+					      + tolerance);
+    *Pos0 += *Pos;
+    sledFrame_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), sledFrame_log, "sledFrame_phys", expHall_log, false, 0);
+
+    sledRunnerBox  = new G4Box("sledRunnerBox", sledRunnerLength/2.0, sledRunnerHeight/2.0, sledRunnerThickness/2.0);
+    sledRunnerTubs = new G4Tubs("sledRunnerTubs", sledRunnerRmin, sledRunnerRmax, sledRunnerThickness, 0., 360.*deg);
+    Pos0->set(0., 1.5*2.54*cm, 0.);
+    sledRunner     = new G4IntersectionSolid("sledRunner", sledRunnerBox, sledRunnerTubs, G4Transform3D(NoRot,*Pos0));
+
+    sledRunner_log = new G4LogicalVolume(sledRunner, sledMaterial, "sledRunner_log", 0, 0, 0);
+
+    Pos0->set(0., -1.5*2.54*cm, 
+	      -sledBarLength/2.0 
+	      - sledRunnerThickness/2.0 
+	      + Target_thickness/2.0 
+	      + sledFrameThickness/2.0);
+    *Pos0 += *Pos;
+    sledRunner1_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), sledRunner_log, "sledRunner1_phys", expHall_log, false, 0);
+
+    Pos0->set(0., -1.5*2.54*cm, 
+	      sledBarLength/2.0 
+	      + sledRunnerThickness/2.0 
+	      + Target_thickness/2.0 
+	      + sledFrameThickness/2.0
+	      + 2.*tolerance);
+    *Pos0 += *Pos;
+    sledRunner2_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), sledRunner_log, "sledRunner2_phys", expHall_log, false, 0);
+
+    sledBarBoxA    = new G4Box("sledBarBoxA", sledBarThickness/2.0, sledBarHA/2.0,  sledBarLA/2.0);
+    sledBarBoxB    = new G4Box("sledBarBoxB", sledBarThickness/2.0, sledBarHBC/2.0, sledBarLB/2.0);
+    sledBarBoxC    = new G4Box("sledBarBoxC", sledBarThickness/2.0, sledBarHBC/2.0, sledBarLC/2.0);
+
+    sledBarBoxA_log = new G4LogicalVolume(sledBarBoxA, sledMaterial, "sledBarBoxA_log", 0, 0, 0);
+    sledBarBoxB_log = new G4LogicalVolume(sledBarBoxB, sledMaterial, "sledBarBoxB_log", 0, 0, 0);
+    sledBarBoxC_log = new G4LogicalVolume(sledBarBoxC, sledMaterial, "sledBarBoxC_log", 0, 0, 0);
+
+    sledBar        = new G4AssemblyVolume();
+  
+    sledBarZ1        = -sledBarLength/2.0 + 0.25*2.54*cm;
+    sledBarY1        = 0.;
+    Pos0 = new G4ThreeVector(0., sledBarY1, sledBarZ1-tolerance);
+    sledBar->AddPlacedVolume(sledBarBoxA_log, *Pos0, &NoRot);
+
+    sledBarZ2        = 0.;
+    sledBarY2        = 0.;
+    Pos0->set(0., sledBarY2, sledBarZ2);
+    sledBar->AddPlacedVolume(sledBarBoxB_log, *Pos0, &NoRot);
+
+    sledBarZ3        = -sledFrameThickness/2.0 - sledBarLC/2.0;
+    sledBarY3        = 0.25*2.54*cm;
+    Pos0->set(0., sledBarY3+tolerance, sledBarZ3-tolerance);
+    sledBar->AddPlacedVolume(sledBarBoxC_log, *Pos0, &NoRot);
+
+    sledBarZ4        = sledFrameThickness/2.0 + sledBarLC/2.0;
+    sledBarY4        = sledBarY3;
+    Pos0->set(0., sledBarY4+tolerance, sledBarZ4+tolerance);
+    sledBar->AddPlacedVolume(sledBarBoxC_log, *Pos0, &NoRot);
+
+    sledBarZ5        = sledBarLength/2.0 - 0.25*2.54*cm;
+    sledBarY5        = 0.;
+    Pos0->set(0., sledBarY5, sledBarZ5+tolerance);
+    sledBar->AddPlacedVolume(sledBarBoxA_log, *Pos0, &NoRot);
+
+    Pos0->set(-(1.011 + 1.287)/2.0*2.54*cm, -(1.011 + 1.287)/2.0*2.54*cm,
+	      Target_thickness/2.0 
+	      + sledFrameThickness/2.0 
+	      + tolerance);
+    *Pos0 += *Pos;
+    G4RotationMatrix Rot0 = G4RotationMatrix::IDENTITY;  
+    Rot0.rotateZ(-45.*deg);
+    sledBar->MakeImprint(expHall_log, *Pos0, &Rot0);
+
+    Pos0->set( (1.011 + 1.287)/2.0*2.54*cm, -(1.011 + 1.287)/2.0*2.54*cm,
+	       Target_thickness/2.0 
+	       + sledFrameThickness/2.0
+	       + tolerance);
+    *Pos0 += *Pos;
+    Rot0 = G4RotationMatrix::IDENTITY;  
+    Rot0.rotateZ(45.*deg);
+    sledBar->MakeImprint(expHall_log, *Pos0, &Rot0);
+
+    G4cout << "----> Including the target sled." << G4endl;
+  }
 
 }
 //-------------------------------------------------------------------

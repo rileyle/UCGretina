@@ -22,6 +22,7 @@
 #include "G4UserLimits.hh"
 #include "G4SubtractionSolid.hh"
 #include "G4UnionSolid.hh"
+#include "G4IntersectionSolid.hh"
 #include "G4AssemblyVolume.hh"
 
 class Target 
@@ -38,6 +39,7 @@ class Target
   G4VPhysicalVolume *Construct200mgCell();
   G4VPhysicalVolume *Construct50mgCell();
   G4VPhysicalVolume *ConstructEmptyCell();
+  G4VPhysicalVolume *ConstructNoCell();
   void ConstructWindows();
   void ConstructCryo();
 
@@ -90,6 +92,33 @@ private:
   G4double frameOuterRadius;
   G4double tapeThickness;
   G4double tape_r;
+
+  //target sled dimensions
+  G4double sledFrameThickness;
+  G4double sledFrameRmin;
+  G4double sledFrameRmax;
+  G4double sledRunnerThickness;
+  G4double sledRunnerLength;
+  G4double sledRunnerHeight;
+  G4double sledRunnerRmin;
+  G4double sledRunnerRmax;
+  G4double sledBarThickness;
+  G4double sledBarLength;
+  G4double sledBarLA;
+  G4double sledBarLB;
+  G4double sledBarLC;
+  G4double sledBarHA;
+  G4double sledBarHBC;
+  G4double sledBarY1;
+  G4double sledBarZ1;
+  G4double sledBarY2;
+  G4double sledBarZ2;
+  G4double sledBarY3;
+  G4double sledBarZ3;
+  G4double sledBarY4;
+  G4double sledBarZ4;
+  G4double sledBarY5;
+  G4double sledBarZ5;
   
   //elements
 
@@ -105,6 +134,8 @@ private:
   G4Material* frameMaterial;
   G4Material* tapeMaterial;
 
+  G4Material* sledMaterial;
+
   //default position
   G4RotationMatrix NoRot;
   G4ThreeVector *Pos;
@@ -116,6 +147,15 @@ private:
   G4Tubs* csRing;
   G4Tubs* csTape;
   G4Box* coFrame;
+
+  G4Tubs* sledFrame;
+  G4Box* sledBarBoxA;
+  G4Box* sledBarBoxB;
+  G4Box* sledBarBoxC;
+  G4AssemblyVolume* sledBar;
+  G4Box* sledRunnerBox;
+  G4Tubs* sledRunnerTubs;
+  G4IntersectionSolid* sledRunner; 
 
   //Assembly Volume
   G4AssemblyVolume* LHTarget;
@@ -132,6 +172,12 @@ private:
   G4LogicalVolume* csTape_log;
   G4LogicalVolume* coFrame_log;
 
+  G4LogicalVolume* sledFrame_log;
+  G4LogicalVolume* sledBarBoxA_log;
+  G4LogicalVolume* sledBarBoxB_log;
+  G4LogicalVolume* sledBarBoxC_log;
+  G4LogicalVolume* sledRunner_log;
+
   //physical volume
   G4VPhysicalVolume* Target_phys;
   G4VPhysicalVolume* euFrame_phys;
@@ -140,6 +186,10 @@ private:
   G4VPhysicalVolume* csRing_phys;
   G4VPhysicalVolume* csTape_phys;
   G4VPhysicalVolume* coFrame_phys;
+
+  G4VPhysicalVolume* sledFrame_phys;
+  G4VPhysicalVolume* sledRunner1_phys;
+  G4VPhysicalVolume* sledRunner2_phys;
 
   G4UserLimits *target_limits;
 

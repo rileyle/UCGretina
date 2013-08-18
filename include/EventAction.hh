@@ -41,7 +41,7 @@ class EventAction : public G4UserEventAction
     void closeMode2file();
     void writeGEBHeader(GEBDATA*);
     void writeS800(long long int, G4double, G4double, G4double, G4double);
-    void writeDecomp(long long int, G4int, G4int*, G4int*, G4double*, G4double*, G4double*, G4double*);
+  void writeDecomp(long long int, G4int, G4int*, G4int*, G4int*, G4double*, G4double*, G4double*, G4double*, G4double*);
     void writeSim(long long int, EventInformation*);
     void openCrmatFile();
     void closeCrmatFile();

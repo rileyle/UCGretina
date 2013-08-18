@@ -21,7 +21,7 @@ PrimaryGeneratorAction_Messenger::PrimaryGeneratorAction_Messenger(PrimaryGenera
   PGABCmd->SetGuidance("Select in-beam simulations.");
 
   SrcCmd  = new G4UIcmdWithAString("/Experiment/Source/Set",this);          //LR
-  SrcCmd->SetGuidance("Set source type (eu152, eu152_peaks (9 peaks, equal intensities), cs137, co56, co56_peaks (11 peaks, equal intensities), co60, photopeaks, au, white, background, simple, or muon)");  //LR
+  SrcCmd->SetGuidance("Set source type (eu152, eu152_peaks (9 peaks, equal intensities), cs137, co56, co56_peaks (11 peaks, equal intensities), co60, ra226, ra226_peaks (10 peaks, equal intensities), photopeaks, au, white, background, simple, or muon)");  //LR
   SrcCmd->SetParameterName("Source type",false);                            //LR
   SrcCmd->AvailableForStates(G4State_PreInit,G4State_Idle);                 //LR
 
