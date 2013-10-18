@@ -20,6 +20,7 @@ public:
   void setZ(G4int);
   void setKE(G4double);
   void setKEu(G4double); 
+  void setDTAFile(G4String);
   void setfcX(G4double);
   void setfcDX(G4double);
   void setfcY(G4double);
@@ -47,6 +48,12 @@ private:
   G4double Ex;
   G4double KE;
   G4double KEu;
+  G4String dtaFileName;
+  G4double dta[1000];
+  G4int Ndta;
+  G4double dtaMin;
+  G4double dtaMax;
+  G4double dtaBin;
   G4double Dpp;
   G4double fcX;
   G4double fcDX;

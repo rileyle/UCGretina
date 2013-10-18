@@ -623,7 +623,7 @@ void EventAction::openEvfile()
 {
   if (!evfile.is_open()) evfile.open(outFileName.c_str());
   if (evfile == NULL){
-    G4cout<< "evfile ERROR"<<G4endl;
+    G4cout<< "ERROR opening evfile." << G4endl;
     evOut = false;
   } else {
     G4cout << "\nOpened output file: " << outFileName << G4endl;
@@ -651,7 +651,7 @@ void EventAction::openMode2file()
   mode2file = open(mode2FileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 
 		   S_IRUSR | S_IWUSR | S_IRGRP |  S_IWGRP | S_IROTH);
   if(mode2file < 0){
-    G4cout << "mode2file ERROR" << G4endl;
+    G4cout << "ERROR opening mode2file" << G4endl;
     mode2Out = false;
   } else {
     G4cout << "\nOpened mode 2 Output file: " << mode2FileName << G4endl;
@@ -677,7 +677,8 @@ void EventAction::openCrmatFile()
 {
   crmatFile = open(crmatFileName.c_str(), O_RDONLY, 0);
   if(crmatFile < 0){
-    G4cout << "crmatFile ERROR" << G4endl;
+    G4cout << "ERROR opening crmatFile" << G4endl;
+    exit(1);
   }
   return;
 }
@@ -700,6 +701,11 @@ void EventAction::SetCrmatFile(G4String name) {
   size = read(crmatFile, (char *) crmat, sizeof(crmat));
 
   closeCrmatFile();
+
+  if(size < 0){
+    G4cout << "ERROR reading crmat file." << G4endl;
+    exit(1);
+  }
 
   G4cout << "Read " << size << " bytes into crmat" << G4endl;
 

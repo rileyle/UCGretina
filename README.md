@@ -127,6 +127,29 @@ Commands related to the incoming beam:
 
 > Kinetic energy per nucleon of the incoming beam
 
+    /BeamIn/Dpp <double>
+
+> Momentum acceptance (dp/p) for the incoming beam. (Set this to 0 if
+> you are providing the dta spectrum of the incoming beam using the
+> /BeamIn/dtaFile command.) 
+
+    /BeamIn/dtaFile
+
+> file name for the dta spectrum of the incoming beam. This is a text 
+> file with format:
+>
+>       <Minimum DTA [%]> <Maximum DTA [%]> <DTA bin width [%]>
+>       <Channel 1 counts>
+>       <Channel 2 counts>
+>       <Channel 3 counts>
+>       ...
+>
+> If this command is present, the incoming beam energy is set by drawing 
+> randomly from the dta distribution centered on the beam energy specified 
+> by the /BeamIn/KEu command. (The dta spectrum specifies the momentum
+> acceptance of the incoming beam, so the momentum acceptance
+> parameter should be set to zero: /BeamIn/Dpp 0.)
+
     /BeamIn/Focus/X <double> <unit>
     /BeamIn/Focus/Y <double> <unit>
 
@@ -150,10 +173,6 @@ Commands related to the incoming beam:
 
 > Angular divergences of the incoming beam in the dispersive and
 > nondispersive directions, respectively.
-
-    /BeamIn/Dpp <double>
-
-> Momentum acceptance (dp/p) for the incoming beam
 
 Commands related to the outgoing reaction product:
 

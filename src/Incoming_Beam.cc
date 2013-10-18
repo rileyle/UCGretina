@@ -9,6 +9,11 @@ Incoming_Beam::Incoming_Beam()
   Ex=0.;
   KEu=100*MeV;
   KE=KEu*A;
+  dtaFileName = "";
+  Ndta = 0;
+  dtaMin = 0.;
+  dtaMax = 0.;
+  dtaBin = 0.;
   Dpp=0.0;
   fcX=0.;
   fcDX=0.;
@@ -136,6 +141,29 @@ G4cout<<"----> Kin. En. of the incoming beam set to "<<
 G4cout<<"----> Kin. En. per nucleon of the incoming beam set to "<<
  G4BestUnit(KEu,"Energy")<<G4endl; 
 }
+//-----------------------------------------------------------------
+void Incoming_Beam::setDTAFile(G4String fileName)
+{
+  char line[1000];
+
+  dtaFileName = fileName;
+  std::ifstream dtaFile;
+  dtaFile.open(dtaFileName);
+
+  dtaFile >> dtaMin >> dtaMax >> dtaBin;
+  dtaFile.getline(line,1000);  // Advance to next line.
+
+  G4double d;
+  Ndta = 0;
+  while(dtaFile >> d){
+    dtaFile.getline(line,1000);  // Advance to next line.
+    dta[Ndta] = d;
+    Ndta++;
+  }
+
+  dtaFile.close();
+
+}
 //---------------------------------------------------------
 G4ThreeVector Incoming_Beam::getDirection()
 {
@@ -194,13 +222,20 @@ G4double Incoming_Beam::getKE(G4ParticleDefinition *ion)
   G4ThreeVector momentum_vector;
   G4double momentum;
   G4double rand;
-  G4double KinEne;
+  G4double ke, KinEne;
   //  momentum_vector=0;    //LR (Change to CLHEP library Hep3Vector)
   momentum_vector.setX(0.); //LR
   momentum_vector.setY(0.); //LR
-
   momentum_vector.setZ(1.);
-  dynamic=G4DynamicParticle(ion,momentum_vector,KE);
+
+  if(Ndta > 0){
+    CLHEP::RandGeneral randDTA( dta, Ndta );
+    ke = KE*(1 + dtaMin/100. + randDTA.fire()*(dtaMax-dtaMin)/100.);
+  } else {
+    ke = KE;
+  }
+
+  dynamic=G4DynamicParticle(ion,momentum_vector,ke);
   momentum=dynamic.GetTotalMomentum();
   rand=G4UniformRand()-0.5;
   momentum*=(1+rand*Dpp);
