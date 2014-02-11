@@ -157,6 +157,8 @@ void Outgoing_Beam::setDecayProperties()
 
     closeLvlSchemeFile();
 
+    //    G4ParticleTable::GetParticleTable()->DumpTable();
+
   }
 }
 

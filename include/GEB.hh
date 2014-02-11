@@ -8,7 +8,7 @@
 
 #define MAX_SEGS 8              /* max. number of segments to take in events */
 #define MAX_INTPTS (2*MAX_SEGS) /* max. number of interaction points */
-#define MAX_SIM_GAMMAS 10       /* max. simulated gammas per event */
+#define MAX_SIM_GAMMAS 40       /* max. simulated gammas per event */
 
 typedef struct gebData
 {

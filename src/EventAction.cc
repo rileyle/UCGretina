@@ -129,29 +129,42 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	// Initialize a new interaction point for each gamma-ray hit.
 	if((*gammaCollection)[i]->GetParticleID() == "gamma"){
 
-	  trackID[NMeasured]      = (*gammaCollection)[i]->GetTrackID();
-	  detNum[NMeasured]       = (*gammaCollection)[i]->GetDetNumb();
-	  segNum[NMeasured]       = (*gammaCollection)[i]->GetSegNumb();
+	  // Combine multiple gamma hits at the same position.
+	  // (This is rare, but it happens.)
+	  if(i > 0 
+	     && (x - measuredX[i-1])*(x - measuredX[i-1]) < 0.001*mm*0.001*mm
+	     && (y - measuredY[i-1])*(y - measuredY[i-1]) < 0.001*mm*0.001*mm
+	     && (z - measuredZ[i-1])*(z - measuredZ[i-1]) < 0.001*mm*0.001*mm){
 
-          // This becomes the total energy deposit associated with this interaction.
-	  measuredEdep[NMeasured] = e; 
+	    measuredEdep[NMeasured-1] += e; 
+	    processed = true;
 
-	  // This becomes the barycenter of all energy depositions associated with
-	  // this interaction.
-	  measuredX[NMeasured]    = x;
-	  measuredY[NMeasured]    = y;
-	  measuredZ[NMeasured]    = z;
-	  trackID[NMeasured]      = (*gammaCollection)[i]->GetTrackID();
+	  } else {
 
-	  // Position of the initial interaction. We use position to identify the 
-	  // tracks produced by this interaction.
-	  X0[NMeasured]           = x;
-	  Y0[NMeasured]           = y;
-	  Z0[NMeasured]           = z;
+	    trackID[NMeasured]      = (*gammaCollection)[i]->GetTrackID();
+	    detNum[NMeasured]       = (*gammaCollection)[i]->GetDetNumb();
+	    segNum[NMeasured]       = (*gammaCollection)[i]->GetSegNumb();
 
-	  NCons[NMeasured] = 1;
-	  NMeasured++;
-	  processed = true;
+	    // This becomes the total energy deposit associated with this interaction.
+	    measuredEdep[NMeasured] = e; 
+
+	    // This becomes the barycenter of all energy depositions associated with
+	    // this interaction.
+	    measuredX[NMeasured]    = x;
+	    measuredY[NMeasured]    = y;
+	    measuredZ[NMeasured]    = z;
+	    trackID[NMeasured]      = (*gammaCollection)[i]->GetTrackID();
+
+	    // Position of the initial interaction. We use position to identify the 
+	    // tracks produced by this interaction.
+	    X0[NMeasured]           = x;
+	    Y0[NMeasured]           = y;
+	    Z0[NMeasured]           = z;
+
+	    NCons[NMeasured] = 1;
+	    NMeasured++;
+	    processed = true;
+	  }
 
 	// Combine secondary-particle hits with their parent interaction points.
 	} else {
@@ -178,8 +191,6 @@ void EventAction::EndOfEventAction(const G4Event* e)
 		&& (y0 - Y0[j])*(y0 - Y0[j]) < 0.001*mm*0.001*mm
 		&& (z0 - Z0[j])*(z0 - Z0[j]) < 0.001*mm*0.001*mm // correct interaction point
 		&& (*gammaCollection)[i]->GetDetNumb() == detNum[j]){        // same crystal
-	      //		     && (*gammaCollection)[i]->GetSegNumb() == segNum[j]        // same segment
-	      //		     && !processed ){                                   // not already counted
 
 	      // Energy-weighted average position (barycenter)
 	      measuredX[j] = (measuredEdep[j]*measuredX[j] + e*x)/(measuredEdep[j] + e);
@@ -234,7 +245,6 @@ void EventAction::EndOfEventAction(const G4Event* e)
 		 << G4endl;
 
       }
-
 
       // Packing: Consolidate the "measured" gamma-ray interaction points
       // within a single segment that are closer than the PackingRes 
