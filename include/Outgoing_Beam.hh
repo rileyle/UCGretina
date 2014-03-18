@@ -50,6 +50,7 @@ public:
   void ScanInitialConditions(const G4Track &);
   void SetReactionOn(){ reacted=true;};
   void SetReactionOff(){reacted=false;}
+  void SetSource(){source=true;}
   void SetAlphaTarget(G4double a){alpha=a;Calc_pmax();}         // appear defunct
   void SetThetaMaxTarget(G4double t){theta_max=t;Calc_pmax();}  //
   void SetThetaSigmaA(G4double s){sigma_a=s;} //LR // TB
@@ -65,6 +66,7 @@ public:
   G4ThreeVector GetPosDopp(){return posDopp;}
   G4double getTime(){return tau;}
   G4bool   ReactionOn(){return reacted;}
+  G4bool   Source(){return source;}
   G4double GetAlpha(){return alpha;}
   G4double GetTheta(){return theta_max;}
   G4double GetThetaSigmaA(){return sigma_a;} //TB
@@ -106,6 +108,9 @@ private:
   G4double Ex,TarEx,TFrac;
   G4String lvlSchemeFileName;
   std::ifstream lvlSchemeFile;
+  G4int    Nlevels;
+  G4double relPop[1000];
+  G4double levelEnergy[1000];
   G4double tau;
   G4double betaDopp;
   G4int    NQ,SQ;
@@ -119,6 +124,7 @@ private:
  
   static G4Decay decay;
   G4bool  reacted;
+  G4bool  source;
 
   Incoming_Beam *beamIn;
   // polynomial coefficients for momentum change for the reacted beam

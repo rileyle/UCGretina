@@ -13,7 +13,6 @@
 /Experiment/RunSource
 /Experiment/Source/Set background
 # Tracking parameters ==========================================================
-/Tracking/Method 0
 #/GammaPrint/Track_Set
 #/IonPrint/Track_Set
 # Output parameters ============================================================

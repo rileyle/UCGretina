@@ -11,20 +11,29 @@ Reaction::Reaction(Outgoing_Beam* BO, const G4String& aName)
   BeamOut=BO;
   theProcessType=(G4ProcessType)6;       // Decay
   theProcessSubType=(G4ProcessType)231;  //DecayExt
+
+  decayed_at_rest = false;
+  ground_state = false;
 }
 
 Reaction::~Reaction() 
 {                                     
 }                                     
 
+// In-flight reaction
 G4VParticleChange* Reaction::PostStepDoIt(
 			     const G4Track& aTrack,
 			     const G4Step& 
 			    )
-//
-// Stop the current particle, if requested by G4UserLimits 
-// 			    			    			    
 {
+
+  // G4cout << "I'm in PostStepDoIt." << G4endl;
+  // G4cout << "  " 
+  // 	 << aTrack.GetDynamicParticle()->GetParticleDefinition()->GetParticleName()
+  // 	 << G4endl;
+  // G4cout << "  stable: " 
+  // 	 << aTrack.GetDynamicParticle()->GetParticleDefinition()->GetPDGStable()
+  // 	 << G4endl;
 
   aParticleChange.Initialize(aTrack);
 
@@ -35,8 +44,6 @@ G4VParticleChange* Reaction::PostStepDoIt(
       BeamOut->ScanInitialConditions(aTrack);
 
       aParticleChange.ProposeTrackStatus(fStopAndKill);
-
- 
 
       if(G4UniformRand()<BeamOut->getTFrac())
 	{
@@ -58,10 +65,18 @@ G4VParticleChange* Reaction::PostStepDoIt(
 
 
     }
+
+  // Stationary source: stop and kill the reaction product in its ground state.
+  if(ground_state){
+    ground_state = false;
+    aParticleChange.ProposeTrackStatus(fStopAndKill);
+  }
    
   return &aParticleChange;
 }
 
+// Trigger the in-flight reaction at the depth in the target determined
+// by the PrimaryGeneratorAction.
 G4double Reaction::PostStepGetPhysicalInteractionLength(
                              const G4Track& aTrack,
                              G4double,
@@ -69,16 +84,25 @@ G4double Reaction::PostStepGetPhysicalInteractionLength(
                             )
 {
 
+  // G4cout << "I'm in PostStepGPIL." << G4endl;
+  // G4cout << "  " 
+  // 	 << aTrack.GetDynamicParticle()->GetParticleDefinition()->GetParticleName()
+  // 	 << G4endl;
+  // G4cout << "  stable: " 
+  // 	 << aTrack.GetDynamicParticle()->GetParticleDefinition()->GetPDGStable()
+  // 	 << G4endl;
 
   reaction_here=false;
   *condition=NotForced;
 
-  if(BeamOut->ReactionOn())
+  if(BeamOut->ReactionOn() && !BeamOut->Source())
     {
       G4String name=aTrack.GetVolume()->GetLogicalVolume()->GetName();
       G4UserLimits* pUserLimits = aTrack.GetVolume()->GetLogicalVolume()->GetUserLimits();
+
       if(name=="target_log")
 	{
+
 	  G4double ZReaction=pUserLimits->GetUserMinRange(aTrack);
 	  G4double ZCurrent=aTrack.GetPosition().getZ();
 	  G4double Z=ZReaction-ZCurrent;
@@ -105,8 +129,73 @@ G4double Reaction::PostStepGetPhysicalInteractionLength(
 	   reaction_here=true;
 	   return 0.;
 	 }
-     }
+       
+	}
+
     }
+
+  // Sationary source: stop and kill the decay product once it reaches its 
+  // ground state.
+  if(BeamOut->Source()
+     && aTrack.GetDynamicParticle()->GetParticleDefinition()->GetPDGStable()){
+    ground_state=true;
+    decayed_at_rest=false;    //Reset for next decay
+    return 0;
+  }
+
   return DBL_MAX;
+}
+
+// Stationary source decay
+G4VParticleChange* Reaction::AtRestDoIt(
+			     const G4Track& aTrack,
+			     const G4Step& 
+			    )
+{
+
+  // G4cout << "I'm in AtRestDoIt." << G4endl;
+  // G4cout << "  " 
+  // 	 << aTrack.GetDynamicParticle()->GetParticleDefinition()->GetParticleName()
+  // 	 << G4endl;
+  // G4cout << "  stable: " 
+  // 	 << aTrack.GetDynamicParticle()->GetParticleDefinition()->GetPDGStable()
+  // 	 << G4endl;
+
+  aParticleChange.Initialize(aTrack);
+
+  BeamOut->ScanInitialConditions(aTrack);
+
+  aParticleChange.ProposeTrackStatus(fStopAndKill);
+  aParticleChange.SetNumberOfSecondaries(1);
+  aParticleChange.AddSecondary(BeamOut->ReactionProduct(),aTrack.GetPosition(),true);
+
+  return &aParticleChange;
+
+}
+
+// Trigger the decay of a stationary source
+G4double Reaction::AtRestGetPhysicalInteractionLength(
+                             const G4Track& aTrack,
+                             G4ForceCondition* condition
+                            )
+{
+
+  // G4cout << "I'm in AtRestGPIL." << G4endl;
+  // G4cout << "  " 
+  // 	 << aTrack.GetDynamicParticle()->GetParticleDefinition()->GetParticleName()
+  // 	 << G4endl;
+  // G4cout << "  stable: " 
+  // 	 << aTrack.GetDynamicParticle()->GetParticleDefinition()->GetPDGStable()
+  // 	 << G4endl;
+
+  *condition=NotForced;
+
+  if(!decayed_at_rest && BeamOut->Source()){
+    decayed_at_rest = true;
+    return 0.;
+  }
+
+  return DBL_MAX;
+
 }
 

@@ -21,6 +21,8 @@ class Reaction : public G4VProcess
 {
   public:     
    G4bool reaction_here;
+   G4bool decayed_at_rest;
+   G4bool ground_state;
 
      Reaction(Outgoing_Beam*, const G4String& processName ="Reaction" );
 
@@ -43,13 +45,15 @@ class Reaction : public G4VProcess
      virtual G4double AtRestGetPhysicalInteractionLength(
                              const G4Track& ,
 			     G4ForceCondition* 
-			    ){ return -1.0; };
+			    );
+			     //			    ){ return -1.0; };
 			    
      //  no operation in  AtRestDoIt      
      virtual G4VParticleChange* AtRestDoIt(
 			     const G4Track& ,
 			     const G4Step&
-			    ){ return NULL; };
+			    );
+			     //			    ){ return NULL; };
 
      //  no operation in  AlongStepGPIL
      virtual G4double AlongStepGetPhysicalInteractionLength(

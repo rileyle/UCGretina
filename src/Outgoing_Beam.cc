@@ -12,6 +12,7 @@ Outgoing_Beam::Outgoing_Beam()
   DA=0;
   Ex=1.0*MeV;
   lvlSchemeFileName = "";
+  Nlevels = 1;
   TarEx=547.5*keV;
   TFrac=0.;
   tau=0.0*ns;
@@ -21,6 +22,7 @@ Outgoing_Beam::Outgoing_Beam()
   posDopp.setZ(0.);
 
   reacted=false;
+  source=false;
   alpha=20.;
   sigma_a=0.;
   sigma_b=0.;
@@ -103,22 +105,23 @@ void Outgoing_Beam::setDecayProperties()
 	   << lvlSchemeFileName << G4endl;
 
     G4int nBranch;
-    G4double Elevel, meanLife, BR, Exf, a0, a2, a4;
+    G4double meanLife, BR, Exf, a0, a2, a4;
     G4ParticleDefinition* intermediateIon;
 
     openLvlSchemeFile();
 
-    G4int i = 0;
-    while(lvlSchemeFile >> Elevel >> nBranch >> meanLife){
+    Nlevels = 0;
+    while(lvlSchemeFile >> levelEnergy[Nlevels] >> nBranch >> meanLife >> relPop[Nlevels]){
       G4cout << "Constructing decay properties for Z=" << Zin + DZ
-	     << " A=" << Ain + DA << " with excitation " << Elevel << " keV" << G4endl;
+	     << " A=" << Ain + DA 
+	     << " with excitation " << levelEnergy[Nlevels] 
+	     << " keV, relative population" << relPop[Nlevels]
+	     << G4endl;
+      if(Nlevels>0) relPop[Nlevels] += relPop[Nlevels-1];
       for(G4int j = 0; j < nBranch; j++){
 	lvlSchemeFile >> BR >> Exf >> a0 >> a2 >> a4;
 
-	if(i == 0)
-	  intermediateIon = ion;
-	else
-	  intermediateIon = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,Elevel*keV);
+	intermediateIon = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,levelEnergy[Nlevels]*keV);
 	if (intermediateIon == NULL) {
 	  G4cerr << "Could not find intermediate ion in particle table "
 		 << Zin + DZ << " " << Ain+DA << G4endl;
@@ -136,7 +139,7 @@ void Outgoing_Beam::setDecayProperties()
 	theAngularDistribution.SetCoeffs(a0,a2,a4);
 	theAngularDistribution.Report();
 
-	GamDec = new GammaDecayChannel(-1,intermediateIon,BR,(Elevel-Exf)*keV,Exf*keV,theAngularDistribution);
+	GamDec = new GammaDecayChannel(-1,intermediateIon,BR,(levelEnergy[Nlevels]-Exf)*keV,Exf*keV,theAngularDistribution);
 	DecTab->Insert(GamDec);
 
 	// make sure that the ion has the decay process in its manager
@@ -152,10 +155,18 @@ void Outgoing_Beam::setDecayProperties()
       DecTab->DumpInfo();
       //      pm->DumpInfo();
 
-      i++;
+      Nlevels++;
     }
 
     closeLvlSchemeFile();
+
+    // Normalize relative population parameters
+    for(G4int j = 0; j<Nlevels; j++){
+      relPop[j] /= relPop[Nlevels-1];
+      //      G4cout << "Level energy = " << levelEnergy[j] 
+      //             << " keV, relPop[" << j << "] = " << relPop[j] 
+      //	     << G4endl;
+    }
 
     //    G4ParticleTable::GetParticleTable()->DumpTable();
 
@@ -192,7 +203,18 @@ G4ThreeVector Outgoing_Beam::ReactionPosition()
 //---------------------------------------------------------
 G4DynamicParticle* Outgoing_Beam::ReactionProduct()
 {
-  G4DynamicParticle* aReactionProduct =new G4DynamicParticle(ion,GetOutgoingMomentum());
+
+  G4int lvl;
+  G4double rnd = G4UniformRand();
+  for(lvl=0; lvl < Nlevels; lvl++){
+    //    G4cout << std::fixed << std::setprecision(4) 
+    //	   << "rnd = " << rnd << ", lvl = " << lvl << G4endl;
+    if(rnd < relPop[lvl]) break;
+  }
+  //  G4cout << "Chose lvl = " << lvl << ", E = " << levelEnergy[lvl] << " keV" << G4endl;
+  G4ParticleDefinition* product = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,levelEnergy[lvl]*keV);
+
+  G4DynamicParticle* aReactionProduct =new G4DynamicParticle(product,GetOutgoingMomentum());
 
   //  aReactionProduct->SetProperTime(tauIn);
   // G4cout<<" Proper time set to "<<aReactionProduct->GetProperTime()<<G4endl;

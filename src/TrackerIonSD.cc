@@ -42,6 +42,7 @@ G4bool TrackerIonSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
  const G4String name =  aParticle->GetDefinition()->GetParticleName();
  const G4double len=aStep->GetStepLength();
  // G4cout<<G4endl;
+
   if(type=="nucleus")
    {     
 
@@ -69,14 +70,18 @@ G4bool TrackerIonSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
        }
      G4TrackStatus TrackStatus;
      TrackStatus=aStep->GetTrack()->GetTrackStatus();
+
      if(TrackStatus==fStopButAlive||TrackStatus==fStopAndKill)
        {
 	 TrackerIonHit* newIonHitF= new TrackerIonHit();   	
 	 vf=aStep->GetPostStepPoint();
-         if(vf->GetProcessDefinedStep()->GetProcessName()=="Decay")
+
+	 if(vf->GetProcessDefinedStep()->GetProcessName()=="Decay")
 	   newIonHitF->SetDecayFlag();
-         if(vf->GetProcessDefinedStep()->GetProcessName()=="Reaction")
+
+	 if(vf->GetProcessDefinedStep()->GetProcessName()=="Reaction")
 	   newIonHitF->SetReactionFlag();
+
 	 newIonHitF->SetTrackID(trackID);
 	 newIonHitF->SetParticleID(name);
 	 newIonHitF->SetBeta(vf->GetBeta());
@@ -93,6 +98,7 @@ G4bool TrackerIonSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
 	 newIonHitF->SetLength(0.);
 	 newIonHitF->Draw();
 	 ionCollection->insert(newIonHitF);
+
        }
 
    

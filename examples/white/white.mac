@@ -12,7 +12,6 @@
 /Experiment/Source/setWhiteLowE     10. keV
 /Experiment/Source/setWhiteHighE 20000. keV
 # Tracking parameters ==========================================================
-/Tracking/Method 0
 #/GammaPrint/Track_Set
 #/IonPrint/Track_Set
 # Output parameters ============================================================

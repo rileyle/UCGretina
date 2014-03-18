@@ -17,7 +17,7 @@ RunAction::~RunAction()
 void RunAction::BeginOfRunAction(const G4Run* run)
 {
 
-  G4cout<<" Begining of run "<<G4endl;
+  G4cout<<" Beginning of run "<<G4endl;
 
   evaction->SetNTotalevents(run->GetNumberOfEventToBeProcessed());
   if(run->GetNumberOfEventToBeProcessed() > 1000)

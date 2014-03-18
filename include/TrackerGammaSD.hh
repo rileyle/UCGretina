@@ -27,7 +27,6 @@ class TrackerGammaSD : public G4VSensitiveDetector
       void UnSetPrint(){
 	G4cout<<"----> Gamma track data set not to print at the end of event"<<G4endl;
 	print=false;}
-      void SetTrackingMethod(G4int m){trackingMethod = m;}
 
       void Initialize(G4HCofThisEvent*);
       G4bool ProcessHits(G4Step*, G4TouchableHistory*);
@@ -37,11 +36,7 @@ class TrackerGammaSD : public G4VSensitiveDetector
       TrackerGammaHitsCollection* gammaCollection;
       G4int         depth;
       G4bool        print;
-      G4int         trackingMethod;
       G4int         primaryGammaID;
-      G4bool        annihilationHappened;
-      G4ThreeVector positionOfAnnihilation;
-      G4double      residualEnergy;
 
 };
 

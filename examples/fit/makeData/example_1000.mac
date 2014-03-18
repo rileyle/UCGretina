@@ -33,7 +33,7 @@
 #
 #/GammaPrint/Track_Set
 #/IonPrint/Track_Set
-/Mode2/PositionRes 6.0 mm
+/Mode2/PackingRes 6.0 mm
 /Mode2/crmatFile crmat.LINUX
 /Mode2/GretinaCoords
 /Mode2/S800KE 3.810 GeV

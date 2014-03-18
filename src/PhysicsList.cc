@@ -112,8 +112,9 @@ void PhysicsList::ConstructEM()
 
       pmanager->AddProcess(new G4hMultipleScattering, -1, 1, 1);
       pmanager->AddProcess(new G4ionIonisation,      -1, 2, 2);
-      pmanager->AddProcess(new Reaction(BeamOut),    -1,-1, 3);
-      pmanager->AddProcess(new G4StepLimiter,        -1,-1, 4);
+      //      pmanager->AddProcess(new Reaction(BeamOut),    -1,-1, 3);
+      pmanager->AddProcess(new Reaction(BeamOut),    3,-1, 3); // At Rest, PostStep
+      pmanager->AddProcess(new G4StepLimiter,       -1,-1, 4);
 
     } 
 

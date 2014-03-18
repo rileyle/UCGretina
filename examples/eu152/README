@@ -1,30 +1,62 @@
 ================================================================================
 
-Several gamma-ray calibration sources are implemented in UCGretina. This
-example illustrates the use of the 152Eu source.
+Several gamma-ray calibration sources are implemented in UCGretina
+which can be accessed with the 
+
+    /Experiment/RunSource
+
+and 
+
+    /Experiment/Source/Set
+
+commands. The macro file eu152_gammas.mac illustrates this
+approach. These simulations are based on intensities adopted by the
+IAEA for standard calibration sources and should be used for
+efficiency calibrations.
+
+In addition, realistic gamma-ray cascades from stationary sources can
+be simulated using the 
+
+    /BeamOut/Source
+
+and
+
+    /BeamOut/LevelSchemeFile
+
+commands. The macro files sm152.mac and gd152.mac and the level scheme
+files sm152.lvl and gd152.lvl illustrate this approach. The level
+scheme files are based on ENSDF adopted beta- and gamma-decay
+branching ratios. The experimental uncertainties in the branching
+ratios combine to yield gamma-ray intensities that do not match the
+IAEA values. The resulting spectra should not be used for efficiency 
+calibrations.
 
 ================================================================================
 
 ================================================================================
-152Eu
-
-o Run the simulation
+o Run the simulations
 
   - In this directory, type
 
       $ make
 
-    to run the simulation of the 152Eu source measurement described in
-    eu152.mac. The Makefile automates the following steps:
+    to run the simulations of the 152Eu source described in
+    eu152_gammas.mac, sm152.mac, and gd152.mac. The Makefile automates
+    the following steps:
 
-  - UCGretina writes mode 2 data to eu152.dat. (The name of the output
-    file is specified in eu152.mac.)
+  - UCGretina writes mode 2 data to eu152_gammas.dat, sm152.dat, and
+    gd152.dat. (The names of the output files are specified in the
+    .mac files.)
 
-  - SimCalculate is used to load the mode 2 data in eu152.dat into a
-    calibrated tree in eu152_sim.root
+  - SimCalculate is used to load the mode 2 data in the .dat files into 
+    calibrated trees in eu152_gammas_sim.root, sm152_sim.root, and
+    gd152_sim.root.
 
-  - Sim_histos is used to sort the calibrated tree into histograms
-    written to eu152_sim_histos.root
+  - Sim_histos is used to sort the calibrated trees into histograms
+    written to eu152_gammas_sim_histos.root and
+    eu152_sim_histos.root. The trees in sm152_sim.root and
+    gd152_sim.root are sorted into a single set of spectra in
+    eu152_sim_histos.root.
 
 o Fit a measured spectrum
 

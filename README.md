@@ -1,12 +1,17 @@
 ## Compile and install UCGretina ##
 
-Install the latest version of the Geant4 libraries from
+Install version 4.9.6.p02 of the Geant4 libraries from
 http://geant4.web.cern.ch/geant4/support/download.shtml. You will need
 the data files for low energy electromagnetic processes. 
 
+_Important note: UCGretina is not compatible wiht the latest version
+(4.10.x) of the Geant4 libraries. The GRETINA detector geometry code
+currently relies on a deprecated class (BREPSolid) that has been
+removed in Geant4.10._
+
 Set up your environment (consider adding this to your .bashrc):
 
-    $ source <G4INSTALL>/share/Geant4-9.6.1/geant4make/geant4make.sh
+    $ source <G4INSTALL>/share/Geant4-9.6.2/geant4make/geant4make.sh
 
 Compile:
 
@@ -19,7 +24,7 @@ To use the liquid hydrogen target:
 (produces the binary UCGretina_LH)
 
 The executables UCGretina and UCGretina_LH are automatically installed
-in 
+in
 
     $G4WORKDIR/bin/$G4SYSTEM
 
@@ -44,9 +49,9 @@ Optional commands for setting target parameters:
 
     /Target/Y_length <double> <unit>
 
-    /Target/SetPosition_Z  <double> <unit>
+    /Target/SetPosition_Z <double> <unit>
 
-    /Target/Thickness  <double> <unit>
+    /Target/Thickness <double> <unit>
 
     /Target/ScaleDensity <double>
 
@@ -70,7 +75,7 @@ Mandatory command for building the beam tube:
 
 Optional commands for including Gretina-related dead material:
 
-    /Gretina/detector/enableCapsules 
+    /Gretina/detector/enableCapsules
 
     /Gretina/detector/enableCryostats
 
@@ -82,17 +87,23 @@ Mandatory command after setting any GRETINA parameters:
 
 ### LH Target Geometry ###
 
-(UCGretina_LH only) 
+(UCGretina_LH only)
 
-Optional commands for setting LH target parameters (must precede /Target/Construct):
+Optional commands for setting LH target parameters (must precede
+/Target/Construct):
 
     /Target/Cell < thick || thin || empty || notarget >
 
-> The "empty" type is the cell body with no window frames. (To construct an empty cell with frames, set "thick" or "thin" and set the target material to vacuum.) The "notarget" type constructs only the LH-target beam pipe without the target assembly.
+> The "empty" type is the cell body with no window frames. (To
+  construct an empty cell with frames, set "thick" or "thin" and set
+  the target material to vacuum.) The "notarget" type constructs only
+  the LH-target beam pipe without the target assembly.
 
     /Target/Bulge <double> <unit>
 
-> Set the maximum target thickness (at the center) added to the target by the window bulge. (This increases the total target thickness along the beam axis by twice the bulge thickness.)
+> Set the maximum target thickness (at the center) added to the target
+  by the window bulge. (This increases the total target thickness
+  along the beam axis by twice the bulge thickness.)
 
     /Target/Windows
 
@@ -100,7 +111,8 @@ Optional commands for setting LH target parameters (must precede /Target/Constru
 
     /Target/Angle <double> <unit>
 
-> Set the angle of tilt about the beam axis of the entire target assembly (30 degrees for Gretina at the NSCL).
+> Set the angle of tilt about the beam axis of the entire target
+  assembly (30 degrees for Gretina at the NSCL).
 
     /Target/SetDensity <double>
 
@@ -108,7 +120,9 @@ Optional commands for setting LH target parameters (must precede /Target/Constru
 
     /Target/Material <material>
 
-> Only "vacuum" or "G4_Galactic" are allowed with the LH target. (This is provided to enable source simulations with an empty cell with window frames installed.)
+> Only "vacuum" or "G4_Galactic" are allowed with the LH target. (This
+  is provided to enable source simulations with an empty cell with
+  window frames installed.)
 
 Mandatory command for building the LH target (UCGretina_LH):
 
@@ -118,8 +132,7 @@ Mandatory command for building the LH target (UCGretina_LH):
 
 Commands related to the incoming beam:
 
-    /BeamIn/A <A>
-    /BeamIn/Z <Z>
+    /BeamIn/A <A> /BeamIn/Z <Z>
 
 > Mass number and atomic number
 
@@ -131,108 +144,111 @@ Commands related to the incoming beam:
 
 > Momentum acceptance (dp/p) for the incoming beam. (Set this to 0 if
 > you are providing the dta spectrum of the incoming beam using the
-> /BeamIn/dtaFile command.) 
+> /BeamIn/dtaFile command.)
 
     /BeamIn/dtaFile
 
-> file name for the dta spectrum of the incoming beam. This is a text 
-> file with format:
->
->       <Minimum DTA [%]> <Maximum DTA [%]> <DTA bin width [%]>
->       <Channel 1 counts>
+> file name for the dta spectrum of the incoming beam. This is a text
+> file with format: 
+
+>       <Minimum DTA [%]> <Maximum DTA [%]> <DTA bin width [%]> 
+>       <Channel 1 counts> 
 >       <Channel 2 counts>
 >       <Channel 3 counts>
 >       ...
->
-> If this command is present, the incoming beam energy is set by drawing 
-> randomly from the dta distribution centered on the beam energy specified 
-> by the /BeamIn/KEu command. (The dta spectrum specifies the momentum
-> acceptance of the incoming beam, so the momentum acceptance
-> parameter should be set to zero: /BeamIn/Dpp 0.)
 
-    /BeamIn/Focus/X <double> <unit>
-    /BeamIn/Focus/Y <double> <unit>
+> If this command is present, the incoming beam energy is set by
+> drawing randomly from the dta distribution centered on the beam
+> energy specified by the /BeamIn/KEu command. (The dta spectrum
+> specifies the momentum acceptance of the incoming beam, so the
+> momentum acceptance parameter should be set to zero: /BeamIn/Dpp 0.)
+
+    /BeamIn/Focus/X <double> <unit> /BeamIn/Focus/Y <double> <unit>
 
 > Offsets of the emission point of the incoming beam. (Z defaults to
->  -50 cm. If you change this, make sure it is upstream of the target!)
+> -50 cm. If you change this, make sure it is upstream of the target!)
 
-    /BeamIn/Focus/DX <double> <unit>
-    /BeamIn/Focus/DY <double> <unit>
+    /BeamIn/Focus/DX <double> <unit> /BeamIn/Focus/DY <double> <unit>
 
 > Horizontal and vertical widths of the beam spot at the emission
-> point (not on target) 
+> point (not on target)
 
-    /BeamIn/Focus/Ata0 <double> <unit>
-    /BeamIn/Focus/Bta0 <double> <unit>
+    /BeamIn/Focus/Ata0 <double> <unit> /BeamIn/Focus/Bta0 <double>
+    <unit>
 
 > Direction of the incoming beam (dispersive and nondispersive angles,
 > respectively)
 
-    /BeamIn/Focus/maxAta <double> <unit>
-    /BeamIn/Focus/maxBta <double> <unit>
+    /BeamIn/Focus/maxAta <double> <unit> /BeamIn/Focus/maxBta <double>
+    <unit>
 
 > Angular divergences of the incoming beam in the dispersive and
 > nondispersive directions, respectively.
 
 Commands related to the outgoing reaction product:
 
-    /BeamOut/DA <int>
-    /BeamOut/DZ <int>
+    /BeamOut/DA <int> /BeamOut/DZ <int>
 
 > Changes in mass number and atomic number of the reaction. The
-> incoming beam has (A,Z) and the outgoing reaction product has
-> (A+DA, Z+DZ)
+> incoming beam has (A,Z) and the outgoing reaction product has (A+DA,
+> Z+DZ)
 
     /BeamOut/ProjectileExcitation <double> <unit>
 
-> Excitation energy of the outgoing reaction product. 
+> Excitation energy of the outgoing reaction product.
 
-    /BeamOut/seta0 <double>
-    /BeamOut/seta2 <double>
-    /BeamOut/seta4 <double>
+    /BeamOut/seta0 <double> /BeamOut/seta2 <double> /BeamOut/seta4
+    <double>
 
-> Angular distribution coefficients for the emitted gamma rays. 
+> Angular distribution coefficients for the emitted gamma rays.
 
-> NOTE: These commands are superseded by a level scheme file if
-> a /BeamOut/LevelSchemeFile command is present.
+> NOTE: These commands are superseded by a level scheme file if a
+> /BeamOut/LevelSchemeFile command is present.
 
     /BeamOut/tau <double> <unit>
 
 > Mean lifetime of the excitation
 
-> NOTE: This command is superseded by a level scheme file if
-> a /BeamOut/LevelSchemeFile command is present.
+> NOTE: This command is superseded by a level scheme file if a
+> /BeamOut/LevelSchemeFile command is present.
 
     /BeamOut/LevelSchemeFile <filename>
 
-> The level scheme file describes the portion of the level scheme
-> populated by de-excitation of the initial state, including the 
-> initial state. (The initial state must be at the energy specified by
-> the /BeamOut/ProjectileExcitation command.) The format of the level
-> scheme file:
+> The level scheme file describes the portion of the level scheme to
+>  be simulated. The format of the level scheme file:
 
->       <Level energy [keV]>  <Number of gamma-decay Branches>  <Lifetime [ps]>
->       <BR 1>   <Final-state energy [keV]>  <A0>  <A2>  <A4>
->       <BR 2>   <Final-state energy [keV]>  <A0>  <A2>  <A4>
->       ...
->       <Level energy [keV]>  <Number of gamma-decay Branches>  <Lifetime [ps]>
->       <BR 1>   <Final-state energy [keV]>  <A0>  <A2>  <A4>
->       <BR 2>   <Final-state energy [keV]>  <A0>  <A2>  <A4>
+>       <Level energy [keV]> <Number of gamma-decay Branches> <Lifetime [ps]> <Relative direct population> 
+>       <BR 1> <Final-state energy [keV]> <A0> <A2> <A4> 
+>       <BR 2> <Final-state energy [keV]> <A0> <A2> <A4> 
+>       ...  
+>       <Level energy [keV]> <Number of gamma-decay Branches> <Lifetime [ps]> <Relative direct population> 
+>       <BR 1> <Final-state energy [keV]> <A0> <A2> <A4>
+>       <BR 2> <Final-state energy [keV]> <A0> <A2> <A4>
 >       ...
 
-> where <BR N> are branching rations, <A0>, <A2>, <A4> are gamma-ray
-> angular distribution coefficients.
-
+> where <BR N> are branching ratios, <A0>, <A2>, <A4> are gamma-ray
+> angular distribution coefficients. The <Relative direct population>
+> parameters determine how often the level is populated directly by
+> the reaction.
 
 > NOTE: This command supersedes values set with the
-> /BeamOut/seta0, /BeamOut/seta2, /BeamOut/seta4, and /BeamOut/tau
-> commands described above.
+> /BeamOut/ProjectileExcitation, /BeamOut/seta0, /BeamOut/seta2,
+> /BeamOut/seta4, and /BeamOut/tau commands described above.
 
-    /BeamOut/AngDistSigmaA 0.012 rad
-    /BeamOut/AngDistSigmaB 0.012 rad
+    /BeamOut/AngDistSigmaA 0.012 rad /BeamOut/AngDistSigmaB 0.012 rad
 
-> Angular spreads of the outgoing reaction products in the
-> dispersive and nondispersive directions, respectively.
+> Angular spreads of the outgoing reaction products in the dispersive
+> and nondispersive directions, respectively.
+
+    /BeamOut/Source
+
+> Simulate a stationary source using the in-beam simulation framework.
+> The incoming beam particle decays into the outgoing beam particle. A
+> level scheme file must be used. The energy of the incoming beam must
+> be set to zero, and the position of incoming beam must be set to the
+> desired source position. _This is an independent approach to that
+> described under **Source Simulations** below, in which gamma-rays are 
+> emitted as primary particles._ 
 
 ### Source Simulations (see also ./examples/eu152) ###
 
@@ -295,10 +311,6 @@ Optional commands describing the spherical shell surrounding GRETINA from which 
 
 > Set the inner and outer radii of the background sphere (default: 3.0 m, 3.4 m).
 ## Tracking ##
-
-    /Tracking/Method < 0 | 1 >
-
-> Set the tracking method. 0: Track the primary particle and all associated secondary particles. 1: Track only the interactions of the primary gamma-ray and secondary gammas produced by associated e+ annihilation events. The default is option 0. Option 1 should not be used with muon background simulations.
 
     /GammaPrint/Track_Set
 

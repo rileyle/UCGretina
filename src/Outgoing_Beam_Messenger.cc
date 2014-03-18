@@ -23,6 +23,10 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
   ExCmd->SetParameterName("choice",false);
   ExCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  SrcCmd = new G4UIcmdWithoutParameter("/BeamOut/Source",this);
+  SrcCmd->SetGuidance("Simulate a stationary source.");
+  SrcCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   LvlCmd = new G4UIcmdWithAString("/BeamOut/LevelSchemeFile",this);
   LvlCmd->SetGuidance("Set the level scheme filename.");
   LvlCmd->SetParameterName("choice",false);
@@ -143,6 +147,7 @@ Outgoing_Beam_Messenger::~Outgoing_Beam_Messenger()
 //  delete betaCmd;
   delete tauCmd;
   delete ExCmd;
+  delete SrcCmd;
   delete LvlCmd;
   delete TExCmd;
   delete TExFCmd;
@@ -181,6 +186,8 @@ void Outgoing_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamOut->setDZ(DZCmd->GetNewIntValue(newValue));}
   if( command == ExCmd )
     { BeamOut->setEx(ExCmd->GetNewDoubleValue(newValue));}
+  if( command == SrcCmd )
+    { BeamOut->SetSource();}
   if( command == LvlCmd )
     { BeamOut->setLvlSchemeFile(newValue);}
   if( command == TExCmd )
@@ -235,4 +242,3 @@ void Outgoing_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
   if( command == a4Targetcmd )
     { BeamOut->SetTargetCoeff(4,a4Targetcmd->GetNewDoubleValue(newValue));}
 }
-

@@ -26,7 +26,6 @@ class TrackerGammaSD_Messenger: public G4UImessenger
     G4UIdirectory*             PrtGDir;
     G4UIcmdWithoutParameter*   PrtGSCmd;
     G4UIcmdWithoutParameter*   PrtGUCmd;
-    G4UIcmdWithAnInteger*      MethodCmd;
 
 };
 
