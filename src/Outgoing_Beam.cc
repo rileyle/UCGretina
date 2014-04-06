@@ -75,6 +75,10 @@ void Outgoing_Beam::setDecayProperties()
   G4ProcessManager *pm = NULL;
 
   if (lvlSchemeFileName == ""){
+
+    levelEnergy[0] = Ex/keV;
+    relPop[0] = 1.0;
+
     G4cout << "Constructing decay properties for Z=" << Zin + DZ
 	   << " A=" << Ain + DA << " with excitation " << Ex/keV << " keV" << G4endl;
     G4cout << "Direct gamma decay to the ground state." << G4endl;
@@ -89,7 +93,7 @@ void Outgoing_Beam::setDecayProperties()
     }
     GammaDecayChannel *GamDec = new GammaDecayChannel(-1,ion,1,Ex,0.,theAngularDistribution);
     DecTab->Insert(GamDec);
-    // DecTab->DumpInfo();
+    //    DecTab->DumpInfo();
 
     // make sure that the ion has the decay process in its manager
     G4ProcessManager *pm = ion->GetProcessManager();
