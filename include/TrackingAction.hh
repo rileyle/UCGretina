@@ -6,6 +6,7 @@
 #include "EventInformation.hh"
 #include "G4Track.hh"
 #include "G4ios.hh"
+#include "GEB.hh"
 
 #include "EventAction.hh"
 

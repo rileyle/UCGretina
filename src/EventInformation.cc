@@ -12,6 +12,7 @@ void EventInformation::AddEmittedGamma(G4double e,
 				       G4ThreeVector *pos, 
 				       G4ThreeVector *dir){
 
+  //  G4cout << "   fNEmittedGammas = " << fNEmittedGammas << G4endl;
   fEmittedGammaEnergies[fNEmittedGammas] = e/keV;
   fEmittedGammaPosX[fNEmittedGammas] = pos->getX()/mm;
   fEmittedGammaPosY[fNEmittedGammas] = pos->getY()/mm;

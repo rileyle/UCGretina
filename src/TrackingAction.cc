@@ -35,10 +35,30 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
       ( aTrack->GetParentID() == 0 ||
 	aTrack->GetCreatorProcess()->GetProcessName() == "Decay" ||
 	aTrack->GetCreatorProcess()->GetProcessName() == "Reaction" ) ){
+
+    //    G4cout << "> Event ID = " << eventAction->GetEvent()->GetEventID();
+
     G4ThreeVector pos = aTrack->GetPosition();
     G4ThreeVector dir = aTrack->GetMomentumDirection();
-    eventInfo->AddEmittedGamma(aTrack->GetKineticEnergy(), 
-			       &pos, &dir);
+
+    // G4cout << std::fixed << std::setprecision(4) 
+    // 	   << std::setw(12) << std::right
+    // 	   << "   pos = " << pos
+    // 	   << "   dir = " << dir
+    // 	   << "   energy = " << aTrack->GetKineticEnergy();
+
+    if(eventInfo->GetNEmittedGammas() < MAX_SIM_GAMMAS){
+      eventInfo->AddEmittedGamma(aTrack->GetKineticEnergy(), 
+				 &pos, &dir);
+    } else {
+      G4cout << "WARNING: the number of emitted gammas = " 
+	     << eventInfo->GetNEmittedGammas()
+	     << ", MAX_SIM_GAMMAS = " << MAX_SIM_GAMMAS << "\n"
+	     << "         We may have a zombie track. Aborting event " 
+	     << eventAction->GetEvent()->GetEventID()
+	     << G4endl;
+      G4EventManager::GetEventManager()->AbortCurrentEvent();
+    }
   }
 
 }
