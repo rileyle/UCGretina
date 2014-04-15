@@ -47,18 +47,8 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
     // 	   << "   dir = " << dir
     // 	   << "   energy = " << aTrack->GetKineticEnergy();
 
-    if(eventInfo->GetNEmittedGammas() < MAX_SIM_GAMMAS){
-      eventInfo->AddEmittedGamma(aTrack->GetKineticEnergy(), 
-				 &pos, &dir);
-    } else {
-      G4cout << "WARNING: the number of emitted gammas = " 
-	     << eventInfo->GetNEmittedGammas()
-	     << ", MAX_SIM_GAMMAS = " << MAX_SIM_GAMMAS << "\n"
-	     << "         We may have a zombie track. Aborting event " 
-	     << eventAction->GetEvent()->GetEventID()
-	     << G4endl;
-      G4EventManager::GetEventManager()->AbortCurrentEvent();
-    }
+    eventInfo->AddEmittedGamma(aTrack->GetKineticEnergy(), 
+			       &pos, &dir);
   }
 
 }

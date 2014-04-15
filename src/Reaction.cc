@@ -161,13 +161,18 @@ G4VParticleChange* Reaction::AtRestDoIt(
   // 	 << aTrack.GetDynamicParticle()->GetParticleDefinition()->GetPDGStable()
   // 	 << G4endl;
 
+
   aParticleChange.Initialize(aTrack);
 
-  BeamOut->ScanInitialConditions(aTrack);
+  if(BeamOut->Source()){
 
-  aParticleChange.ProposeTrackStatus(fStopAndKill);
-  aParticleChange.SetNumberOfSecondaries(1);
-  aParticleChange.AddSecondary(BeamOut->ReactionProduct(),aTrack.GetPosition(),true);
+    BeamOut->ScanInitialConditions(aTrack);
+
+    aParticleChange.ProposeTrackStatus(fStopAndKill);
+    aParticleChange.SetNumberOfSecondaries(1);
+    aParticleChange.AddSecondary(BeamOut->ReactionProduct(),aTrack.GetPosition(),true);
+
+  }
 
   return &aParticleChange;
 

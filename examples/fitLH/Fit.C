@@ -102,7 +102,7 @@ void fitSpectrum() {
   spectrum->GetXaxis()->SetRangeUser(0.,2500.);
   TH1F *diff = (TH1F*)spectrum->Clone("diff");
 
-  spectrum->Fit("f1","LRME");
+  spectrum->Fit("f1","LR");
 
   // Create the difference spectrum
   for(int i=0;i<diff->GetNbinsX();i++) {

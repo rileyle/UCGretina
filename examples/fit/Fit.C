@@ -81,9 +81,9 @@ void fitSpectrum() {
 
   // Initialize fit parameter array
   Double_t par[1000];
-  par[0]  = 1;                // Exponential 1
+  par[0]  = 0.1;              // Exponential 1
   par[1]  = -1E-03;
-  par[2]  = 1;                // Exponential 2
+  par[2]  = 0.1;              // Exponential 2
   par[3]  = -1E-04;
   par[4]  = 0;                // Measured random background
   par[5]  = 0.001;             //  500 keV
@@ -102,7 +102,7 @@ void fitSpectrum() {
   spectrum->GetXaxis()->SetRangeUser(0.,2500.);
   TH1F *diff = (TH1F*)spectrum->Clone("diff");
 
-  spectrum->Fit("f1","LRME");
+  spectrum->Fit("f1","LR");
 
   // Create the difference spectrum
   for(int i=0;i<diff->GetNbinsX();i++) {
