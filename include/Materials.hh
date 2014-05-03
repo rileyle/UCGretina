@@ -52,6 +52,7 @@ private:
   G4Material* Cu;
   G4Material* Nb;
   G4Material* C;
+  G4Material* gC;
   G4Material* Au;
   G4Material* Ir;
   G4Material* Si;

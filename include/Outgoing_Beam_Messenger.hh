@@ -31,6 +31,8 @@ class Outgoing_Beam_Messenger: public G4UImessenger
     G4UIcmdWithADoubleAndUnit* ExCmd;
     G4UIcmdWithoutParameter*   SrcCmd;
     G4UIcmdWithAString*        LvlCmd;
+    G4UIcmdWithAnInteger*      TACmd;
+    G4UIcmdWithAnInteger*      TZCmd;
     G4UIcmdWithADoubleAndUnit* TExCmd;
     G4UIcmdWithADouble*        TExFCmd;
     G4UIcmdWithADoubleAndUnit* tauCmd;
@@ -60,4 +62,3 @@ class Outgoing_Beam_Messenger: public G4UImessenger
 
 
 #endif
-

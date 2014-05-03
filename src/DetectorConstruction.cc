@@ -74,7 +74,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // GRETINA
 
   the_Gretina_Array = new Gretina_Array();
-  the_Gretina_Array_Messenger = new Gretina_Array_Messenger(the_Gretina_Array);  
+  the_Gretina_Array_Messenger = new Gretina_Array_Messenger(the_Gretina_Array);
+
   return ExpHall_phys;
 }
 

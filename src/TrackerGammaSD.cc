@@ -78,7 +78,7 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
       G4VPhysicalVolume* topVolume = theTouchable->GetVolume(depth);
   
       G4ThreeVector frameTrans = topVolume->GetFrameTranslation();
-                                  
+
       const G4RotationMatrix* rot = topVolume->GetFrameRotation();
                                   
       G4RotationMatrix frameRot;
@@ -87,7 +87,7 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   
       G4ThreeVector posSol = frameRot( position );
       posSol += frameRot( frameTrans );
-    
+
       //////////////////////
       /// Segment number
       //////////////////////
@@ -127,6 +127,7 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
       newHit->SetSegNumb    (segCode);
       newHit->SetEdep       (edep);
       newHit->SetPos        (position);
+      newHit->SetPosCrys    (posSol);
       newHit->SetTrackOrigin(aStep->GetTrack()->GetVertexPosition());
 
       gammaCollection->insert( newHit );

@@ -173,8 +173,7 @@ Commands related to the incoming beam:
 > Horizontal and vertical widths of the beam spot at the emission
 > point (not on target)
 
-    /BeamIn/Focus/Ata0 <double> <unit> /BeamIn/Focus/Bta0 <double>
-    <unit>
+    /BeamIn/Focus/Ata0 <double> <unit> /BeamIn/Focus/Bta0 <double> <unit>
 
 > Direction of the incoming beam (dispersive and nondispersive angles,
 > respectively)
@@ -187,18 +186,39 @@ Commands related to the incoming beam:
 
 Commands related to the outgoing reaction product:
 
-    /BeamOut/DA <int> /BeamOut/DZ <int>
+    /BeamOut/DA <int> 
+
+    /BeamOut/DZ <int>
 
 > Changes in mass number and atomic number of the reaction. The
 > incoming beam has (A,Z) and the outgoing reaction product has (A+DA,
 > Z+DZ)
 
+    /BeamOut/TargetA <int>
+
+    /BeamOut/TargetZ <int>
+
+> Mass number and charge number of the target nucleus (used to look up
+> masses for 2-body reaction kinematics).
+
     /BeamOut/ProjectileExcitation <double> <unit>
 
 > Excitation energy of the outgoing reaction product.
 
-    /BeamOut/seta0 <double> /BeamOut/seta2 <double> /BeamOut/seta4
-    <double>
+    /BeamOut/AngDistSigmaA <double> <unit>
+
+    /BeamOut/AngDistSigmaB <double> <unit>
+
+> Angular spreads of the lab-frame scattering angle distribution of
+> the outgoing reaction products in the dispersive 
+> and nondispersive directions, respectively. The 2-body reaction
+> kinematics draw from this scattering-angle distribution.
+
+    /BeamOut/seta0 <double> 
+
+    /BeamOut/seta2 <double> 
+
+    /BeamOut/seta4 <double>
 
 > Angular distribution coefficients for the emitted gamma rays.
 
@@ -234,11 +254,6 @@ Commands related to the outgoing reaction product:
 > NOTE: This command supersedes values set with the
 > /BeamOut/ProjectileExcitation, /BeamOut/seta0, /BeamOut/seta2,
 > /BeamOut/seta4, and /BeamOut/tau commands described above.
-
-    /BeamOut/AngDistSigmaA 0.012 rad /BeamOut/AngDistSigmaB 0.012 rad
-
-> Angular spreads of the outgoing reaction products in the dispersive
-> and nondispersive directions, respectively.
 
     /BeamOut/Source
 
@@ -281,6 +296,7 @@ Optional commands
 > Set the energy of the "simple" source type
 
     /Experiment/Source/setWhiteLowE  <double> <unit>
+
     /Experiment/Source/setWhiteHighE <double> <unit>
 
 > Set the limits of the energy distribution of the "white" source type
@@ -296,6 +312,7 @@ Optional commands
 Mandatory commands for running background simulations
 
     /Experiment/RunSource
+
     /Experiment/Source/Set <background || muons>
 
 > The background source type emits several gamma rays from a solid spherical shell surrounding GRETINA. The muon source type emits 4.0 GeV muons vertically from obove GRETINA.
@@ -307,9 +324,12 @@ Optional commands describing the spherical shell surrounding GRETINA from which 
 > Set material for the background sphere (default: G4_Galactic).
 
     /BackgroundSphere/R_min <double> <unit>
+
     /BackgroundSphere/R_max <double> <unit>
 
-> Set the inner and outer radii of the background sphere (default: 3.0 m, 3.4 m).
+> Set the inner and outer radii of the background sphere 
+> (default: 3.0 m, 3.4 m). 
+
 ## Tracking ##
 
     /GammaPrint/Track_Set

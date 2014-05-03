@@ -13,13 +13,11 @@ Outgoing_Beam::Outgoing_Beam()
   Ex=1.0*MeV;
   lvlSchemeFileName = "";
   Nlevels = 1;
-  TarEx=547.5*keV;
+  TarEx=0.*keV;
+  TarA = 1;
+  TarZ = 1;
   TFrac=0.;
   tau=0.0*ns;
-  betaDopp=0.33;
-  posDopp.setX(0.);
-  posDopp.setY(0.);
-  posDopp.setZ(0.);
 
   reacted=false;
   source=false;
@@ -56,9 +54,13 @@ void Outgoing_Beam::setDecayProperties()
 
   Zin = beamIn->getZ();
   Ain = beamIn->getA();
+  beam = G4ParticleTable::GetParticleTable()->GetIon(Zin,Ain,0.);
   ion = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,Ex);
   iongs = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,0.);
   iongs->SetPDGStable(true);
+  tarIn  = G4ParticleTable::GetParticleTable()->GetIon(TarZ,    TarA,    0.);
+  tarOut = G4ParticleTable::GetParticleTable()->GetIon(TarZ-DZ, TarA-DA, 0.);
+
   if (ion == NULL) {
     G4cerr << "Could not find outgoing ion in particle table "
 	   << Zin + DZ << " " << Ain+DA << G4endl;
@@ -187,6 +189,7 @@ void Outgoing_Beam::ScanInitialConditions(const G4Track & aTrack)
   KEIn=aTrack.GetDynamicParticle()->GetKineticEnergy();
   Ain=aTrack.GetDynamicParticle()->GetDefinition()->GetAtomicMass();
   Zin=aTrack.GetDynamicParticle()->GetDefinition()->GetAtomicNumber();
+  Min=aTrack.GetDynamicParticle()->GetDefinition()->GetPDGMass();
   tauIn=aTrack.GetProperTime();
   ReactionFlag=-1;
   if(aTrack.GetVolume()->GetLogicalVolume()->GetName()=="target_log")
@@ -258,26 +261,21 @@ G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
 {
   static const G4ThreeVector ez(0.,0.,1.);
 
-  //? (RFE) differentiate Coulomb scattering vs. Knockout
   G4ThreeVector ax,ppOut;
   G4double      theta;
-  // ppin/Ain = ppout/Aout, Aout = Ain + DA
-  //ppOut=pIn * (float(Ain) / float(Ain-DA)); // conserve KE/u
-  //  ppOut=pIn * (float(Ain) / float(Ain-DA)); // conserve KE/u  RS (Aout=Ain+DA)
 
-  // conserve KE/u LR
-  //  G4double tout = KEIn*float(Ain+DA)/float(Ain);
-  //  ppOut = pIn;
-  //  ppOut.setMag( sqrt(tout*tout + 2*ion->GetPDGMass()*tout) );
-  
-  // conserve p/u LR
-  ppOut=pIn * float(Ain+DA)/float(Ain);
+  G4double m1 = Min;
+  G4double m2 = tarIn->GetPDGMass();
+  G4double m3 = ion->GetPDGMass();
+  G4double m4 = tarOut->GetPDGMass();
 
-  ax=pIn.cross(ez);
-  if (pIn.mag2() == 0.) {
-    return ppOut;
-  }
-  ax.rotate(pIn,G4UniformRand()*twopi);
+  // G4cout << " m1 = " << m1
+  // 	    << " m2 = " << m2
+  // 	    << " m3 = " << m3
+  // 	    << " m4 = " << m4
+  // 	    << G4endl;
+
+  // Lab-frame scattering angle ================================================
 
   theta=GetDTheta();
   //  G4cout << std::setprecision(3) << std::setw(10)
@@ -288,9 +286,35 @@ G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
       theta=GetDTheta();
       //      G4cout << std::setprecision(3) << std::setw(10)
       //	     << "***Theta_1 = " << theta/deg << G4endl;
-
     }
 
+  // Relativistic kinematics ===================================================
+
+  //       Baldin et al, Kinematics of Nuclear Reactions, Pergamon (1961)
+
+  G4double ET = KEIn + m1 + m2;                                      // Total E
+  G4double p1 = sqrt( (KEIn + m1)*(KEIn + m1) - m1*m1 );          // Incoming p
+  G4double E3Lab = 1/(ET*ET - p1*p1*cos(theta)*cos(theta))        // Outgoing E
+    *( ET*( m2*(KEIn + m1) + (m1*m1+m2*m2+m3*m3-m4*m4)/2. )
+       + p1*cos(theta)*sqrt( ( m2*(KEIn+m1) + (m1*m1+m2*m2-m3*m3-m4*m4)/2. )
+			     *( m2*(KEIn+m1) + (m1*m1+m2*m2-m3*m3-m4*m4)/2. ) 
+			     - m3*m3*m4*m4 
+			     - p1*p1*m3*m3*sin(theta)*sin(theta) ) );
+
+  G4double p3Lab = sqrt( E3Lab*E3Lab - m3*m3 );                   // Outgoing p
+
+  // Set the magnitude of the outgoing momentum ================================
+
+  ppOut = pIn;
+  ppOut.setMag( p3Lab );
+
+  // Set the direction of the outgoing momentum ================================
+
+  ax=pIn.cross(ez);
+  if (pIn.mag2() == 0.) {
+    return ppOut;
+  }
+  ax.rotate(pIn,G4UniformRand()*twopi);
   
   if (ax.mag2() == 0.) {
     return ppOut;
@@ -302,7 +326,6 @@ G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
   //	 << "  ata = " << -asin(ppOut.getY()/ppOut.mag())/mrad
   //	 << "  bta = " << -asin(ppOut.getX()/ppOut.mag())/mrad
   //	 << G4endl;
-  
 
   return ppOut;
 }
@@ -310,12 +333,6 @@ G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
 //---------------------------------------------------------
 G4double Outgoing_Beam::GetDTheta()
 {
-  //LR G4double delta,d,theta;
-
-  //LR delta=alpha/2.-1./12.;
-  //LR d=sqrt(1+4.*delta*pmax*G4UniformRand());
-  //LR theta=sqrt(0.5*(-1.+d)/delta);
-
   G4double theta_a,theta_b,theta;
 
   theta_a = CLHEP::RandGauss::shoot(0,sigma_a);
@@ -338,39 +355,39 @@ void Outgoing_Beam::Report()
 {
   setDecayProperties();
 
-G4cout<<"----> Delta Z for the outgoing beam set to  "<<DZ<< G4endl;
-G4cout<<"----> Delta A for the outgoing beam set to  "<<DA<< G4endl;
-G4cout<<"----> Excitation energy of the outgoing beam set to "<<
- G4BestUnit(Ex,"Energy")<<G4endl;
-G4cout<<"----> Target excitation energy set to "<< G4BestUnit(TarEx,"Energy")<<G4endl;  
-G4cout<<"----> Fraction of target excitations set to "<<TFrac<<G4endl;
-G4cout<<"----> Lifetime of the excited state for the outgoing beam set to "<<
- G4BestUnit(tau,"Time")<<G4endl; 
-//G4cout<<"----> Beta for the outgoing beam set to "<<betaDopp<<G4endl; 
-//G4cout<<"----> X position for the outgoing beam Doppler corrections set to "<<posDopp.getX()<<G4endl; 
-//G4cout<<"----> Y position for the outgoing beam Doppler corrections set to "<<posDopp.getY()<<G4endl; 
-//G4cout<<"----> Z position for the outgoing beam Doppler corrections set to "<<posDopp.getZ()<<G4endl;
-//G4cout<<"----> Alpha coefficient for angular distribution of ions Coulomb scattered on the target set to "<<alpha<<G4endl; 
-// G4cout<<"----> Maximum scattering angle for ions Coulomb scattered on the target "<<theta_max/deg<<" deg. "<<G4endl; 
- G4cout<<"Sigma for ata............"<<sigma_a<<G4endl;
- G4cout<<"Sigma for bta............"<<sigma_b<<G4endl;
- G4cout<<"----> Number of charge states "<<NQ<<G4endl;
- vector<Charge_State*>::iterator itPos = Q.begin();
- for(; itPos < Q.end(); itPos++) 
-   {
-     G4cout<<"----> Charge state "     <<(*itPos)->GetCharge()<<G4endl;
-     G4cout<<"   => UnReactedFraction "<<(*itPos)->GetUnReactedFraction()<<G4endl;
-     G4cout<<"   =>   ReactedFraction "<<(*itPos)->GetReactedFraction()<<G4endl;
-     if((*itPos)->GetUseSetKEu())
-       {
-	 G4cout<<"   =>              KE/A "<<(*itPos)->GetSetKEu()/MeV<<" MeV"<<G4endl; 
-	 //	 G4cout<<"   =>                KE "<<(*itPos)->GetSetKE()/MeV<<" MeV"<<G4endl; LR (not initialized if KEu is used)
-       }
-     else
-       G4cout<<"   =>                KE "<<(*itPos)->GetSetKE()/MeV<<" MeV"<<G4endl;
-   }
- CalcQUR();
- CalcQR();
+  G4cout<<"----> Delta A for the outgoing beam set to  "<<DA<< G4endl;
+  G4cout<<"----> Delta Z for the outgoing beam set to  "<<DZ<< G4endl;
+  G4cout<<"----> Target A (for kinematics calculations) is set to  "<<TarA<< G4endl;
+  G4cout<<"----> Target Z (for kinematics calculations) is set to  "<<TarZ<< G4endl;
+  G4cout<<"----> Excitation energy of the outgoing beam set to "<<
+    G4BestUnit(Ex,"Energy")<<G4endl;
+  G4cout<<"----> Target excitation energy set to "<< G4BestUnit(TarEx,"Energy")<<G4endl;  
+  G4cout<<"----> Fraction of target excitations set to "<<TFrac<<G4endl;
+  G4cout<<"----> Mass of the incoming beam is " <<beam->GetPDGMass()<<" MeV"<<G4endl;
+  G4cout<<"----> Mass of the target is " <<tarIn->GetPDGMass()<<" MeV"<<G4endl;
+  G4cout<<"----> Mass of the outgoing beam-like reaction product is " <<ion->GetPDGMass()<<" MeV"<<G4endl;
+  G4cout<<"----> Mass of the outgoing target-like reaction product is " <<tarOut->GetPDGMass()<<" MeV"<<G4endl;
+  G4cout<<"----> Lifetime of the excited state for the outgoing beam set to "<<
+    G4BestUnit(tau,"Time")<<G4endl; 
+  G4cout<<"----> Sigma for ata distribution set to "<<sigma_a<<G4endl;
+  G4cout<<"----> Sigma for bta distribution set to "<<sigma_b<<G4endl;
+  G4cout<<"----> Number of charge states "<<NQ<<G4endl;
+  vector<Charge_State*>::iterator itPos = Q.begin();
+  for(; itPos < Q.end(); itPos++) 
+    {
+      G4cout<<"----> Charge state "     <<(*itPos)->GetCharge()<<G4endl;
+      G4cout<<"   => UnReactedFraction "<<(*itPos)->GetUnReactedFraction()<<G4endl;
+      G4cout<<"   =>   ReactedFraction "<<(*itPos)->GetReactedFraction()<<G4endl;
+      if((*itPos)->GetUseSetKEu())
+	{
+	  G4cout<<"   =>              KE/A "<<(*itPos)->GetSetKEu()/MeV<<" MeV"<<G4endl; 
+	  //	 G4cout<<"   =>                KE "<<(*itPos)->GetSetKE()/MeV<<" MeV"<<G4endl; LR (not initialized if KEu is used)
+	}
+      else
+	G4cout<<"   =>                KE "<<(*itPos)->GetSetKE()/MeV<<" MeV"<<G4endl;
+    }
+  CalcQUR();
+  CalcQR();
 }
 
 
@@ -409,6 +426,24 @@ G4cout<<"----> Target excitation energy set to "<< G4BestUnit(TarEx,"Energy")<<G
 
 }
 //---------------------------------------------------------
+void Outgoing_Beam::setTarA(G4int a)
+{
+
+  TarA = a;
+  
+  G4cout<<"----> Target A set to "<< TarA <<G4endl;
+
+}
+//---------------------------------------------------------
+void Outgoing_Beam::setTarZ(G4int z)
+{
+
+  TarZ = z;
+  
+  G4cout<<"----> Target Z set to "<< TarZ <<G4endl;
+
+}
+//---------------------------------------------------------
 void Outgoing_Beam::setTFrac(G4double ex)
 {
   TFrac=ex;
@@ -427,41 +462,6 @@ void Outgoing_Beam::settau(G4double t)
 
 G4cout<<"----> Lifetime of the excited state for the outgoing beam set to "<<
  G4BestUnit(tau,"Time")<<G4endl; 
-}
-//---------------------------------------------------------
-void Outgoing_Beam::setbeta(G4double b)
-{
-// this function is defunct. was used for doppler reconstruction 
-// when it was included in the simulation. Now it is handled separately
-// TB
-  betaDopp=b;
-
-//G4cout<<"----> Beta for the outgoing beam set to "<<betaDopp<<G4endl; 
-}
-//---------------------------------------------------------
-void Outgoing_Beam::setDoppZ(G4double z)
-{
-// TB same as setBeta
-  posDopp.setZ(z);
-
-//G4cout<<"----> Z position for the outgoing beam Doppler corrections set to "<<posDopp.getZ()<<G4endl; 
-}
-//---------------------------------------------------------
-void Outgoing_Beam::setDoppY(G4double y)
-{
-// TB same as setbeta()
-  posDopp.setY(y);
-
-//G4cout<<"----> Y position for the outgoing beam Doppler corrections set to "<<posDopp.getY()<<G4endl; 
-}
-
-//---------------------------------------------------------
-void Outgoing_Beam::setDoppX(G4double x)
-{
-// sameas setBeta()
-  posDopp.setX(x);
-
-//G4cout<<"----> X position for the outgoing beam Doppler corrections set to "<<posDopp.getX()<<G4endl; 
 }
 //---------------------------------------------------------
 void Outgoing_Beam::SetUpChargeStates()

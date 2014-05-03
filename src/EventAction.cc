@@ -15,6 +15,7 @@ EventAction::EventAction()
   mode2FileName = "";
   mode2Out = false;
   crmatFileName = "";
+  crystalXforms = false;
   gretinaCoords = false;
   print = false;
   evt = NULL;
@@ -117,9 +118,23 @@ void EventAction::EndOfEventAction(const G4Event* e)
 
       for(G4int i = 0; i < Nhits; i++){
 
-	G4double x  = (*gammaCollection)[i]->GetPos().getX()/mm;
-	G4double y  = (*gammaCollection)[i]->GetPos().getY()/mm;
-	G4double z  = (*gammaCollection)[i]->GetPos().getZ()/mm;
+	G4double x, y, z;
+	if(crystalXforms){
+	  G4double xx, yy;
+	  xx = (*gammaCollection)[i]->GetPosCrys().getX()/mm;
+	  yy = (*gammaCollection)[i]->GetPosCrys().getY()/mm;
+	  z = (*gammaCollection)[i]->GetPosCrys().getZ()/mm;
+	  G4double ph = -120.*3.14159/180.;              // Type A
+	  if((*gammaCollection)[i]->GetDetNumb()%2 == 0) // Type B
+	    ph = -210.*3.14159/180.;
+	  x = xx*cos(ph) - yy*sin(ph);
+	  y = xx*sin(ph) + yy*cos(ph);
+
+	} else {
+	  x = (*gammaCollection)[i]->GetPos().getX()/mm;
+	  y = (*gammaCollection)[i]->GetPos().getY()/mm;
+	  z = (*gammaCollection)[i]->GetPos().getZ()/mm;
+	}
 	G4double e  = (*gammaCollection)[i]->GetEdep()/keV;
 	totalEdep += e;
 
@@ -157,9 +172,9 @@ void EventAction::EndOfEventAction(const G4Event* e)
 
 	    // Position of the initial interaction. We use position to identify the 
 	    // tracks produced by this interaction.
-	    X0[NMeasured]           = x;
-	    Y0[NMeasured]           = y;
-	    Z0[NMeasured]           = z;
+	    X0[NMeasured] = (*gammaCollection)[i]->GetPos().getX()/mm;
+	    Y0[NMeasured] = (*gammaCollection)[i]->GetPos().getY()/mm;
+	    Z0[NMeasured] = (*gammaCollection)[i]->GetPos().getZ()/mm;
 
 	    NCons[NMeasured] = 1;
 	    NMeasured++;
@@ -742,6 +757,16 @@ void EventAction::SetGretinaCoords(){
   gretinaCoords = true; 
 
   G4cout << "Writing interaction points in the Gretina coordinate system (x = down, z = beam)." << G4endl;
+
+  return;
+}
+//---------------------------------------------------
+ 
+void EventAction::SetCrystalXforms(){ 
+
+  crystalXforms = true; 
+
+  G4cout << "Using internal transformations from the world frame to the crystal frames for Mode 2 output." << G4endl;
 
   return;
 }

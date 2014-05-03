@@ -32,6 +32,16 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
   LvlCmd->SetParameterName("choice",false);
   LvlCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  TACmd = new G4UIcmdWithAnInteger("/BeamOut/TargetA",this);
+  TACmd->SetGuidance("Set target mass number.");
+  TACmd->SetParameterName("choice",false);
+  TACmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  TZCmd = new G4UIcmdWithAnInteger("/BeamOut/TargetZ",this);
+  TZCmd->SetGuidance("Set target atomic number.");
+  TZCmd->SetParameterName("choice",false);
+  TZCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   TExCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/TargetExcitation",this);
   TExCmd->SetGuidance("Set target excitation energy.");
   TExCmd->SetParameterName("choice",false);
@@ -149,6 +159,8 @@ Outgoing_Beam_Messenger::~Outgoing_Beam_Messenger()
   delete ExCmd;
   delete SrcCmd;
   delete LvlCmd;
+  delete TACmd;
+  delete TZCmd;
   delete TExCmd;
   delete TExFCmd;
   delete RepCmd;
@@ -190,6 +202,10 @@ void Outgoing_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamOut->SetSource();}
   if( command == LvlCmd )
     { BeamOut->setLvlSchemeFile(newValue);}
+  if( command == TACmd )
+    { BeamOut->setTarA(TACmd->GetNewIntValue(newValue));}
+  if( command == TZCmd )
+    { BeamOut->setTarZ(TACmd->GetNewIntValue(newValue));}
   if( command == TExCmd )
     { BeamOut->setTarEx(TExCmd->GetNewDoubleValue(newValue));}
   if( command == TExFCmd )

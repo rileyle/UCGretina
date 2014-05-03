@@ -40,13 +40,11 @@ public:
   void setLvlSchemeFile(G4String name){lvlSchemeFileName = name;}
   void openLvlSchemeFile();
   void closeLvlSchemeFile();
+  void setTarA(G4int);
+  void setTarZ(G4int);
   void setTarEx(G4double);
   void setTFrac(G4double);
   void settau(G4double);
-  void setbeta(G4double);   // all defunct, see .cc file
-  void setDoppZ(G4double);  // 
-  void setDoppY(G4double);  // 
-  void setDoppX(G4double);  // 
   void ScanInitialConditions(const G4Track &);
   void SetReactionOn(){ reacted=true;};
   void SetReactionOff(){reacted=false;}
@@ -61,9 +59,10 @@ public:
   G4DynamicParticle* ProjectileGS();
   G4DynamicParticle* TargetExcitation();
   G4ThreeVector ReactionPosition();
+  G4int getTarA(){return TarA;}
+  G4int getTarZ(){return TarZ;}
   G4double GetBetaDopp(){return betaDopp;}
   G4double GetGammaDopp(){return 1./sqrt(1.-betaDopp*betaDopp);}
-  G4ThreeVector GetPosDopp(){return posDopp;}
   G4double getTime(){return tau;}
   G4bool   ReactionOn(){return reacted;}
   G4bool   Source(){return source;}
@@ -92,6 +91,7 @@ public:
 private:
   G4int Ain;
   G4int Zin;
+  G4double Min;
   G4ThreeVector dirIn;
   G4ThreeVector posIn;
   G4ThreeVector posOut;
@@ -104,6 +104,8 @@ private:
 
   G4int DZ;
   G4int DA;
+  G4int TarA;
+  G4int TarZ;
 
   G4double Ex,TarEx,TFrac;
   G4String lvlSchemeFileName;
@@ -118,9 +120,11 @@ private:
   G4double  QR[1000],QUR[1000];
   G4int     QRI[1000],QURI[1000],Index;
 
-  G4ThreeVector posDopp;
+  G4ParticleDefinition* beam;
   G4ParticleDefinition* ion;
   G4ParticleDefinition* iongs;
+  G4ParticleDefinition* tarIn;
+  G4ParticleDefinition* tarOut;
  
   static G4Decay decay;
   G4bool  reacted;

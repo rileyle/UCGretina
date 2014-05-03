@@ -17,7 +17,10 @@ EventAction_Messenger::EventAction_Messenger(EventAction* EA):theEventAction(EA)
   Mode2FileCmd->SetGuidance("Mode 2 output file name");
 
   crmatCmd = new G4UIcmdWithAString("/Mode2/crmatFile",this);
-  crmatCmd->SetGuidance("Transformations from crystal to world coordinates for Mode2 data (expected in crystal coordinates). Leave unset to get interaction points in world coordinates.");
+  crmatCmd->SetGuidance("Use the crystal-frame to world-frame transformations in the specified file for Mode2 data (expected in crystal coordinates).");
+
+  crysCmd = new G4UIcmdWithoutParameter("/Mode2/crystalXforms",this);
+  crysCmd->SetGuidance("Use internal transformations from world coordinates to crystal frames for Mode2 data (expected in crystal coordinates).");
 
   coordsCmd = new G4UIcmdWithoutParameter("/Mode2/GretinaCoords",this);
   coordsCmd->SetGuidance("Write interaction points in GRETINA coordinate system --- x down, z beam (standard for Mode2 data).");
@@ -44,6 +47,7 @@ EventAction_Messenger::~EventAction_Messenger()
   delete Mode2Dir;
   delete Mode2FileCmd;
   delete crmatCmd;
+  delete crysCmd;
   delete coordsCmd;
   delete PackResCmd;
   delete S800KECmd;
@@ -62,6 +66,8 @@ void EventAction_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
     {theEventAction->SetMode2File(newValue);}
   if( command == crmatCmd )
     {theEventAction->SetCrmatFile(newValue);}
+  if( command == crysCmd )
+    {theEventAction->SetCrystalXforms();}
   if( command == coordsCmd )
     {theEventAction->SetGretinaCoords();}
   if( command == PackResCmd )

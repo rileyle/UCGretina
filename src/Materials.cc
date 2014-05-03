@@ -59,18 +59,19 @@
   concrete      = NISTman->FindOrBuildMaterial("G4_CONCRETE");
   air           = NISTman->FindOrBuildMaterial("G4_AIR");
 
-  Be = new G4Material("Be",  4., 9.012182*g/mole,  1.84*g/cm3);
-  C  = new G4Material("C",   6., 12.011*g/mole,    2.15*g/cm3);
-  Al = new G4Material("Al", 13., 26.98153*g/mole,  2.70*g/cm3);
-  Si = new G4Material("Si", 14., 28.0855*g/mole,   2.33*g/cm3);
-  Fe = new G4Material("Fe", 26., 55.85*g/mole,     7.87*g/cm3);
-  Cu = new G4Material("Cu", 29., 63.55*g/mole,     8.96*g/cm3);
-  Nb = new G4Material("Nb", 41., 92.90638*g/mole,  8.57*g/cm3);
-  Au = new G4Material("Au", 79., 196.9*g/mole,    19.32*g/cm3);
-  Be = new G4Material("Be",  4., 9.012182*g/mole,  1.84*g/cm3);
-  Si = new G4Material("Si", 14., 28.0855*g/mole,   2.33*g/cm3);
-  Ir = new G4Material("Ir", 77., 192.217*g/mole,  22.65*g/cm3);
-  Au = new G4Material("Au", 79., 196.9*g/mole,    19.32*g/cm3);
+  Be = new G4Material("Be",       4., 9.012182*g/mole,  1.84*g/cm3);
+  C  = new G4Material("C",        6., 12.011*g/mole,    2.15*g/cm3);
+  gC = new G4Material("glassyC",  6., 12.011*g/mole,  1.54*g/cm3);
+  Al = new G4Material("Al",       13., 26.98153*g/mole,  2.70*g/cm3);
+  Si = new G4Material("Si",       14., 28.0855*g/mole,   2.33*g/cm3);
+  Fe = new G4Material("Fe",       26., 55.85*g/mole,     7.87*g/cm3);
+  Cu = new G4Material("Cu",       29., 63.55*g/mole,     8.96*g/cm3);
+  Nb = new G4Material("Nb",       41., 92.90638*g/mole,  8.57*g/cm3);
+  Au = new G4Material("Au",       79., 196.9*g/mole,    19.32*g/cm3);
+  Be = new G4Material("Be",        4., 9.012182*g/mole,  1.84*g/cm3);
+  Si = new G4Material("Si",       14., 28.0855*g/mole,   2.33*g/cm3);
+  Ir = new G4Material("Ir",       77., 192.217*g/mole,  22.65*g/cm3);
+  Au = new G4Material("Au",       79., 196.9*g/mole,    19.32*g/cm3);
 
 }
 
