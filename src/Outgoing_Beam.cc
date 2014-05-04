@@ -71,6 +71,21 @@ void Outgoing_Beam::setDecayProperties()
 	   << Zin + DZ << " " << Ain+DA << G4endl;
     exit(EXIT_FAILURE);
   }
+  if (tarIn == NULL) {
+    G4cerr << "Could not find the target nucleus in particle table "
+	   << TarZ << " " << TarA << G4endl;
+    exit(EXIT_FAILURE);
+  }
+  if (tarOut == NULL) {
+    G4cerr << "Could not find the target-like product in particle table "
+	   << TarZ-DZ << " " << TarA-DA << G4endl;
+    exit(EXIT_FAILURE);
+  }
+
+  m1 = beam->GetPDGMass();
+  m2 = tarIn->GetPDGMass();
+  m3 = ion->GetPDGMass();
+  m4 = tarOut->GetPDGMass();
 
   G4DecayTable *DecTab = NULL;
   GammaDecayChannel *GamDec = NULL;
@@ -189,11 +204,26 @@ void Outgoing_Beam::ScanInitialConditions(const G4Track & aTrack)
   KEIn=aTrack.GetDynamicParticle()->GetKineticEnergy();
   Ain=aTrack.GetDynamicParticle()->GetDefinition()->GetAtomicMass();
   Zin=aTrack.GetDynamicParticle()->GetDefinition()->GetAtomicNumber();
-  Min=aTrack.GetDynamicParticle()->GetDefinition()->GetPDGMass();
+  //  m1 = aTrack.GetDynamicParticle()->GetDefinition()->GetPDGMass();
   tauIn=aTrack.GetProperTime();
   ReactionFlag=-1;
   if(aTrack.GetVolume()->GetLogicalVolume()->GetName()=="target_log")
     ReactionFlag=0;
+  ET = KEIn + m1 + m2;                                      // Total E
+  p1 = sqrt( (KEIn + m1)*(KEIn + m1) - m1*m1 );          // Incoming p
+  // Lab-grame scattering angle limit
+  sin2theta_max = 
+    ( (ET*ET - p1*p1 + m3*m3 - m4*m4)*(ET*ET - p1*p1 + m3*m3 - m4*m4)
+      -4*m3*m3*((m1 + m2)*(m1 + m2) + 2*m2*KEIn) )/( 4*m3*m3*p1*p1 );
+
+  // G4cout << "m1 = " << m1 << ", m2 = " << m2 
+  // 	 << ", m3 = " << m3 << ", m4 = " << m4 
+  // 	 << G4endl;
+
+  // G4cout << "ET = " << ET << ", p1 = " << p1
+  // 	 << ", sin2theta_max = " << sin2theta_max
+  // 	 << G4endl;
+
 }
 
 //---------------------------------------------------------
@@ -264,36 +294,20 @@ G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
   G4ThreeVector ax,ppOut;
   G4double      theta;
 
-  G4double m1 = Min;
-  G4double m2 = tarIn->GetPDGMass();
-  G4double m3 = ion->GetPDGMass();
-  G4double m4 = tarOut->GetPDGMass();
-
-  // G4cout << " m1 = " << m1
-  // 	    << " m2 = " << m2
-  // 	    << " m3 = " << m3
-  // 	    << " m4 = " << m4
-  // 	    << G4endl;
-
   // Lab-frame scattering angle ================================================
 
   theta=GetDTheta();
-  //  G4cout << std::setprecision(3) << std::setw(10)
-  //	 << "Theta_0 = " << theta/deg << G4endl;
-  //If an angle cut is specified ...
-  if(theta_max > 0.)
-    while(theta > theta_max){
-      theta=GetDTheta();
-      //      G4cout << std::setprecision(3) << std::setw(10)
-      //	     << "***Theta_1 = " << theta/deg << G4endl;
-    }
+  // If theta is beyond the limit dictated by the kinematics
+  // or if an angle cut is specified ...
+  while( sin(theta)*sin(theta) > sin2theta_max
+	 || (theta_max > 0. && theta > theta_max) ){
+    theta=GetDTheta();
+  }
 
   // Relativistic kinematics ===================================================
 
   //       Baldin et al, Kinematics of Nuclear Reactions, Pergamon (1961)
 
-  G4double ET = KEIn + m1 + m2;                                      // Total E
-  G4double p1 = sqrt( (KEIn + m1)*(KEIn + m1) - m1*m1 );          // Incoming p
   G4double E3Lab = 1/(ET*ET - p1*p1*cos(theta)*cos(theta))        // Outgoing E
     *( ET*( m2*(KEIn + m1) + (m1*m1+m2*m2+m3*m3-m4*m4)/2. )
        + p1*cos(theta)*sqrt( ( m2*(KEIn+m1) + (m1*m1+m2*m2-m3*m3-m4*m4)/2. )

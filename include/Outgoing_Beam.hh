@@ -91,7 +91,6 @@ public:
 private:
   G4int Ain;
   G4int Zin;
-  G4double Min;
   G4ThreeVector dirIn;
   G4ThreeVector posIn;
   G4ThreeVector posOut;
@@ -106,6 +105,13 @@ private:
   G4int DA;
   G4int TarA;
   G4int TarZ;
+  G4double m1;
+  G4double m2;
+  G4double m3;
+  G4double m4;
+  G4double ET;
+  G4double p1;
+  G4double sin2theta_max;
 
   G4double Ex,TarEx,TFrac;
   G4String lvlSchemeFileName;
