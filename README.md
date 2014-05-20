@@ -1,17 +1,17 @@
 ## Compile and install UCGretina ##
 
-Install version 4.9.6.p02 of the Geant4 libraries from
+Install version 4.9.6.p03 of the Geant4 libraries from
 http://geant4.web.cern.ch/geant4/support/download.shtml. You will need
 the data files for low energy electromagnetic processes. 
 
-_Important note: UCGretina is not compatible wiht the latest version
+_Important note: UCGretina is not compatible with the latest version
 (4.10.x) of the Geant4 libraries. The GRETINA detector geometry code
 currently relies on a deprecated class (BREPSolid) that has been
 removed in Geant4.10._
 
 Set up your environment (consider adding this to your .bashrc):
 
-    $ source <G4INSTALL>/share/Geant4-9.6.2/geant4make/geant4make.sh
+    $ source <G4INSTALL>/share/Geant4-9.6.3/geant4make/geant4make.sh
 
 Compile:
 
@@ -178,8 +178,9 @@ Commands related to the incoming beam:
 > Direction of the incoming beam (dispersive and nondispersive angles,
 > respectively)
 
-    /BeamIn/Focus/maxAta <double> <unit> /BeamIn/Focus/maxBta <double>
-    <unit>
+    /BeamIn/Focus/maxAta <double> <unit> 
+
+    /BeamIn/Focus/maxBta <double> <unit>
 
 > Angular divergences of the incoming beam in the dispersive and
 > nondispersive directions, respectively.
@@ -365,6 +366,15 @@ Energies are expressed in keV, and positions are expressed in mm.
 > world coordinate system. UCGretina inverts this transformation to
 > produce data in the crystal frames, as expected in Mode 2 data.
 
+    /Mode2/crystalXforms
+
+> Internal transformations from the world frame to the crystal 
+> frames are used. This is an alternative to specifying a crmat
+> file. There are small deviations in crystal placement from the
+> design positions. Therefore, using the standard crmat file
+> introduces offsets in the crystal-frame hit patterns. Using the
+> internal transormations does not.
+
     /Mode2/GretinaCoords
 
 > When this command is present, the world coordinates are rotated Pi/2
@@ -402,22 +412,32 @@ The optional command
 
 activates ASCII output.
 
-The output file contains gamma-ray information for each event that
-deposited energy in GRETINA. For each event there is a header line
-beginning with '$':
+If energy was deposited in GRETINA in the event, S800 data and
+decomposed gamma-ray information are written: 
 
-    $ nHits Egamma fullEnergy Event#
+    S   <ATA>   <BTA>   <DTA>   <YTA>   <Event #>
+    D   <# of decomposed gamma events>   <Event #>
+    C   <Crystal ID>   <# of interaction points>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>
+    C   <Crystal ID>   <# of interaction points>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>
+    ...
 
-where nHits is the number of interaction ponts, Egamma is the total
-energy of the event, fullEnergy is 1 for events in which the full energy
-of the emitted gamma ray is deposited and 0 otherwise, and Event# is
-the event number. The header line is followed by nHits lines
-describing the hits with the format:
+The energy, emission position, emission direction, and the
+velocity of the projectile are written for each gamma ray emitted in
+every event:
 
-    detNum Edep x y z
+    E   <# of emitted gamma rays>    <Full Energy>     <Event #>
+        <Energy>   <X>   <Y>   <Z>   <theta>   <phi>   <beta>
+        <Energy>   <X>   <Y>   <Z>   <theta>   <phi>   <beta>
+        ...
 
-where Edep is the energy (in keV) deposited in crystal detNum by the
-hit. The hit positions (x, y, z) are in mm.
+<Full Energy> = 1 if a single gamma ray is emitted and its
+full energy is deposited in a single crystal. <Full Energy> = 0 if a
+single gamma ray is emitted and only part of its energy is deposited
+in any one crystal. <Full Energy> = -1 otherwise.
 
 ## Visualize the array ##
 

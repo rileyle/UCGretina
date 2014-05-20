@@ -57,6 +57,8 @@ void EventAction::EndOfEventAction(const G4Event* e)
 {
   evt = e;
 
+  ios::fmtflags f( G4cout.flags() );
+
   G4int event_id=evt->GetEventID();
 
   EventInformation* eventInfo = (EventInformation*)evt->GetUserInformation();
@@ -85,20 +87,19 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	     << G4endl;
   }
 
-  //  G4cout<<"+++++ End of event "<<evt->GetEventID()<<G4endl;
- 
   // Analyze hits and write event information to the output file.
   G4HCofThisEvent * HCE = evt->GetHCofThisEvent();
   if(HCE) {
 
-    TrackerGammaHitsCollection* gammaCollection = (TrackerGammaHitsCollection*)(HCE->GetHC(gammaCollectionID));
+    TrackerGammaHitsCollection* gammaCollection 
+      = (TrackerGammaHitsCollection*)(HCE->GetHC(gammaCollectionID));
 
     G4int Nhits = gammaCollection->entries();
 
     if(Nhits>0) {
 
-      // Packing: consolidate interaction points within segments based on proximity. 
-
+      // Packing: consolidate interaction points within segments 
+      // based on proximity. 
       G4int trackID[1000];
       G4int detNum[1000];
       G4int segNum[1000];
@@ -124,9 +125,9 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	  xx = (*gammaCollection)[i]->GetPosCrys().getX()/mm;
 	  yy = (*gammaCollection)[i]->GetPosCrys().getY()/mm;
 	  z = (*gammaCollection)[i]->GetPosCrys().getZ()/mm;
-	  G4double ph = -120.*3.14159/180.;              // Type A
+	  G4double ph = -122.93*3.14159/180.;              // Type A
 	  if((*gammaCollection)[i]->GetDetNumb()%2 == 0) // Type B
-	    ph = -210.*3.14159/180.;
+	    ph = -208.25*3.14159/180.;
 	  x = xx*cos(ph) - yy*sin(ph);
 	  y = xx*sin(ph) + yy*cos(ph);
 
@@ -160,18 +161,19 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	    detNum[NMeasured]       = (*gammaCollection)[i]->GetDetNumb();
 	    segNum[NMeasured]       = (*gammaCollection)[i]->GetSegNumb();
 
-	    // This becomes the total energy deposit associated with this interaction.
+	    // This becomes the total energy deposit associated with this 
+	    // interaction.
 	    measuredEdep[NMeasured] = e; 
 
-	    // This becomes the barycenter of all energy depositions associated with
-	    // this interaction.
+	    // This becomes the barycenter of all energy depositions associated
+	    // with this interaction.
 	    measuredX[NMeasured]    = x;
 	    measuredY[NMeasured]    = y;
 	    measuredZ[NMeasured]    = z;
 	    trackID[NMeasured]      = (*gammaCollection)[i]->GetTrackID();
 
-	    // Position of the initial interaction. We use position to identify the 
-	    // tracks produced by this interaction.
+	    // Position of the initial interaction. We use position to identify
+	    // the tracks produced by this interaction.
 	    X0[NMeasured] = (*gammaCollection)[i]->GetPos().getX()/mm;
 	    Y0[NMeasured] = (*gammaCollection)[i]->GetPos().getY()/mm;
 	    Z0[NMeasured] = (*gammaCollection)[i]->GetPos().getZ()/mm;
@@ -191,7 +193,7 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	    G4double y0 = (*gammaCollection)[i]->GetTrackOrigin().getY()/mm;
 	    G4double z0 = (*gammaCollection)[i]->GetTrackOrigin().getZ()/mm;
 
-	    // G4cout << "(*gammaCollection)[" << i << "]->GetParentTrackID() = "
+	    // G4cout << "(*gammaCollection)["<< i <<"]->GetParentTrackID() = "
 	    // 	   << (*gammaCollection)[i]->GetParentTrackID()
 	    // 	   << "   trackID[j] = " << trackID[j]
 	    // 	   << "   (x0 - X0[" << j << "]) = " << (x0 - X0[j])
@@ -228,10 +230,6 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	// We'll initialize a new interaction point and treat it as a 
 	// gamma-ray interaction.
 	if(!processed){
-
-	  // G4cout << "Warning: Could not find a home for hit " << i
-	  // 	 << " of event " << event_id << ".\n Assigning it a new interaction point."
-	  // 	 << G4endl;
 
 	  trackID[NMeasured]      = (*gammaCollection)[i]->GetTrackID();
 	  detNum[NMeasured]       = (*gammaCollection)[i]->GetDetNumb();
@@ -286,7 +284,7 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	    NGammaHits--;
 
 	  }
-	  
+
 	}
 
       }
@@ -296,6 +294,7 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	if(NCons[i] > 0)
 	  segmentEdep[i] = measuredEdep[i];
 
+      G4bool singleDetector = true;
       for(G4int i = 0; i < NMeasured; i++){
 	for(G4int j = i+1; j < NMeasured; j++){
 	  if(NCons[i] > 0 && NCons[j] > 0
@@ -304,26 +303,25 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	    segmentEdep[i] += measuredEdep[j];
 	    segmentEdep[j] += measuredEdep[i];
 	  }
+	  if( detNum[i] != detNum[j] )
+	    singleDetector = false;
 	}
       }
 
-      // Identify full-energy events. 
-      G4bool fullEnergy = false;
-      if( (totalEdep - eventInfo->GetEmittedGammaEnergy(0))
-	  *(totalEdep - eventInfo->GetEmittedGammaEnergy(0)) 
-	  < 0.001*keV*0.001*keV )
-	fullEnergy = true;
+      // Identify events in which the full emitted gamma-ray energy
+      // is deposited in a single crystal
+      // (only evaluated for emitted multiplicity = 1 events).
+      if( eventInfo->GetNEmittedGammas() == 1 ){
+	if( singleDetector &&
+	    (totalEdep - eventInfo->GetEmittedGammaEnergy(0))
+	    *(totalEdep - eventInfo->GetEmittedGammaEnergy(0)) 
+	    < 0.001*keV*0.001*keV )
+	  eventInfo->SetFullEnergy(1);
+	else
+	  eventInfo->SetFullEnergy(0);
+      }
 
-      // Write the event with consolidated interaction points to the
-      // output file(s). 
-      if(evOut)
-	evfile << "$   " << std::setw(4) << NGammaHits << "   " 
-	       << std::fixed << std::setprecision(2) << std::setw(12) << std::right
-	       << totalEdep << "   " << fullEnergy << "   "
-	       << event_id
-	       << endl;
-
-      // Coordinate transformations for Mode 2
+      // Coordinate transformations
       for(int i=0; i<NMeasured; i++) {
 
 	if(NCons[i] > 0){
@@ -363,66 +361,45 @@ void EventAction::EndOfEventAction(const G4Event* e)
                          + z*crmat[h+1][c][2][2];
 	  }
 
-	  if(evOut)
-	    evfile
-	      << std::setw(3) << detNum[i]+4  // +4 to match measured data stream
-	      << std::setw(3) << segNum[i]
-	      << std::fixed << std::setprecision(2) << std::setw(12) << std::right
-	      << measuredEdep[i]
-	      //	      << std::fixed << std::setprecision(2) << std::setw(12) << std::right
-	      //	      << segmentEdep[i]
-	      << std::setw(10) << std::right
-	      << measuredX[i]
-	      << std::setw(10) << std::right
-	      << measuredY[i]
-	      << std::setw(10) << std::right
-	      << measuredZ[i]
-	      << G4endl;
-
 	}
 
       }
 
-      if(mode2Out){
-	// Write S800 event to the Mode 2 output file
-	if(fisInBeam)
-	  writeS800(timestamp, 
-		    eventInfo->GetATA(), 
-		    eventInfo->GetBTA(), 
-		    eventInfo->GetDTA(), 
-		    eventInfo->GetYTA());
+      // Write S800 event to the output file
+      if(fisInBeam)
+	writeS800(timestamp, 
+		  eventInfo->GetATA(), 
+		  eventInfo->GetBTA(), 
+		  eventInfo->GetDTA(), 
+		  eventInfo->GetYTA());
 
-	// Write decomposed gamma event(s) to the Mode 2 output file
-        writeDecomp(timestamp, 
-		    NMeasured, 
-		    detNum, segNum, NCons, 
-		    measuredX, measuredY, measuredZ, 
-		    measuredEdep, segmentEdep);
-      }
-
+      // Write decomposed gamma event(s) to the output file
+      writeDecomp(timestamp, 
+		  NMeasured, 
+		  detNum, segNum, NCons, 
+		  measuredX, measuredY, measuredZ, 
+		  measuredEdep, segmentEdep);
+      
     }
-
+    
   }
 
   // Write emitted gamma information from this event to 
-  // the Mode 2 output file.
-  if(mode2Out)
-    writeSim(timestamp, eventInfo);
+  // the output file.
+  writeSim(timestamp, eventInfo);
 
-  //  if(event_id%((int)NTotalEvents/everyNevents)==0) {
   if(event_id%everyNevents == 0 && event_id > 0) {
     Timerintern.Stop();
     timerCount++;
     eventsPerSecond += 
-      ((double)everyNevents/Timerintern.GetRealElapsed() - eventsPerSecond)/timerCount;
-      //      (((int)NTotalEvents/everyNevents)/Timerintern.GetRealElapsed() - eventsPerSecond)/timerCount;
+      ((double)everyNevents/Timerintern.GetRealElapsed() 
+       - eventsPerSecond)/timerCount;
     G4cout << std::fixed << std::setprecision(0) << std::setw(3) 
 	   << std::setfill(' ')
 	   << (float)event_id/NTotalEvents*100 << " %   "
 	   << eventsPerSecond << " events/s ";
 
     G4double hours, minutes, seconds;
-    //    G4double time = (float)(NTotalEvents - event_id)*everyNevents/NTotalEvents*Timerintern.GetRealElapsed();
     G4double time = (float)(NTotalEvents - event_id)/eventsPerSecond;
     hours = floor(time/3600.0);
     if(hours>0){
@@ -447,6 +424,8 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	   << "\r"<<std::flush;
     Timerintern.Start();
   }
+
+  G4cout.flags( f );
 
 }
 // --------------------------------------------------
@@ -473,46 +452,59 @@ void EventAction::writeGEBHeader(GEBDATA* gd){
   }
 }
 // --------------------------------------------------
-void EventAction::writeS800(long long int ts, G4double a, G4double b, G4double d, G4double y)
+void EventAction::writeS800(long long int ts, G4double a, G4double b, 
+			    G4double d, G4double y)
 {
-  //Construct GEB header for S800 event
-  G4int siz;
-  GEBDATA gd;
-  gd.type = GEB_TYPE_S800PHYSDATA;
-  gd.timestamp = ts;
-  gd.length = sizeof(S800_PHYSICSDATA);
+  if(mode2Out){
+    //Construct GEB header for S800 event
+    G4int siz;
+    GEBDATA gd;
+    gd.type = GEB_TYPE_S800PHYSDATA;
+    gd.timestamp = ts;
+    gd.length = sizeof(S800_PHYSICSDATA);
 
-  //Construct payload for S800 event (mostly zeros)
-  S800_PHYSICSDATA s800data;
-  s800data.type =  0xABCD1234;
-  s800data.crdc1_x = 0;
-  s800data.crdc1_y = 0;
-  s800data.crdc2_x = 0;
-  s800data.crdc2_y = 0;
-  s800data.ic_sum = 0;
-  s800data.tof_xfp = 0;
-  s800data.tof_obj = 0;
-  s800data.rf = 0;
-  s800data.trigger = 0;
-  s800data.ic_de = 0;
-  s800data.tof_xfpe1 = 0;
-  s800data.tof_obje1 = 0;
-  s800data.tof_rfe1 = 0;
-  s800data.ata = (float)a;
-  s800data.bta = (float)b;
-  s800data.dta = (float)d;
-  s800data.yta = (float)y;
+    //Construct payload for S800 event (mostly zeros)
+    S800_PHYSICSDATA s800data;
+    s800data.type =  0xABCD1234;
+    s800data.crdc1_x = 0;
+    s800data.crdc1_y = 0;
+    s800data.crdc2_x = 0;
+    s800data.crdc2_y = 0;
+    s800data.ic_sum = 0;
+    s800data.tof_xfp = 0;
+    s800data.tof_obj = 0;
+    s800data.rf = 0;
+    s800data.trigger = 0;
+    s800data.ic_de = 0;
+    s800data.tof_xfpe1 = 0;
+    s800data.tof_obje1 = 0;
+    s800data.tof_rfe1 = 0;
+    s800data.ata = (float)a;
+    s800data.bta = (float)b;
+    s800data.dta = (float)d;
+    s800data.yta = (float)y;
 
-  //Write GEB header for S800 event
-  writeGEBHeader(&gd);
+    //Write GEB header for S800 event
+    writeGEBHeader(&gd);
 
-  //Write payload for S800 event
-  siz = write(mode2file, (char *) &s800data, gd.length);
-  if(siz != gd.length){
-    G4cout << "EventAction: error writing S800 GEB payload." << G4endl;
-    G4cout << "             siz = " << siz << " (should be "
-    	   << gd.length << ")" << G4endl;
+    //Write payload for S800 event
+    siz = write(mode2file, (char *) &s800data, gd.length);
+    if(siz != gd.length){
+      G4cout << "EventAction: error writing S800 GEB payload." << G4endl;
+      G4cout << "             siz = " << siz << " (should be "
+	     << gd.length << ")" << G4endl;
+    }
+
   }
+
+  if(evOut)
+    evfile << "S    " 
+	   << std::fixed << std::setprecision(4) 
+	   << std::right << std::setw(12) 
+	   << a << std::setw(12) << b << std::setw(12) 
+	   << d << std::setw(12) << y << std::setw(12) 
+	   << (G4int)ts/10000
+	   << G4endl;
 }
 // --------------------------------------------------
 void EventAction::writeDecomp(long long int ts, 
@@ -534,7 +526,7 @@ void EventAction::writeDecomp(long long int ts,
     if( NCons[i] > 0 && Processed[i] == false ){
 
       crys_ips[Ndecomp].type = 0xABCD5678;
-      crys_ips[Ndecomp].crystal_id = detNum[i]+4; // +4 to match measured data stream
+      crys_ips[Ndecomp].crystal_id = detNum[i]+4; // +4 to match measured data
       crys_ips[Ndecomp].num = 1;
       crys_ips[Ndecomp].tot_e = e[i]; //NOT += for the first one!
 
@@ -568,7 +560,8 @@ void EventAction::writeDecomp(long long int ts,
 	  crys_ips[Ndecomp].ips[j].seg_ener = 0.;
       }
 
-      for(G4int j = i+1; j < NMeasured; j++){ // Get other interactions with this crystal
+      // Get other interactions with this crystal
+      for(G4int j = i+1; j < NMeasured; j++){ 
 	if(NCons[j] > 0 && 
 	   Processed[j] == false &&
 	   detNum[j]+4 == crys_ips[Ndecomp].crystal_id){
@@ -587,61 +580,113 @@ void EventAction::writeDecomp(long long int ts,
     }
   }
 
-  //Construct GEB header for decomp event(s)
-  gd.type = GEB_TYPE_DECOMP;
-  gd.timestamp = ts;
-  gd.length = sizeof(CRYS_IPS);
+  if(mode2Out){
+    //Construct GEB header for decomp event(s)
+    gd.type = GEB_TYPE_DECOMP;
+    gd.timestamp = ts;
+    gd.length = sizeof(CRYS_IPS);
 
-  for(G4int i = 0; i < Ndecomp; i++){
-    //Write GEB header for decomp event
-    writeGEBHeader(&gd);
+    for(G4int i = 0; i < Ndecomp; i++){
+      //Write GEB header for decomp event
+      writeGEBHeader(&gd);
 
-    //Write GEB payload for decomp event
-    siz = write(mode2file, (char *) &crys_ips[i], sizeof(CRYS_IPS));
-    if(siz != sizeof(CRYS_IPS)){
-      G4cout << "EventAction: error writing decomp GEB payload." << G4endl;
-      G4cout << "             siz = " << siz << " (should be "
-	     << sizeof(CRYS_IPS) << ")" << G4endl;
+      //Write GEB payload for decomp event
+      siz = write(mode2file, (char *) &crys_ips[i], sizeof(CRYS_IPS));
+      if(siz != sizeof(CRYS_IPS)){
+	G4cout << "EventAction: error writing decomp GEB payload." << G4endl;
+	G4cout << "             siz = " << siz << " (should be "
+	       << sizeof(CRYS_IPS) << ")" << G4endl;
+      }
+
     }
 
   }
+
+  if(evOut){
+    evfile << "D" << std::setw(4) << Ndecomp 
+	   << std::setw(12) << (G4int)ts/10000 << G4endl;
+    for(G4int i = 0; i < Ndecomp; i++){
+      evfile << "C" << std::setw(4) << crys_ips[i].crystal_id
+	     << std::setw(4) << crys_ips[i].num << G4endl;
+      for(G4int j = 0; j < crys_ips[i].num; j++){
+	evfile << std::setw(5) 
+	       << crys_ips[i].ips[j].seg 
+	       << std::fixed << std::setprecision(4) 
+	       << std::right << std::setw(12) 
+	       << crys_ips[i].ips[j].e << std::setw(12) 
+	       << crys_ips[i].ips[j].x << std::setw(12) 
+	       << crys_ips[i].ips[j].y << std::setw(12) 
+	       << crys_ips[i].ips[j].z
+	       << G4endl;
+      }
+    }
+  }
+
 }
 // --------------------------------------------------
 void EventAction::writeSim(long long int ts, EventInformation* eventInfo)
 {
-  G4int siz;
-  GEBDATA gd;
-  G4SIM_EGS g4sim_egs;
+  if(mode2Out){
+    G4int siz;
+    GEBDATA gd;
+    G4SIM_EGS g4sim_egs;
 
-  //Construct GEB header for G4SIM event
-  gd.type = GEB_TYPE_G4SIM;
-  gd.timestamp = ts;
-  gd.length = sizeof(G4SIM_EGS);
+    //Construct GEB header for G4SIM event
+    gd.type = GEB_TYPE_G4SIM;
+    gd.timestamp = ts;
+    gd.length = sizeof(G4SIM_EGS);
 
-  //Construct GEB payload for G4SIM event
-  g4sim_egs.type = 0xABCD1234;
-  g4sim_egs.num = eventInfo->GetNEmittedGammas();
+    //Construct GEB payload for G4SIM event
+    g4sim_egs.type = 0xABCD1234;
+    g4sim_egs.num = eventInfo->GetNEmittedGammas();
+    g4sim_egs.full = eventInfo->GetFullEnergy();
 
-  for(G4int i = 0; i < g4sim_egs.num; i++){
-    g4sim_egs.gammas[i].e     = eventInfo->GetEmittedGammaEnergy(i);
-    g4sim_egs.gammas[i].x     = eventInfo->GetEmittedGammaPosX(i);
-    g4sim_egs.gammas[i].y     = eventInfo->GetEmittedGammaPosY(i);
-    g4sim_egs.gammas[i].z     = eventInfo->GetEmittedGammaPosZ(i);
-    g4sim_egs.gammas[i].phi   = eventInfo->GetEmittedGammaPhi(i);
-    g4sim_egs.gammas[i].theta = eventInfo->GetEmittedGammaTheta(i);
+    for(G4int i = 0; i < g4sim_egs.num; i++){
+      g4sim_egs.gammas[i].e     = eventInfo->GetEmittedGammaEnergy(i);
+      g4sim_egs.gammas[i].x     = eventInfo->GetEmittedGammaPosX(i);
+      g4sim_egs.gammas[i].y     = eventInfo->GetEmittedGammaPosY(i);
+      g4sim_egs.gammas[i].z     = eventInfo->GetEmittedGammaPosZ(i);
+      g4sim_egs.gammas[i].phi   = eventInfo->GetEmittedGammaPhi(i);
+      g4sim_egs.gammas[i].theta = eventInfo->GetEmittedGammaTheta(i);
+      g4sim_egs.gammas[i].beta  = eventInfo->GetBeta(i);
+    }
+
+    //Write GEB header for G4SIM event
+    writeGEBHeader(&gd);
+
+    //Write GEB payload for G4SIM event
+    siz = write(mode2file, (char *) &g4sim_egs, sizeof(G4SIM_EGS));
+    if(siz != sizeof(G4SIM_EGS)){
+      G4cout << "EventAction: error writing G4SIM GEB payload." << G4endl;
+      G4cout << "             siz = " << siz << " (should be " 
+	     << sizeof(G4SIM_EGS) << ")" << G4endl;
+    }
+
   }
 
-  //Write GEB header for G4SIM event
-  writeGEBHeader(&gd);
-
-  //Write GEB payload for G4SIM event
-  siz = write(mode2file, (char *) &g4sim_egs, sizeof(G4SIM_EGS));
-  if(siz != sizeof(G4SIM_EGS)){
-    G4cout << "EventAction: error writing G4SIM GEB payload." << G4endl;
-    G4cout << "             siz = " << siz << " (should be " 
-	   << sizeof(G4SIM_EGS) << ")" << G4endl;
+  if(evOut){
+    evfile << "E" << std::setw(4) << eventInfo->GetNEmittedGammas()  
+	   << std::setw(4) << eventInfo->GetFullEnergy()  
+	   << std::setw(12) << (G4int)ts/10000 << G4endl;
+    for(G4int i = 0; i < eventInfo->GetNEmittedGammas(); i++)
+      evfile << "     "
+	     << std::fixed << std::setprecision(4) 
+	     << std::right << std::setw(12) 
+	     << eventInfo->GetEmittedGammaEnergy(i)
+	     << std::setw(12) 
+	     << eventInfo->GetEmittedGammaPosX(i)
+	     << std::setw(12) 
+	     << eventInfo->GetEmittedGammaPosY(i)
+	     << std::setw(12) 
+	     << eventInfo->GetEmittedGammaPosZ(i)
+	     << std::setw(12) 
+	     << eventInfo->GetEmittedGammaPhi(i)
+	     << std::setw(12) 
+	     << eventInfo->GetEmittedGammaTheta(i)
+	     << std::setw(12) 
+	     << eventInfo->GetBeta(i) << G4endl;
   }
-
+ 
 }
 // --------------------------------------------------TB
 void EventAction::openEvfile()
@@ -720,7 +765,9 @@ void EventAction::SetCrmatFile(G4String name) {
 
   openCrmatFile();
 
-  G4cout << "\nUsing crmat from file " << crmatFileName << " to transform interaction points from world to crytsal coordinates." << G4endl;
+  G4cout << "\nUsing crmat from file " << crmatFileName 
+	 << " to transform interaction points from world to crytsal frames."
+	 << G4endl;
 
   int size;
   size = read(crmatFile, (char *) crmat, sizeof(crmat));

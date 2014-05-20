@@ -1066,7 +1066,11 @@ void Gretina_Array::ConstructGeCrystals()
         pPg->pCoax  = new G4Polycone(G4String(sName), 0.*deg, 360.*deg, 4, zSliceGe, InnRadGe, OutRadGe );
         sprintf(sName, "geCapsPolyPcone%2.2d", nGe);
         pPg->pCaps = new G4IntersectionSolid(G4String(sName), pPg->pPoly, pPg->pCoax, G4Transform3D( rm, G4ThreeVector() ) );
-        
+
+	G4cout << " Cubic Volume (" << sName << ") = "
+	       << pPg->pCaps->GetCubicVolume()/cm3
+	       << " cm3" << G4endl;
+
         if( usePassive ) {
           if( pPg->passThick1 > 0. ) {
             zSliceGe = new G4double[2];

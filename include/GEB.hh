@@ -8,7 +8,11 @@
 
 #define MAX_SEGS 8              /* max. number of segments to take in events */
 #define MAX_INTPTS (2*MAX_SEGS) /* max. number of interaction points */
+#ifdef HIGHMULT
 #define MAX_SIM_GAMMAS 40       /* max. simulated gammas per event */
+#else
+#define MAX_SIM_GAMMAS 10       /* max. simulated gammas per event */
+#endif
 
 typedef struct gebData
 {
@@ -53,11 +57,13 @@ typedef struct g4sim_emitted_gamma{
   float e;
   float x, y, z;
   float phi, theta;
+  float beta;
 } EG;
 
 typedef struct g4sim_abcd1234 {
   int type;          /* defined as abcd1234 */
   int num;           /* # of emitted gammas */
+  int full;          /* is full energy */
   EG gammas[MAX_SIM_GAMMAS];
 } G4SIM_EGS;
 

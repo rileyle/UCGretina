@@ -4,6 +4,7 @@ DEVNOTES
 *.log
 *_sim.root
 *_sim_histos.root
+example_spectrum.root
 *.rad
 *.spe
 *.wrl

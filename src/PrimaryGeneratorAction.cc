@@ -643,7 +643,6 @@ void PrimaryGeneratorAction::SetSourceWhite()
 {
   sourceType = "white";
 
-  G4double e;
   sourceBranchingSum=0.;
 
   // start from the beginning of the array

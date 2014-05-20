@@ -92,14 +92,14 @@ void fitSpectrum() {
   par[8]  = 0.01;              // 2000 keV
 
   TF1 *f1 = new TF1("f1",fitf,fitMinE,fitMaxE,nPar);
-  f1->SetLineColor(4); // 4 = Blue
+  f1->SetLineColor(kBlue);
   f1->SetNpx(1000);     // Number of points used to draw the function
   f1->SetLineWidth(2);
 
   f1->SetParameters(par);
   f1->FixParameter(4,0); // No actual measured background here ...
 
-  spectrum->GetXaxis()->SetRangeUser(0.,2500.);
+  spectrum->GetXaxis()->SetRangeUser(0.,5000.);
   TH1F *diff = (TH1F*)spectrum->Clone("diff");
 
   spectrum->Fit("f1","LR");
@@ -125,6 +125,7 @@ void fitSpectrum() {
   Spectra->cd(1);
   Spectra_1->SetLogy();
 
+  spectrum->SetLineColor(kBlack);
   spectrum->Draw();
 
   Spectra->cd(2);

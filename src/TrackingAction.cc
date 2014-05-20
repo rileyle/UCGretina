@@ -10,7 +10,7 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
   // G4cout << "> PreUserTrackingAction" << G4endl;
   // G4cout << "> Event ID = " << eventAction->GetEvent()->GetEventID() << G4endl;
   // G4cout << "> TrackID = "       << aTrack->GetTrackID() << G4endl;
-  // G4cout << std::fixed << std::setprecision(3) << std::setw(12);
+  // G4cout << std::fixed << std::setprecision(4) << std::setw(12);
   // G4cout << "> KineticEnergy = " << aTrack->GetKineticEnergy() << G4endl;
   // G4cout << "> TotalEnergy = "   << aTrack->GetTotalEnergy() << G4endl;
   // G4cout << "> Position = "      << aTrack->GetPosition() << G4endl;
@@ -36,7 +36,7 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 	aTrack->GetCreatorProcess()->GetProcessName() == "Decay" ||
 	aTrack->GetCreatorProcess()->GetProcessName() == "Reaction" ) ){
 
-    //    G4cout << "> Event ID = " << eventAction->GetEvent()->GetEventID();
+    //    G4cout << "> Event ID = " << eventAction->GetEvent()->GetEventID() << G4endl;
 
     G4ThreeVector pos = aTrack->GetPosition();
     G4ThreeVector dir = aTrack->GetMomentumDirection();
@@ -55,7 +55,12 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 
 void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
 {
-  // G4cout << "> PostUserTrackingAction" << G4endl;
+
+  eventInfo 
+    = (EventInformation*)eventAction->GetEvent()->GetUserInformation();
+
+  // G4cout << std::fixed << std::setprecision(4) << std::setw(12)
+  // 	 << "> PostUserTrackingAction" << G4endl;
   // G4cout << "> KineticEnergy = " << aTrack->GetKineticEnergy() << G4endl;
   // G4cout << "> TotalEnergy = "   << aTrack->GetTotalEnergy() << G4endl;
   // G4cout << "> Pre-step Position = " 
@@ -64,6 +69,8 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
   // 	 << aTrack->GetStep()->GetPostStepPoint()->GetPosition() << G4endl;
   // G4cout << "> MomentumDirection = " 
   // 	 << aTrack->GetMomentumDirection() << G4endl;
+  // G4cout << "> Beta = " 
+  // 	 << aTrack->GetStep()->GetPreStepPoint()->GetBeta() << G4endl;
   // G4cout << ">==========================================" << G4endl;
 
   // S800 data
@@ -75,12 +82,16 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
 
   if( aTrack->GetParticleDefinition()->GetParticleType() == "nucleus" &&
       aTrack->GetParentID() > 0 ){
+
+    if( !aTrack->GetDefinition ()-> GetPDGStable() )
+      eventInfo->AddBeta(aTrack->GetStep()->GetPreStepPoint()->GetBeta());
+
     if( aTrack->GetCreatorProcess()->GetProcessName() == "Decay" ) {
       G4ThreeVector pDir = aTrack->GetMomentumDirection();
       // ATA is the dispersive angle, down is + in NSCL coords= -y in Geant4 coords
-      eventInfo->SetATA( asin(-pDir.getY()/pDir.mag())/rad );
+      eventInfo->SetATA( asin(-pDir.getY()/pDir.mag())/mrad );
       // BTA is the non-dispersive angle, South is + in NSL coords = -x in Geant4 coords
-      eventInfo->SetBTA( asin(-pDir.getX()/pDir.mag())/rad );
+      eventInfo->SetBTA( asin(-pDir.getX()/pDir.mag())/mrad );
       // DTA is dT/T with T = kinetic energy corresponding to the user-supplied center of the S800 acceptance
       eventInfo->SetDTA( (aTrack->GetKineticEnergy() - eventAction->GetS800KE()) / eventAction->GetS800KE() ); 
     } else if ( aTrack->GetCreatorProcess()->GetProcessName() == "Reaction" ) {

@@ -62,30 +62,33 @@ void Outgoing_Beam::setDecayProperties()
   tarOut = G4ParticleTable::GetParticleTable()->GetIon(TarZ-DZ, TarA-DA, 0.);
 
   if (ion == NULL) {
-    G4cerr << "Could not find outgoing ion in particle table "
+    G4cerr << "Error: Could not find outgoing ion in particle table "
 	   << Zin + DZ << " " << Ain+DA << G4endl;
     exit(EXIT_FAILURE);
   }
   if (iongs == NULL) {
-    G4cerr << "Could not find outgoing ion in particle table "
+    G4cerr << "Error: Could not find outgoing ion in particle table "
 	   << Zin + DZ << " " << Ain+DA << G4endl;
     exit(EXIT_FAILURE);
   }
   if (tarIn == NULL) {
-    G4cerr << "Could not find the target nucleus in particle table "
+    G4cerr << "Warning: no target nucleus in particle table "
 	   << TarZ << " " << TarA << G4endl;
-    exit(EXIT_FAILURE);
+    //    exit(EXIT_FAILURE);
   }
   if (tarOut == NULL) {
-    G4cerr << "Could not find the target-like product in particle table "
-	   << TarZ-DZ << " " << TarA-DA << G4endl;
-    exit(EXIT_FAILURE);
+    G4cerr << "Warning: no target-like product in particle table "
+  	   << TarZ-DZ << " " << TarA-DA << G4endl;
+    //    exit(EXIT_FAILURE);
   }
 
   m1 = beam->GetPDGMass();
   m2 = tarIn->GetPDGMass();
   m3 = ion->GetPDGMass();
-  m4 = tarOut->GetPDGMass();
+  if (tarOut == NULL)
+    m4 = 0.;
+  else
+    m4 = tarOut->GetPDGMass();
 
   G4DecayTable *DecTab = NULL;
   GammaDecayChannel *GamDec = NULL;
@@ -136,7 +139,8 @@ void Outgoing_Beam::setDecayProperties()
       G4cout << "Constructing decay properties for Z=" << Zin + DZ
 	     << " A=" << Ain + DA 
 	     << " with excitation " << levelEnergy[Nlevels] 
-	     << " keV, relative population" << relPop[Nlevels]
+	     << " keV, mean lifetime " << meanLife
+	     << " ps, relative population " << relPop[Nlevels]
 	     << G4endl;
       if(Nlevels>0) relPop[Nlevels] += relPop[Nlevels-1];
       for(G4int j = 0; j < nBranch; j++){
@@ -320,7 +324,8 @@ G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
   // Set the magnitude of the outgoing momentum ================================
 
   ppOut = pIn;
-  ppOut.setMag( p3Lab );
+  if( ppOut.mag() > 0)
+    ppOut.setMag( p3Lab );
 
   // Set the direction of the outgoing momentum ================================
 
@@ -380,7 +385,8 @@ void Outgoing_Beam::Report()
   G4cout<<"----> Mass of the incoming beam is " <<beam->GetPDGMass()<<" MeV"<<G4endl;
   G4cout<<"----> Mass of the target is " <<tarIn->GetPDGMass()<<" MeV"<<G4endl;
   G4cout<<"----> Mass of the outgoing beam-like reaction product is " <<ion->GetPDGMass()<<" MeV"<<G4endl;
-  G4cout<<"----> Mass of the outgoing target-like reaction product is " <<tarOut->GetPDGMass()<<" MeV"<<G4endl;
+  if(tarOut != NULL)
+    G4cout<<"----> Mass of the outgoing target-like reaction product is " <<tarOut->GetPDGMass()<<" MeV"<<G4endl;
   G4cout<<"----> Lifetime of the excited state for the outgoing beam set to "<<
     G4BestUnit(tau,"Time")<<G4endl; 
   G4cout<<"----> Sigma for ata distribution set to "<<sigma_a<<G4endl;
