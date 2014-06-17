@@ -34,19 +34,13 @@
 #include "G4Point3D.hh"
 #include "G4Plane3D.hh"
 #include "G4Normal3D.hh"
+
+#ifndef G4V10
 #include "G4Point3DVector.hh"
-#include "G4BoundingBox3D.hh" 
-
-#include "G4ThreeVector.hh"
-
-#include "G4VoxelLimits.hh"
-#include "G4AffineTransform.hh"
-
-#include "G4VGraphicsScene.hh"
-#include "G4Polyhedron.hh"
-#include <iomanip>
-
-using namespace std;
+#include "G4BoundingBox3D.hh"
+//#else
+//#include "G4Point3DList.hh"
+#endif
 
 class CConvexPolyhedron : public G4CSGSolid
 {
@@ -60,14 +54,22 @@ class CConvexPolyhedron : public G4CSGSolid
     /////////////////////////////////////////////////////////////////
     /// Constructor for MarsView: 2 faces of n/2 points connected by quadrangles
     /////////////////////////////////////////////////////////////////
+#ifndef G4V10
     CConvexPolyhedron(const G4String& pName, const G4Point3DVector& pVec);
-
+#else
+    CConvexPolyhedron(const G4String& pName, const std::vector<G4Point3D>& pVec);
+#endif
     /////////////////////////////////////////////////////////////////
     /// Generic Constructor: points and descriptors of faces
     /////////////////////////////////////////////////////////////////
+#ifndef G4V10
     CConvexPolyhedron(const G4String& pName, const G4Point3DVector& pVec, 
                              const G4int nFaces, const std::vector<G4int>& theFaces);
-
+#else
+    CConvexPolyhedron(const G4String& pName, const std::vector<G4Point3D>& pVec, 
+                             const G4int nFaces, const std::vector<G4int>& theFaces);
+#endif
+ 
     ///////////////////////////////////////////////
     /// Destructor
     //////////////////////////////////////////////
@@ -79,8 +81,10 @@ class CConvexPolyhedron : public G4CSGSolid
     G4Point3D  *fPoints;            //> the points as G4Point3D
     G4Point3D  *cCenter;            //> the center of the convex polyhedron (average of fPoints)
 
+#ifndef G4V10
   private:
     G4BoundingBox3D* bbox;          //> used for a fast test in Inside()
+#endif
     
   private:
     G4int        nPlanes;           //> number of enclosing planes
@@ -131,7 +135,9 @@ class CConvexPolyhedron : public G4CSGSolid
   public:
     void          DescribeYourselfTo ( G4VGraphicsScene& scene  ) const;
     G4Polyhedron* CreatePolyhedron   () const;
+#ifndef G4V10
     G4NURBS*      CreateNURBS        () const;
+#endif
 
   protected:
     G4ThreeVectorList* CreateRotatedVertices( const G4AffineTransform& pTransform ) const ;

@@ -1,0 +1,33 @@
+/Gretina/detector/enableCapsules
+/Gretina/detector/enableCryostats
+/Gretina/Shell Greta
+/Target/Construct
+/Target/Sled
+/BeamTube/Construct
+/Gretina/update
+
+#start visualizer
+#/vis/open OGLIX
+/vis/open VRML2FILE
+
+# Disable auto refresh and quieten vis messages whilst scene and trajectories are established
+/vis/viewer/set/autoRefresh false
+/vis/verbose errors
+
+# setup viewer
+/vis/drawVolume 
+/vis/viewer/set/style surface
+/vis/viewer/set/hiddenEdge
+#/vis/scene/add/axes 
+/vis/scene/add/trajectories
+#/vis/scene/add/hits
+/vis/scene/endOfEventAction accumulate 
+
+# set viewing angle and zoom
+/vis/viewer/set/viewpointThetaPhi 150 20
+/vis/viewer/zoom 4
+
+# Re-establish auto refreshing and verbosity
+/vis/viewer/set/autoRefresh true
+/vis/verbose warnings
+

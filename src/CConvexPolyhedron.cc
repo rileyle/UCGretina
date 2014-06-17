@@ -1,10 +1,27 @@
 #include "CConvexPolyhedron.hh"
+#include "G4ThreeVector.hh"
+
+#include "G4VoxelLimits.hh"
+#include "G4AffineTransform.hh"
+
+#include "G4VGraphicsScene.hh"
+#include "G4Polyhedron.hh"
+#include <iomanip>
+
+using namespace std; // needed for swap()
+
+#ifdef G4V10
+using namespace CLHEP;
+#endif
+
 
 CConvexPolyhedron::~CConvexPolyhedron()
 {
   if(fPoints) delete [] fPoints;
   if(cCenter) delete    cCenter;
+#ifndef G4V10
   if(bbox)    delete    bbox;
+#endif
   if(fPlanes) delete [] fPlanes;
   for(G4int nn = 0; nn < nPlanes; nn++ )
     if(iPlanes[nn]) delete [] iPlanes[nn];
@@ -14,22 +31,33 @@ CConvexPolyhedron::~CConvexPolyhedron()
 }
 
 // the copy constructor
+#ifndef G4V10
 CConvexPolyhedron::CConvexPolyhedron(const CConvexPolyhedron& orig)
   : G4CSGSolid(orig.GetName()), nPoints(0), fPoints(0), cCenter(0), bbox(0),
                                 nPlanes(0), iPlanes(0), fPlanes(0),
                                 xyz(0), nFacets(0), fff(0)
+#else
+CConvexPolyhedron::CConvexPolyhedron(const CConvexPolyhedron& orig)
+  : G4CSGSolid(orig.GetName()), nPoints(0), fPoints(0), cCenter(0),
+                                nPlanes(0), iPlanes(0), fPlanes(0),
+                                xyz(0), nFacets(0), fff(0)
+#endif
 {
   nPoints = orig.nPoints;
   fPoints = new G4Point3D[nPoints];
   cCenter = new G4Point3D;
+#ifndef G4V10
   bbox    = new G4BoundingBox3D;
+#endif
   
   G4int nn;
   for( nn = 0; nn < nPoints; nn++ )
     fPoints[nn] = orig.fPoints[nn];
 
   cCenter = orig.cCenter;
+#ifndef G4V10 
   bbox    = orig.bbox;
+#endif
 
   nPlanes = orig.nPlanes;
   iPlanes = new G4int*[nPlanes];
@@ -52,10 +80,17 @@ CConvexPolyhedron::CConvexPolyhedron(const CConvexPolyhedron& orig)
 }
 
 // constructor for 2 polygonal faces of n/2 points with quadrangular sides
+#ifndef G4V10
 CConvexPolyhedron::CConvexPolyhedron(const G4String& pName, const G4Point3DVector &pVec)
   : G4CSGSolid(pName), nPoints(0), fPoints(0), cCenter(0), bbox(0),
                        nPlanes(0), iPlanes(0), fPlanes(0),
                        xyz(0), nFacets(0), fff(0)
+#else
+    CConvexPolyhedron::CConvexPolyhedron(const G4String& pName, const std::vector<G4Point3D> &pVec)
+  : G4CSGSolid(pName), nPoints(0), fPoints(0), cCenter(0),
+                       nPlanes(0), iPlanes(0), fPlanes(0),
+                       xyz(0), nFacets(0), fff(0)
+#endif
 {
   nPoints = pVec.size();
 
@@ -64,17 +99,20 @@ CConvexPolyhedron::CConvexPolyhedron(const G4String& pName, const G4Point3DVecto
            << "        Invalid number of vertices: " << nPoints << G4endl;
     G4cerr << "ERROR - CConvexPolyhedron::CConvexPolyhedron(): " << GetName() << G4endl
            << "        Invalid number of vertices: " << nPoints << G4endl;
-    G4Exception("CConvexPolyhedron::CConvexPolyhedron()", 
-		"CConvexPolyhedron_nVertices",  
-		FatalErrorInArgument,
-		"Invalid number of vertices");
+#if defined G4V495 || G4V496 || G4V10
+    G4Exception("CConvexPolyhedron::CConvexPolyhedron()","Error2",FatalException,"Invalid number of vertices");
+#else
+    G4Exception("CConvexPolyhedron::CConvexPolyhedron() - Invalid number of vertices");
+#endif
   }
 
   G4int nSides = nPoints/2;
   fPoints = new G4Point3D[nPoints];
   cCenter = new G4Point3D;
+#ifndef G4V10
   bbox    = new G4BoundingBox3D;
-  
+#endif
+
   G4int ii;
   for( ii = 0; ii < nPoints; ++ii ) {
     fPoints[ii] = pVec[ii];
@@ -82,10 +120,12 @@ CConvexPolyhedron::CConvexPolyhedron(const G4String& pName, const G4Point3DVecto
   }
   *cCenter /= nPoints;
 
+#ifndef G4V10
   bbox->Init(*cCenter);
   for( ii = 0; ii < nPoints; ++ii ) {
     bbox->Extend(fPoints[ii]);
   }
+#endif
   
   nPlanes = nSides + 2;
   iPlanes = new G4int*[nPlanes];
@@ -121,15 +161,19 @@ CConvexPolyhedron::CConvexPolyhedron(const G4String& pName, const G4Point3DVecto
   for( ii = 0; ii < nPoints; ii++ ) {   // recalculate the points
     MakePoint(ii);
     cc += fPoints[ii];
+#ifndef G4V10
     bbox->Extend(fPoints[ii]);
+#endif
   }
   cc /= nPoints;
   *cCenter = cc;
 
+#ifndef G4V10
   bbox->Init(cc);
   for( ii = 0; ii < nPoints; ii++ ) {   // adjust bbox
     bbox->Extend(fPoints[ii]);
   }
+#endif
   
   CheckConvexity(kCarTolerance/2.);   // now we can check with the default precision
 
@@ -138,11 +182,19 @@ CConvexPolyhedron::CConvexPolyhedron(const G4String& pName, const G4Point3DVecto
 }
 
 // generic constructor: the points and descriptors of the faces
+#ifndef G4V10
 CConvexPolyhedron::CConvexPolyhedron(const G4String& pName, const G4Point3DVector &pVec,
                                      const G4int nFaces, const std::vector<G4int> &theFaces)
   : G4CSGSolid(pName), nPoints(0), fPoints(0), cCenter(0), bbox(0),
                        nPlanes(0), iPlanes(0), fPlanes(0),
                        xyz(0), nFacets(0), fff(0)
+#else
+    CConvexPolyhedron::CConvexPolyhedron(const G4String& pName, const std::vector<G4Point3D> &pVec,
+                                     const G4int nFaces, const std::vector<G4int> &theFaces)
+  : G4CSGSolid(pName), nPoints(0), fPoints(0), cCenter(0),
+                       nPlanes(0), iPlanes(0), fPlanes(0),
+                       xyz(0), nFacets(0), fff(0)
+#endif
 {
   nPoints = pVec.size();
 
@@ -151,10 +203,11 @@ CConvexPolyhedron::CConvexPolyhedron(const G4String& pName, const G4Point3DVecto
            << "        Invalid number of vertices: " << nPoints << G4endl;
     G4cerr << "ERROR - CConvexPolyhedron::CConvexPolyhedron(): " << GetName() << G4endl
            << "        Invalid number of vertices: " << nPoints << G4endl;
-    G4Exception("CConvexPolyhedron::CConvexPolyhedron()", 
-		"CConvexPolyhedron_nVertices",  
-		FatalErrorInArgument,
-		"Invalid number of vertices");
+#if defined G4V495 || G4V496 || G4V10
+    G4Exception("CConvexPolyhedron::CConvexPolyhedron()","Error3",FatalException,"Invalid number of vertices");
+#else
+    G4Exception("CConvexPolyhedron::CConvexPolyhedron() - Invalid number of vertices");
+#endif
   }
 
   if(nFaces < 4) {
@@ -162,15 +215,18 @@ CConvexPolyhedron::CConvexPolyhedron(const G4String& pName, const G4Point3DVecto
            << "        Invalid number of faces: " << nFaces << G4endl;
     G4cerr << "ERROR - CConvexPolyhedron::CConvexPolyhedron(): " << GetName() << G4endl
            << "        Invalid number of faces: " << nFaces << G4endl;
-    G4Exception("CConvexPolyhedron::CConvexPolyhedron()", 
-		"CConvexPolyhedron_nFaces",  
-		FatalErrorInArgument,
-		"Invalid number of faces");
+#if defined G4V495 || G4V496 || G4V10
+    G4Exception("CConvexPolyhedron::CConvexPolyhedron()","Error4",FatalException,"Invalid number of faces");
+#else
+    G4Exception("CConvexPolyhedron::CConvexPolyhedron() - Invalid number of faces");
+#endif
   }
 
   fPoints = new G4Point3D[nPoints];
   cCenter = new G4Point3D;
+#ifndef G4V10
   bbox    = new G4BoundingBox3D;
+#endif
   
   G4int ii;
   for( ii = 0; ii < nPoints; ++ii ) {
@@ -179,11 +235,13 @@ CConvexPolyhedron::CConvexPolyhedron(const G4String& pName, const G4Point3DVecto
   }
   *cCenter /= nPoints;
 
+#ifndef G4V10
   bbox->Init(*cCenter);
   for( ii = 0; ii < nPoints; ++ii ) {
     bbox->Extend(fPoints[ii]);
   }
-  
+#endif  
+
   nPlanes = nFaces;
   iPlanes = new      int*[nPlanes];
   fPlanes = new G4Plane3D[nPlanes];
@@ -209,21 +267,29 @@ CConvexPolyhedron::CConvexPolyhedron(const G4String& pName, const G4Point3DVecto
   for( ii = 0; ii < nPoints; ii++ ) {   // recalculate the points
     MakePoint(ii);
     cc += fPoints[ii];
+#ifndef G4V10
     bbox->Extend(fPoints[ii]);
+#endif
   }
   cc /= nPoints;
   *cCenter = cc;
 
+#ifndef G4V10
   bbox->Init(cc);
   for( ii = 0; ii < nPoints; ii++ ) {   // adjust bbox
     bbox->Extend(fPoints[ii]);
   }
-  
+ #endif 
+
   CheckConvexity(kCarTolerance/2.);   // now we can check with the default precision
 
   PreparePolyhedron();
 
 }
+
+
+
+
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -321,10 +387,12 @@ G4Point3D CConvexPolyhedron::SolvePointEq(G4Plane3D& pl0, G4Plane3D& pl1, G4Plan
   if(det == 0.) {
     G4cout << "CConvexPolyhedron::SolvePointEq : Determinant of matrix is 0." << G4endl;
     G4cerr << "CConvexPolyhedron::SolvePointEq : Determinant of matrix is 0." << G4endl;
-    G4Exception("CConvexPolyhedron::SolvePointEq()", 
-		"CConvexPolyhedron_Det0",  
-		FatalException,
-		"Determinant of matrix is 0.");  }
+#if defined G4V495 || G4V496 || G4V10
+    G4Exception("CConvexPolyhedron::SolvePointEq","Error5",FatalException,"Determinant of matrix is 0.");
+#else
+    G4Exception("CConvexPolyhedron::SolvePointEq : Determinant of matrix is 0.");
+#endif
+  }
 
   det = 1. / det;
   for( ii = 0; ii < 3; ii++ ) {
@@ -415,7 +483,9 @@ G4bool CConvexPolyhedron::MovePlane(const G4int nn, const G4double distance)
   for( ii = 0; ii < nPoints; ii++ ) {   // recalculate the points and adjust bbox
     MakePoint(ii);
     cc += fPoints[ii];
+#ifndef G4V10
     bbox->Extend(fPoints[ii]);
+#endif
   }
   cc /= nPoints;
   *cCenter = cc;
@@ -637,9 +707,11 @@ EInside CConvexPolyhedron::Inside( const G4ThreeVector& p ) const
   G4double Dist;
   G4int i;
 
+#ifndef G4V10
   i = bbox->Inside(p);
   if (!i)
     return in = kOutside;
+#endif
 
   for ( i = 0; i < nPlanes; i++ ) {
     Dist = fPlanes[i].distance(p);
@@ -874,12 +946,11 @@ CConvexPolyhedron::CreateRotatedVertices( const G4AffineTransform& pTransform ) 
   }
   else {
 //  DumpInfo();
-    G4cout << "ERROR - CConvexPolyhedron::CreateRotatedVertices() - Out of memory !" << G4endl;
-    G4cerr << "ERROR - CConvexPolyhedron::CreateRotatedVertices() - Out of memory !" << G4endl;
-    G4Exception("CConvexPolyhedron::CreateRotatedVertices()", 
-		"CConvexPolyhedron_Memory",  
-		FatalException,
-		"Out of memory !");
+#if defined G4V495 || G4V496 || G4V10
+    G4Exception("CConvexPolyhedron::CreateRotatedVertices()","error6", FatalException,"Out of memory !");
+#else
+    G4Exception("CConvexPolyhedron::CreateRotatedVertices() - Out of memory !");
+#endif
   }
   return vertices;
 }
@@ -922,7 +993,8 @@ void CConvexPolyhedron::DescribeYourselfTo ( G4VGraphicsScene& scene ) const
 #ifdef G4V47
   scene.AddSolid (*this);
 #else
-  scene.AddThis (*this);
+  //  scene.AddThis (*this);
+  scene.AddSolid (*this);
 #endif
 }
 
@@ -933,8 +1005,9 @@ G4Polyhedron* CConvexPolyhedron::CreatePolyhedron () const
   return cpp;
 }
 
+#ifndef G4V10
 G4NURBS* CConvexPolyhedron::CreateNURBS () const
 {
   return 0;
 }
-
+#endif
