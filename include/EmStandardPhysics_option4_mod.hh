@@ -23,72 +23,56 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file electromagnetic/TestEm1/include/PhysicsList.hh
-/// \brief Definition of the PhysicsList class
 //
-// $Id: PhysicsList.hh 66586 2012-12-21 10:48:39Z ihrivnac $
+// $Id$
 //
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//---------------------------------------------------------------------------
 //
-// 14.10.02 (V.Ivanchenko) provide modular list on base of old PhysicsList
+// ClassName:   G4EmStandardPhysics_option4
 //
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// Author:      V.Ivanchenko 28.09.2012
+//
+// Modified:
+//
+//----------------------------------------------------------------------------
+//
+// This class provides construction of EM physics using the best models
+// of standard and low-energy packages and set of 
+// the most adavced options allowing precise simulation at low
+// and intermediate energies
+//
 
-#ifndef PhysicsList_h
-#define PhysicsList_h 1
+#ifndef EmStandardPhysics_option4_mod_h
+#define EmStandardPhysics_option4_mod_h 1
 
-#include "G4VModularPhysicsList.hh"
+#include "G4VPhysicsConstructor.hh"
 #include "globals.hh"
-#include "Outgoing_Beam.hh"
-
-class DetectorConstruction;
-//class PhysicsListMessenger;
-class G4VPhysicsConstructor;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class PhysicsList: public G4VModularPhysicsList
+class EmStandardPhysics_option4_mod : public G4VPhysicsConstructor
 {
-  public:
-    PhysicsList(DetectorConstruction*);
-   ~PhysicsList();
+public:
+  EmStandardPhysics_option4_mod(G4int ver = 1);
 
-    virtual void ConstructParticle();
-    virtual void ConstructProcess();
+  // obsolete
+  EmStandardPhysics_option4_mod(G4int ver, const G4String& name);
 
-    void SetOutgoingBeam(Outgoing_Beam *BO) {BeamOut = BO;}
-    void AddReaction();
+  virtual ~EmStandardPhysics_option4_mod();
 
-    void AddPhysicsList(const G4String& name);
-    
-    void AddDecay();
-    void AddRadioactiveDecay();
-    void AddStepMax();
+  virtual void ConstructParticle();
+  virtual void ConstructProcess();
 
-    virtual void SetCuts();
-    void SetCutForGamma(G4double);
-    void SetCutForElectron(G4double);
-    void SetCutForPositron(G4double);
-    void GetRange(G4double);
-      
-  private:
-    G4double fCutForGamma;
-    G4double fCutForElectron;
-    G4double fCutForPositron;
-    G4double fCurrentDefaultCut;
-    
-    G4VPhysicsConstructor* fEmPhysicsList;
-    G4String               fEmName;
-    
-    DetectorConstruction* fDet;
-
-    Outgoing_Beam* BeamOut;
-
-  //    PhysicsListMessenger* fMessenger;         
+private:
+  G4int  verbose;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
+
+
+
+
+
 

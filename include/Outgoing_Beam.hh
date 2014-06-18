@@ -37,6 +37,9 @@ public:
   void setDA(G4int);
   void setDZ(G4int);
   void setEx(G4double);
+  void setProjectileExcitation(){ targetExcitation = false; }
+  void setTargetExcitation(){ targetExcitation = true; }
+  G4bool TargetExcitation(){ return targetExcitation; }
   void setLvlSchemeFile(G4String name){lvlSchemeFileName = name;}
   void openLvlSchemeFile();
   void closeLvlSchemeFile();
@@ -56,8 +59,8 @@ public:
 
   G4ParticleTable* particleTable; 
   G4DynamicParticle* ReactionProduct();
-  G4DynamicParticle* ProjectileGS();
-  G4DynamicParticle* TargetExcitation();
+  //  G4DynamicParticle* ProjectileGS();
+  //  G4DynamicParticle* TargetExcitation();
   G4ThreeVector ReactionPosition();
   G4int getTarA(){return TarA;}
   G4int getTarZ(){return TarZ;}
@@ -111,7 +114,7 @@ private:
   G4double m4;
   G4double ET;
   G4double p1;
-  G4double sin2theta_max;
+  G4double sin2theta3_max;
 
   G4double Ex,TarEx,TFrac;
   G4String lvlSchemeFileName;
@@ -128,13 +131,16 @@ private:
 
   G4ParticleDefinition* beam;
   G4ParticleDefinition* ion;
-  G4ParticleDefinition* iongs;
+  G4ParticleDefinition* ionGS;
   G4ParticleDefinition* tarIn;
   G4ParticleDefinition* tarOut;
+  G4ParticleDefinition* tarOutGS;
  
   static G4Decay decay;
   G4bool  reacted;
   G4bool  source;
+
+  G4bool targetExcitation;
 
   Incoming_Beam *beamIn;
   // polynomial coefficients for momentum change for the reacted beam
@@ -152,7 +158,6 @@ private:
   G4ThreeVector GetOutgoingMomentum();
   
   // TB angular distribution also for the target.
-  //  double targetai[3];
   G4ThreeVector TargetAngularDistribution();
   AngularDistribution theTargetAngularDistribution;
 

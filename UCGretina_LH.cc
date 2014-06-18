@@ -33,12 +33,13 @@ int main(int argc,char** argv)
 {
   // Construct the default run manager
   G4RunManager* runManager = new G4RunManager;
-  PhysicsList *physicsList = new PhysicsList;
 
   cout << "Instantiating DetectorConstruction ..." << endl;
   // set mandatory initialization classes
   DetectorConstruction* detector=new DetectorConstruction();
   runManager->SetUserInitialization(detector);
+
+  PhysicsList *physicsList = new PhysicsList(detector);
   runManager->SetUserInitialization(physicsList);
 
   cout << "... Done" << endl;

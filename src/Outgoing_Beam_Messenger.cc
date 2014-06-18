@@ -9,19 +9,24 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
   BeamOutDir->SetGuidance("Outgoing beam control.");
 
   DACmd = new G4UIcmdWithAnInteger("/BeamOut/DA",this);
-  DACmd->SetGuidance("Select the mass number change for the outgoing beam.");
+  DACmd->SetGuidance("Select the mass number change for the beam-like product.");
   DACmd->SetParameterName("choice",false);
   DACmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   DZCmd = new G4UIcmdWithAnInteger("/BeamOut/DZ",this);
-  DZCmd->SetGuidance("Select the atomic number change for the outgoing beam.");
+  DZCmd->SetGuidance("Select the atomic number change for the beam-like product.");
   DZCmd->SetParameterName("choice",false);
   DZCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   ExCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/ProjectileExcitation",this);
-  ExCmd->SetGuidance("Set excitation energy for the outgoing beam.");
+  ExCmd->SetGuidance("Set the excitation energy for the beam-like reaction product (a level scheme file supersedes energy parameter).");
   ExCmd->SetParameterName("choice",false);
   ExCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  TExCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/TargetExcitation",this);
+  TExCmd->SetGuidance("Set the excitation energy of the target-like reaction product (a level scheme file supersedes energy parameter).");
+  TExCmd->SetParameterName("choice",false);
+  TExCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   SrcCmd = new G4UIcmdWithoutParameter("/BeamOut/Source",this);
   SrcCmd->SetGuidance("Simulate a stationary source.");
@@ -42,41 +47,16 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
   TZCmd->SetParameterName("choice",false);
   TZCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  TExCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/TargetExcitation",this);
-  TExCmd->SetGuidance("Set target excitation energy.");
-  TExCmd->SetParameterName("choice",false);
-  TExCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
   TExFCmd = new G4UIcmdWithADouble("/BeamOut/TargetExcitationFraction",this);
   TExFCmd->SetGuidance("Set fraction of target excitation as compared to the projectile excitation.");
   TExFCmd->SetParameterName("choice",false);
   TExFCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   tauCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/tau",this);
-  tauCmd->SetGuidance("Set lifetime of the excited state of the outgoing beam.");
+  tauCmd->SetGuidance("Set lifetime of the excited state of the reaction product.");
   tauCmd->SetParameterName("choice",false);
   tauCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-/*
-  betaCmd = new G4UIcmdWithADouble("/BeamOut/beta",this);
-  betaCmd->SetGuidance("Set beta for the outgoing beam.");
-  betaCmd->SetParameterName("choice",false);
-  betaCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  DoppZCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/DoppZ",this);
-  DoppZCmd->SetGuidance("Set Z position for the outgoing beam Doppler corrections.");
-  DoppZCmd->SetParameterName("choice",false);
-  DoppZCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-  DoppYCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/DoppY",this);
-  DoppYCmd->SetGuidance("Set Y position for the outgoing beam Doppler corrections.");
-  DoppYCmd->SetParameterName("choice",false);
-  DoppYCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-  DoppXCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/DoppX",this);
-  DoppXCmd->SetGuidance("Set X position for the outgoing beam Doppler corrections.");
-  DoppXCmd->SetParameterName("choice",false);
-  DoppXCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-*/
   RepCmd = new G4UIcmdWithoutParameter("/BeamOut/Report",this);
   RepCmd->SetGuidance("Report parameters for the outgoing beam.");
 
@@ -151,10 +131,6 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
 Outgoing_Beam_Messenger::~Outgoing_Beam_Messenger()
 {
   delete BeamOutDir;
-//  delete DoppXCmd;
-//  delete DoppYCmd;
-//  delete DoppZCmd;
-//  delete betaCmd;
   delete tauCmd;
   delete ExCmd;
   delete SrcCmd;
@@ -196,8 +172,14 @@ void Outgoing_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamOut->setDA(DACmd->GetNewIntValue(newValue));}
   if( command == DZCmd )
     { BeamOut->setDZ(DZCmd->GetNewIntValue(newValue));}
-  if( command == ExCmd )
-    { BeamOut->setEx(ExCmd->GetNewDoubleValue(newValue));}
+  if( command == ExCmd ){ 
+    BeamOut->setEx(ExCmd->GetNewDoubleValue(newValue));
+    BeamOut->setProjectileExcitation();
+  }
+  if( command == TExCmd ){ 
+    BeamOut->setEx(TExCmd->GetNewDoubleValue(newValue));
+    BeamOut->setTargetExcitation();
+  }
   if( command == SrcCmd )
     { BeamOut->SetSource();}
   if( command == LvlCmd )
@@ -206,21 +188,10 @@ void Outgoing_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamOut->setTarA(TACmd->GetNewIntValue(newValue));}
   if( command == TZCmd )
     { BeamOut->setTarZ(TACmd->GetNewIntValue(newValue));}
-  if( command == TExCmd )
-    { BeamOut->setTarEx(TExCmd->GetNewDoubleValue(newValue));}
   if( command == TExFCmd )
     { BeamOut->setTFrac(TExFCmd->GetNewDoubleValue(newValue));}
   if( command == tauCmd )
     { BeamOut->settau(tauCmd->GetNewDoubleValue(newValue));}
-/*  if( command == betaCmd )
-    { BeamOut->setbeta(betaCmd->GetNewDoubleValue(newValue));}
-  if( command == DoppZCmd )
-    { BeamOut->setDoppZ(DoppZCmd->GetNewDoubleValue(newValue));}
-  if( command == DoppYCmd )
-    { BeamOut->setDoppY(DoppYCmd->GetNewDoubleValue(newValue));}
-  if( command == DoppXCmd )
-    { BeamOut->setDoppX(DoppXCmd->GetNewDoubleValue(newValue));}
-*/
   if( command == RepCmd )
     { BeamOut->Report();}
   if( command == ThMTCmd )

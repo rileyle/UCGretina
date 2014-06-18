@@ -199,19 +199,27 @@ Commands related to the outgoing reaction product:
 
     /BeamOut/TargetZ <int>
 
-> Mass number and charge number of the target nucleus (used to look up
-> masses for 2-body reaction kinematics).
+> Mass number and charge number of the target nucleus.
 
     /BeamOut/ProjectileExcitation <double> <unit>
 
-> Excitation energy of the outgoing reaction product.
+> Excitation energy of the beam-like reaction product. (The
+> target-like reaction product is not excited.) If a level scheme file
+> is used, the energy parameter is ignored. 
+
+    /BeamOut/TargetExcitation <double> <unit>
+
+> Excitation energy of the target-like reaction product. (The
+> beam-like reaction product is not excited.) The energy parameter is
+> superseded by a level scheme file if a /BeamOut/LevelSchemeFile
+> command is present.
 
     /BeamOut/AngDistSigmaA <double> <unit>
 
     /BeamOut/AngDistSigmaB <double> <unit>
 
 > Angular spreads of the lab-frame scattering angle distribution of
-> the outgoing reaction products in the dispersive 
+> the outgoing beam-like reaction products in the dispersive 
 > and nondispersive directions, respectively. The 2-body reaction
 > kinematics draw from this scattering-angle distribution.
 
@@ -222,16 +230,13 @@ Commands related to the outgoing reaction product:
     /BeamOut/seta4 <double>
 
 > Angular distribution coefficients for the emitted gamma rays.
-
-> NOTE: These commands are superseded by a level scheme file if a
+> These commands are superseded by a level scheme file if a
 > /BeamOut/LevelSchemeFile command is present.
 
     /BeamOut/tau <double> <unit>
 
-> Mean lifetime of the excitation
-
-> NOTE: This command is superseded by a level scheme file if a
-> /BeamOut/LevelSchemeFile command is present.
+> Mean lifetime of the excitation. This command is superseded by a
+> level scheme file if a /BeamOut/LevelSchemeFile command is present.
 
     /BeamOut/LevelSchemeFile <filename>
 
@@ -253,8 +258,9 @@ Commands related to the outgoing reaction product:
 > the reaction.
 
 > NOTE: This command supersedes values set with the
-> /BeamOut/ProjectileExcitation, /BeamOut/seta0, /BeamOut/seta2,
-> /BeamOut/seta4, and /BeamOut/tau commands described above.
+> /BeamOut/ProjectileExcitation, /BeamOut/TargetExcitation,
+> /BeamOut/seta0, /BeamOut/seta2, /BeamOut/seta4, and /BeamOut/tau
+> commands described above. 
 
     /BeamOut/Source
 

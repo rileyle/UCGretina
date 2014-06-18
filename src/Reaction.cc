@@ -13,7 +13,8 @@ Reaction::Reaction(Outgoing_Beam* BO, const G4String& aName)
   theProcessSubType=(G4ProcessType)231;  //DecayExt
 
   decayed_at_rest = false;
-  ground_state = false;
+  target_reaction = false;
+  ground_state    = false;
 }
 
 Reaction::~Reaction() 
@@ -34,6 +35,14 @@ G4VParticleChange* Reaction::PostStepDoIt(
   // G4cout << "  stable: " 
   // 	 << aTrack.GetDynamicParticle()->GetParticleDefinition()->GetPDGStable()
   // 	 << G4endl;
+  // G4cout << "  BeamOut->TargetExcitation():" << BeamOut->TargetExcitation()
+  // 	 << G4endl;
+  // G4cout << "  reaction_here: " 
+  // 	 << reaction_here
+  // 	 << G4endl;
+  // G4cout << "  ground_state: " 
+  // 	 << ground_state
+  // 	 << G4endl;
 
   aParticleChange.Initialize(aTrack);
 
@@ -45,28 +54,28 @@ G4VParticleChange* Reaction::PostStepDoIt(
 
       aParticleChange.ProposeTrackStatus(fStopAndKill);
 
-      if(G4UniformRand()<BeamOut->getTFrac())
-	{
-	  aParticleChange.SetNumberOfSecondaries(2);
-	  aParticleChange.AddSecondary(BeamOut->ProjectileGS(),BeamOut->ReactionPosition(),true);
-	  aParticleChange.AddSecondary(BeamOut->TargetExcitation(),BeamOut->ReactionPosition(),true);
+      //      if(G4UniformRand()<BeamOut->getTFrac())
+      //	{
+      //	  aParticleChange.SetNumberOfSecondaries(2);
+      //	  aParticleChange.AddSecondary(BeamOut->ProjectileGS(),BeamOut->ReactionPosition(),true);
+      //	  aParticleChange.AddSecondary(BeamOut->TargetExcitation(),BeamOut->ReactionPosition(),true);
 
 //  	  aParticleChange.DumpInfo();
 // 	  getc(stdin);
 //  	  aParticleChange.GetSecondary(0)->GetDynamicParticle()->DumpInfo();
 //  	  aParticleChange.GetSecondary(1)->GetDynamicParticle()->DumpInfo();
 //  	  getc(stdin);
-	}
-      else
-	{
+//	}
+//      else
+//	{
 	  aParticleChange.SetNumberOfSecondaries(1);
 	  aParticleChange.AddSecondary(BeamOut->ReactionProduct(),BeamOut->ReactionPosition(),true);
-	}
+	  //	}
 
 
     }
 
-  // Stationary source: stop and kill the reaction product in its ground state.
+  // Stationary source / target excitation: stop and kill the reaction product in its ground state.
   if(ground_state){
     ground_state = false;
     aParticleChange.ProposeTrackStatus(fStopAndKill);
@@ -91,6 +100,14 @@ G4double Reaction::PostStepGetPhysicalInteractionLength(
   // G4cout << "  stable: " 
   // 	 << aTrack.GetDynamicParticle()->GetParticleDefinition()->GetPDGStable()
   // 	 << G4endl;
+  // G4cout << "  BeamOut->TargetExcitation():" << BeamOut->TargetExcitation()
+  // 	 << G4endl;
+  // G4cout << "  momentum: " 
+  // 	 << aTrack.GetDynamicParticle()->GetMomentum()
+  // 	 << G4endl;
+  // G4cout << "  target_reaction: " 
+  // 	 << target_reaction
+  // 	 << G4endl;
 
   reaction_here=false;
   *condition=NotForced;
@@ -103,41 +120,50 @@ G4double Reaction::PostStepGetPhysicalInteractionLength(
       if(name=="target_log")
 	{
 
+	  // Target excitations:
+	  // Stop and kill the decay product once it reaches its ground state.
+	  if( target_reaction 
+	      && aTrack.GetDynamicParticle()->GetParticleDefinition()->GetPDGStable() ){
+	    ground_state = true;
+	    target_reaction = false;  //Reset for next decay
+	    return 0;
+	  }
+
 	  G4double ZReaction=pUserLimits->GetUserMinRange(aTrack);
 	  G4double ZCurrent=aTrack.GetPosition().getZ();
 	  G4double Z=ZReaction-ZCurrent;
-	  if(Z<0)
-	    {
-// 	      G4cout<<" Past the reaction point"<<G4endl;
-// 	      G4cout<<" Volume "<<name<<G4endl;
-// 	      G4cout<<" Z[mm]: reaction "<<ZReaction/mm<<" current "<<ZCurrent/mm<<" DZ "<<Z/mm<<G4endl;
-	      return DBL_MAX;
-	    }
-	  if(Z>eps)
-	    {
-	      G4ThreeVector dir=aTrack.GetDynamicParticle()->GetMomentumDirection();
+	  if(Z<0){
+	    // G4cout<<" Past the reaction point"<<G4endl;
+	    // G4cout<<" Volume "<<name<<G4endl;
+	    // G4cout<<" Z[mm]: reaction "<<ZReaction/mm<<" current "<<ZCurrent/mm<<" DZ "<<Z/mm<<G4endl;
+	    return DBL_MAX;
+	  } else if(Z>eps) {
+	    G4ThreeVector dir=aTrack.GetDynamicParticle()->GetMomentumDirection();
 	      
-	      dir*=(ZReaction-ZCurrent);
-// 	      G4cout<<" Before the reaction point"<<G4endl;
-// 	      G4cout<<" Volume "<<name<<G4endl;
-// 	      G4cout<<" Z[mm]: reaction "<<ZReaction/mm<<" current "<<ZCurrent/mm<<" DZ "<<Z/mm<<G4endl;
-	      return dir.mag();
-	    }
-       if(Z<eps)
-	 {
-	   
-	   reaction_here=true;
-	   return 0.;
-	 }
+	    dir*=(ZReaction-ZCurrent);
+	    // G4cout<<" Before the reaction point"<<G4endl;
+	    // G4cout<<" Volume "<<name<<G4endl;
+	    // G4cout<<" Z[mm]: reaction "<<ZReaction/mm<<" current "<<ZCurrent/mm<<" DZ "<<Z/mm<<G4endl;
+	    return dir.mag();
+	  } else if(Z<eps) {
+	    // G4cout<<" At the reaction point"<<G4endl;
+	    // G4cout<<" Volume "<<name<<G4endl;
+	    // G4cout<<" Z[mm]: reaction "<<ZReaction/mm<<" current "<<ZCurrent/mm<<" DZ "<<Z/mm<<G4endl;
+
+	    reaction_here = true;
+	    if( BeamOut->TargetExcitation() ) 
+	      target_reaction = true;
+	    return 0.;
+	  }
        
 	}
 
     }
 
-  // Sationary source: stop and kill the decay product once it reaches its 
-  // ground state.
-  if(BeamOut->Source()
-     && aTrack.GetDynamicParticle()->GetParticleDefinition()->GetPDGStable()){
+  // Sationary sources:
+  // Stop and kill the decay product once it reaches its ground state.
+  if( BeamOut->Source()
+     && aTrack.GetDynamicParticle()->GetParticleDefinition()->GetPDGStable() ){
     ground_state=true;
     decayed_at_rest=false;    //Reset for next decay
     return 0;
@@ -203,4 +229,3 @@ G4double Reaction::AtRestGetPhysicalInteractionLength(
   return DBL_MAX;
 
 }
-

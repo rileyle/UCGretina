@@ -19,6 +19,7 @@ Outgoing_Beam::Outgoing_Beam()
   TFrac=0.;
   tau=0.0*ns;
 
+  targetExcitation=false;
   reacted=false;
   source=false;
   alpha=20.;
@@ -54,71 +55,131 @@ void Outgoing_Beam::setDecayProperties()
 
   Zin = beamIn->getZ();
   Ain = beamIn->getA();
-  beam = G4ParticleTable::GetParticleTable()->GetIon(Zin,Ain,0.);
-  ion = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,Ex);
-  iongs = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,0.);
-  iongs->SetPDGStable(true);
-  tarIn  = G4ParticleTable::GetParticleTable()->GetIon(TarZ,    TarA,    0.);
-  tarOut = G4ParticleTable::GetParticleTable()->GetIon(TarZ-DZ, TarA-DA, 0.);
+
+  // Load the particle table
+  beam     = G4ParticleTable::GetParticleTable()->GetIon(Zin,Ain,0.);
+  ion      = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,Ex);
+  ionGS    = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,0.);
+  ionGS->SetPDGStable(true);
+
+  if(TarA == 1 && TarZ ==1)
+    tarIn = G4ParticleTable::GetParticleTable()->FindParticle("proton");
+  else if (TarA == 2 && TarZ ==1)
+    tarIn = G4ParticleTable::GetParticleTable()->FindParticle("deuteron");
+  else if (TarA == 3 && TarZ ==1)
+    tarIn = G4ParticleTable::GetParticleTable()->FindParticle("triton");
+  else if (TarA == 3 && TarZ ==2)
+    tarIn = G4ParticleTable::GetParticleTable()->FindParticle("He3");
+  else
+    tarIn = G4ParticleTable::GetParticleTable()->GetIon(TarZ,    TarA,    0.);
+
+  if(TarA-DA == 1 && TarZ-DZ ==1){
+    tarOut = G4ParticleTable::GetParticleTable()->FindParticle("proton");
+    tarOutGS = tarOut;
+  } else if(TarA-DA == 2 && TarZ-DZ ==1){
+    tarOut = G4ParticleTable::GetParticleTable()->FindParticle("deuteron");
+    tarOutGS = tarOut;
+  } else if(TarA-DA == 3 && TarZ-DZ ==1){
+    tarOut = G4ParticleTable::GetParticleTable()->FindParticle("triton");
+    tarOutGS = tarOut;
+  } else if(TarA-DA == 3 && TarZ-DZ ==2) {
+    tarOut = G4ParticleTable::GetParticleTable()->FindParticle("He3");
+    tarOutGS = tarOut;
+  } else {
+    tarOut = G4ParticleTable::GetParticleTable()->GetIon(TarZ-DZ, TarA-DA, Ex);
+    tarOutGS = G4ParticleTable::GetParticleTable()->GetIon(TarZ-DZ, TarA-DA, 0.);
+  }
+  tarOutGS->SetPDGStable(true);
+
 
   if (ion == NULL) {
-    G4cerr << "Error: Could not find outgoing ion in particle table "
+    G4cerr << "Error: no outgoing ion in particle table "
 	   << Zin + DZ << " " << Ain+DA << G4endl;
     exit(EXIT_FAILURE);
   }
-  if (iongs == NULL) {
-    G4cerr << "Error: Could not find outgoing ion in particle table "
+  if (ionGS == NULL) {
+    G4cerr << "Error: no outgoing ion ground state in particle table "
 	   << Zin + DZ << " " << Ain+DA << G4endl;
     exit(EXIT_FAILURE);
   }
   if (tarIn == NULL) {
-    G4cerr << "Warning: no target nucleus in particle table "
-	   << TarZ << " " << TarA << G4endl;
-    //    exit(EXIT_FAILURE);
+    if(targetExcitation){
+      G4cerr << "Error: no target nucleus in particle table "
+	     << TarZ << " " << TarA << G4endl;
+      exit(EXIT_FAILURE);
+    } else {
+      G4cerr << "Warning: no target nucleus in particle table "
+	     << TarZ << " " << TarA << G4endl;
+    }
   }
   if (tarOut == NULL) {
-    G4cerr << "Warning: no target-like product in particle table "
-  	   << TarZ-DZ << " " << TarA-DA << G4endl;
-    //    exit(EXIT_FAILURE);
+    if(targetExcitation){
+      G4cerr << "Error: no target-like product in particle table "
+	     << TarZ-DZ << " " << TarA-DA << G4endl;
+      exit(EXIT_FAILURE);
+    } else {
+      G4cerr << "Warning: no target-like product in particle table "
+	     << TarZ-DZ << " " << TarA-DA << G4endl;
+    }
+  }
+  if (tarOutGS == NULL) {
+    if(targetExcitation){
+      G4cerr << "Error: no target-like ground-state product in particle table "
+	     << TarZ-DZ << " " << TarA-DA << G4endl;
+      exit(EXIT_FAILURE);
+    } else {
+      G4cerr << "Warning: no target-like ground-state product in particle table "
+	     << TarZ-DZ << " " << TarA-DA << G4endl;
+    }
   }
 
   m1 = beam->GetPDGMass();
   m2 = tarIn->GetPDGMass();
-  m3 = ion->GetPDGMass();
-  if (tarOut == NULL)
-    m4 = 0.;
-  else
+  if(targetExcitation){  
+    m3 = ionGS->GetPDGMass();
     m4 = tarOut->GetPDGMass();
+  } else {
+    m3 = ion->GetPDGMass();
+    if (tarOutGS == NULL)
+      m4 = 0.;
+    else
+      m4 = tarOutGS->GetPDGMass();
+  }
 
   G4DecayTable *DecTab = NULL;
   GammaDecayChannel *GamDec = NULL;
   G4ProcessManager *pm = NULL;
-
+  G4ParticleDefinition* product;
+  if(targetExcitation)
+    product = tarOut;
+  else
+    product = ion;
+  
   if (lvlSchemeFileName == ""){
 
     levelEnergy[0] = Ex/keV;
     relPop[0] = 1.0;
 
-    G4cout << "Constructing decay properties for Z=" << Zin + DZ
-	   << " A=" << Ain + DA << " with excitation " << Ex/keV << " keV" << G4endl;
+    G4cout << "Constructing decay properties for Z = " << product->GetAtomicNumber()
+	   << " A = " << product->GetAtomicMass() << " with excitation energy " << Ex/keV << " keV" << G4endl;
     G4cout << "Direct gamma decay to the ground state." << G4endl;
 
-    ion->SetPDGStable(false);
-    ion->SetPDGLifeTime(tau);
+    product->SetPDGStable(false);
+    product->SetPDGLifeTime(tau);
 
-    DecTab = ion->GetDecayTable(); 
+    DecTab = product->GetDecayTable(); 
     if (DecTab == NULL) {
       DecTab = new G4DecayTable();
-      ion->SetDecayTable(DecTab);
+      product->SetDecayTable(DecTab);
     }
-    GammaDecayChannel *GamDec = new GammaDecayChannel(-1,ion,1,Ex,0.,theAngularDistribution);
+    GammaDecayChannel *GamDec = new GammaDecayChannel(-1,product,1,Ex,0.,theAngularDistribution);
     DecTab->Insert(GamDec);
     //    DecTab->DumpInfo();
 
     // make sure that the ion has the decay process in its manager
-    G4ProcessManager *pm = ion->GetProcessManager();
+    G4ProcessManager *pm = product->GetProcessManager();
     if (pm == NULL) {
-      G4cerr << "Could not find process manager for outgoing ion." << G4endl;
+      G4cerr << "Could not find process manager for reaction product." << G4endl;
       exit(EXIT_FAILURE);
     }
     pm->AddProcess(&decay,1,-1,4);
@@ -146,10 +207,13 @@ void Outgoing_Beam::setDecayProperties()
       for(G4int j = 0; j < nBranch; j++){
 	lvlSchemeFile >> BR >> Exf >> a0 >> a2 >> a4;
 
-	intermediateIon = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,levelEnergy[Nlevels]*keV);
+	intermediateIon = 
+	  G4ParticleTable::GetParticleTable()->GetIon(product->GetAtomicNumber(),
+						      product->GetAtomicMass(),
+						      levelEnergy[Nlevels]*keV);
 	if (intermediateIon == NULL) {
-	  G4cerr << "Could not find intermediate ion in particle table "
-		 << Zin + DZ << " " << Ain+DA << G4endl;
+	  G4cerr << "Could not find intermediate ion in particle table."
+		 << product->GetAtomicNumber() << " " << product->GetAtomicMass() << G4endl;
 	  exit(EXIT_FAILURE);
 	}
 	intermediateIon->SetPDGStable(false);
@@ -170,7 +234,7 @@ void Outgoing_Beam::setDecayProperties()
 	// make sure that the ion has the decay process in its manager
 	pm = intermediateIon->GetProcessManager();
 	if (pm == NULL) {
-	  G4cerr << "Could not find process manager for outgoing ion." << G4endl;
+	  G4cerr << "Could not find process manager for reaction product." << G4endl;
 	  exit(EXIT_FAILURE);
 	}
 	pm->AddProcess(&decay,1,-1,4);
@@ -192,9 +256,6 @@ void Outgoing_Beam::setDecayProperties()
       //             << " keV, relPop[" << j << "] = " << relPop[j] 
       //	     << G4endl;
     }
-
-    //    G4ParticleTable::GetParticleTable()->DumpTable();
-
   }
 }
 
@@ -216,17 +277,9 @@ void Outgoing_Beam::ScanInitialConditions(const G4Track & aTrack)
   ET = KEIn + m1 + m2;                                      // Total E
   p1 = sqrt( (KEIn + m1)*(KEIn + m1) - m1*m1 );          // Incoming p
   // Lab-grame scattering angle limit
-  sin2theta_max = 
+  sin2theta3_max = 
     ( (ET*ET - p1*p1 + m3*m3 - m4*m4)*(ET*ET - p1*p1 + m3*m3 - m4*m4)
       -4*m3*m3*((m1 + m2)*(m1 + m2) + 2*m2*KEIn) )/( 4*m3*m3*p1*p1 );
-
-  // G4cout << "m1 = " << m1 << ", m2 = " << m2 
-  // 	 << ", m3 = " << m3 << ", m4 = " << m4 
-  // 	 << G4endl;
-
-  // G4cout << "ET = " << ET << ", p1 = " << p1
-  // 	 << ", sin2theta_max = " << sin2theta_max
-  // 	 << G4endl;
 
 }
 
@@ -253,36 +306,43 @@ G4DynamicParticle* Outgoing_Beam::ReactionProduct()
     if(rnd < relPop[lvl]) break;
   }
   //  G4cout << "Chose lvl = " << lvl << ", E = " << levelEnergy[lvl] << " keV" << G4endl;
-  G4ParticleDefinition* product = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,levelEnergy[lvl]*keV);
 
-  G4DynamicParticle* aReactionProduct =new G4DynamicParticle(product,GetOutgoingMomentum());
+  G4int Zout, Aout;
+  if(targetExcitation){
+    Zout = TarZ - DZ;
+    Aout = TarA - DA;
+  } else {
+    Zout = Zin + DZ;
+    Aout = Ain + DA;
+  }
+
+  G4ParticleDefinition* product = G4ParticleTable::GetParticleTable()->GetIon(Zout,Aout,levelEnergy[lvl]*keV);
+
+  G4DynamicParticle* aReactionProduct = new G4DynamicParticle(product,GetOutgoingMomentum());
+
+  return aReactionProduct;
+}
+//---------------------------------------------------------
+//G4DynamicParticle* Outgoing_Beam::ProjectileGS()
+//{
+//  G4DynamicParticle* aReactionProduct =new G4DynamicParticle(ionGS,GetOutgoingMomentum());
 
   //  aReactionProduct->SetProperTime(tauIn);
   // G4cout<<" Proper time set to "<<aReactionProduct->GetProperTime()<<G4endl;
 
-  return aReactionProduct;
-}
+//  return aReactionProduct;
+//}
 //---------------------------------------------------------
-G4DynamicParticle* Outgoing_Beam::ProjectileGS()
-{
-  G4DynamicParticle* aReactionProduct =new G4DynamicParticle(iongs,GetOutgoingMomentum());
+// G4DynamicParticle* Outgoing_Beam::TargetExcitation() // No longer needed
+// {
+//   particleTable = G4ParticleTable::GetParticleTable();
+//   G4DynamicParticle* aReactionProduct =new G4DynamicParticle(particleTable->FindParticle("gamma"),TargetAngularDistribution(),TarEx);
 
-  //  aReactionProduct->SetProperTime(tauIn);
-  // G4cout<<" Proper time set to "<<aReactionProduct->GetProperTime()<<G4endl;
-
-  return aReactionProduct;
-}
-//---------------------------------------------------------
-G4DynamicParticle* Outgoing_Beam::TargetExcitation()
-{
-  particleTable = G4ParticleTable::GetParticleTable();
-  G4DynamicParticle* aReactionProduct =new G4DynamicParticle(particleTable->FindParticle("gamma"),TargetAngularDistribution(),TarEx);
-
-  return aReactionProduct;
-}
+//   return aReactionProduct;
+// }
 
 //---------------------------------------------------------
-G4ThreeVector Outgoing_Beam::TargetAngularDistribution()
+G4ThreeVector Outgoing_Beam::TargetAngularDistribution() // No longer needed
 {
     //TB allow a coulex angular distribution for target excitation (coulex on gold)
     G4ThreeVector direction = G4RandomDirection();
@@ -296,36 +356,46 @@ G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
   static const G4ThreeVector ez(0.,0.,1.);
 
   G4ThreeVector ax,ppOut;
-  G4double      theta;
+  G4double      theta3;
 
   // Lab-frame scattering angle ================================================
 
-  theta=GetDTheta();
-  // If theta is beyond the limit dictated by the kinematics
+  theta3=GetDTheta();
+  // If theta3 is beyond the limit dictated by the kinematics
   // or if an angle cut is specified ...
-  while( sin(theta)*sin(theta) > sin2theta_max
-	 || (theta_max > 0. && theta > theta_max) ){
-    theta=GetDTheta();
+  while( sin(theta3)*sin(theta3) > sin2theta3_max
+	 || (theta_max > 0. && theta3 > theta_max) ){
+    theta3=GetDTheta();
   }
 
   // Relativistic kinematics ===================================================
-
   //       Baldin et al, Kinematics of Nuclear Reactions, Pergamon (1961)
 
-  G4double E3Lab = 1/(ET*ET - p1*p1*cos(theta)*cos(theta))        // Outgoing E
+  G4double E3Lab = 1/(ET*ET - p1*p1*cos(theta3)*cos(theta3))// Beam-like product
     *( ET*( m2*(KEIn + m1) + (m1*m1+m2*m2+m3*m3-m4*m4)/2. )
-       + p1*cos(theta)*sqrt( ( m2*(KEIn+m1) + (m1*m1+m2*m2-m3*m3-m4*m4)/2. )
+       + p1*cos(theta3)*sqrt( ( m2*(KEIn+m1) + (m1*m1+m2*m2-m3*m3-m4*m4)/2. )
 			     *( m2*(KEIn+m1) + (m1*m1+m2*m2-m3*m3-m4*m4)/2. ) 
 			     - m3*m3*m4*m4 
-			     - p1*p1*m3*m3*sin(theta)*sin(theta) ) );
+			     - p1*p1*m3*m3*sin(theta3)*sin(theta3) ) );
 
-  G4double p3Lab = sqrt( E3Lab*E3Lab - m3*m3 );                   // Outgoing p
+  G4double p3Lab = sqrt( E3Lab*E3Lab - m3*m3 );
+
+  G4double p4Lab = sqrt( (ET-E3Lab)*(ET-E3Lab) - m4*m4);  // Target-like product
+
+  G4double theta4 = asin( p3Lab/p4Lab * sin(theta3) );
+
+  G4double pLab = p3Lab;       // Construct pLab vector of the Beam-like product
+  G4double theta = theta3;
+  if( targetExcitation ){    // Construct pLab vector of the Target-like product
+    pLab = p4Lab;
+    theta = theta4;
+  }
 
   // Set the magnitude of the outgoing momentum ================================
 
   ppOut = pIn;
   if( ppOut.mag() > 0)
-    ppOut.setMag( p3Lab );
+      ppOut.setMag( pLab );
 
   // Set the direction of the outgoing momentum ================================
 

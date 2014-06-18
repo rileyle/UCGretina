@@ -161,7 +161,7 @@ void DetectorConstruction::DefineMaterials()
   backWallMat->AddElement(elCu, 1.);
   myMaterials.push_back(backWallMat);
  
-  G4cout << *(G4Material::GetMaterialTable()) << G4endl;
+  //  G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 }
 
 void DetectorConstruction::Placement()

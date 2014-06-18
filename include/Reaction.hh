@@ -22,6 +22,7 @@ class Reaction : public G4VProcess
   public:     
    G4bool reaction_here;
    G4bool decayed_at_rest;
+   G4bool target_reaction;
    G4bool ground_state;
 
      Reaction(Outgoing_Beam*, const G4String& processName ="Reaction" );
