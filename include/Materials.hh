@@ -29,6 +29,7 @@ private:
   G4Element* elementFe;
   G4Element* elementCo;
   G4Element* elementCu;
+  G4Element* elementNi;
   G4Element* elementMo;
   G4Element* elementSn;
   G4Element* elementPt;
@@ -58,6 +59,7 @@ private:
   G4Material* Au;
   G4Material* Ir;
   G4Material* Si;
+  G4Material* Ni;
   G4Material* Be;
   G4Material* Bi;
   G4Material* lH2;

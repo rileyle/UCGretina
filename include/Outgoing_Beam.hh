@@ -52,15 +52,13 @@ public:
   void SetReactionOn(){ reacted=true;};
   void SetReactionOff(){reacted=false;}
   void SetSource(){source=true;}
-  void SetAlphaTarget(G4double a){alpha=a;Calc_pmax();}         // appear defunct
-  void SetThetaMaxTarget(G4double t){theta_max=t;Calc_pmax();}  //
+  void SetThetaMin(G4double t){theta_min=t;}
+  void SetThetaMax(G4double t){theta_max=t;}
   void SetThetaSigmaA(G4double s){sigma_a=s;} //LR // TB
   void SetThetaSigmaB(G4double s){sigma_b=s;} //LR // TB
 
   G4ParticleTable* particleTable; 
   G4DynamicParticle* ReactionProduct();
-  //  G4DynamicParticle* ProjectileGS();
-  //  G4DynamicParticle* TargetExcitation();
   G4ThreeVector ReactionPosition();
   G4int getTarA(){return TarA;}
   G4int getTarZ(){return TarZ;}
@@ -69,10 +67,11 @@ public:
   G4double getTime(){return tau;}
   G4bool   ReactionOn(){return reacted;}
   G4bool   Source(){return source;}
-  G4double GetAlpha(){return alpha;}
-  G4double GetTheta(){return theta_max;}
+  G4double GetThetaMax(){return theta_max;}
+  G4double GetThetaMin(){return theta_min;}
   G4double GetThetaSigmaA(){return sigma_a;} //TB
   G4double GetThetaSigmaB(){return sigma_b;} //TB
+  void setXsectFile(G4String);
   G4double getTFrac(){return TFrac;};
   G4int    GetReactionFlag(){return ReactionFlag;}
   void     SetReactionFlag(G4int f){ReactionFlag=f;}
@@ -91,6 +90,7 @@ public:
   G4double GetRsetKE();
  	void SetCoeff(int,double);  // TB 
     void SetTargetCoeff(int, double); // TB 
+
 private:
   G4int Ain;
   G4int Zin;
@@ -143,12 +143,15 @@ private:
   G4bool targetExcitation;
 
   Incoming_Beam *beamIn;
-  // polynomial coefficients for momentum change for the reacted beam
-  G4double alpha;
+
   G4double sigma_a; //TB
   G4double sigma_b; //TB
+  G4String xsectFileName;
+  G4double theta_min;
   G4double theta_max;
-  G4double pmax;
+  G4double theta_bin;
+  G4int    Nxsect;
+  G4double Xsect[1000];
   G4double twopi;
 
   // TB angular distribution coefficients for a coulex angular distribution
@@ -162,7 +165,7 @@ private:
   AngularDistribution theTargetAngularDistribution;
 
   G4double GetDTheta();
-  void Calc_pmax();
+
 };
 
 #endif

@@ -33,6 +33,7 @@ private:
   G4UIcmdWithAString*        sFCmd; 
   G4UIcmdWithoutParameter*   sledCmd; 
   G4UIcmdWithoutParameter*   RepCmd; 
+  G4UIcmdWithoutParameter*   GCmd;
 };
 
 #endif

@@ -36,15 +36,12 @@ class Outgoing_Beam_Messenger: public G4UImessenger
     G4UIcmdWithADoubleAndUnit* TExCmd;
     G4UIcmdWithADouble*        TExFCmd;
     G4UIcmdWithADoubleAndUnit* tauCmd;
-//    G4UIcmdWithADoubleAndUnit* DoppXCmd;  //
-//    G4UIcmdWithADoubleAndUnit* DoppYCmd;  //
-//    G4UIcmdWithADoubleAndUnit* DoppZCmd;  // TB all defunct
-//    G4UIcmdWithADouble*        betaCmd;   //
     G4UIcmdWithoutParameter*   RepCmd;
+    G4UIcmdWithADoubleAndUnit* ThMinCmd;
     G4UIcmdWithADoubleAndUnit* ThMTCmd;
-    G4UIcmdWithADouble*        AphTCmd;
-    G4UIcmdWithADoubleAndUnit*        DistSigACmd;
-    G4UIcmdWithADoubleAndUnit*        DistSigBCmd;
+    G4UIcmdWithADoubleAndUnit* DistSigACmd;
+    G4UIcmdWithADoubleAndUnit* DistSigBCmd;
+    G4UIcmdWithAString*        XsectCmd;
     G4UIcmdWithAnInteger*      NQCmd;    
     G4UIcmdWithAnInteger*      SQCmd;  
     G4UIcmdWithAnInteger*      SCCmd;  
@@ -52,12 +49,12 @@ class Outgoing_Beam_Messenger: public G4UImessenger
     G4UIcmdWithADouble*        QRFCmd;  
     G4UIcmdWithADoubleAndUnit* QKECmd;
     G4UIcmdWithADoubleAndUnit* QKEuCmd;
-    G4UIcmdWithADouble*        a0Targetcmd;  //
-    G4UIcmdWithADouble*        a2Targetcmd;  // TB
-    G4UIcmdWithADouble*        a4Targetcmd;  //
-    G4UIcmdWithADouble*        a0cmd;  //
-    G4UIcmdWithADouble*        a2cmd;  // TB
-    G4UIcmdWithADouble*        a4cmd;  //
+    G4UIcmdWithADouble*        a0Targetcmd;
+    G4UIcmdWithADouble*        a2Targetcmd;
+    G4UIcmdWithADouble*        a4Targetcmd;
+    G4UIcmdWithADouble*        a0cmd;
+    G4UIcmdWithADouble*        a2cmd;
+    G4UIcmdWithADouble*        a4cmd;
 };
 
 

@@ -444,12 +444,12 @@ void EmStandardPhysics_option4_mod::ConstructProcess()
     
   // Ionization
   //
-  //opt.SetSubCutoff(true);    
+  opt.SetSubCutoff(true);    
 
   // Deexcitation
-  //  G4VAtomDeexcitation* de = new G4UAtomicDeexcitation();
-  //  G4LossTableManager::Instance()->SetAtomDeexcitation(de);
-  //  de->SetFluo(true);
+  // G4VAtomDeexcitation* de = new G4UAtomicDeexcitation();
+  // G4LossTableManager::Instance()->SetAtomDeexcitation(de);
+  // de->SetFluo(true);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

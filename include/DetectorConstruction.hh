@@ -10,11 +10,17 @@
 #ifndef LHTARGET
   #include "Beam_Tube.hh"
   #include "Beam_Tube_Messenger.hh"
+  #include "Greta_Chamber.hh"
+  #include "Greta_Chamber_Messenger.hh"
+  #include "WU_Chamber.hh"
+  #include "Target_Messenger.hh"
 #else
   #include "Target_LH.hh"
+  #include "Target_LH_Messenger.hh"
 #endif
-#include "Target_Messenger.hh"
+
 #include "Gretina_NSCL_Shell.hh"
+#include "Greta_Shell.hh"
 #include "Gretina_Array.hh"
 #include "G4LogicalVolume.hh"
 #include "G4VPhysicalVolume.hh"
@@ -60,6 +66,8 @@ public:
 
 #ifndef LHTARGET
   void SetBeamTubeStatus(G4bool s){beamTubeStatus = s;}
+  void SetGretaChamberStatus(G4bool s){gretaChamberStatus = s;}
+  void SetWUChamberStatus(G4bool s){WUChamberStatus = s;}
 #endif
 
   void SetShellStatus(G4String s){shellStatus = s;}
@@ -79,6 +87,12 @@ private:
 #ifndef LHTARGET
   G4bool beamTubeStatus;
   Beam_Tube* BeamTube;
+
+  G4bool gretaChamberStatus;
+  Greta_Chamber* GretaChamber;
+
+  G4bool WUChamberStatus;
+  WU_Chamber* WUChamber;
 #endif
 
   G4String shellStatus;
@@ -101,6 +115,7 @@ private:
   Gretina_Array_Messenger*  the_Gretina_Array_Messenger;
 #ifndef LHTARGET
   Beam_Tube_Messenger* BeamTubeMessenger;
+  Greta_Chamber_Messenger* GretaChamberMessenger;
 #endif
 };
 
@@ -124,6 +139,8 @@ class DetectorConstruction_Messenger: public G4UImessenger
     G4UIcmdWithAString*          ShellCmd;
 #ifndef LHTARGET
     G4UIcmdWithoutParameter*     BeamTubeCmd;
+    G4UIcmdWithoutParameter*     GretaChamberCmd;
+    G4UIcmdWithoutParameter*     WUChamberCmd;
 #endif
     
   public:
@@ -131,4 +148,3 @@ class DetectorConstruction_Messenger: public G4UImessenger
 };
 
 #endif
-

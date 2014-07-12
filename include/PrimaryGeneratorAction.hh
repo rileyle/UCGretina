@@ -48,6 +48,7 @@ public:
   void SetSourceSimple();
   void SetSourceWhite();
   void SetSourceBG();
+  void SetSourceBGWhite();
   void SetSourceMuon();
   void ReactionOn(){BeamOut->SetReactionOn();fracOn=false;}
   void ReactionOff(){BeamOut->SetReactionOff();fracOn=false;}

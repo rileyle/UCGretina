@@ -119,19 +119,16 @@ void TrackerIonSD::EndOfEvent(G4HCofThisEvent* HCE)
   if(NbHits>0)
     {
  
-       (*ionCollection)[0]->SetGunFlag();
+      //       (*ionCollection)[0]->SetGunFlag();
 
-       for (i=0;i<NbHits-1;i++) 
-	   if ((*ionCollection)[i]->GetVolName()=="expHall"&&(*ionCollection)[i+1]->GetVolName()=="target")
-	     (*ionCollection)[i+1]->SetTargetFaceFlag();
+       // for (i=0;i<NbHits-1;i++)
+       // 	 if ((*ionCollection)[i]->GetVolName()=="expHall"&&(*ionCollection)[i+1]->GetVolName()=="target")
+       // 	     (*ionCollection)[i+1]->SetTargetFaceFlag();
 
 
-	
-
-       for (i=1;i<NbHits;i++) 
-	   if ((*ionCollection)[i-1]->GetVolName()=="target"&&(*ionCollection)[i]->GetVolName()=="expHall")
-	     (*ionCollection)[i]->SetTargetBackFlag();
-
+       // for (i=1;i<NbHits;i++) 
+       // 	 if ((*ionCollection)[i-1]->GetVolName()=="target"&&(*ionCollection)[i]->GetVolName()=="expHall")
+       // 	     (*ionCollection)[i]->SetTargetBackFlag();
 
      if (print) 
      {	

@@ -42,6 +42,7 @@ class Target
   G4VPhysicalVolume *ConstructNoCell();
   void ConstructWindows();
   void ConstructCryo();
+  void ConstructGretaChamber();
 
   void setTargetCell(G4String type){ targetCellType = type; }
   G4String getTargetCell(){ return targetCellType; }
@@ -56,6 +57,7 @@ class Target
   void setNStep(G4int);
   void setSourceFrame(G4String);
   void setSled();
+  void SetGreta(){ Greta = true; }
   void Report();
   G4LogicalVolume* GetTargetLog(){return Target_log;}
   G4UnionSolid* GetTarget(){return aTarget;}
@@ -119,6 +121,13 @@ private:
   G4double sledBarZ4;
   G4double sledBarY5;
   G4double sledBarZ5;
+
+  // Greta Chamber dimensions
+  G4double GretaChamberRmin;
+  G4double GretaChamberRmax;
+  G4double GretaBTrmin;
+  G4double GretaBTrmax;
+  G4double GretaBTDz;
   
   //elements
 
@@ -200,6 +209,8 @@ private:
 
   G4double targetAngle;
   G4double targetDensity;
+
+  G4bool Greta;
 
 };
 

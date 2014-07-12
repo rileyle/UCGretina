@@ -6,6 +6,7 @@ DetectorConstruction::DetectorConstruction()
 
 #ifndef LHTARGET
   beamTubeStatus = false;
+  gretaChamberStatus = false;
 #endif
 
   shellStatus    = "";
@@ -21,6 +22,7 @@ DetectorConstruction::~DetectorConstruction()
   delete TrackerGammaSDMessenger;
 #ifndef LHTARGET
   delete BeamTubeMessenger;
+  delete GretaChamberMessenger;
 #endif
 }
 
@@ -64,6 +66,14 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   BeamTube = new Beam_Tube(ExpHall_log,materials);
   BeamTubeMessenger = new Beam_Tube_Messenger(BeamTube);
+
+  // Greta Chamber
+
+  GretaChamber = new Greta_Chamber(ExpHall_log,materials);
+  GretaChamberMessenger = new Greta_Chamber_Messenger(GretaChamber);
+
+  // WU Chamber
+  WUChamber = new WU_Chamber(ExpHall_log,materials);
 #endif
 
   // Target
@@ -172,6 +182,16 @@ void DetectorConstruction::Placement()
   if( beamTubeStatus ){
     BeamTube->Construct();
   }
+
+  // Greta Chamber
+  if( gretaChamberStatus ){
+    GretaChamber->Construct();
+  }
+
+  // WU Chamber
+  if( WUChamberStatus ){
+    WUChamber->Construct();
+  }
 #endif
 
   // Target
@@ -184,6 +204,10 @@ void DetectorConstruction::Placement()
       shellStatus == "north" ||
       shellStatus == "south"){
     Gretina_NSCL_Shell* Shell = new Gretina_NSCL_Shell();
+    Shell->Placement(shellStatus);
+  } else if ( shellStatus == "Greta" ||
+	      shellStatus == "GretaLH" ){
+    Greta_Shell* Shell = new Greta_Shell();
     Shell->Placement(shellStatus);
   }
 
@@ -219,6 +243,18 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
   BeamTubeCmd = new G4UIcmdWithoutParameter(aLine, this);
   BeamTubeCmd->SetGuidance("Construct the beam tube.");
   BeamTubeCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  commandName = "/GretaChamber/Construct";
+  aLine = commandName.c_str();
+  GretaChamberCmd = new G4UIcmdWithoutParameter(aLine, this);
+  GretaChamberCmd->SetGuidance("Construct the Greta chamber.");
+  GretaChamberCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  commandName = "/WUChamber/Construct";
+  aLine = commandName.c_str();
+  WUChamberCmd = new G4UIcmdWithoutParameter(aLine, this);
+  WUChamberCmd->SetGuidance("Construct the Greta chamber.");
+  WUChamberCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 #endif
 
   commandName = "/Gretina/Shell";
@@ -236,6 +272,8 @@ DetectorConstruction_Messenger::~DetectorConstruction_Messenger()
   delete ShellCmd;
 #ifndef LHTARGET
   delete BeamTubeCmd;
+  delete GretaChamberCmd;
+  delete WUChamberCmd;
 #endif
 }
 
@@ -250,6 +288,12 @@ void DetectorConstruction_Messenger::SetNewValue(G4UIcommand* command,G4String n
 #ifndef LHTARGET
   if( command == BeamTubeCmd ) {
     myTarget->SetBeamTubeStatus(true);
+  } 
+  if( command == GretaChamberCmd ) {
+    myTarget->SetGretaChamberStatus(true);
+  } 
+  if( command == WUChamberCmd ) {
+    myTarget->SetWUChamberStatus(true);
   } 
 #endif
   if( command == ShellCmd ) {

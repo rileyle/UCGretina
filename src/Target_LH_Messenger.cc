@@ -46,11 +46,14 @@ Target_Messenger::Target_Messenger(Target* Tar)
   sFCmd->SetParameterName("choice",false);
   sFCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  sledCmd = new G4UIcmdWithoutParameter("/Target/Sled",this);
+  sledCmd->SetGuidance("Construct the target sled.");  
+
   RepCmd = new G4UIcmdWithoutParameter("/Target/Report",this);
   RepCmd->SetGuidance("Report target parameters");  
 
-  sledCmd = new G4UIcmdWithoutParameter("/Target/Sled",this);
-  sledCmd->SetGuidance("Construct the target sled.");  
+  GCmd = new G4UIcmdWithoutParameter("/Target/Greta",this);
+  GCmd->SetGuidance("Construct the Greta LH target");
 
 }
 
@@ -58,6 +61,7 @@ Target_Messenger::Target_Messenger(Target* Tar)
 
 Target_Messenger::~Target_Messenger()
 {
+
   delete TargetDir;
   delete CCmd;
   delete BCmd;
@@ -69,6 +73,7 @@ Target_Messenger::~Target_Messenger()
   delete sFCmd;
   delete sledCmd;
   delete RepCmd;
+  delete GCmd;
 }
 
 
@@ -94,5 +99,7 @@ void Target_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
     { aTarget->setSled(); }
   if( command == RepCmd )
     { aTarget->Report(); }
+  if( command == GCmd )
+    { aTarget->SetGreta(); }
 }
 #endif

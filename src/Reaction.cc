@@ -24,7 +24,7 @@ Reaction::~Reaction()
 // In-flight reaction
 G4VParticleChange* Reaction::PostStepDoIt(
 			     const G4Track& aTrack,
-			     const G4Step& 
+			     const G4Step& aStep
 			    )
 {
 
@@ -50,35 +50,42 @@ G4VParticleChange* Reaction::PostStepDoIt(
     {
       reaction_here=false;
 
-      BeamOut->ScanInitialConditions(aTrack);
+      // Kill the track if we've already reacted and wandered back
+      if(BeamOut->GetReactionFlag() == 1){
 
-      aParticleChange.ProposeTrackStatus(fStopAndKill);
+	aParticleChange.ProposeTrackStatus(fStopAndKill);
 
-      //      if(G4UniformRand()<BeamOut->getTFrac())
-      //	{
-      //	  aParticleChange.SetNumberOfSecondaries(2);
-      //	  aParticleChange.AddSecondary(BeamOut->ProjectileGS(),BeamOut->ReactionPosition(),true);
-      //	  aParticleChange.AddSecondary(BeamOut->TargetExcitation(),BeamOut->ReactionPosition(),true);
+	// G4cout << "************************* PostStepDoIt: terminating track in "
+	//        << aStep.GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetName()
+	//        << " at reaction depth"
+	//        << G4endl;
+       
+      } 
+      // React!
+      else {
 
-//  	  aParticleChange.DumpInfo();
-// 	  getc(stdin);
-//  	  aParticleChange.GetSecondary(0)->GetDynamicParticle()->DumpInfo();
-//  	  aParticleChange.GetSecondary(1)->GetDynamicParticle()->DumpInfo();
-//  	  getc(stdin);
-//	}
-//      else
-//	{
-	  aParticleChange.SetNumberOfSecondaries(1);
-	  aParticleChange.AddSecondary(BeamOut->ReactionProduct(),BeamOut->ReactionPosition(),true);
-	  //	}
+	BeamOut->ScanInitialConditions(aTrack);
 
+	aParticleChange.ProposeTrackStatus(fStopAndKill);
+
+	aParticleChange.SetNumberOfSecondaries(1);
+	aParticleChange.AddSecondary(BeamOut->ReactionProduct(),BeamOut->ReactionPosition(),true);
+
+	BeamOut->SetReactionFlag(1);
+
+      }
 
     }
 
-  // Stationary source / target excitation: stop and kill the reaction product in its ground state.
+  // Stop and kill the reaction product in its ground state.
   if(ground_state){
     ground_state = false;
     aParticleChange.ProposeTrackStatus(fStopAndKill);
+
+    // G4cout << "************************* PostStepDoIt: terminating track in "
+    // 	   << aStep.GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetName()
+    // 	   << G4endl;
+
   }
    
   return &aParticleChange;
@@ -117,7 +124,7 @@ G4double Reaction::PostStepGetPhysicalInteractionLength(
       G4String name=aTrack.GetVolume()->GetLogicalVolume()->GetName();
       G4UserLimits* pUserLimits = aTrack.GetVolume()->GetLogicalVolume()->GetUserLimits();
 
-      if(name=="target_log")
+      if(name=="Target_log")
 	{
 
 	  // Target excitations:
@@ -175,7 +182,7 @@ G4double Reaction::PostStepGetPhysicalInteractionLength(
 // Stationary source decay
 G4VParticleChange* Reaction::AtRestDoIt(
 			     const G4Track& aTrack,
-			     const G4Step& 
+			     const G4Step& aStep
 			    )
 {
 
@@ -187,7 +194,6 @@ G4VParticleChange* Reaction::AtRestDoIt(
   // 	 << aTrack.GetDynamicParticle()->GetParticleDefinition()->GetPDGStable()
   // 	 << G4endl;
 
-
   aParticleChange.Initialize(aTrack);
 
   if(BeamOut->Source()){
@@ -197,6 +203,16 @@ G4VParticleChange* Reaction::AtRestDoIt(
     aParticleChange.ProposeTrackStatus(fStopAndKill);
     aParticleChange.SetNumberOfSecondaries(1);
     aParticleChange.AddSecondary(BeamOut->ReactionProduct(),aTrack.GetPosition(),true);
+
+  } 
+  // If the reaction product comes to rest after emitting its gamma(s), kill it.
+  else if( aTrack.GetDefinition()->GetPDGStable() ) { 
+
+    // G4cout << "************************* AtRestDoIt: terminating track in "
+    // 	   << aStep.GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetName()
+    // 	   << G4endl;
+
+    aParticleChange.ProposeTrackStatus(fStopAndKill);
 
   }
 

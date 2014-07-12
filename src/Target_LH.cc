@@ -18,8 +18,8 @@ Target::Target(G4LogicalVolume* experimentalHall_log,Materials* mat)
   Pos = new G4ThreeVector(0.,0.,0.);
   NoRot = G4RotationMatrix::IDENTITY;
   TargetMaterial = lH2;
-  targetDensity = 72.42*mg/cm3; // lH2 @ 19 K
-  targetAngle = 30.0*deg;
+  targetDensity = 75.36*mg/cm3; // lH2 @ 16 K (NIST)
+  targetAngle = 30.0*deg;       // NSCL GRETINA configuration
 
   // Beam tube
   BeamTubeRmax = 3.0*2.54*cm;
@@ -30,6 +30,13 @@ Target::Target(G4LogicalVolume* experimentalHall_log,Materials* mat)
   BeamTeeRmin = BeamTeeRmax - 0.065*2.54*cm;
   BeamTeeDz   = 24.2*cm/2.;
 
+  // Greta LH chamber (science fiction)
+  GretaChamberRmin = 178.5*mm;
+  GretaChamberRmax = 180.0*mm;
+  GretaBTrmin = 18.5*mm;
+  GretaBTrmax = 20.0*mm;
+  GretaBTDz = (127.6/2*cm - GretaChamberRmax)/2.;
+
   BulgeDz = 1.0*mm;
 
   windowThickness = 125.*um;
@@ -39,18 +46,22 @@ Target::Target(G4LogicalVolume* experimentalHall_log,Materials* mat)
   
   sourceFrame = "";
 
+  Greta = false;
+
 }
 
 Target::~Target()
 { delete target_limits;}
+
 //-----------------------------------------------------------------------------
 G4VPhysicalVolume* Target::Construct()
 {
   LHTarget = new G4AssemblyVolume();
 
-#if(1)
-  ConstructBeamTube();
-#endif
+  if(Greta)
+    ConstructGretaChamber();
+  else
+    ConstructBeamTube();
 
   // Target and Cell
   if(targetCellType == "thick")
@@ -75,6 +86,7 @@ G4VPhysicalVolume* Target::Construct()
   LHTarget->MakeImprint(expHall_log, *Pos, &LHTargetRot);
 
   return Target_phys;
+
 }
 //-----------------------------------------------------------------------------
 void Target::ConstructBeamTube(){
@@ -110,10 +122,10 @@ void Target::ConstructBeamTube(){
 
   // Tee
 
-  G4ThreeVector* BeamTeeOffset = new G4ThreeVector(0., BeamTeeDz, 0.);
+  G4ThreeVector BeamTeeOffset = G4ThreeVector(0., BeamTeeDz, 0.);
   G4LogicalVolume* BeamTee_log
     = new G4LogicalVolume(BeamTee, Aluminum, "BeamTee_log", 0, 0, 0);
-  LHTarget->AddPlacedVolume(BeamTee_log, *BeamTeeOffset, &BeamTeeRot);
+  LHTarget->AddPlacedVolume(BeamTee_log, BeamTeeOffset, &BeamTeeRot);
 
   G4Tubs* BeamTeeFlange = new G4Tubs("BeamTeeFlange", 
 				     4.915*cm, 9.0*cm, 1.194*cm/2.,
@@ -150,6 +162,120 @@ void Target::ConstructBeamTube(){
 						 24.2*cm + 1.194*cm
 						 +0.75/2*cm,
 						 0.);
+
+  LHTarget->AddPlacedVolume(BellowsFlange_log, 
+			    BellowsFlangePos, 
+			    &BellowsFlangeRot);
+
+}
+//-----------------------------------------------------------------------------
+void Target::ConstructGretaChamber(){
+
+  // Beam line segments
+
+  G4Tubs* BeamTube = new G4Tubs("BeamTube", GretaBTrmin, GretaBTrmax, 
+				 GretaBTDz, 0.*deg, 360.*deg); 
+
+  G4LogicalVolume* BeamTube_log = new G4LogicalVolume(BeamTube, 
+						      Aluminum,
+						      "BeamTube_log",
+						      0, 0, 0);
+
+  G4ThreeVector *GretaBTPos = new G4ThreeVector(0., 0., 0.);
+  GretaBTPos->setZ(sqrt(GretaChamberRmin*GretaChamberRmin 
+			- GretaBTrmin*GretaBTrmin) + GretaBTDz);
+
+  LHTarget->AddPlacedVolume(BeamTube_log, *GretaBTPos, &NoRot);
+
+  GretaBTPos->setZ(-sqrt(GretaChamberRmin*GretaChamberRmin 
+			- GretaBTrmin*GretaBTrmin) - GretaBTDz);
+
+  LHTarget->AddPlacedVolume(BeamTube_log, *GretaBTPos, &NoRot);
+
+  // Target tee
+  G4Tubs* BeamTee = new G4Tubs("BeamTee", BeamTeeRmin, BeamTeeRmax, 
+			       BeamTeeDz, 0.*deg, 360.*deg); 
+
+  G4RotationMatrix BeamTeeRot = NoRot;
+  BeamTeeRot.rotateX(90.0*deg);
+
+  G4ThreeVector* BeamTeeOffset 
+    = new G4ThreeVector(0., BeamTeeDz+
+			sqrt(GretaChamberRmin*GretaChamberRmin 
+			     -BeamTeeDz*BeamTeeDz), 
+			0.);
+
+  G4LogicalVolume* BeamTee_log
+    = new G4LogicalVolume(BeamTee, Aluminum, "BeamTee_log", 0, 0, 0);
+
+  LHTarget->AddPlacedVolume(BeamTee_log, *BeamTeeOffset, &BeamTeeRot);
+
+  // Chamber
+  G4Sphere* sphere = new G4Sphere("sphere", GretaChamberRmin, GretaChamberRmax, 
+				  0., 360.*deg, 0., 180.*deg);
+
+  G4Tubs* drill = new G4Tubs("drill", 0, GretaBTrmax, 1.1*GretaChamberRmax, 
+			     0., 360.*deg);
+
+  G4SubtractionSolid* Chamber = new G4SubtractionSolid("Chamber", 
+						       sphere, drill);
+
+  G4Tubs* BeamTeeDrill = new G4Tubs("BeamTeeDrill", 0., BeamTeeRmax, 
+				    BeamTeeDz, 0.*deg, 360.*deg); 
+
+  Chamber = new G4SubtractionSolid("Chamber", 
+				   Chamber, BeamTeeDrill,
+				   G4Transform3D(BeamTeeRot,
+						 G4ThreeVector(0., 
+							       BeamTeeDz, 
+							       0.)));
+
+  G4LogicalVolume* Chamber_log 
+    = new G4LogicalVolume(Chamber, Aluminum, "Chamber_log",
+			  0, 0, 0);
+
+  LHTarget->AddPlacedVolume(Chamber_log, *Pos, &NoRot);
+
+
+  // Flanges
+  G4Tubs* BeamTeeFlange = new G4Tubs("BeamTeeFlange", 
+				     4.915*cm, 9.0*cm, 1.194*cm/2.,
+				     0., 360.*deg);
+
+  G4LogicalVolume* BeamTeeFlange_log
+    = new G4LogicalVolume(BeamTeeFlange, Aluminum, "BeamTeeFlange_log", 0, 0, 0);
+
+  G4RotationMatrix BeamTeeFlangeRot = NoRot;
+  BeamTeeFlangeRot.rotateX(-90.0*deg);
+
+  G4ThreeVector BeamTeeFlangePos 
+    = G4ThreeVector(0., 
+		    2.*BeamTeeDz +
+		    sqrt(GretaChamberRmin*GretaChamberRmin 
+			 -BeamTeeDz*BeamTeeDz));
+
+  LHTarget->AddPlacedVolume(BeamTeeFlange_log, 
+			    BeamTeeFlangePos, 
+			    &BeamTeeFlangeRot);
+
+  // DIMENSIONS APPROXIMATE
+  G4Tubs* BellowsFlange = new G4Tubs("BellowsFlange",
+				     4.*2.54/2*cm, 9.*2.54/2*cm, 
+				     0.5*2.54/2*cm, 0.*deg, 360.*deg); 
+
+  G4LogicalVolume* BellowsFlange_log
+    = new G4LogicalVolume(BellowsFlange, StainlessSteel, "BellowsFlange_log", 0, 0, 0);
+
+  G4RotationMatrix BellowsFlangeRot = NoRot;
+  BellowsFlangeRot.rotateX(-90.0*deg);
+
+  G4ThreeVector BellowsFlangePos 
+    = G4ThreeVector(0., 
+		    2.*BeamTeeDz +
+		    sqrt(GretaChamberRmin*GretaChamberRmin 
+			 -BeamTeeDz*BeamTeeDz)
+		    +0.75/2*cm,
+		    0.);
 
   LHTarget->AddPlacedVolume(BellowsFlange_log, 
 			    BellowsFlangePos, 
@@ -198,7 +324,7 @@ G4VPhysicalVolume* Target::Construct200mgCell(){
   G4double A=TargetMaterial->GetA();
   TargetMaterial=new G4Material(name, Z,A,targetDensity);
 
-  Target_log = new G4LogicalVolume(aTarget,TargetMaterial,"target_log",0,0,0);
+  Target_log = new G4LogicalVolume(aTarget,TargetMaterial,"Target_log",0,0,0);
   target_limits= new G4UserLimits();
   target_limits->SetMaxAllowedStep(Target_thickness/NStep);
   Target_log->SetUserLimits(target_limits);
@@ -215,32 +341,35 @@ G4VPhysicalVolume* Target::Construct200mgCell(){
   TargetPos += Pos0;
 
   Target_phys = new G4PVPlacement(G4Transform3D(NoRot,TargetPos),
-				  Target_log,"target",expHall_log,false,0);
+				  Target_log,"Target",expHall_log,false,0);
 
   // Cell windows
+  //
+  // Include "Target" in the volume name so that it is included
+  // in determining when the reaction product leaves the target.
   if(windows){
     G4SubtractionSolid* UpstreamWindow 
-      = new G4SubtractionSolid("UpstreamWindow", Bulge, Bulge,
+      = new G4SubtractionSolid("UpStrTargetWindow", Bulge, Bulge,
 			       G4Transform3D(NoRot,
 					     G4ThreeVector(0., 
 							   0., 
 							   windowThickness)));
 
     G4LogicalVolume* UpstreamWindow_log
-      = new G4LogicalVolume(UpstreamWindow, Kapton, "UpstreamWindow_log", 
+      = new G4LogicalVolume(UpstreamWindow, Kapton, "UpStrTargetWindow_log", 
 			    0, 0, 0);
     G4ThreeVector USwindowPos = G4ThreeVector(0., 0.,
 					      -TargetDz-windowThickness);
     LHTarget->AddPlacedVolume(UpstreamWindow_log, USwindowPos, &NoRot);
 
     G4SubtractionSolid* DnstreamWindow 
-      = new G4SubtractionSolid("DnstreamWindow", Bulge, Bulge,
+      = new G4SubtractionSolid("DnStrTargetWindow", Bulge, Bulge,
 			       G4Transform3D(NoRot,
 					     G4ThreeVector(0., 
 							   0., 
 							   -windowThickness)));
     G4LogicalVolume* DnstreamWindow_log
-      = new G4LogicalVolume(DnstreamWindow, Kapton, "DnstreamWindow_log", 
+      = new G4LogicalVolume(DnstreamWindow, Kapton, "DnStrTargetWindow_log", 
 			    0, 0, 0);
     G4ThreeVector DSwindowPos = G4ThreeVector(0., 0., 
 					      TargetDz+windowThickness);
@@ -301,7 +430,7 @@ G4VPhysicalVolume* Target::Construct50mgCell(){
 			     G4Transform3D(NoRot,
 					   G4ThreeVector(0., 0., TargetDz)));
 
-  Target_log = new G4LogicalVolume(aTarget,lH2,"target_log",0,0,0);
+  Target_log = new G4LogicalVolume(aTarget,lH2,"Target_log",0,0,0);
   target_limits= new G4UserLimits();
   target_limits->SetMaxAllowedStep(Target_thickness/NStep);
   Target_log->SetUserLimits(target_limits);
@@ -314,7 +443,7 @@ G4VPhysicalVolume* Target::Construct50mgCell(){
   Target_log->SetVisAttributes(Vis);
 
   Target_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos),
-				  Target_log,"target",expHall_log,false,0);
+				  Target_log,"Target",expHall_log,false,0);
 
   // Cell windows
   if(windows){
@@ -406,7 +535,7 @@ G4VPhysicalVolume* Target::ConstructEmptyCell(){
 			     G4Transform3D(NoRot,
 					   G4ThreeVector(0., 0., TargetDz)));
 
-  Target_log = new G4LogicalVolume(aTarget,vacuum,"target_log",0,0,0);
+  Target_log = new G4LogicalVolume(aTarget,vacuum,"Target_log",0,0,0);
   target_limits= new G4UserLimits();
   target_limits->SetMaxAllowedStep(Target_thickness/NStep);
   Target_log->SetUserLimits(target_limits);
@@ -418,7 +547,7 @@ G4VPhysicalVolume* Target::ConstructEmptyCell(){
   Target_log->SetVisAttributes(Vis);
 
   Target_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos),
-				  Target_log,"target",expHall_log,false,0);
+				  Target_log,"Target",expHall_log,false,0);
 
   // Target Cell Body
 
@@ -457,7 +586,7 @@ G4VPhysicalVolume* Target::ConstructNoCell(){
 			     G4Transform3D(NoRot,
 					   G4ThreeVector(0., 0., TargetDz)));
 
-  Target_log = new G4LogicalVolume(aTarget,vacuum,"target_log",0,0,0);
+  Target_log = new G4LogicalVolume(aTarget,vacuum,"Target_log",0,0,0);
   target_limits= new G4UserLimits();
   target_limits->SetMaxAllowedStep(Target_thickness/NStep);
   Target_log->SetUserLimits(target_limits);
@@ -469,7 +598,7 @@ G4VPhysicalVolume* Target::ConstructNoCell(){
   Target_log->SetVisAttributes(Vis);
 
   Target_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos),
-				  Target_log,"target",expHall_log,false,0);
+				  Target_log,"Target",expHall_log,false,0);
 
   return Target_phys;
 
@@ -696,7 +825,7 @@ void Target::ConstructCryo(){
   // Radiation Shield ==================
 
   const G4double RSzPlane[6] = { 0.,       0.32*cm,  0.32*cm,  
-				49.19*cm, 49.19*cm, 50.14*cm};
+				 49.19*cm, 49.19*cm, 50.14*cm};
   const G4double RSrInner[6] = { 0.,       0.,       3.64*cm,
 				 3.64*cm,  3.64*cm,  3.64*cm};
   const G4double RSrOuter[6] = { 3.81*cm,  3.81*cm,  3.81*cm,
@@ -733,6 +862,7 @@ void Target::ConstructCryo(){
   LHTarget->AddPlacedVolume(RadiationShield_log, 
 			    RadiationShieldPos, 
 			    &RadiationShieldRot);
+
 }
 //-----------------------------------------------------------------------------
 void Target::setX(G4double X)

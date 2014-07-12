@@ -7,12 +7,9 @@ Greta_Shell::Greta_Shell()
   Rmin      = 1022.0/2.0*mm;
   Rmax      = 1276.0/2.0*mm;
 
-  mountPortRadius   = 3.0/2.0*2.54*cm;   // DETAIL F, SHEET2
+  //  mountPortRadius   = 3.0/2.0*2.54*cm;   // DETAIL F, SHEET2
   smallPortRadius   = 7.0/2.0*2.54*cm;   // DETAIL C, SHEET2
   modulePortRadius = 12.008/2.0*2.54*cm; // DETAIL A, SHEET2
-  S800PortRadius   = 13.287*2.54*cm;     // SHEET 1
-  notchWidth       = 15.59*2.54*cm;
-  notchThickness   = 4.921*2.54*cm+10*cm;
 
   // Small port positions
   PosSP[0] = G4ThreeVector(-492.891*mm, -145.253*mm, -256.924*mm);
@@ -30,72 +27,97 @@ Greta_Shell::Greta_Shell()
   // Psi                              Slot   Hemisphere
   // Theta
   // Phi
-  ModuleEuler[0][0] =   91.58*deg;       //  7    South
-  ModuleEuler[0][1] =   63.43495*deg;
-  ModuleEuler[0][2] =   88.420*deg;
-  ModuleEuler[1][0] =   91.58*deg;       //  8    South
-  ModuleEuler[1][1] =   63.43495*deg;
-  ModuleEuler[1][2] =  160.420*deg;
-  ModuleEuler[2][0] =   19.58*deg;       // 15    South
-  ModuleEuler[2][1] =   63.43495*deg;
-  ModuleEuler[2][2] =   88.420*deg;
-  ModuleEuler[3][0] =  -52.42*deg;       // 16    South
-  ModuleEuler[3][1] =   63.43495*deg;
-  ModuleEuler[3][2] =  160.420*deg;
-  ModuleEuler[4][0] =   -52.42*deg;      // 18    South
-  ModuleEuler[4][1] =    63.43495*deg;
-  ModuleEuler[4][2] =   232.420*deg;
-  ModuleEuler[5][0] =    19.58*deg;      // 19    South
-  ModuleEuler[5][1] =    63.43495*deg; 
-  ModuleEuler[5][2] =   232.420*deg;
-  ModuleEuler[6][0] =    55.58*deg;      // 23    South
-  ModuleEuler[6][1] =   116.56505*deg;
-  ModuleEuler[6][2] =   124.420*deg;
-  ModuleEuler[7][0] =    55.58*deg;      // 24    South
-  ModuleEuler[7][1] =   116.56505*deg;
-  ModuleEuler[7][2] =   196.420*deg;
-  ModuleEuler[8][0] =   -16.42*deg;      // 27    South
-  ModuleEuler[8][1] =   116.56505*deg;
-  ModuleEuler[8][2] =   124.420*deg;
-  ModuleEuler[9][0] =   -16.42*deg;      // 28    South
-  ModuleEuler[9][1] =   116.56505*deg;
-  ModuleEuler[9][2] =   196.420*deg;
-  ModuleEuler[10][0] =   55.58*deg;      // 22    Split
-  ModuleEuler[10][1] =  116.56505*deg;
-  ModuleEuler[10][2] =   52.420*deg;
-  ModuleEuler[11][0] =  -16.42*deg;      // 29    Split
-  ModuleEuler[11][1] =  116.56505*deg;
-  ModuleEuler[11][2] =  268.420*deg;
-  ModuleEuler[12][0] =  235.58*deg;      //  5    North
+  
+  ModuleEuler[0][0] =  288.00*deg;    //  0    North
+  ModuleEuler[0][1] =    0.00*deg;
+  ModuleEuler[0][2] =    0.00*deg;
+  ModuleEuler[1][0] =    0.00*deg;    //  1    North
+  ModuleEuler[1][1] =    0.00*deg;
+  ModuleEuler[1][2] =    0.00*deg;
+  ModuleEuler[2][0] =   72.00*deg;    //  2    Split
+  ModuleEuler[2][1] =    0.00*deg;
+  ModuleEuler[2][2] =    0.00*deg;
+  ModuleEuler[3][0] =  144.00*deg;    //  3    South
+  ModuleEuler[3][1] =    0.00*deg;
+  ModuleEuler[3][2] =    0.00*deg;
+  ModuleEuler[4][0] =  216.00*deg;    //  4    South
+  ModuleEuler[4][1] =    0.00*deg;
+  ModuleEuler[4][2] =    0.00*deg;
+  ModuleEuler[5][0] =  235.58*deg;    //  5    North
+  ModuleEuler[5][1] =   63.43495*deg;
+  ModuleEuler[5][2] =   16.420*deg;
+  ModuleEuler[6][0] =   91.58*deg;    //  6    North
+  ModuleEuler[6][1] =   63.43495*deg;
+  ModuleEuler[6][2] =   16.420*deg;
+  ModuleEuler[7][0] =   91.58*deg;    //  7    South
+  ModuleEuler[7][1] =   63.43495*deg;
+  ModuleEuler[7][2] =   88.420*deg;
+  ModuleEuler[8][0] =   91.58*deg;    //  8    South
+  ModuleEuler[8][1] =   63.43495*deg;
+  ModuleEuler[8][2] =  160.420*deg;
+  ModuleEuler[9][0] =   91.58*deg;    //  9    Split
+  ModuleEuler[9][1] =   63.43495*deg;
+  ModuleEuler[9][2] =  232.420*deg;
+  ModuleEuler[10][0] = -52.42*deg;    // 10    North
+  ModuleEuler[10][1] =   63.43495*deg;
+  ModuleEuler[10][2] =  304.420*deg;
+  ModuleEuler[11][0] = -340.42*deg;   // 11    North
+  ModuleEuler[11][1] =   63.43495*deg;
+  ModuleEuler[11][2] =  304.420*deg;
+  ModuleEuler[12][0] =  -52.42*deg;   // 12    North
   ModuleEuler[12][1] =   63.43495*deg;
   ModuleEuler[12][2] =   16.420*deg;
-  ModuleEuler[13][0] =   91.58*deg;      //  6    North
+  ModuleEuler[13][0] =   19.58*deg;   // 13    North
   ModuleEuler[13][1] =   63.43495*deg;
   ModuleEuler[13][2] =   16.420*deg;
-  ModuleEuler[14][0] =  -52.42*deg;      // 10    North
+  ModuleEuler[14][0] =  -52.42*deg;   // 14    North
   ModuleEuler[14][1] =   63.43495*deg;
-  ModuleEuler[14][2] =  304.420*deg;
-  ModuleEuler[15][0] = -340.42*deg;      // 11    North
+  ModuleEuler[14][2] =   88.420*deg;
+  ModuleEuler[15][0] =   19.58*deg;   // 15    South
   ModuleEuler[15][1] =   63.43495*deg;
-  ModuleEuler[15][2] =  304.420*deg;
-  ModuleEuler[16][0] =   19.58*deg;      // 13    North
+  ModuleEuler[15][2] =   88.420*deg;
+  ModuleEuler[16][0] =   -52.42*deg;  // 16    South
   ModuleEuler[16][1] =   63.43495*deg;
-  ModuleEuler[16][2] =   16.420*deg;
-  ModuleEuler[17][0] =  -52.42*deg;      // 14    North
+  ModuleEuler[16][2] =   160.420*deg;
+  ModuleEuler[17][0] =   19.58*deg;   // 17    South
   ModuleEuler[17][1] =   63.43495*deg;
-  ModuleEuler[17][2] =   88.420*deg;
-  ModuleEuler[18][0] =   55.58*deg;      // 20    North
-  ModuleEuler[18][1] =  116.56505*deg;
-  ModuleEuler[18][2] =  268.420*deg;
-  ModuleEuler[19][0] =  -88.42*deg;      // 21    North
-  ModuleEuler[19][1] =  116.56505*deg;
-  ModuleEuler[19][2] =   52.420*deg;
-  ModuleEuler[20][0] =  -16.42*deg;      // 25    North
+  ModuleEuler[17][2] =   160.420*deg;
+  ModuleEuler[18][0] =   -52.42*deg;  // 18    South
+  ModuleEuler[18][1] =   63.43495*deg;
+  ModuleEuler[18][2] =   232.420*deg;
+  ModuleEuler[19][0] =   19.58*deg;   // 19    South
+  ModuleEuler[19][1] =   63.43495*deg;
+  ModuleEuler[19][2] =   232.420*deg;
+  ModuleEuler[20][0] =   55.58*deg;   // 20    North
   ModuleEuler[20][1] =  116.56505*deg;
-  ModuleEuler[20][2] =  340.420*deg;
-  ModuleEuler[21][0] =  -16.42*deg;      // 26    North
+  ModuleEuler[20][2] =  268.420*deg;
+  ModuleEuler[21][0] =  -88.42*deg;   // 21    North
   ModuleEuler[21][1] =  116.56505*deg;
   ModuleEuler[21][2] =   52.420*deg;
+  ModuleEuler[22][0] =   55.58*deg;   // 22    Split
+  ModuleEuler[22][1] =  116.56505*deg;
+  ModuleEuler[22][2] =   52.420*deg;
+  ModuleEuler[23][0] =   55.58*deg;   // 23    South
+  ModuleEuler[23][1] =  116.56505*deg;
+  ModuleEuler[23][2] =  124.420*deg;
+  ModuleEuler[24][0] =   55.58*deg;   // 24    South
+  ModuleEuler[24][1] =  116.56505*deg;
+  ModuleEuler[24][2] =  196.420*deg;
+  ModuleEuler[25][0] =  -16.42*deg;   // 25    North
+  ModuleEuler[25][1] =  116.56505*deg;
+  ModuleEuler[25][2] =  340.420*deg;
+  ModuleEuler[26][0] =  -16.42*deg;   // 26    North
+  ModuleEuler[26][1] =  116.56505*deg;
+  ModuleEuler[26][2] =   52.420*deg;
+  ModuleEuler[27][0] =   -16.42*deg;  // 27    South
+  ModuleEuler[27][1] =   116.56505*deg;
+  ModuleEuler[27][2] =   124.420*deg;
+  ModuleEuler[28][0] =   -16.42*deg;  // 28    South
+  ModuleEuler[28][1] =   116.56505*deg;
+  ModuleEuler[28][2] =   196.420*deg;
+  ModuleEuler[29][0] =  -16.42*deg;   // 29    Split
+  ModuleEuler[29][1] =  116.56505*deg;
+  ModuleEuler[29][2] =  268.420*deg;
 
   matShell       = NULL;
   matShellName   = "Al";
@@ -116,14 +138,6 @@ Greta_Shell::Greta_Shell()
   Rot0.rotateZ( Pos0.getPhi() );
 
   Rot = G4RotationMatrix::IDENTITY;
-
-  PosNotch.setX(0.*cm);
-  PosNotch.setY(-13.287*2.54*cm);
-  PosNotch.setZ(14.646*2.54*cm+notchThickness/2.0);
-
-  PosPlane.setX(0.*cm);
-  PosPlane.setY(0.*cm);
-  PosPlane.setZ(-Rmax+19.567*2.54*cm);
 
 }
 
@@ -150,8 +164,8 @@ G4int Greta_Shell::FindMaterials()
 
 void Greta_Shell::Placement(G4String status)
 {
-  //  if ( status != "full" && status != "north" && status != "south" ){
-  if ( status != "Greta" ){
+  if ( status != "Greta" && 
+       status != "GretaLH" ){
     G4cout << "Shell status " << status << " is not defined." << G4endl;
     return;
   }
@@ -167,13 +181,7 @@ void Greta_Shell::Placement(G4String status)
 
   G4double Phi0 =   0.*deg;
   G4double dPhi = 360.*deg;
-  if(status == "north"){
-    Phi0 = -90.*deg;
-    dPhi = 180.*deg;
-  } else if(status == "south"){
-    Phi0 =  90.*deg;
-    dPhi = 180.*deg;
-  }
+
   G4Sphere* solidShell = new G4Sphere( "solidShell", Rmin, Rmax, Phi0, dPhi, 0., 180.*deg);
 
   // Beam Port  
@@ -181,33 +189,12 @@ void Greta_Shell::Placement(G4String status)
 
   G4SubtractionSolid* shell = new G4SubtractionSolid("Shell", solidShell, beamPort, G4Transform3D(Rot,G4ThreeVector(0.0,0.0,0.0)));
 
-  // Mounting-arm Ports
-  G4Tubs* mountPort = new G4Tubs( "mountPort", 0., mountPortRadius, 1.1*Rmax, 0.*deg, 360.*deg);
-
-  Rot.rotateY(90.0*deg);     
-
-  shell = new G4SubtractionSolid ("Shell",shell,mountPort,G4Transform3D(Rot,G4ThreeVector(0.0,0.0,0.0)));
-
-  // S800 Port
-  G4Tubs* S800Port = new G4Tubs( "S800Port", 0., S800PortRadius, 4*(Rmax-Rmin)/2., 0., 360.*deg);
-
-  Rot.rotateY(90.0*deg);
-
-  shell = new G4SubtractionSolid ("Shell",shell,S800Port,G4Transform3D(Rot,G4ThreeVector(0.0,0.0,(Rmax+Rmin)/2))); 
-
-  //  G4Tubs* Dewar = new G4Tubs("Dewar", 0, .8*modulePortRadius, .7*(Rmin)/2., 0.*deg, 360.*deg);
-
-  //  G4LogicalVolume* logicDewar = new G4LogicalVolume(Dewar, matShell, "Dewar_log", 0, 0, 0 );
-
   // Subtract the small ports from the shell.
   G4Tubs* smallPort = new G4Tubs("smallPort", 0, smallPortRadius, 1.5*(Rmax-Rmin)/2., 0., 360.*deg);
 
   G4int iMin = 0;
   G4int iMax = 10;
-  if(status == "north")
-    iMin = 5;
-  if(status == "south")
-    iMax = 5;
+
   for(G4int i = iMin; i<iMax; i++){
     Rot = G4RotationMatrix::IDENTITY;
     Rot.rotateY( PosSP[i].getTheta() );
@@ -215,15 +202,25 @@ void Greta_Shell::Placement(G4String status)
     shell = new G4SubtractionSolid ("Shell",shell,smallPort,G4Transform3D(Rot,PosSP[i]));
   }
 
+  // Make space for the LH target
+  if( status == "GretaLH"){
+    G4Box* PortBox = new G4Box("PortBox", modulePortRadius, Rmax-Rmin, modulePortRadius);
+
+    Rot = G4RotationMatrix::IDENTITY;
+
+    shell = new G4SubtractionSolid ("Shell",shell,PortBox,
+				    G4Transform3D(Rot,
+						  G4ThreeVector(0.,
+								(Rmax+Rmin)/2.,
+								0.0)));
+  }
+
   // Subtract the module ports from the shell.
   G4Tubs* modulePort = new G4Tubs("modulePort", 0, modulePortRadius, 1.5*(Rmax-Rmin)/2., 0., 360.*deg);
 
   iMin = 0;
-  iMax = 22;
-  if(status == "north")
-    iMin = 10;
-  if(status == "south")
-    iMax = 12;
+  iMax = 30;
+
   for(G4int i = iMin; i<iMax; i++){
     Pos = Pos0;
     Pos.rotateZ(ModuleEuler[i][0]);
@@ -236,36 +233,7 @@ void Greta_Shell::Placement(G4String status)
     shell = new G4SubtractionSolid ("Shell",shell,modulePort,G4Transform3D(Rot,Pos));
   }
 
-
-  //  new G4PVPlacement(G4Transform3D(Rot,Pos*.86), logicDewar, "LNDewar", theDetector->HallLog(), false, 0 );
-
-  //  new G4PVPlacement(G4Transform3D(Rot,Pos*.86), logicDewar, "LNDewar", theDetector->HallLog(), false, 0 );
-
-  //  new G4PVPlacement(G4Transform3D(Rot,Pos*.86), logicDewar, "LNDewar", theDetector->HallLog(), false, 0 );
-
-  //  new G4PVPlacement(G4Transform3D(Rot,Pos*.86), logicDewar, "LNDewar", theDetector->HallLog(), false, 0 );
-
-  //  new G4PVPlacement(G4Transform3D(Rot,Pos*.86), logicDewar, "LNDewar", theDetector->HallLog(), false, 0 );
-
-  //  new G4PVPlacement(G4Transform3D(Rot,Pos*.86), logicDewar, "LNDewar", theDetector->HallLog(), false, 0 );
-
-  //  new G4PVPlacement(G4Transform3D(Rot,Pos*.86), logicDewar, "LNDewar", theDetector->HallLog(), false, 0 );
-
-  G4Box* s800notch = new G4Box("s800notch", notchWidth/2.0, 40*cm, notchThickness/2.0);
-
   Rot = G4RotationMatrix::IDENTITY;
-
-  shell = new G4SubtractionSolid ("Shell",shell,s800notch,G4Transform3D(Rot,PosNotch));
-
-  G4Tubs* s800plane = new G4Tubs( "s800plane", 0., 1.1*Rmax, Rmax, 0., 360.*deg);
-
-  Rot = G4RotationMatrix::IDENTITY;
-
-  //  G4LogicalVolume* logicPlane = new G4LogicalVolume(s800plane, matShell, "Plane_log", 0, 0, 0 );
-
-  //  new G4PVPlacement(G4Transform3D(Rot,PosPlane), logicPlane, "Plane_log", theDetector->HallLog(), false, 0 );
-
-  //  G4IntersectionSolid* Shell = new G4IntersectionSolid ("Shell",shell,s800plane,G4Transform3D(Rot,PosPlane));
 
   G4LogicalVolume* logicShell = new G4LogicalVolume(shell, matShell, "Shell_log", 0, 0, 0 );
 

@@ -16,6 +16,7 @@
   elementV  = new G4Element("Vanadium",  "V", 23., 50.9415*g/mole);
   elementFe = new G4Element("Iron",      "Fe",26.,  55.845*g/mole);
   elementCo = new G4Element("Cobalt",    "Co",27., 58.9332*g/mole);
+  elementNi = new G4Element("Nickel",    "Ni",28., 58.6934*g/mole);
   elementCu = new G4Element("Copper",    "Cu",29.,   63.55*g/mole);
   elementMo = new G4Element("Molybdenum","Mo",42.,   95.94*g/mole);
   elementSn = new G4Element("Tin",       "Sn",50., 118.710*g/mole);
@@ -71,6 +72,7 @@
   Au = new G4Material("Au",       79., 196.9*g/mole,    19.32*g/cm3);
   Be = new G4Material("Be",        4., 9.012182*g/mole,  1.84*g/cm3);
   Si = new G4Material("Si",       14., 28.0855*g/mole,   2.33*g/cm3);
+  Ni = new G4Material("Ni",       28., 58.6934*g/mole,  8.908*g/cm3);
   Sn = new G4Material("Sn",       50., 118.710*g/mole,  7.365*g/cm3);
   Ir = new G4Material("Ir",       77., 192.217*g/mole,  22.65*g/cm3);
   Au = new G4Material("Au",       79., 196.9*g/mole,    19.32*g/cm3);

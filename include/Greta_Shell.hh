@@ -48,20 +48,14 @@ private:
   ////////////////////////////
   G4double         Rmin;
   G4double         Rmax;
-  G4double         mountPortRadius;
   G4double         smallPortRadius;
   G4double         modulePortRadius;
-  G4double         S800PortRadius;
-  G4double         notchWidth;
-  G4double         notchThickness;
   G4ThreeVector    Pos;
   G4ThreeVector    Pos0;
-  G4ThreeVector    PosNotch;
-  G4ThreeVector    PosPlane;
   G4RotationMatrix Rot;
   G4RotationMatrix Rot0;
   G4ThreeVector    PosSP[10];
-  G4double         ModuleEuler[22][3];
+  G4double         ModuleEuler[30][3];
 
 public:
     G4int  FindMaterials();

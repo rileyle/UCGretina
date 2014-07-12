@@ -60,16 +60,17 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
   RepCmd = new G4UIcmdWithoutParameter("/BeamOut/Report",this);
   RepCmd->SetGuidance("Report parameters for the outgoing beam.");
 
+  ThMinCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/ThetaMin",this);
+  ThMinCmd->SetGuidance("Set minimum scattering angle for the reaction product");
+  ThMinCmd->SetParameterName("choice",false);
+  ThMinCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   ThMTCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/ThetaMax",this);
-  ThMTCmd->SetGuidance("Set maximum scattering angle for ions Coulomb scattered on the target");
+  ThMTCmd->SetGuidance("Set maximum scattering angle for the reaction product");
   ThMTCmd->SetParameterName("choice",false);
   ThMTCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
   
-  AphTCmd = new G4UIcmdWithADouble("/BeamOut/AngDistAlpha",this);
-  AphTCmd->SetGuidance("Set alpha coefficient for angular distribution of ions Coulomb scattered on the target");
-  AphTCmd->SetParameterName("choice",false);
-  AphTCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-    // TB added sigma_a and sigma_b instead of just sigma
+  // TB added sigma_a and sigma_b instead of just sigma
   DistSigACmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/AngDistSigmaA",this); //LR
   DistSigACmd->SetGuidance("Set sigma coefficient for Gaussian distribution of ions scattered on the target"); //LR
   DistSigACmd->SetParameterName("choice",false); //LR
@@ -79,7 +80,12 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
   DistSigBCmd->SetGuidance("Set sigma coefficient for Gaussian distribution of ions scattered on the target"); //LR
   DistSigBCmd->SetParameterName("choice",false); //LR
   DistSigBCmd->AvailableForStates(G4State_PreInit,G4State_Idle); //LR
-  
+
+  XsectCmd = new G4UIcmdWithAString("/BeamOut/XsectFile",this);
+  XsectCmd->SetGuidance("Set the differential cross section filename.");
+  XsectCmd->SetParameterName("choice",false);
+  XsectCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   QDir = new G4UIdirectory("/BeamOut/Q/");
   QDir->SetGuidance("Charge state control for the outgoing beam.");
 
@@ -118,12 +124,13 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
   QKEuCmd->SetParameterName("choice",false);
   QKEuCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-	a0cmd = new G4UIcmdWithADouble("/BeamOut/seta0",this);
-	a2cmd = new G4UIcmdWithADouble("/BeamOut/seta2",this);
-	a4cmd = new G4UIcmdWithADouble("/BeamOut/seta4",this);
-	a0Targetcmd = new G4UIcmdWithADouble("/BeamOut/setTargeta0",this);
-	a2Targetcmd = new G4UIcmdWithADouble("/BeamOut/setTargeta2",this);
-	a4Targetcmd = new G4UIcmdWithADouble("/BeamOut/setTargeta4",this);
+  a0cmd = new G4UIcmdWithADouble("/BeamOut/seta0",this);
+  a2cmd = new G4UIcmdWithADouble("/BeamOut/seta2",this);
+  a4cmd = new G4UIcmdWithADouble("/BeamOut/seta4",this);
+  a0Targetcmd = new G4UIcmdWithADouble("/BeamOut/setTargeta0",this);
+  a2Targetcmd = new G4UIcmdWithADouble("/BeamOut/setTargeta2",this);
+  a4Targetcmd = new G4UIcmdWithADouble("/BeamOut/setTargeta4",this);
+
 }
 
 
@@ -142,10 +149,11 @@ Outgoing_Beam_Messenger::~Outgoing_Beam_Messenger()
   delete RepCmd;
   delete DZCmd;
   delete DACmd;
+  delete ThMinCmd;
   delete ThMTCmd;
-  delete AphTCmd;
   delete DistSigACmd;
   delete DistSigBCmd;
+  delete XsectCmd;
   delete QDir;
   delete NQCmd;
   delete SQCmd;
@@ -154,12 +162,12 @@ Outgoing_Beam_Messenger::~Outgoing_Beam_Messenger()
   delete QRFCmd;
   delete QKECmd;
   delete QKEuCmd;
-	delete a0Targetcmd;
-	delete a2Targetcmd;
-	delete a4Targetcmd;
-	delete a0cmd;
-	delete a2cmd;
-	delete a4cmd;
+  delete a0Targetcmd;
+  delete a2Targetcmd;
+  delete a4Targetcmd;
+  delete a0cmd;
+  delete a2cmd;
+  delete a4cmd;
 }
 
 
@@ -194,14 +202,16 @@ void Outgoing_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamOut->settau(tauCmd->GetNewDoubleValue(newValue));}
   if( command == RepCmd )
     { BeamOut->Report();}
+  if( command == ThMinCmd )
+    { BeamOut->SetThetaMin(ThMinCmd->GetNewDoubleValue(newValue));}
   if( command == ThMTCmd )
-    { BeamOut->SetThetaMaxTarget(ThMTCmd->GetNewDoubleValue(newValue));}
-  if( command == AphTCmd )
-    { BeamOut->SetAlphaTarget(AphTCmd->GetNewDoubleValue(newValue));}
+    { BeamOut->SetThetaMax(ThMTCmd->GetNewDoubleValue(newValue));}
   if( command == DistSigACmd )
     { BeamOut->SetThetaSigmaA(DistSigACmd->GetNewDoubleValue(newValue));}
   if( command == DistSigBCmd )
     { BeamOut->SetThetaSigmaB(DistSigBCmd->GetNewDoubleValue(newValue));}
+  if( command == XsectCmd )
+    { BeamOut->setXsectFile(newValue);}
   if( command == NQCmd )
     { BeamOut->SetNQ(NQCmd->GetNewIntValue(newValue));}
   if( command == SQCmd )

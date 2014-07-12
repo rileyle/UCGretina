@@ -30,12 +30,12 @@ G4VPhysicalVolume* Target::Construct()
 
   aTarget = new G4Box("target",Target_side_x/2.,Target_side_y/2.,Target_thickness/2.);
 
-  Target_log = new G4LogicalVolume(aTarget,TargetMaterial,"target_log",0,0,0);
+  Target_log = new G4LogicalVolume(aTarget,TargetMaterial,"Target_log",0,0,0);
   target_limits= new G4UserLimits();
   target_limits->SetMaxAllowedStep(Target_thickness/NStep);
   Target_log->SetUserLimits(target_limits);
 
-  Target_phys = new G4PVPlacement(G4Transform3D(Rot,*Pos),Target_log,"target",expHall_log,false,0);
+  Target_phys = new G4PVPlacement(G4Transform3D(Rot,*Pos),Target_log,"Target",expHall_log,false,0);
 
   G4Colour red (1.0,0.0, 0.0); 
   G4VisAttributes* Vis_6 = new G4VisAttributes(red);

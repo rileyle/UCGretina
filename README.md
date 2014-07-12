@@ -73,13 +73,30 @@ Mandatory command for building the beam tube:
 
     /BeamTube/Construct
 
+
+Mandatory command for building the WU chamber:
+
+    /WUChamber/Construct
+
+Mandatory command for building the GRETA chamber (spherical chamber
+with 36 cm OD and 1.5 mm wall thickness, and a beam pipe with 4 cm OD
+and 1.5 mm wall thickness):
+
+    /GretaChamber/Construct
+
+Optional commands for setting GRETA chamber geometry:
+
+    /GretaChamber/R_min <double> <unit>
+
+    /GretaChamber/R_max <double> <unit>
+
 Optional commands for including Gretina-related dead material:
 
     /Gretina/detector/enableCapsules
 
     /Gretina/detector/enableCryostats
 
-    /Gretina/Shell < full || north || south >
+    /Gretina/Shell < full || north || south || Greta >
 
 Mandatory command after setting any GRETINA parameters:
 
@@ -214,6 +231,24 @@ Commands related to the outgoing reaction product:
 > superseded by a level scheme file if a /BeamOut/LevelSchemeFile
 > command is present.
 
+    /BeamOut/XsectFile <filename>
+
+> The differential cross section file is a text file containing a
+> lab-frame scattering angle distribution. 
+> The format of the level scheme file:
+
+>       <Minimum Theta [deg]> <Maximum Theta [deg]> <Theta bin width [deg]> 
+>       <Channel 1 differential cross section [arbitrary units]>
+>       <Channel 2 differential cross section [arbitrary units]>
+>       <Channel 3 differential cross section [arbitrary units]>
+>       ...
+
+> If this file is presnet, the 2-body reaction will draw from this
+> distribution to determine the scattering-angle for each event. The
+> minimum and maximum scattering angles read from this file supersede
+> values set with the /BeamOut/ThetaMin and /BeamOut/ThetaMax
+> commands.
+
     /BeamOut/AngDistSigmaA <double> <unit>
 
     /BeamOut/AngDistSigmaB <double> <unit>
@@ -221,7 +256,17 @@ Commands related to the outgoing reaction product:
 > Angular spreads of the lab-frame scattering angle distribution of
 > the outgoing beam-like reaction products in the dispersive 
 > and nondispersive directions, respectively. The 2-body reaction
-> kinematics draw from this scattering-angle distribution.
+> kinematics draw from this scattering-angle distribution. This is
+> the alternative to providing a lab-frame scattering-angle distribution 
+> with the /BeamOut/XsectFile command.
+
+    /BeamOut/ThetaMin <double> <unit>
+
+    /BeamOut/ThetaMax <double> <unit>
+
+> Limits of the scattering angle distribution used in the 2-body
+> reaction kinematics. If a scattering-angle distribution is supplied
+> with the /BeamOut/XsectFile command, these values are superseded.
 
     /BeamOut/seta0 <double> 
 
@@ -320,9 +365,13 @@ Mandatory commands for running background simulations
 
     /Experiment/RunSource
 
-    /Experiment/Source/Set <background || muons>
+    /Experiment/Source/Set <background || bgwhite || muon>
 
-> The background source type emits several gamma rays from a solid spherical shell surrounding GRETINA. The muon source type emits 4.0 GeV muons vertically from obove GRETINA.
+> The background source type emits several gamma rays from a solid
+> spherical shell surrounding GRETINA. The bgwhite source type emits
+> gamma rays from a uniform energy distribution from the solid
+> shell. The muon source type emits 4.0 GeV muons vertically from
+> above GRETINA. 
 
 Optional commands describing the spherical shell surrounding GRETINA from which background gamma-rays are emitted.
 

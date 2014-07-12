@@ -12,6 +12,7 @@ Outgoing_Beam::Outgoing_Beam()
   DA=0;
   Ex=1.0*MeV;
   lvlSchemeFileName = "";
+  xsectFileName = "";
   Nlevels = 1;
   TarEx=0.*keV;
   TarA = 1;
@@ -22,11 +23,11 @@ Outgoing_Beam::Outgoing_Beam()
   targetExcitation=false;
   reacted=false;
   source=false;
-  alpha=20.;
   sigma_a=0.;
   sigma_b=0.;
-  theta_max=-1.;
-  Calc_pmax();
+  theta_max=180.*deg;
+  theta_min=0.;
+  theta_bin=0.;
   twopi=8.*atan(1.);
   NQ=1;SQ=0;
   SetUpChargeStates();
@@ -364,7 +365,8 @@ G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
   // If theta3 is beyond the limit dictated by the kinematics
   // or if an angle cut is specified ...
   while( sin(theta3)*sin(theta3) > sin2theta3_max
-	 || (theta_max > 0. && theta3 > theta_max) ){
+	 || (theta3 < theta_min)
+	 || (theta3 > theta_max) ){
     theta3=GetDTheta();
   }
 
@@ -422,22 +424,47 @@ G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
 //---------------------------------------------------------
 G4double Outgoing_Beam::GetDTheta()
 {
-  G4double theta_a,theta_b,theta;
 
-  theta_a = CLHEP::RandGauss::shoot(0,sigma_a);
-  theta_b = CLHEP::RandGauss::shoot(0,sigma_b);
-  theta = sqrt(theta_a*theta_a+theta_b*theta_b);
+  G4double theta;
+  if(xsectFileName == ""){
+    G4double theta_a,theta_b;
+    theta_a = CLHEP::RandGauss::shoot(0,sigma_a);
+    theta_b = CLHEP::RandGauss::shoot(0,sigma_b);
+    theta = sqrt(theta_a*theta_a+theta_b*theta_b);
+  } else {
+    CLHEP::RandGeneral randTheta( Xsect, Nxsect );
+    theta = theta_min + randTheta.fire()*(theta_max-theta_min);
+  }
 
   return theta;
 }
 //---------------------------------------------------------
-void Outgoing_Beam::Calc_pmax()
+void Outgoing_Beam::setXsectFile(G4String fileName)
 {
+ 
+  char line[1000];
 
-  G4double delta;
-  delta=alpha/2.-1./12.;
-  pmax=(1.+delta*theta_max*theta_max)*theta_max*theta_max;
-    
+  xsectFileName = fileName;
+  std::ifstream xsectFile;
+  xsectFile.open(xsectFileName);
+
+  xsectFile >> theta_min >> theta_max >> theta_bin;
+  xsectFile.getline(line,1000);  // Advance to next line.
+
+  theta_min *= deg;
+  theta_max *= deg;
+  theta_bin *= deg;
+
+  G4double x;
+  Nxsect = 0;
+  while(xsectFile >> x){
+    xsectFile.getline(line,1000);  // Advance to next line.
+    Xsect[Nxsect] = x*sin( theta_min + (Nxsect+0.5)*theta_bin );
+    Nxsect++;
+  }
+
+  xsectFile.close();
+
 }
 //---------------------------------------------------------
 void Outgoing_Beam::Report()

@@ -13,6 +13,7 @@
 #include "PrimaryGeneratorAction.hh"
 #include "PrimaryGeneratorAction_Messenger.hh"
 #include "TrackingAction.hh"
+#include "SteppingAction.hh"
 #include "EventAction.hh"
 #include "EventAction_Messenger.hh"
 #include "RunAction.hh"
@@ -68,6 +69,9 @@ int main(int argc,char** argv)
 
   TrackingAction* trackingAction = new TrackingAction(eventAction);
   runManager->SetUserAction(trackingAction);
+
+  SteppingAction* steppingAction = new SteppingAction();
+  runManager->SetUserAction(steppingAction);
 
   G4UIsession* session=0;
 

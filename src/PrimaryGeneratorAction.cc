@@ -204,6 +204,8 @@ void PrimaryGeneratorAction::SetSourceType(G4String name) //LR
     SetSourceWhite();
   } else if (name == "background") {
     SetSourceBG();
+  } else if (name == "bgwhite") {
+    SetSourceBGWhite();
   } else if (name == "muon") {
     SetSourceMuon();
   } else if (name == "simple") {
@@ -654,6 +656,21 @@ void PrimaryGeneratorAction::SetSourceWhite()
   TheSource.clear();
 }
 //-------------------------------------------------------------------------
+void PrimaryGeneratorAction::SetSourceBGWhite()
+{
+  sourceType = "bgwhite";
+
+  sourceBranchingSum=0.;
+
+  // start from the beginning of the array
+  vector<SourceData*>::iterator itPos = TheSource.begin();
+  // clear all elements from the array
+  for(; itPos < TheSource.end(); itPos++)
+    delete *itPos;    // free the element from memory
+   // finally, clear all elements from the array
+  TheSource.clear();
+}
+//-------------------------------------------------------------------------
 void PrimaryGeneratorAction::SetSourceBG()
 {
   background = true;
@@ -723,7 +740,7 @@ G4double PrimaryGeneratorAction::GetSourceEnergy()
 {
  
   G4double rand;
-  if(sourceType != "white"){
+  if(sourceType != "white" && sourceType != "bgwhite"){
 
     rand=G4UniformRand()*sourceBranchingSum;
 
