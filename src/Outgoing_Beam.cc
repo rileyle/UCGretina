@@ -54,14 +54,21 @@ void Outgoing_Beam::setDecayProperties()
     exit(EXIT_FAILURE);
   }
 
+  G4cout << " mark 1" << G4endl;
+
   Zin = beamIn->getZ();
   Ain = beamIn->getA();
+
+  G4cout << " mark 2" << G4endl;
 
   // Load the particle table
   beam     = G4ParticleTable::GetParticleTable()->GetIon(Zin,Ain,0.);
   ion      = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,Ex);
   ionGS    = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,0.);
   ionGS->SetPDGStable(true);
+
+  G4cout << " mark 3" << G4endl;
+  G4cout << " TarA = " << TarA << ", TarZ = " << TarZ << G4endl;
 
   if(TarA == 1 && TarZ ==1)
     tarIn = G4ParticleTable::GetParticleTable()->FindParticle("proton");
@@ -71,6 +78,8 @@ void Outgoing_Beam::setDecayProperties()
     tarIn = G4ParticleTable::GetParticleTable()->FindParticle("triton");
   else if (TarA == 3 && TarZ ==2)
     tarIn = G4ParticleTable::GetParticleTable()->FindParticle("He3");
+  else if (TarA == 1 && TarZ ==0)
+    tarIn = G4ParticleTable::GetParticleTable()->FindParticle("neutron");
   else
     tarIn = G4ParticleTable::GetParticleTable()->GetIon(TarZ,    TarA,    0.);
 
@@ -86,12 +95,16 @@ void Outgoing_Beam::setDecayProperties()
   } else if(TarA-DA == 3 && TarZ-DZ ==2) {
     tarOut = G4ParticleTable::GetParticleTable()->FindParticle("He3");
     tarOutGS = tarOut;
+  } else if(TarA-DA == 1 && TarZ-DZ ==0) {
+    tarOut = G4ParticleTable::GetParticleTable()->FindParticle("neutron");
+    tarOutGS = tarOut;
   } else {
     tarOut = G4ParticleTable::GetParticleTable()->GetIon(TarZ-DZ, TarA-DA, Ex);
     tarOutGS = G4ParticleTable::GetParticleTable()->GetIon(TarZ-DZ, TarA-DA, 0.);
   }
   tarOutGS->SetPDGStable(true);
 
+  G4cout << " mark 4" << G4endl;
 
   if (ion == NULL) {
     G4cerr << "Error: no outgoing ion in particle table "

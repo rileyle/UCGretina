@@ -31,7 +31,10 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
     = (EventInformation*)eventAction->GetEvent()->GetUserInformation();
 
   // Emitted gamma
-  if( aTrack->GetParticleDefinition()->GetParticleName() == "gamma" &&
+  if( ( aTrack->GetParticleDefinition()->GetParticleName() == "gamma" ||
+	aTrack->GetParticleDefinition()->GetParticleName() == "mu+" ||
+	aTrack->GetParticleDefinition()->GetParticleName() == "mu-" )
+      &&
       ( aTrack->GetParentID() == 0 ||
 	aTrack->GetCreatorProcess()->GetProcessName() == "Decay" ||
 	aTrack->GetCreatorProcess()->GetProcessName() == "Reaction" ) ){

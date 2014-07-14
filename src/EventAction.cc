@@ -100,18 +100,18 @@ void EventAction::EndOfEventAction(const G4Event* e)
 
       // Packing: consolidate interaction points within segments 
       // based on proximity. 
-      G4int trackID[1000];
-      G4int detNum[1000];
-      G4int segNum[1000];
-      G4double measuredEdep[1000];
-      G4double segmentEdep[1000];
-      G4double measuredX[1000];
-      G4double measuredY[1000];
-      G4double measuredZ[1000];
-      G4double X0[1000];
-      G4double Y0[1000];
-      G4double Z0[1000];
-      G4int NCons[1000];
+      G4int trackID[10000];
+      G4int detNum[10000];
+      G4int segNum[10000];
+      G4double measuredEdep[10000];
+      G4double segmentEdep[10000];
+      G4double measuredX[10000];
+      G4double measuredY[10000];
+      G4double measuredZ[10000];
+      G4double X0[10000];
+      G4double Y0[10000];
+      G4double Z0[10000];
+      G4int NCons[10000];
       G4double packingRes2 = packingRes*packingRes;
 
       G4int NMeasured = 0;
@@ -515,10 +515,10 @@ void EventAction::writeDecomp(long long int ts,
 {
   G4int siz;
   GEBDATA gd;
-  CRYS_IPS crys_ips[1000];
+  CRYS_IPS crys_ips[10000];
 
   G4int Ndecomp = 0;
-  G4bool Processed[1000];
+  G4bool Processed[10000];
   for(G4int i = 0; i < NMeasured; i++)
     Processed[i] = false;
 
@@ -585,6 +585,11 @@ void EventAction::writeDecomp(long long int ts,
     gd.type = GEB_TYPE_DECOMP;
     gd.timestamp = ts;
     gd.length = sizeof(CRYS_IPS);
+
+    if(Ndecomp > MAX_INTPTS)
+      G4cout << "Warning: " << Ndecomp << " interaction points."
+	     << "         only " << MAX_INTPTS << " can be written."
+	     << G4endl;
 
     for(G4int i = 0; i < Ndecomp; i++){
       //Write GEB header for decomp event
