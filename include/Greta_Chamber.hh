@@ -17,6 +17,7 @@
 #include "G4RotationMatrix.hh"
 #include "G4Transform3D.hh"
 #include "G4UnitsTable.hh"
+#include "G4SystemOfUnits.hh"
 
 class Greta_Chamber 
 {
@@ -30,6 +31,7 @@ public:
   G4VPhysicalVolume *Construct();
   void setRmin(G4double r){ Rmin = r; }
   void setRmax(G4double r){ Rmax = r; }
+  void setCutaway(){ Cutaway = true; }
   void Report();
   
 private:
@@ -49,6 +51,8 @@ private:
  
   //physical volume
   G4VPhysicalVolume* Chamber_phys;
+
+  G4bool Cutaway;
 
 };
 

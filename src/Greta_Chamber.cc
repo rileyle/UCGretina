@@ -15,6 +15,8 @@ Greta_Chamber::Greta_Chamber(G4LogicalVolume* experimentalHall_log,Materials* ma
 
   ChamberMaterial = materials->FindMaterial("Al");
 
+  Cutaway = false;
+
 }
 
 Greta_Chamber::~Greta_Chamber()
@@ -23,8 +25,15 @@ Greta_Chamber::~Greta_Chamber()
 G4VPhysicalVolume* Greta_Chamber::Construct()
 {
 
+  G4double Phi0 = 0.*deg;
+  G4double dPhi = 360.*deg;
+  if(Cutaway){
+    Phi0 = -90.*deg;
+    dPhi = 180.*deg;
+  }
+
   G4Sphere* sphere = new G4Sphere("sphere", Rmin, Rmax, 
-				  0., 360.*deg, 0., 180.*deg);
+				  Phi0, dPhi, 0., 180.*deg);
 
   G4Tubs* drill = new G4Tubs("drill", 0, BTrmax, 1.1*Rmax, 0., 360.*deg);
 
@@ -42,7 +51,8 @@ G4VPhysicalVolume* Greta_Chamber::Construct()
 				    Chamber_log, "Chamber_phys",
 				    expHall_log, false, 0);
 
-  G4Tubs* BeamTube = new G4Tubs("BeamTube", BTrmin, BTrmax, BTDz, 0., 360.*deg);
+  G4Tubs* BeamTube = new G4Tubs("BeamTube", BTrmin, BTrmax, BTDz, 
+				Phi0, dPhi);
 
   G4LogicalVolume* BeamTube_log = new G4LogicalVolume(BeamTube, 
 						      ChamberMaterial,
@@ -88,6 +98,7 @@ void Greta_Chamber::Report()
      G4cout<<"----> Greta beam tube inner radius set to "<<G4BestUnit(BTrmin,"Length")<< G4endl;
      G4cout<<"----> Greta beam tube outer radius set to "<<G4BestUnit(BTrmax,"Length")<< G4endl;
      G4cout<<"----> Greta beam tube length set to       "<<G4BestUnit(2.*BTDz,"Length")<< G4endl;
-
+     if(Cutaway)
+       G4cout<<"----> Constructing the cutaway view. For visualization only!"<< G4endl;
 }
 #endif

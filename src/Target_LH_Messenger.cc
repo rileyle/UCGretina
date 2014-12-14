@@ -49,11 +49,14 @@ Target_Messenger::Target_Messenger(Target* Tar)
   sledCmd = new G4UIcmdWithoutParameter("/Target/Sled",this);
   sledCmd->SetGuidance("Construct the target sled.");  
 
-  RepCmd = new G4UIcmdWithoutParameter("/Target/Report",this);
-  RepCmd->SetGuidance("Report target parameters");  
-
   GCmd = new G4UIcmdWithoutParameter("/Target/Greta",this);
   GCmd->SetGuidance("Construct the Greta LH target");
+
+  CutCmd = new G4UIcmdWithoutParameter("/Target/Cutaway",this);
+  CutCmd->SetGuidance("Build a cutaway view of the beamline tee and flanges. For visualization only!");  
+
+  RepCmd = new G4UIcmdWithoutParameter("/Target/Report",this);
+  RepCmd->SetGuidance("Report target parameters");  
 
 }
 
@@ -72,8 +75,9 @@ Target_Messenger::~Target_Messenger()
   delete NSCmd;
   delete sFCmd;
   delete sledCmd;
-  delete RepCmd;
   delete GCmd;
+  delete CutCmd;
+  delete RepCmd;
 }
 
 
@@ -97,9 +101,11 @@ void Target_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
     { aTarget->setSourceFrame(newValue); }
   if( command == sledCmd )
     { aTarget->setSled(); }
-  if( command == RepCmd )
-    { aTarget->Report(); }
   if( command == GCmd )
     { aTarget->SetGreta(); }
+  if( command == CutCmd )
+    { aTarget->setCutaway(); }
+  if( command == RepCmd )
+    { aTarget->Report(); }
 }
 #endif

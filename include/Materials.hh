@@ -3,6 +3,7 @@
 
 #include "G4Material.hh"
 #include "G4NistManager.hh"
+#include "G4SystemOfUnits.hh"
 
 class Materials 
 {

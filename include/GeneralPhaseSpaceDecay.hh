@@ -42,6 +42,8 @@
 #include "G4VDecayChannel.hh"     //LR
 #include "G4HadronicException.hh"
 #include "AngularDistribution.hh"
+#include "G4SystemOfUnits.hh"
+
 class G4GeneralPhaseSpaceDecay : public G4VDecayChannel
 {
   public:

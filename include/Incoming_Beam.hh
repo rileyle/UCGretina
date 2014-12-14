@@ -2,11 +2,14 @@
 #define Incoming_Beam_h 1
 
 #include "globals.hh"
-#include "G4UnitsTable.hh"
 #include "G4ThreeVector.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4DynamicParticle.hh"
 #include "Randomize.hh"
+#include "G4UnitsTable.hh"
+#include "G4SystemOfUnits.hh"
+
+
 class Incoming_Beam
 {
 public:

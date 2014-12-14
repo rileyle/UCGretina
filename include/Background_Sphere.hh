@@ -14,6 +14,7 @@
 #include "G4RotationMatrix.hh"
 #include "G4Transform3D.hh"
 #include "G4UnitsTable.hh"
+#include "G4SystemOfUnits.hh"
 
 class Background_Sphere 
 {

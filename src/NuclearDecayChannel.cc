@@ -69,6 +69,8 @@
 #include "G4AtomicShell.hh"
 #include "G4AtomicDeexcitation.hh"
 
+using namespace CLHEP;
+
 const G4double G4NuclearDecayChannel:: pTolerance = 0.001;
 const G4double G4NuclearDecayChannel:: levelTolerance = 2.0*keV;
 //const G4bool G4NuclearDecayChannel:: FermiOn = true;

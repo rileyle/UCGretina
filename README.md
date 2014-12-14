@@ -1,13 +1,13 @@
-## Compile and install UCGretina ##
+# UCGretina v2.9.1 #
+
+## Compile and install ##
 
 Install version 4.9.6.p03 of the Geant4 libraries from
 http://geant4.web.cern.ch/geant4/support/download.shtml. You will need
 the data files for low energy electromagnetic processes. 
 
-_Important note: UCGretina is not compatible with the latest version
-(4.10.x) of the Geant4 libraries. The GRETINA detector geometry code
-currently relies on a deprecated class (BREPSolid) that has been
-removed in Geant4.10._
+_Important note: UCGretina is not yet compatible with the latest
+version (4.10.x) of the Geant4 libraries._
 
 Set up your environment (consider adding this to your .bashrc):
 
@@ -96,7 +96,7 @@ Optional commands for including Gretina-related dead material:
 
     /Gretina/detector/enableCryostats
 
-    /Gretina/Shell < full || north || south || Greta >
+    /Gretina/Shell < full || north || south || Greta || GretaLH || Greta_North || Greta_South || GretaLH_North || GretaLH_South >
 
 Mandatory command after setting any GRETINA parameters:
 

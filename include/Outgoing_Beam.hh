@@ -54,8 +54,8 @@ public:
   void SetSource(){source=true;}
   void SetThetaMin(G4double t){theta_min=t;}
   void SetThetaMax(G4double t){theta_max=t;}
-  void SetThetaSigmaA(G4double s){sigma_a=s;} //LR // TB
-  void SetThetaSigmaB(G4double s){sigma_b=s;} //LR // TB
+  void SetThetaSigmaA(G4double sig){sigma_a=sig;} //LR // TB
+  void SetThetaSigmaB(G4double sig){sigma_b=sig;} //LR // TB
 
   G4ParticleTable* particleTable; 
   G4DynamicParticle* ReactionProduct();

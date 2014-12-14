@@ -48,6 +48,8 @@ Target::Target(G4LogicalVolume* experimentalHall_log,Materials* mat)
 
   Greta = false;
 
+  Cutaway = false;
+
 }
 
 Target::~Target()
@@ -167,14 +169,34 @@ void Target::ConstructBeamTube(){
 			    BellowsFlangePos, 
 			    &BellowsFlangeRot);
 
+
+  // Visualization Attributes
+
+  G4Colour lblue (0.0, 1.0, 1.0, 0.3); 
+  G4VisAttributes* Vis = new G4VisAttributes(lblue);
+  Vis->SetVisibility(true);
+  Vis->SetForceSolid(false);
+
+  BeamTube_log->SetVisAttributes(Vis);
+  BeamTee_log->SetVisAttributes(Vis);
+  BeamTeeFlange_log->SetVisAttributes(Vis);
+  BellowsFlange_log->SetVisAttributes(Vis);
+
 }
 //-----------------------------------------------------------------------------
 void Target::ConstructGretaChamber(){
 
+  G4double Phi0 = 0.*deg;
+  G4double dPhi = 360.*deg;
+  if(Cutaway){
+    Phi0 = -90.*deg;
+    dPhi = 180.*deg;
+  }
+
   // Beam line segments
 
   G4Tubs* BeamTube = new G4Tubs("BeamTube", GretaBTrmin, GretaBTrmax, 
-				 GretaBTDz, 0.*deg, 360.*deg); 
+				GretaBTDz, Phi0, dPhi); 
 
   G4LogicalVolume* BeamTube_log = new G4LogicalVolume(BeamTube, 
 						      Aluminum,
@@ -194,15 +216,14 @@ void Target::ConstructGretaChamber(){
 
   // Target tee
   G4Tubs* BeamTee = new G4Tubs("BeamTee", BeamTeeRmin, BeamTeeRmax, 
-			       BeamTeeDz, 0.*deg, 360.*deg); 
+			       BeamTeeDz, Phi0, dPhi); 
 
   G4RotationMatrix BeamTeeRot = NoRot;
   BeamTeeRot.rotateX(90.0*deg);
 
   G4ThreeVector* BeamTeeOffset 
-    = new G4ThreeVector(0., BeamTeeDz+
-			sqrt(GretaChamberRmin*GretaChamberRmin 
-			     -BeamTeeDz*BeamTeeDz), 
+    = new G4ThreeVector(0., sqrt(GretaChamberRmin*GretaChamberRmin 
+				 -BeamTeeRmax*BeamTeeRmax) + BeamTeeDz, 
 			0.);
 
   G4LogicalVolume* BeamTee_log
@@ -212,7 +233,7 @@ void Target::ConstructGretaChamber(){
 
   // Chamber
   G4Sphere* sphere = new G4Sphere("sphere", GretaChamberRmin, GretaChamberRmax, 
-				  0., 360.*deg, 0., 180.*deg);
+				  Phi0, dPhi, 0., 180.*deg);
 
   G4Tubs* drill = new G4Tubs("drill", 0, GretaBTrmax, 1.1*GretaChamberRmax, 
 			     0., 360.*deg);
@@ -240,7 +261,7 @@ void Target::ConstructGretaChamber(){
   // Flanges
   G4Tubs* BeamTeeFlange = new G4Tubs("BeamTeeFlange", 
 				     4.915*cm, 9.0*cm, 1.194*cm/2.,
-				     0., 360.*deg);
+				     Phi0, dPhi);
 
   G4LogicalVolume* BeamTeeFlange_log
     = new G4LogicalVolume(BeamTeeFlange, Aluminum, "BeamTeeFlange_log", 0, 0, 0);
@@ -252,7 +273,7 @@ void Target::ConstructGretaChamber(){
     = G4ThreeVector(0., 
 		    2.*BeamTeeDz +
 		    sqrt(GretaChamberRmin*GretaChamberRmin 
-			 -BeamTeeDz*BeamTeeDz));
+			 -BeamTeeRmax*BeamTeeRmax));
 
   LHTarget->AddPlacedVolume(BeamTeeFlange_log, 
 			    BeamTeeFlangePos, 
@@ -261,7 +282,7 @@ void Target::ConstructGretaChamber(){
   // DIMENSIONS APPROXIMATE
   G4Tubs* BellowsFlange = new G4Tubs("BellowsFlange",
 				     4.*2.54/2*cm, 9.*2.54/2*cm, 
-				     0.5*2.54/2*cm, 0.*deg, 360.*deg); 
+				     0.5*2.54/2*cm, Phi0, dPhi); 
 
   G4LogicalVolume* BellowsFlange_log
     = new G4LogicalVolume(BellowsFlange, StainlessSteel, "BellowsFlange_log", 0, 0, 0);
@@ -273,13 +294,26 @@ void Target::ConstructGretaChamber(){
     = G4ThreeVector(0., 
 		    2.*BeamTeeDz +
 		    sqrt(GretaChamberRmin*GretaChamberRmin 
-			 -BeamTeeDz*BeamTeeDz)
+			 -BeamTeeRmax*BeamTeeRmax)
 		    +0.75/2*cm,
 		    0.);
 
   LHTarget->AddPlacedVolume(BellowsFlange_log, 
 			    BellowsFlangePos, 
 			    &BellowsFlangeRot);
+
+  // Visualization Attributes
+
+  G4Colour lblue (0.0, 1.0, 1.0, 0.3); 
+  G4VisAttributes* Vis = new G4VisAttributes(lblue);
+  Vis->SetVisibility(true);
+  Vis->SetForceSolid(false);
+
+  BeamTube_log->SetVisAttributes(Vis);
+  BeamTee_log->SetVisAttributes(Vis);
+  Chamber_log->SetVisAttributes(Vis);
+  BeamTeeFlange_log->SetVisAttributes(Vis);
+  BellowsFlange_log->SetVisAttributes(Vis);
 
 }
 //-----------------------------------------------------------------------------
@@ -824,6 +858,13 @@ void Target::ConstructCryo(){
 
   // Radiation Shield ==================
 
+  G4double Phi0 = 0.*deg;
+  G4double dPhi = 360.*deg;
+  if(Cutaway){
+    Phi0 = -90.*deg;
+    dPhi = 180.*deg;
+  }
+
   const G4double RSzPlane[6] = { 0.,       0.32*cm,  0.32*cm,  
 				 49.19*cm, 49.19*cm, 50.14*cm};
   const G4double RSrInner[6] = { 0.,       0.,       3.64*cm,
@@ -832,7 +873,7 @@ void Target::ConstructCryo(){
 				 3.81*cm,  5.87*cm,  5.87*cm};
 
   G4Polycone* RadiationShield0 = new G4Polycone("RadiationShield0",  
-						0., 360.*deg,
+						Phi0, dPhi,
 						6, 
 						RSzPlane, 
 						RSrInner, 
@@ -892,6 +933,10 @@ void Target::setNStep(G4int n)
 void Target::Report()
 {
   G4cout<<"----> Using the " << targetCellType << " target cell." << G4endl;
+  if(Greta)
+      G4cout<<"----> Constructing the GRETA target." << G4endl;
+  if(Cutaway)
+      G4cout<<"----> Constructing the cutaway view. For visualization only!" << G4endl;
   G4cout<<"----> Target bulge thickness set to " << BulgeDz/mm << " mm." << G4endl;
   G4cout<<"----> Target angle set to " << targetAngle/deg << " deg." << G4endl;
   G4cout<<"----> Target material set to  "<<Target_log->GetMaterial()->GetName()<< G4endl;   

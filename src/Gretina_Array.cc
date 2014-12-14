@@ -1546,10 +1546,17 @@ G4int Gretina_Array::CalculateSegments(G4int iPg)
   G4int nsegs    = nsides * nslices;
    
   // vertices of inner and outer face of crystal
+#ifdef G4V10
+  G4Point3D* vertexF1;
+  G4Point3D* vertexF2;
+  vertexF1= new G4Point3D[nsides];
+  vertexF2= new G4Point3D[nsides];
+#else
   G4Point3DVector vertexF1;
   G4Point3DVector vertexF2;
   vertexF1.resize(nsides);
   vertexF2.resize(nsides);
+#endif
 
   // for consistency, the points taken directly from CConvexPolyhedron
   for( sector=0; sector<nsides; sector++ ) {

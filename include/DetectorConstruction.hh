@@ -62,15 +62,15 @@ public:
 
   void DefineMaterials();
 
-  void SetTargetStatus(G4bool s){targetStatus = s;}
+  void SetTargetStatus(G4bool stat){targetStatus = stat;}
 
 #ifndef LHTARGET
-  void SetBeamTubeStatus(G4bool s){beamTubeStatus = s;}
-  void SetGretaChamberStatus(G4bool s){gretaChamberStatus = s;}
-  void SetWUChamberStatus(G4bool s){WUChamberStatus = s;}
+  void SetBeamTubeStatus(G4bool stat){beamTubeStatus = stat;}
+  void SetGretaChamberStatus(G4bool stat){gretaChamberStatus = stat;}
+  void SetWUChamberStatus(G4bool stat){WUChamberStatus = stat;}
 #endif
 
-  void SetShellStatus(G4String s){shellStatus = s;}
+  void SetShellStatus(G4String stat){shellStatus = stat;}
 
   void Placement();
 

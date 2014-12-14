@@ -30,7 +30,7 @@ G4VPhysicalVolume* Beam_Tube::Construct()
 
   // Visualization Attributes
 
-  G4Colour lblue (0.0, 1.0, 1.0,0.3); 
+  G4Colour lblue (0.0, 1.0, 1.0, 0.3); 
   G4VisAttributes* Vis = new G4VisAttributes(lblue);
   Vis->SetVisibility(true);
   Vis->SetForceSolid(false);

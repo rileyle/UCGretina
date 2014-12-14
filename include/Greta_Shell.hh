@@ -56,6 +56,8 @@ private:
   G4RotationMatrix Rot0;
   G4ThreeVector    PosSP[10];
   G4double         ModuleEuler[30][3];
+  G4int            SmallPortStatus[10];
+  G4int            ModulePortStatus[30];
 
 public:
     G4int  FindMaterials();

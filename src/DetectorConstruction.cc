@@ -7,6 +7,7 @@ DetectorConstruction::DetectorConstruction()
 #ifndef LHTARGET
   beamTubeStatus = false;
   gretaChamberStatus = false;
+  WUChamberStatus = false;
 #endif
 
   shellStatus    = "";
@@ -95,7 +96,7 @@ void DetectorConstruction::DefineMaterials()
   G4double a, z, density, temperature, pressure;
   G4double fractionmass;
   G4String name, symbol;
-  G4int    nelements, natoms, nprot, nnucl, ncomponents;
+  G4int    nelements, natoms, nprot, nnucl;
 
   std::vector<G4Element*>  myElements;    // save pointers here to avoid
   std::vector<G4Material*> myMaterials;   // warnings of unused variables
@@ -206,7 +207,11 @@ void DetectorConstruction::Placement()
     Gretina_NSCL_Shell* Shell = new Gretina_NSCL_Shell();
     Shell->Placement(shellStatus);
   } else if ( shellStatus == "Greta" ||
-	      shellStatus == "GretaLH" ){
+	      shellStatus == "GretaLH" || 
+	      shellStatus == "Greta_North" ||
+	      shellStatus == "Greta_South" ||
+	      shellStatus == "GretaLH_North" ||
+	      shellStatus == "GretaLH_South" ){
     Greta_Shell* Shell = new Greta_Shell();
     Shell->Placement(shellStatus);
   }
@@ -253,7 +258,7 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
   commandName = "/WUChamber/Construct";
   aLine = commandName.c_str();
   WUChamberCmd = new G4UIcmdWithoutParameter(aLine, this);
-  WUChamberCmd->SetGuidance("Construct the Greta chamber.");
+  WUChamberCmd->SetGuidance("Construct the WU chamber.");
   WUChamberCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 #endif
 

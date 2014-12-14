@@ -58,9 +58,13 @@
 #include "G4MuMultipleScattering.hh"
 #include "G4hMultipleScattering.hh"
 #include "G4MscStepLimitType.hh"
+#ifdef G4V10
+#include "G4UrbanMscModel.hh"
+#else
 #include "G4UrbanMscModel93.hh"
 #include "G4UrbanMscModel95.hh"
 #include "G4UrbanMscModel96.hh"
+#endif
 #include "G4DummyModel.hh"
 #include "G4WentzelVIModel.hh"
 #include "G4CoulombScattering.hh"
@@ -207,9 +211,15 @@ void EmStandardPhysics_option4_mod::ConstructProcess()
   G4NuclearStopping* pnuc = new G4NuclearStopping();
 
   // Add standard EM Processes
+#ifdef G4V10
+  aParticleIterator->reset();
+  while( (*aParticleIterator)() ){
+    G4ParticleDefinition* particle = aParticleIterator->value();
+#else
   theParticleIterator->reset();
   while( (*theParticleIterator)() ){
     G4ParticleDefinition* particle = theParticleIterator->value();
+#endif
     G4String particleName = particle->GetParticleName();
     if(verbose > 1)
       G4cout << "### " << GetPhysicsName() << " instantiates for " 
@@ -220,9 +230,14 @@ void EmStandardPhysics_option4_mod::ConstructProcess()
       // Compton scattering
       G4ComptonScattering* cs = new G4ComptonScattering;
       cs->SetEmModel(new G4KleinNishinaModel(),1);
+#ifdef G4V10
+      G4VEmModel* theLowEPComptonModel = new G4LowEPComptonModel();
+      theLowEPComptonModel->SetHighEnergyLimit(20*MeV);
+#else
       G4VEmModel* theLowEPComptonModel = new G4LivermoreComptonModel();
       //G4VEmModel* theLowEPComptonModel = new G4LowEPComptonModel();
       theLowEPComptonModel->SetHighEnergyLimit(2*MeV);
+#endif
       cs->AddEmModel(0, theLowEPComptonModel);
       ph->RegisterProcess(cs, particle);
 
@@ -248,7 +263,11 @@ void EmStandardPhysics_option4_mod::ConstructProcess()
       // multiple scattering
       G4eMultipleScattering* msc = new G4eMultipleScattering;
       msc->SetStepLimitType(fUseDistanceToBoundary);
+#ifdef G4V10
+      G4UrbanMscModel* msc1 = new G4UrbanMscModel();
+#else
       G4UrbanMscModel96* msc1 = new G4UrbanMscModel96();
+#endif
       G4WentzelVIModel* msc2 = new G4WentzelVIModel();
       msc1->SetHighEnergyLimit(highEnergyLimit);
       msc2->SetLowEnergyLimit(highEnergyLimit);
@@ -283,7 +302,11 @@ void EmStandardPhysics_option4_mod::ConstructProcess()
       // multiple scattering
       G4eMultipleScattering* msc = new G4eMultipleScattering;
       msc->SetStepLimitType(fUseDistanceToBoundary);
+#ifdef G4V10
+      G4UrbanMscModel* msc1 = new G4UrbanMscModel();
+#else
       G4UrbanMscModel96* msc1 = new G4UrbanMscModel96();
+#endif
       G4WentzelVIModel* msc2 = new G4WentzelVIModel();
       msc1->SetHighEnergyLimit(highEnergyLimit);
       msc2->SetLowEnergyLimit(highEnergyLimit);
@@ -311,10 +334,8 @@ void EmStandardPhysics_option4_mod::ConstructProcess()
       ph->RegisterProcess(msc, particle);
       ph->RegisterProcess(eIoni, particle);
       ph->RegisterProcess(eBrem, particle);
-      ph->RegisterProcess(ss, particle);
-
-      // annihilation at rest and in flight
       ph->RegisterProcess(new G4eplusAnnihilation(), particle);
+      ph->RegisterProcess(ss, particle);
 
     } else if (particleName == "mu+" ||
                particleName == "mu-"    ) {

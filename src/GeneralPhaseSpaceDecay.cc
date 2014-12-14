@@ -45,6 +45,8 @@
 #include "G4ios.hh"
 #include "AngularDistribution.hh"
 
+using namespace CLHEP;
+
 G4GeneralPhaseSpaceDecay::G4GeneralPhaseSpaceDecay(AngularDistribution theAngularDistribution,
 																							G4int Verbose) : 
                           G4VDecayChannel("Phase Space",Verbose),

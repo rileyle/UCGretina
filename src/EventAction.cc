@@ -32,9 +32,9 @@ EventAction::~EventAction()
   ;
 }
 
-void EventAction::BeginOfEventAction(const G4Event* e)
+void EventAction::BeginOfEventAction(const G4Event* ev)
 {
-  evt = e;
+  evt = ev;
 
   // Add a G4UserEventInformation object to store event info
   G4EventManager::
@@ -53,9 +53,9 @@ void EventAction::BeginOfEventAction(const G4Event* e)
 }
 
 
-void EventAction::EndOfEventAction(const G4Event* e)
+void EventAction::EndOfEventAction(const G4Event* ev)
 {
-  evt = e;
+  evt = ev;
 
   ios::fmtflags f( G4cout.flags() );
 
@@ -136,8 +136,8 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	  y = (*gammaCollection)[i]->GetPos().getY()/mm;
 	  z = (*gammaCollection)[i]->GetPos().getZ()/mm;
 	}
-	G4double e  = (*gammaCollection)[i]->GetEdep()/keV;
-	totalEdep += e;
+	G4double en  = (*gammaCollection)[i]->GetEdep()/keV;
+	totalEdep += en;
 
 	NCons[i] = -1;
 	G4bool processed = false;	
@@ -152,7 +152,7 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	     && (y - measuredY[i-1])*(y - measuredY[i-1]) < 0.001*mm*0.001*mm
 	     && (z - measuredZ[i-1])*(z - measuredZ[i-1]) < 0.001*mm*0.001*mm){
 
-	    measuredEdep[NMeasured-1] += e; 
+	    measuredEdep[NMeasured-1] += en; 
 	    processed = true;
 
 	  } else {
@@ -163,7 +163,7 @@ void EventAction::EndOfEventAction(const G4Event* e)
 
 	    // This becomes the total energy deposit associated with this 
 	    // interaction.
-	    measuredEdep[NMeasured] = e; 
+	    measuredEdep[NMeasured] = en; 
 
 	    // This becomes the barycenter of all energy depositions associated
 	    // with this interaction.
@@ -210,10 +210,10 @@ void EventAction::EndOfEventAction(const G4Event* e)
 		&& (*gammaCollection)[i]->GetDetNumb() == detNum[j]){        // same crystal
 
 	      // Energy-weighted average position (barycenter)
-	      measuredX[j] = (measuredEdep[j]*measuredX[j] + e*x)/(measuredEdep[j] + e);
-	      measuredY[j] = (measuredEdep[j]*measuredY[j] + e*y)/(measuredEdep[j] + e);
-	      measuredZ[j] = (measuredEdep[j]*measuredZ[j] + e*z)/(measuredEdep[j] + e);
-	      measuredEdep[j] += e;
+	      measuredX[j] = (measuredEdep[j]*measuredX[j] + en*x)/(measuredEdep[j] + en);
+	      measuredY[j] = (measuredEdep[j]*measuredY[j] + en*y)/(measuredEdep[j] + en);
+	      measuredZ[j] = (measuredEdep[j]*measuredZ[j] + en*z)/(measuredEdep[j] + en);
+	      measuredEdep[j] += en;
 
 	      NCons[j]++;
 	      processed = true;
@@ -234,7 +234,7 @@ void EventAction::EndOfEventAction(const G4Event* e)
 	  trackID[NMeasured]      = (*gammaCollection)[i]->GetTrackID();
 	  detNum[NMeasured]       = (*gammaCollection)[i]->GetDetNumb();
 	  segNum[NMeasured]       = (*gammaCollection)[i]->GetSegNumb();
-	  measuredEdep[NMeasured] = e;
+	  measuredEdep[NMeasured] = en;
 	  measuredX[NMeasured]    = x;
 	  measuredY[NMeasured]    = y;
 	  measuredZ[NMeasured]    = z;
@@ -503,7 +503,7 @@ void EventAction::writeS800(long long int ts, G4double a, G4double b,
 	   << std::right << std::setw(12) 
 	   << a << std::setw(12) << b << std::setw(12) 
 	   << d << std::setw(12) << y << std::setw(12) 
-	   << (G4int)ts/10000
+	   << ts/10000
 	   << G4endl;
 }
 // --------------------------------------------------
@@ -609,7 +609,7 @@ void EventAction::writeDecomp(long long int ts,
 
   if(evOut){
     evfile << "D" << std::setw(4) << Ndecomp 
-	   << std::setw(12) << (G4int)ts/10000 << G4endl;
+    	   << std::setw(12) << ts/10000 << G4endl;
     for(G4int i = 0; i < Ndecomp; i++){
       evfile << "C" << std::setw(4) << crys_ips[i].crystal_id
 	     << std::setw(4) << crys_ips[i].num << G4endl;
@@ -672,7 +672,7 @@ void EventAction::writeSim(long long int ts, EventInformation* eventInfo)
   if(evOut){
     evfile << "E" << std::setw(4) << eventInfo->GetNEmittedGammas()  
 	   << std::setw(4) << eventInfo->GetFullEnergy()  
-	   << std::setw(12) << (G4int)ts/10000 << G4endl;
+	   << std::setw(12) << ts/10000 << G4endl;
     for(G4int i = 0; i < eventInfo->GetNEmittedGammas(); i++)
       evfile << "     "
 	     << std::fixed << std::setprecision(4) 
@@ -791,8 +791,8 @@ void EventAction::SetCrmatFile(G4String name) {
       for(int j=0;j<MAXCRYSTALNO;j++){
 	G4cout << "Hole : " << i << "\tCrystal: " << j << endl;
 	for(int k=0;k<4;k++){	
-	  for(int m=0;m<4;m++){
-	    G4cout << crmat[i][j][k][m] << "\t";
+	  for(int l=0;l<4;l++){
+	    G4cout << crmat[i][j][k][l] << "\t";
 	  }
 	  G4cout << endl;
 	} 

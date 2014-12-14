@@ -3,6 +3,7 @@
 
 #include "globals.hh"
 #include "G4UnitsTable.hh"
+#include "G4SystemOfUnits.hh"
 
 class Charge_State
 {

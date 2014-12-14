@@ -32,6 +32,8 @@
 #include "G4Transform3D.hh"
 #include <vector>
 
+#include "G4SystemOfUnits.hh"
+
 class Gretina_Array_Messenger;
 
 using namespace std;

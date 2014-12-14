@@ -58,6 +58,7 @@ class Target
   void setSourceFrame(G4String);
   void setSled();
   void SetGreta(){ Greta = true; }
+  void setCutaway(){ Cutaway = true; }
   void Report();
   G4LogicalVolume* GetTargetLog(){return Target_log;}
   G4UnionSolid* GetTarget(){return aTarget;}
@@ -211,6 +212,7 @@ private:
   G4double targetDensity;
 
   G4bool Greta;
+  G4bool Cutaway;
 
 };
 

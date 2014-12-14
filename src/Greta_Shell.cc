@@ -23,6 +23,18 @@ Greta_Shell::Greta_Shell()
   PosSP[8] = G4ThreeVector( 484.135*mm, -172.202*mm, -256.924*mm);
   PosSP[9] = G4ThreeVector( 492.891*mm,  145.253*mm,  256.924*mm);
 
+  // North: -1,  Split: 0,  South: 1
+  SmallPortStatus[0] = -1;
+  SmallPortStatus[1] = 1;
+  SmallPortStatus[2] = 1;
+  SmallPortStatus[3] = -1;
+  SmallPortStatus[4] = -1;
+  SmallPortStatus[5] = 1;
+  SmallPortStatus[6] = 1;
+  SmallPortStatus[7] = -1;
+  SmallPortStatus[8] = -1;
+  SmallPortStatus[9] = 1;
+
   // Module Port Euler angles (relative to Slot 0)
   // Psi                              Slot   Hemisphere
   // Theta
@@ -119,6 +131,38 @@ Greta_Shell::Greta_Shell()
   ModuleEuler[29][1] =  116.56505*deg;
   ModuleEuler[29][2] =  268.420*deg;
 
+  // North: -1,  Split: 0,  South: 1
+  ModulePortStatus[0]  = -1;
+  ModulePortStatus[1]  = -1;
+  ModulePortStatus[2]  = 0;
+  ModulePortStatus[3]  = 1;
+  ModulePortStatus[4]  = 1;
+  ModulePortStatus[5]  = -1;
+  ModulePortStatus[6]  = -1;
+  ModulePortStatus[7]  = 1;
+  ModulePortStatus[8]  = 1;
+  ModulePortStatus[9]  = 0;
+  ModulePortStatus[10]  = -1;
+  ModulePortStatus[11]  = -1;
+  ModulePortStatus[12]  = -1;
+  ModulePortStatus[13]  = -1;
+  ModulePortStatus[14]  = -1;
+  ModulePortStatus[15]  = 1;
+  ModulePortStatus[16]  = 1;
+  ModulePortStatus[17]  = 1;
+  ModulePortStatus[18]  = 1;
+  ModulePortStatus[19]  = 1;
+  ModulePortStatus[20]  = -1;
+  ModulePortStatus[21]  = -1;
+  ModulePortStatus[22]  = 0;
+  ModulePortStatus[23]  = 1;
+  ModulePortStatus[24]  = 1;
+  ModulePortStatus[25]  = -1;
+  ModulePortStatus[26]  = -1;
+  ModulePortStatus[27]  = 1;
+  ModulePortStatus[28]  = 1;
+  ModulePortStatus[29]  = 0;
+
   matShell       = NULL;
   matShellName   = "Al";
 
@@ -165,7 +209,11 @@ G4int Greta_Shell::FindMaterials()
 void Greta_Shell::Placement(G4String status)
 {
   if ( status != "Greta" && 
-       status != "GretaLH" ){
+       status != "GretaLH" &&
+       status != "Greta_North" && 
+       status != "Greta_South" &&
+       status != "GretaLH_North" && 
+       status != "GretaLH_South"){
     G4cout << "Shell status " << status << " is not defined." << G4endl;
     return;
   }
@@ -179,8 +227,18 @@ void Greta_Shell::Placement(G4String status)
   // The GRETA mounting shell
   //////////////////////////////////////////////////
 
-  G4double Phi0 =   0.*deg;
-  G4double dPhi = 360.*deg;
+  G4double Phi0 = 0*deg;
+  G4double dPhi = 360*deg;
+
+  if (status == "Greta_North" || status == "GretaLH_North" ) {
+	Phi0 =  -90.*deg;
+        dPhi = 180.*deg;
+  }
+
+  if (status == "Greta_South" || status == "GretaLH_South" ) {
+	Phi0 =  90.*deg;
+        dPhi = 180.*deg;
+  }
 
   G4Sphere* solidShell = new G4Sphere( "solidShell", Rmin, Rmax, Phi0, dPhi, 0., 180.*deg);
 
@@ -199,11 +257,15 @@ void Greta_Shell::Placement(G4String status)
     Rot = G4RotationMatrix::IDENTITY;
     Rot.rotateY( PosSP[i].getTheta() );
     Rot.rotateZ( PosSP[i].getPhi() );
-    shell = new G4SubtractionSolid ("Shell",shell,smallPort,G4Transform3D(Rot,PosSP[i]));
-  }
+    if( ( ( status == "Greta_North" || status == "GretaLH_North" ) && ModulePortStatus[i] == -1 ) ||
+        ( ( status == "Greta_South" || status == "GretaLH_South" ) && ModulePortStatus[i] ==  1 ) ||
+	status == "Greta" ||
+        status == "GretaLH" )
+      shell = new G4SubtractionSolid ("Shell",shell,smallPort,G4Transform3D(Rot,PosSP[i]));
+  } 
 
   // Make space for the LH target
-  if( status == "GretaLH"){
+  if( status == "GretaLH" || status == "GretaLH_North" || status == "GretaLH_South"){
     G4Box* PortBox = new G4Box("PortBox", modulePortRadius, Rmax-Rmin, modulePortRadius);
 
     Rot = G4RotationMatrix::IDENTITY;
@@ -230,10 +292,15 @@ void Greta_Shell::Placement(G4String status)
     Rot.rotateY( Pos.getTheta() );
     Rot.rotateZ( Pos.getPhi() );
 
-    shell = new G4SubtractionSolid ("Shell",shell,modulePort,G4Transform3D(Rot,Pos));
-  }
+    if( ( ( status == "Greta_North" || status == "GretaLH_North" )
+	  && ModulePortStatus[i] == -1 ) ||
+        ( ( status == "Greta_South" || status == "GretaLH_South" ) 
+	  && ModulePortStatus[i] ==  1 ) ||
+	status == "Greta" ||
+        status == "GretaLH" )
+          shell = new G4SubtractionSolid ("Shell",shell,modulePort,G4Transform3D(Rot,Pos));	
 
-  Rot = G4RotationMatrix::IDENTITY;
+  }
 
   G4LogicalVolume* logicShell = new G4LogicalVolume(shell, matShell, "Shell_log", 0, 0, 0 );
 

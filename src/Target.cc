@@ -37,8 +37,8 @@ G4VPhysicalVolume* Target::Construct()
 
   Target_phys = new G4PVPlacement(G4Transform3D(Rot,*Pos),Target_log,"Target",expHall_log,false,0);
 
-  G4Colour red (1.0,0.0, 0.0); 
-  G4VisAttributes* Vis_6 = new G4VisAttributes(red);
+  G4Colour blue (0.0, 0.0, 1.0); 
+  G4VisAttributes* Vis_6 = new G4VisAttributes(blue);
   if(TargetMaterial->GetName() == "G4_Galactic"){
     Vis_6->SetVisibility(false);
   } else {
@@ -101,8 +101,8 @@ void Target::setMaterial(G4String materialName)
   Target_log->SetMaterial(TargetMaterial);
   G4cout<<"----> Target material set to     "<<Target_log->GetMaterial()->GetName()<< G4endl;        
 
-  G4Colour red (1.0,0.0, 0.0); 
-  G4VisAttributes* Vis_6 = new G4VisAttributes(red);
+  G4Colour blue (0.0, 0.0, 1.0); 
+  G4VisAttributes* Vis_6 = new G4VisAttributes(blue);
   if(TargetMaterial->GetName() == "G4_Galactic"){
     Vis_6->SetVisibility(false);
   } else {

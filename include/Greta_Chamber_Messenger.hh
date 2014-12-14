@@ -25,6 +25,7 @@ class Greta_Chamber_Messenger: public G4UImessenger
     G4UIcmdWithADoubleAndUnit* RmaxCmd;
     G4UIcmdWithADoubleAndUnit* RminCmd;
     G4UIcmdWithoutParameter*   RepCmd;
+    G4UIcmdWithoutParameter*   CutCmd;
 
 };
 

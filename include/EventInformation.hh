@@ -4,6 +4,7 @@
 #include "G4VUserEventInformation.hh"
 #include "G4ThreeVector.hh"
 #include "GEB.hh"
+#include "G4SystemOfUnits.hh"
 
 class EventInformation : public G4VUserEventInformation
 {

@@ -54,21 +54,14 @@ void Outgoing_Beam::setDecayProperties()
     exit(EXIT_FAILURE);
   }
 
-  G4cout << " mark 1" << G4endl;
-
   Zin = beamIn->getZ();
   Ain = beamIn->getA();
-
-  G4cout << " mark 2" << G4endl;
 
   // Load the particle table
   beam     = G4ParticleTable::GetParticleTable()->GetIon(Zin,Ain,0.);
   ion      = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,Ex);
   ionGS    = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,0.);
   ionGS->SetPDGStable(true);
-
-  G4cout << " mark 3" << G4endl;
-  G4cout << " TarA = " << TarA << ", TarZ = " << TarZ << G4endl;
 
   if(TarA == 1 && TarZ ==1)
     tarIn = G4ParticleTable::GetParticleTable()->FindParticle("proton");
@@ -83,7 +76,10 @@ void Outgoing_Beam::setDecayProperties()
   else
     tarIn = G4ParticleTable::GetParticleTable()->GetIon(TarZ,    TarA,    0.);
 
-  if(TarA-DA == 1 && TarZ-DZ ==1){
+  if(DA == 0){
+    tarOut   = tarIn;
+    tarOutGS = tarIn;
+  } else if(TarA-DA == 1 && TarZ-DZ ==1){
     tarOut = G4ParticleTable::GetParticleTable()->FindParticle("proton");
     tarOutGS = tarOut;
   } else if(TarA-DA == 2 && TarZ-DZ ==1){
@@ -104,7 +100,6 @@ void Outgoing_Beam::setDecayProperties()
   }
   tarOutGS->SetPDGStable(true);
 
-  G4cout << " mark 4" << G4endl;
 
   if (ion == NULL) {
     G4cerr << "Error: no outgoing ion in particle table "
@@ -186,12 +181,12 @@ void Outgoing_Beam::setDecayProperties()
       DecTab = new G4DecayTable();
       product->SetDecayTable(DecTab);
     }
-    GammaDecayChannel *GamDec = new GammaDecayChannel(-1,product,1,Ex,0.,theAngularDistribution);
+    GamDec = new GammaDecayChannel(-1,product,1,Ex,0.,theAngularDistribution);
     DecTab->Insert(GamDec);
     //    DecTab->DumpInfo();
 
     // make sure that the ion has the decay process in its manager
-    G4ProcessManager *pm = product->GetProcessManager();
+    pm = product->GetProcessManager();
     if (pm == NULL) {
       G4cerr << "Could not find process manager for reaction product." << G4endl;
       exit(EXIT_FAILURE);
