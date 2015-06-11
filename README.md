@@ -9,6 +9,11 @@ the data files for low energy electromagnetic processes.
 _Important note: UCGretina is not yet compatible with the latest
 version (4.10.x) of the Geant4 libraries._
 
+Simulating the LBL scanning table requires the external
+[CADMesh](https://github.com/christopherpoole/cadmesh) package. Paths
+to the CADMesh include and lib directories must be set in the
+GNUMakefile.
+
 Set up your environment (consider adding this to your .bashrc):
 
     $ source <G4INSTALL>/share/Geant4-9.6.3/geant4make/geant4make.sh
@@ -23,8 +28,13 @@ To use the liquid hydrogen target:
 
 (produces the binary UCGretina_LH)
 
-The executables UCGretina and UCGretina_LH are automatically installed
-in
+To use the LBL scanning table:
+
+    $ make SCANNING=1
+
+(produces the binary UCGretina_Scan)
+
+Executables are automatically installed in
 
     $G4WORKDIR/bin/$G4SYSTEM
 
