@@ -1,0 +1,25 @@
+/ExpHall/X_length 2. m
+/ExpHall/Y_length 2. m
+/ExpHall/Z_length 2. m
+# Detector parameters ==========================================================
+/Gretina/detector/enableCapsules
+/ScanningTable/CADModelPath ../../cadModels
+#/Target/Construct
+/Gretina/update
+# Source parameters ============================================================
+/Experiment/RunSource
+/Experiment/Source/Set cs137
+/Experiment/Source/setX 0. mm
+/Experiment/Source/setY 195. mm
+/Experiment/Source/setZ -81.5 mm
+# Print simulation parameters to stdout ========================================
+/ExpHall/Report
+# Tracking parameters ==========================================================
+#/GammaPrint/Track_Set
+#/IonPrint/Track_Set
+# Output parameters ============================================================
+#/Mode2/crmatFile crmat.LINUX
+/Mode2/crystalXforms
+/Mode2/GretinaCoords
+/Mode2/Filename cs137.dat
+/run/beamOn 1000

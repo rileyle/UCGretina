@@ -77,6 +77,7 @@ int main(int argc,char** argv)
 
 #ifdef G4VIS_USE
   // visualization manager
+  cout << "Starting visualization...";
   G4VisManager* visManager=0;
 #endif
 
@@ -87,6 +88,7 @@ int main(int argc,char** argv)
       // visualization manager
       visManager = new VisManager; 
       visManager->Initialize();
+      cout << "Done!" << endl;
 #endif
 
 // G4UIterminal is a (dumb) terminal.

@@ -2,15 +2,21 @@
 
 DetectorConstruction::DetectorConstruction()
 {
-  targetStatus   = false;
 
+  targetStatus   = false;
+#ifndef SCANNING
+  shellStatus    = "";
+#endif
+  
 #ifndef LHTARGET
+#ifndef SCANNING
   beamTubeStatus = false;
   gretaChamberStatus = false;
   WUChamberStatus = false;
+#else
+  scanningTableStatus = true;
 #endif
-
-  shellStatus    = "";
+#endif
 
   myMessenger = new DetectorConstruction_Messenger(this);
 }
@@ -22,8 +28,12 @@ DetectorConstruction::~DetectorConstruction()
   delete TrackerIonSDMessenger;
   delete TrackerGammaSDMessenger;
 #ifndef LHTARGET
+#ifndef SCANNING
   delete BeamTubeMessenger;
   delete GretaChamberMessenger;
+#else
+  delete ScanningTableMessenger;
+#endif
 #endif
 }
 
@@ -63,6 +73,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   BackgroundSphere->Construct();
 
 #ifndef LHTARGET
+#ifndef SCANNING
   // Beam Tube
 
   BeamTube = new Beam_Tube(ExpHall_log,materials);
@@ -75,6 +86,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   // WU Chamber
   WUChamber = new WU_Chamber(ExpHall_log,materials);
+
+#else
+  // Scanning Table
+  scanningTable = new ScanningTable(ExpHall_log,materials);
+  ScanningTableMessenger = new ScanningTable_Messenger(scanningTable);
+#endif
 #endif
 
   // Target
@@ -179,6 +196,7 @@ void DetectorConstruction::Placement()
 {
 
 #ifndef LHTARGET
+#ifndef SCANNING
   // Beam Tube
   if( beamTubeStatus ){
     BeamTube->Construct();
@@ -193,6 +211,13 @@ void DetectorConstruction::Placement()
   if( WUChamberStatus ){
     WUChamber->Construct();
   }
+
+#else
+  // Scanning Table
+  if( scanningTableStatus ) {
+    scanningTable->Construct();
+  }
+#endif
 #endif
 
   // Target
@@ -201,6 +226,7 @@ void DetectorConstruction::Placement()
     aTarget->GetTargetLog()->SetSensitiveDetector(TrackerIon);
   }
 
+#ifndef SCANNING
   if( shellStatus == "full"  ||
       shellStatus == "north" ||
       shellStatus == "south"){
@@ -215,7 +241,8 @@ void DetectorConstruction::Placement()
     Greta_Shell* Shell = new Greta_Shell();
     Shell->Placement(shellStatus);
   }
-
+#endif
+  
   the_Gretina_Array->Placement();
 
 }
@@ -243,6 +270,7 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
   TargetCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
 #ifndef LHTARGET
+#ifndef SCANNING
   commandName = "/BeamTube/Construct";
   aLine = commandName.c_str();
   BeamTubeCmd = new G4UIcmdWithoutParameter(aLine, this);
@@ -260,25 +288,41 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
   WUChamberCmd = new G4UIcmdWithoutParameter(aLine, this);
   WUChamberCmd->SetGuidance("Construct the WU chamber.");
   WUChamberCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+#else
+  commandName = "/ScanningTable/Construct";
+  aLine = commandName.c_str();
+  ScanningTableCmd = new G4UIcmdWithoutParameter(aLine, this);
+  ScanningTableCmd->SetGuidance("Construct the scanning table.");
+  ScanningTableCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+#endif
 #endif
 
+#ifndef SCANNING
   commandName = "/Gretina/Shell";
   aLine = commandName.c_str();
   ShellCmd = new G4UIcmdWithAString(aLine, this);
   ShellCmd->SetGuidance("Construct the GRETINA mounting shell (full/north/south).");
   ShellCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
+#endif
+  
 }
 
 DetectorConstruction_Messenger::~DetectorConstruction_Messenger()
 {
   delete UpdateCmd;
   delete TargetCmd;
+#ifndef SCANNING
   delete ShellCmd;
+#endif
 #ifndef LHTARGET
+#ifndef SCANNING
   delete BeamTubeCmd;
   delete GretaChamberCmd;
   delete WUChamberCmd;
+#else
+  delete ScanningTableCmd;
+#endif
 #endif
 }
 
@@ -291,6 +335,7 @@ void DetectorConstruction_Messenger::SetNewValue(G4UIcommand* command,G4String n
     myTarget->SetTargetStatus(true);
   } 
 #ifndef LHTARGET
+#ifndef SCANNING
   if( command == BeamTubeCmd ) {
     myTarget->SetBeamTubeStatus(true);
   } 
@@ -299,9 +344,18 @@ void DetectorConstruction_Messenger::SetNewValue(G4UIcommand* command,G4String n
   } 
   if( command == WUChamberCmd ) {
     myTarget->SetWUChamberStatus(true);
-  } 
+  }
+#else
+  if( command == ScanningTableCmd ) {
+    myTarget->SetScanningTableStatus(true);
+  }
 #endif
+#endif
+
+#ifndef SCANNING
   if( command == ShellCmd ) {
     myTarget->SetShellStatus(newValue);
-  } 
+  }
+#endif
+
 }
