@@ -7,6 +7,7 @@ ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,Materials* ma
 
   materials=mat;
   expHall_log=experimentalHall_log;
+
   Pos0 = new G4ThreeVector(0., 0., 44.45*mm); // center flange @ (x,z) = (0,0)
 
   includeCartFrame  = false;
