@@ -10,8 +10,8 @@
 /Experiment/RunSource
 /Experiment/Source/Set cs137
 /Experiment/Source/setX 0. mm
-/Experiment/Source/setY 195. mm
-/Experiment/Source/setZ -81.5 mm
+/Experiment/Source/setY 200. mm
+/Experiment/Source/setZ -37.05 mm
 # Print simulation parameters to stdout ========================================
 /ExpHall/Report
 # Tracking parameters ==========================================================
