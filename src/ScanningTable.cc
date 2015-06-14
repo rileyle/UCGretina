@@ -7,7 +7,11 @@ ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,Materials* ma
 
   materials=mat;
   expHall_log=experimentalHall_log;
+<<<<<<< HEAD
   Pos0 = new G4ThreeVector(0., 0., 44.45*mm); // center flange @ (x,z) = (0,0)
+=======
+  Pos0 = new G4ThreeVector(0.,0.,0.);
+>>>>>>> 1cefc3545941305c25b50aa51ea5cc3f488ef26b
 
   includeCartFrame  = false;
   includeCloverCart = false;
@@ -47,7 +51,10 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	 << "\nand building Tessellated solids ... " << G4endl;
 
   G4String CADFileName = CADModelPath + "/CartTopOnly.stl";
+<<<<<<< HEAD
   //  G4String CADFileName = CADModelPath + "/CartFlangeOnly.stl";
+=======
+>>>>>>> 1cefc3545941305c25b50aa51ea5cc3f488ef26b
   CADMesh *meshCartTop = new CADMesh((char*)CADFileName.data(), (char*)"STL");
   meshCartTop->SetScale(mm);
   meshCartTop->SetOffset(G4ThreeVector(0.,0.,0.));
@@ -59,6 +66,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 				    "CartTop", expHall_log, false, 0);
   CartTop_log->SetVisAttributes(VisCart);
 
+<<<<<<< HEAD
   G4cout << "CartTop: center @" 
 	 << CartTop->GetExtent().GetExtentCenter() 
 	 << " xmin = " 
@@ -75,6 +83,8 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	 << CartTop->GetExtent().GetZmax() 
 	 << G4endl;
 
+=======
+>>>>>>> 1cefc3545941305c25b50aa51ea5cc3f488ef26b
   if (includeCartFrame) {
     CADFileName = CADModelPath + "/Cart8020Frame.stl";
     CADMesh *mesh8020 = new CADMesh((char*)CADFileName.data(), (char*)"STL");
@@ -214,6 +224,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 					expHall_log, false, 0);
   CsCollimator_log->SetVisAttributes(VisSlit);
 
+<<<<<<< HEAD
 
   G4cout << "CsCollimator: center @" 
 	 << CsCollimator->GetExtent().GetExtentCenter() 
@@ -228,6 +239,8 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	 << G4endl;
 
 
+=======
+>>>>>>> 1cefc3545941305c25b50aa51ea5cc3f488ef26b
   //--- Now the clover cart: base and elevator --------------------------------
 
   G4Colour lpurpleBlue (0.3, 0.2, 1.0, 0.3);

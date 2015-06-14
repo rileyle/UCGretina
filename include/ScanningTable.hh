@@ -21,7 +21,10 @@
 #include "G4UnitsTable.hh"
 
 #include "CADMesh.hh"
+<<<<<<< HEAD
 #include "G4VisExtent.hh"
+=======
+>>>>>>> 1cefc3545941305c25b50aa51ea5cc3f488ef26b
 
 class ScanningTable 
 {
