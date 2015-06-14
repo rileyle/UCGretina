@@ -214,7 +214,6 @@ G4VPhysicalVolume* ScanningTable::Construct()
 					expHall_log, false, 0);
   CsCollimator_log->SetVisAttributes(VisSlit);
 
-
   G4cout << "CsCollimator: center @" 
 	 << CsCollimator->GetExtent().GetExtentCenter() 
 	 << " ymin = " 
@@ -226,7 +225,6 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	 << " zmax = " 
 	 << CsCollimator->GetExtent().GetZmax() 
 	 << G4endl;
-
 
   //--- Now the clover cart: base and elevator --------------------------------
 
