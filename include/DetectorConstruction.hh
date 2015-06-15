@@ -17,6 +17,7 @@
 #else
   #include "ScanningTable.hh"
   #include "ScanningTable_Messenger.hh"
+  #include "Clover_Detector.hh"
 #endif
   #include "Target.hh"
   #include "Target_Messenger.hh"
@@ -77,6 +78,9 @@ public:
   void SetWUChamberStatus(G4bool stat){WUChamberStatus = stat;}
 #else
   void SetScanningTableStatus(G4bool stat){scanningTableStatus = stat;}
+  void SetCloverStatus(G4String stat){cloverStatus = stat;}
+  Clover_Detector* rightClover;
+  Clover_Detector* leftClover;
 #endif
 #endif
 
@@ -109,6 +113,7 @@ private:
 #else
   G4bool scanningTableStatus;
   ScanningTable* scanningTable;
+  G4String cloverStatus;
 #endif
 #endif
 
@@ -170,6 +175,7 @@ private:
   G4UIcmdWithoutParameter*     WUChamberCmd;
 #else
   G4UIcmdWithoutParameter*     ScanningTableCmd;
+  G4UIcmdWithAString*          CloverCmd;
 #endif
 #endif
   

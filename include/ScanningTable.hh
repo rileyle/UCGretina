@@ -84,7 +84,9 @@ class ScanningTable
   G4LogicalVolume* TranslateX_log;
   G4LogicalVolume* TranslateY_log;
   G4LogicalVolume* Translate_log;
-  G4LogicalVolume* CsCollimator_log;
+  G4LogicalVolume* CsCollimatorBase_log;
+  G4LogicalVolume* CsCollimatorBody_log;
+  G4LogicalVolume* CsCollimatorPlug_log;
   G4LogicalVolume* CloverBase_log;
   G4LogicalVolume* CloverElevator_log;
   G4LogicalVolume* CloverRight_log;
@@ -105,7 +107,9 @@ class ScanningTable
   G4VPhysicalVolume* TranslateX_phys;
   G4VPhysicalVolume* TranslateY_phys;
   G4VPhysicalVolume* Translate_phys;
-  G4VPhysicalVolume* CsCollimator_phys;
+  G4VPhysicalVolume* CsCollimatorBase_phys;
+  G4VPhysicalVolume* CsCollimatorBody_phys;
+  G4VPhysicalVolume* CsCollimatorPlug_phys;
   G4VPhysicalVolume* CloverBase_phys;
   G4VPhysicalVolume* CloverElevator_phys;
   G4VPhysicalVolume* CloverRight_phys;

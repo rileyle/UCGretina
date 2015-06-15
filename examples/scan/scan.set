@@ -89,10 +89,4 @@ Sim.Resolution.File:    run020.res
 Sim.Threshold.File:     run020_run007.thresh
 
 #Which hole contains each detector
-Detector.0:	15
-Detector.1:	6
-Detector.2:	16
-Detector.3:	8
-Detector.4:	9
-Detector.5:	7
-Detector.6:	17
+Detector.0:	31

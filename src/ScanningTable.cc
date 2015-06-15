@@ -181,11 +181,6 @@ G4VPhysicalVolume* ScanningTable::Construct()
   meshTranslate->SetScale(mm);
   meshTranslate->SetOffset(G4ThreeVector(xShift,0.,yShift));
 
-  CADFileName = CADModelPath + "/CsCollimatorOnly.stl";
-  CADMesh *meshCsColl = new CADMesh((char*)CADFileName.data(), (char*)"STL");
-  meshCsColl->SetScale(mm);
-  meshCsColl->SetOffset(G4ThreeVector(xShift,0.,yShift));
-
   G4VSolid *TranslateX = meshTranslateX->TessellatedMesh();
   TranslateX_log = new G4LogicalVolume(TranslateX, materialTranslation,
 				       "TranslateX_log", 0,0,0);
@@ -207,25 +202,53 @@ G4VPhysicalVolume* ScanningTable::Construct()
 				     "TranslationAssembly", expHall_log, false, 0);
   Translate_log->SetVisAttributes(VisTranslation);
 
-  G4VSolid *CsCollimator = meshCsColl->TessellatedMesh();
-  CsCollimator_log = new G4LogicalVolume(CsCollimator, materialCsCollimator,
-					 "CsCollimator_log", 0,0,0);
-  CsCollimator_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0),
-					CsCollimator_log, "CsCollimator",
-					expHall_log, false, 0);
-  CsCollimator_log->SetVisAttributes(VisSlit);
+  CADFileName = CADModelPath + "/CsCollimatorBase.stl";
+  CADMesh *meshCsCollBase = new CADMesh((char*)CADFileName.data(), 
+					(char*)"STL");
+  meshCsCollBase->SetScale(mm);
+  meshCsCollBase->SetOffset(G4ThreeVector(xShift,0.,yShift));
 
-  G4cout << "CsCollimator: center @" 
-	 << CsCollimator->GetExtent().GetExtentCenter() 
-	 << " ymin = " 
-	 << CsCollimator->GetExtent().GetYmin() 
-	 << " ymax = " 
-	 << CsCollimator->GetExtent().GetYmax() 
-	 << " zmin = " 
-	 << CsCollimator->GetExtent().GetZmin() 
-	 << " zmax = " 
-	 << CsCollimator->GetExtent().GetZmax() 
-	 << G4endl;
+  G4VSolid *CsCollimatorBase = meshCsCollBase->TessellatedMesh();
+  CsCollimatorBase_log = new G4LogicalVolume(CsCollimatorBase, 
+					     materialCsCollimator,
+					     "CsCollimatorBase_log", 0,0,0);
+  CsCollimatorBase_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0),
+					    CsCollimatorBase_log, 
+					    "CsCollimatorBase",
+					    expHall_log, false, 0);
+  CsCollimatorBase_log->SetVisAttributes(VisSlit);
+
+  CADFileName = CADModelPath + "/CsCollimatorBody.stl";
+  CADMesh *meshCsCollBody = new CADMesh((char*)CADFileName.data(), 
+					(char*)"STL");
+  meshCsCollBody->SetScale(mm);
+  meshCsCollBody->SetOffset(G4ThreeVector(xShift,0.,yShift));
+
+  G4VSolid *CsCollimatorBody = meshCsCollBody->TessellatedMesh();
+  CsCollimatorBody_log = new G4LogicalVolume(CsCollimatorBody, 
+					     materialCsCollimator,
+					     "CsCollimatorBody_log", 0,0,0);
+  CsCollimatorBody_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0),
+					    CsCollimatorBody_log, 
+					    "CsCollimatorBody",
+					    expHall_log, false, 0);
+  CsCollimatorBody_log->SetVisAttributes(VisSlit);
+
+  CADFileName = CADModelPath + "/CsCollimatorPlug.stl";
+  CADMesh *meshCsCollPlug = new CADMesh((char*)CADFileName.data(), 
+					(char*)"STL");
+  meshCsCollPlug->SetScale(mm);
+  meshCsCollPlug->SetOffset(G4ThreeVector(xShift,0.,yShift));
+
+  G4VSolid *CsCollimatorPlug = meshCsCollPlug->TessellatedMesh();
+  CsCollimatorPlug_log = new G4LogicalVolume(CsCollimatorPlug, 
+					     materialCsCollimator,
+					     "CsCollimatorPlug_log", 0,0,0);
+  CsCollimatorPlug_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0),
+					    CsCollimatorPlug_log, 
+					    "CsCollimatorPlug",
+					    expHall_log, false, 0);
+  CsCollimatorPlug_log->SetVisAttributes(VisSlit);
 
   //--- Now the clover cart: base and elevator --------------------------------
 

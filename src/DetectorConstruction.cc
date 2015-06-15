@@ -15,6 +15,7 @@ DetectorConstruction::DetectorConstruction()
   WUChamberStatus = false;
 #else
   scanningTableStatus = true;
+  cloverStatus = "";
 #endif
 #endif
 
@@ -217,6 +218,11 @@ void DetectorConstruction::Placement()
   if( scanningTableStatus ) {
     scanningTable->Construct();
   }
+  if(cloverStatus != ""){
+    // Eventually fix this to place left, right, or both based on status.
+    rightClover = new Clover_Detector(ExpHall_log, materials);
+    rightClover->Construct();
+  }
 #endif
 #endif
 
@@ -295,6 +301,12 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
   ScanningTableCmd = new G4UIcmdWithoutParameter(aLine, this);
   ScanningTableCmd->SetGuidance("Construct the scanning table.");
   ScanningTableCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  commandName = "/ScanningTable/Clover";
+  aLine = commandName.c_str();
+  CloverCmd = new G4UIcmdWithAString(aLine, this);
+  CloverCmd->SetGuidance("Construct the clover detector(s) (left/right/both).");
+  CloverCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 #endif
 #endif
 
@@ -322,6 +334,7 @@ DetectorConstruction_Messenger::~DetectorConstruction_Messenger()
   delete WUChamberCmd;
 #else
   delete ScanningTableCmd;
+  delete CloverCmd;
 #endif
 #endif
 }
@@ -348,6 +361,9 @@ void DetectorConstruction_Messenger::SetNewValue(G4UIcommand* command,G4String n
 #else
   if( command == ScanningTableCmd ) {
     myTarget->SetScanningTableStatus(true);
+  }
+  if( command == CloverCmd ) {
+    myTarget->SetCloverStatus(newValue);
   }
 #endif
 #endif
