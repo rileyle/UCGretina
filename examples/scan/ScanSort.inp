@@ -1,0 +1,6 @@
+1.04560   2.30191e-04   3.22402e-08  0. // Resolution parameters
+0.0       1.0                           // Energy calibration parameters
+124       85.0      5.0                 // Threshold parameters
+125       85.0      5.0
+126       85.0      5.0
+127       85.0      5.0

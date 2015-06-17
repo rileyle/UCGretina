@@ -1,22 +1,35 @@
+/ExpHall/X_length 2. m
+/ExpHall/Y_length 2. m
+/ExpHall/Z_length 2. m
+# Detector parameters ==========================================================
 /Gretina/detector/enableCapsules
-#/Gretina/detector/enableCryostats
-/ScanningTable/CADModelPath /usr/local/nuc/GRETINA/geant4/UCGretina/UCGretina/cadModels
-#/ScanningTable/IncludeCloverCart
+/ScanningTable/CADModelPath ../../cadModels
+/ScanningTable/Clover right
 #/ScanningTable/IncludeCartFrame
-#/ScanningTable/IncludeShields
-/Target/Construct
+#/ScanningTable/IncludeCloverCart
+/ScanningTable/IncludeShields
+#/Target/Construct
 /Gretina/update
+# Source parameters ============================================================
+/Experiment/RunSource
+/Experiment/Source/Set cs137
+/Experiment/Source/setX 0. mm
+/Experiment/Source/setY 200. mm
+/Experiment/Source/setZ -37.05 mm
+# Print simulation parameters to stdout ========================================
+/ExpHall/Report
 
 #start visualizer
 #/vis/open OGLIX
 /vis/open VRML2FILE
 
-# Disable auto refresh and quieten vis messages whilst scene and trajectories are established
+# Disable auto refresh and quieten vis messages while scene and
+#   trajectories are established 
 /vis/viewer/set/autoRefresh false
 /vis/verbose errors
 
 # setup viewer
-/vis/drawVolume 
+/vis/drawVolume
 /vis/viewer/set/style surface
 /vis/viewer/set/hiddenEdge
 #/vis/scene/add/axes 
@@ -32,3 +45,4 @@
 /vis/viewer/set/autoRefresh true
 /vis/verbose warnings
 
+/run/beamOn 10

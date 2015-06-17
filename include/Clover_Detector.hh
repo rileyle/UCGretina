@@ -20,6 +20,7 @@
 #include "G4SubtractionSolid.hh"
 #include "G4IntersectionSolid.hh"
 #include "G4UnionSolid.hh"
+#include "G4AssemblyVolume.hh"
 
 #include "G4RotationMatrix.hh"
 #include "G4Transform3D.hh"
@@ -46,7 +47,6 @@ public:
   void setY(G4double y);
   void setZ(G4double z);
 
-  void PlaceDetector();
   void MakeSensitive(TrackerGammaSD*);
 
   private:
@@ -102,6 +102,13 @@ public:
   G4double Cuboxlength;
   G4double boxlength;
   G4double torusradius;
+
+  //here
+  G4Transform3D Dassembly;
+  G4ThreeVector assemblypos;
+  G4RotationMatrix assemblyrot;
+  G4ThreeVector assemblyshift;
+  G4AssemblyVolume* assemblyclover;
 
   // position
   G4RotationMatrix DetRot;

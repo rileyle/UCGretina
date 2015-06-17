@@ -7,8 +7,6 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   materials=mat;
   expHall_log=experimentalHall_log;
 
-  G4cout << "******** Made it to Clover_Detector *************" << G4endl;
-
   HpGe = materials->FindMaterial("HpGe");
   Al = materials->FindMaterial("Al");
   Cu = materials->FindMaterial("Cu");
@@ -23,8 +21,16 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   spanningAngle = 360.*deg;
 
   DetPos.setX(0);
-  DetPos.setY(0);
-  DetPos.setZ(18.5*cm); // source to front face of the cover
+  DetPos.setY(0); 
+  DetPos.setZ(0);
+
+  thetad = 90.*deg;
+  phid = 90.*deg;
+
+  DetRot=G4RotationMatrix::IDENTITY;
+  DetRot.rotateX(180.*deg);
+  DetRot.rotateY(90.*deg+thetad);
+
 
   LeafShift = 2.23*cm; // x and y offset relative to central axis
   
@@ -50,13 +56,6 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
 
   CCoffset = 0.06*cm; // central contact x and y offset relative to the box
   CCradius = .6*cm; // central contact radius
-
-  thetad = 90.*deg;
-  phid = 90.*deg;
-
-  DetRot=G4RotationMatrix::IDENTITY;
-  DetRot.rotateX(180.*deg);
-  DetRot.rotateY(90.*deg+thetad);
 
   wallrot=G4RotationMatrix::IDENTITY;
   
@@ -96,7 +95,16 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   Cuboxshift.setZ(Length + covergap + Cuboxlength/2.);
   Cuboxpos = DetPos + Cuboxshift;
 
-  G4cout << "******** Initialized it. *************" << G4endl;
+  // Final Clover placement
+  assemblyshift.setX(0*cm);
+  assemblyshift.setY(33.51*cm); // collimator y position
+  assemblyshift.setZ(-50*cm);
+  assemblypos = assemblyshift;
+  
+  assemblyrot=G4RotationMatrix::IDENTITY;
+  assemblyrot.rotateZ(0.*deg);
+  assemblyrot.rotateY(180.*deg);
+
 }
 
 
@@ -107,8 +115,6 @@ Clover_Detector::~Clover_Detector()
 G4VPhysicalVolume* Clover_Detector::Construct()
 {
 
-  G4cout << "******** Constructing it. *************" << G4endl;
-
   // Leaf
 
   detector = new G4Tubs("detector", 0, Radius, (Length-torusradius)/2., 
@@ -117,8 +123,6 @@ G4VPhysicalVolume* Clover_Detector::Construct()
   minus = new G4Tubs("minus", 0, CCradius, Length/2., 0*deg, 360*deg);
 
   box = new G4Box("box", boxlength/2., boxlength/2., 9.0*cm);
-
-  G4cout << "********         0          *************" << G4endl;
 
   //creating curved top
 
@@ -138,8 +142,6 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 
   //Actually building detector
 
-  G4cout << "********         1          *************" << G4endl;
-
   detectorcurved = new G4UnionSolid("torus2",detector,torus2,
 				    G4Transform3D(G4RotationMatrix(),
 						  G4ThreeVector(0,0,-(Length-torusradius)/2.)));
@@ -157,8 +159,6 @@ G4VPhysicalVolume* Clover_Detector::Construct()
   detector_log = new G4LogicalVolume(intersect, HpGe, "detector_log", 0, 0, 0);
 
   // Cryosatat
-
-  G4cout << "********         2          *************" << G4endl;
 
   boxout = new G4Box("box", coverwidth/2., coverwidth/2., coverlength/2.);
 
@@ -200,8 +200,6 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 
   // Add the corners.
 
-  G4cout << "********         3          *************" << G4endl;
-
   corner = new G4Tubs("corner", cornerRadius - coverthickness,
 		      cornerRadius, coverlength/2., 0., 90.*deg);
 
@@ -232,8 +230,6 @@ G4VPhysicalVolume* Clover_Detector::Construct()
   cover_log = new G4LogicalVolume(cover8, Al, "cover_log", 0, 0, 0);
 
   // Copper Backing
-
-  G4cout << "********         4          *************" << G4endl;
 
   Cubox = new G4Box("copperbox", boxlength + .03*cm, boxlength + .03*cm, 
 		    Cuboxlength/2.);
@@ -267,11 +263,27 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 
   Cubox_log = new G4LogicalVolume(CuboxCut4,Cu,"Cubox_log",0,0,0);
 
-  G4cout << "********         5          *************" << G4endl;
+  assemblyclover = new G4AssemblyVolume();
 
-  PlaceDetector();
+  assemblyclover->AddPlacedVolume(detector_log,Leaf0Pos,&DetRot);
+ 
+  DetRot.rotateZ(90.*deg);
 
- //------------------------------Detector readout division
+  assemblyclover->AddPlacedVolume(detector_log,Leaf1Pos,&DetRot);
+
+  DetRot.rotateZ(90.*deg);
+  
+  assemblyclover->AddPlacedVolume(detector_log,Leaf2Pos,&DetRot);
+
+  DetRot.rotateZ(90.*deg);
+
+  assemblyclover->AddPlacedVolume(detector_log,Leaf3Pos,&DetRot);
+
+  assemblyclover->AddPlacedVolume(cover_log,coverpos,&wallrot);
+
+  assemblyclover->AddPlacedVolume(Cubox_log,Cuboxpos,&wallrot);
+
+  assemblyclover->MakeImprint(expHall_log,assemblypos,&assemblyrot);
 
   //Visualization Attributes
 
@@ -295,40 +307,8 @@ G4VPhysicalVolume* Clover_Detector::Construct()
   return detector_phys;
 }
 //---------------------------------------------------------------------
-void Clover_Detector::PlaceDetector()
-{
-
-  G4cout << "******** Placing it. *************" << G4endl;
-
-  Leaf0_phys = new G4PVPlacement(G4Transform3D(DetRot,Leaf0Pos),
-				 detector_log,"Leaf0",expHall_log,false,0); 
-
-  DetRot.rotateZ(90.*deg);
-
-  Leaf1_phys = new G4PVPlacement(G4Transform3D(DetRot,Leaf1Pos),
-				 detector_log,"Leaf1",expHall_log,false,0);
-
-  DetRot.rotateZ(90.*deg);
-
-  Leaf2_phys = new G4PVPlacement(G4Transform3D(DetRot,Leaf2Pos),
-				 detector_log,"Leaf2",expHall_log,false,0); 
-
-  DetRot.rotateZ(90.*deg);
-
-  Leaf3_phys = new G4PVPlacement(G4Transform3D(DetRot,Leaf3Pos),
-				 detector_log,"Leaf3",expHall_log,false,0); 
-
-  cover_phys = new G4PVPlacement(G4Transform3D(wallrot,coverpos),cover_log,"cover_phys",expHall_log,false,0); 
-
-  Cubox_phys = new G4PVPlacement(G4Transform3D(wallrot,Cuboxpos),Cubox_log,"Cubox_phys",expHall_log,false,0);
-
-  G4cout << "******** Placed it. *************" << G4endl;
-
-}
-//---------------------------------------------------------------------
 void Clover_Detector::MakeSensitive(TrackerGammaSD* TrackerGamma)
 {
-  G4cout << "******** Making it sensitive. *************" << G4endl;
   detector_log->SetSensitiveDetector(TrackerGamma);
 }
 //---------------------------------------------------------------------

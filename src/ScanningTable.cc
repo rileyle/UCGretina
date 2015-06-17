@@ -26,7 +26,7 @@ ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,Materials* ma
   materialSlitAssembly = materials->FindMaterial("ssteel");
   materialTranslation = materials->FindMaterial("G10");
   materialTranslationAssembly = materials->FindMaterial("ssteel");
-  materialCsCollimator = materials->FindMaterial("Fe");
+  materialCsCollimator = materials->FindMaterial("Hevimet");
   materialClover = materials->FindMaterial("HpGe");
   materialCloverShield = materials->FindMaterial("Al");
 }
@@ -60,21 +60,21 @@ G4VPhysicalVolume* ScanningTable::Construct()
 				    "CartTop", expHall_log, false, 0);
   CartTop_log->SetVisAttributes(VisCart);
 
-  G4cout << "CartTop: center @" 
-	 << CartTop->GetExtent().GetExtentCenter() 
-	 << " xmin = " 
-	 << CartTop->GetExtent().GetXmin() 
-	 << " xmax = " 
-	 << CartTop->GetExtent().GetXmax() 
-	 << " ymin = " 
-	 << CartTop->GetExtent().GetYmin() 
-	 << " ymax = " 
-	 << CartTop->GetExtent().GetYmax() 
-	 << " zmin = " 
-	 << CartTop->GetExtent().GetZmin() 
-	 << " zmax = " 
-	 << CartTop->GetExtent().GetZmax() 
-	 << G4endl;
+  // G4cout << "CartTop: center @" 
+  // 	 << CartTop->GetExtent().GetExtentCenter() 
+  // 	 << " xmin = " 
+  // 	 << CartTop->GetExtent().GetXmin() 
+  // 	 << " xmax = " 
+  // 	 << CartTop->GetExtent().GetXmax() 
+  // 	 << " ymin = " 
+  // 	 << CartTop->GetExtent().GetYmin() 
+  // 	 << " ymax = " 
+  // 	 << CartTop->GetExtent().GetYmax() 
+  // 	 << " zmin = " 
+  // 	 << CartTop->GetExtent().GetZmin() 
+  // 	 << " zmax = " 
+  // 	 << CartTop->GetExtent().GetZmax() 
+  // 	 << G4endl;
 
   if (includeCartFrame) {
     CADFileName = CADModelPath + "/Cart8020Frame.stl";
@@ -216,7 +216,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 					    CsCollimatorBase_log, 
 					    "CsCollimatorBase",
 					    expHall_log, false, 0);
-  CsCollimatorBase_log->SetVisAttributes(VisSlit);
+  CsCollimatorBase_log->SetVisAttributes(VisSlit2);
 
   CADFileName = CADModelPath + "/CsCollimatorBody.stl";
   CADMesh *meshCsCollBody = new CADMesh((char*)CADFileName.data(), 
@@ -232,7 +232,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 					    CsCollimatorBody_log, 
 					    "CsCollimatorBody",
 					    expHall_log, false, 0);
-  CsCollimatorBody_log->SetVisAttributes(VisSlit);
+  CsCollimatorBody_log->SetVisAttributes(VisSlit2);
 
   CADFileName = CADModelPath + "/CsCollimatorPlug.stl";
   CADMesh *meshCsCollPlug = new CADMesh((char*)CADFileName.data(), 
@@ -248,7 +248,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 					    CsCollimatorPlug_log, 
 					    "CsCollimatorPlug",
 					    expHall_log, false, 0);
-  CsCollimatorPlug_log->SetVisAttributes(VisSlit);
+  CsCollimatorPlug_log->SetVisAttributes(VisSlit2);
 
   //--- Now the clover cart: base and elevator --------------------------------
 
@@ -350,6 +350,23 @@ G4VPhysicalVolume* ScanningTable::Construct()
 					       CloverRightShield_log, "RightCloverShield",
 					       expHall_log, false, 0);
     CloverRightShield_log->SetVisAttributes(VisShield);
+
+    G4cout << "CloverRightShield: center @" 
+	   << CloverRightShield->GetExtent().GetExtentCenter() 
+	   << " xmin = " 
+	   << CloverRightShield->GetExtent().GetXmin() 
+	   << " xmax = " 
+	   << CloverRightShield->GetExtent().GetXmax() 
+	   << " ymin = " 
+	   << CloverRightShield->GetExtent().GetYmin() 
+	   << " ymax = " 
+	   << CloverRightShield->GetExtent().GetYmax() 
+	   << " zmin = " 
+	   << CloverRightShield->GetExtent().GetZmin() 
+	   << " zmax = " 
+	   << CloverRightShield->GetExtent().GetZmax() 
+	   << G4endl;
+
 
     CADFileName = CADModelPath + "/Shield-Left.stl";
     CADMesh *meshCloverLeftShield = new CADMesh((char*)CADFileName.data(), (char*)"STL");

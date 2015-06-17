@@ -21,5 +21,6 @@
 #/Mode2/crmatFile crmat.LINUX
 /Mode2/crystalXforms
 /Mode2/GretinaCoords
-/Mode2/Filename scan.dat
-/run/beamOn 100000
+#/Mode2/Filename scan.dat
+/Output/Filename scan.out
+/run/beamOn 5000000
