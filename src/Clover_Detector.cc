@@ -34,21 +34,25 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
 
   LeafShift = 2.23*cm; // x and y offset relative to central axis
   
+  // Lower left (facing clover)
   Leaf0Shift.setX(-LeafShift);
   Leaf0Shift.setY(-LeafShift);
   Leaf0Shift.setZ((Length + torusradius)/2. + covergap);
   Leaf0Pos = DetPos + Leaf0Shift;
 
+  // Lower right (facing clover)
   Leaf1Shift.setX(LeafShift);
   Leaf1Shift.setY(-LeafShift);
   Leaf1Shift.setZ((Length + torusradius)/2. + covergap);
   Leaf1Pos = DetPos + Leaf1Shift;
-  
+
+  // Upper right (facing clover)
   Leaf2Shift.setX(LeafShift);
   Leaf2Shift.setY(LeafShift);
   Leaf2Shift.setZ((Length + torusradius)/2. + covergap);
   Leaf2Pos = DetPos + Leaf2Shift;
 
+  // Upper left (facing clover)
   Leaf3Shift.setX(-LeafShift);
   Leaf3Shift.setY(LeafShift);
   Leaf3Shift.setZ((Length + torusradius)/2. + covergap);
@@ -96,17 +100,16 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   Cuboxpos = DetPos + Cuboxshift;
 
   // Final Clover placement
-  assemblyshift.setX(0*cm);
-  assemblyshift.setY(33.51*cm); // collimator y position
-  assemblyshift.setZ(-50*cm);
+  assemblyshift.setX(  -59.96*mm );
+  assemblyshift.setY(  343.88*mm ); // Shield y position
+  assemblyshift.setZ( -122.19*mm );
   assemblypos = assemblyshift;
   
   assemblyrot=G4RotationMatrix::IDENTITY;
   assemblyrot.rotateZ(0.*deg);
-  assemblyrot.rotateY(180.*deg);
+  assemblyrot.rotateY(200.*deg);
 
 }
-
 
 Clover_Detector::~Clover_Detector()
 {
@@ -118,37 +121,44 @@ G4VPhysicalVolume* Clover_Detector::Construct()
   // Leaf
 
   detector = new G4Tubs("detector", 0, Radius, (Length-torusradius)/2., 
-			0*deg, 360*deg);
+			0., 360.*deg);
 
-  minus = new G4Tubs("minus", 0, CCradius, Length/2., 0*deg, 360*deg);
+  minus = new G4Tubs("minus", 0, CCradius, Length/2., 0., 360.*deg);
 
   box = new G4Box("box", boxlength/2., boxlength/2., 9.0*cm);
 
   //creating curved top
 
-  torus = new G4Torus("torus",0,torusradius,Radius-torusradius,0,360*deg);
+  torus = new G4Torus("torus", 0, torusradius, Radius - torusradius,
+		      0., 360.*deg);
 
-  torusbox = new G4Box("torusbox", Radius + torusradius*3., Radius+torusradius*3., 
+  torusbox = new G4Box("torusbox", Radius + torusradius*3., 
+		       Radius+torusradius*3., 
 		       torusradius);
  
-  torustube = new G4Tubs("torustube", 0, Radius-torusradius, torusradius, 0*deg, 360*deg);
+  torustube = new G4Tubs("torustube", 0, Radius-torusradius, torusradius, 
+			 0., 360.*deg);
 
   torus1 = new G4UnionSolid("torus2", torustube, torus,
 			    G4Transform3D(G4RotationMatrix(),G4ThreeVector()));
 
-  torus2 = new G4SubtractionSolid("torus1", torus1, torusbox, 
-				  G4Transform3D(G4RotationMatrix(),
-						G4ThreeVector(0,0,torusradius)));
+  torus2 = 
+    new G4SubtractionSolid("torus1", torus1, torusbox, 
+			   G4Transform3D(G4RotationMatrix(),
+					 G4ThreeVector(0.,0.,torusradius)));
 
   //Actually building detector
 
-  detectorcurved = new G4UnionSolid("torus2",detector,torus2,
-				    G4Transform3D(G4RotationMatrix(),
-						  G4ThreeVector(0,0,-(Length-torusradius)/2.)));
+  detectorcurved = 
+    new G4UnionSolid("torus2",detector,torus2,
+		     G4Transform3D(G4RotationMatrix(),
+				   G4ThreeVector(0,0,
+						 -(Length-torusradius)/2.)));
 
-  subtract = new G4SubtractionSolid("subtraction", detectorcurved, minus,
-				    G4Transform3D(G4RotationMatrix(),
-						  G4ThreeVector(0.*cm,0.*cm,1.*cm)));
+  subtract = 
+    new G4SubtractionSolid("subtraction", detectorcurved, minus,
+			   G4Transform3D(G4RotationMatrix(),
+					 G4ThreeVector(0.*cm,0.*cm,1.*cm)));
 
   intersect = new G4IntersectionSolid ("intersect", subtract, box, 
 				       G4Transform3D(G4RotationMatrix(),
@@ -156,7 +166,7 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 								   CCoffset, 
 								   0.)));
 
-  detector_log = new G4LogicalVolume(intersect, HpGe, "detector_log", 0, 0, 0);
+  detector_log = new G4LogicalVolume(intersect, HpGe, "Leaf_log", 0, 0, 0);
 
   // Cryosatat
 
@@ -165,9 +175,10 @@ G4VPhysicalVolume* Clover_Detector::Construct()
   boxin = new G4Box("boxin", coverwidth/2. - coverthickness, 
 		    coverwidth/2. - coverthickness, coverlength/2.);
 
-  cover  = new G4SubtractionSolid("cover", boxout, boxin, 
-				  G4Transform3D(G4RotationMatrix(),
-						G4ThreeVector(0,0,coverthickness)));
+  cover = 
+    new G4SubtractionSolid("cover", boxout, boxin, 
+			   G4Transform3D(G4RotationMatrix(),
+					 G4ThreeVector(0,0,coverthickness)));
 
   // Make space for the curved corners.
 
@@ -180,23 +191,26 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 							      corneroffset, 
 							      0.*cm)));
 
-  cover2 = new G4SubtractionSolid("cover2", cover1, cornerCut,
-				  G4Transform3D(G4RotationMatrix(0., 0., 90.*deg),
-						G4ThreeVector(corneroffset, 
-							      -corneroffset,
-							      0.)));
+  cover2 = 
+    new G4SubtractionSolid("cover2", cover1, cornerCut,
+			   G4Transform3D(G4RotationMatrix(0., 0., 90.*deg),
+					 G4ThreeVector(corneroffset, 
+						       -corneroffset,
+						       0.)));
 
-  cover3 = new G4SubtractionSolid("cover3", cover2, cornerCut,
-				  G4Transform3D(G4RotationMatrix(0*deg, 0*deg, 180*deg),
-						G4ThreeVector(-corneroffset,
-							      -corneroffset,
-							      0.)));
+  cover3 = 
+    new G4SubtractionSolid("cover3", cover2, cornerCut,
+			   G4Transform3D(G4RotationMatrix(0., 0., 180.*deg),
+					 G4ThreeVector(-corneroffset,
+						       -corneroffset,
+						       0.)));
 
-  cover4 = new G4SubtractionSolid("cover4", cover3, cornerCut,
-				  G4Transform3D(G4RotationMatrix(0*deg,0*deg,270*deg),
-						G4ThreeVector(-corneroffset,
-							      corneroffset,
-							      0.)));
+  cover4 = 
+    new G4SubtractionSolid("cover4", cover3, cornerCut,
+			   G4Transform3D(G4RotationMatrix(0., 0., 270.*deg),
+					 G4ThreeVector(-corneroffset,
+						       corneroffset,
+						       0.)));
 
   // Add the corners.
 
@@ -237,29 +251,33 @@ G4VPhysicalVolume* Clover_Detector::Construct()
   CuboxCut = new G4Tubs("CuboxCut", Radius, Radius*1.5, Cuboxlength + 1.*cm, 
 			0., 90.*deg); 
 
-  CuboxCut1 = new G4SubtractionSolid("CuboxCut1", Cubox, CuboxCut,
-				     G4Transform3D(G4RotationMatrix(0., 0., 0.),
-						   G4ThreeVector(LeafShift,
-								 LeafShift,
-								 0.)));
+  CuboxCut1 = 
+    new G4SubtractionSolid("CuboxCut1", Cubox, CuboxCut,
+			   G4Transform3D(G4RotationMatrix(0., 0., 0.),
+					 G4ThreeVector(LeafShift,
+						       LeafShift,
+						       0.)));
   
-  CuboxCut2 = new G4SubtractionSolid("CuboxCut2", CuboxCut1, CuboxCut,
-				     G4Transform3D(G4RotationMatrix(0., 0., 90.*deg),
-						   G4ThreeVector(LeafShift,
-								 -LeafShift,
-								 0.)));
+  CuboxCut2 = 
+    new G4SubtractionSolid("CuboxCut2", CuboxCut1, CuboxCut,
+			   G4Transform3D(G4RotationMatrix(0., 0., 90.*deg),
+					 G4ThreeVector(LeafShift,
+						       -LeafShift,
+						       0.)));
  
-  CuboxCut3 = new G4SubtractionSolid("CuboxCut3", CuboxCut2, CuboxCut,
-				     G4Transform3D(G4RotationMatrix(0., 0., 180.*deg),
-						   G4ThreeVector(-LeafShift,
-								 -LeafShift,
-								 0.)));
+  CuboxCut3 = 
+    new G4SubtractionSolid("CuboxCut3", CuboxCut2, CuboxCut,
+			   G4Transform3D(G4RotationMatrix(0., 0., 180.*deg),
+					 G4ThreeVector(-LeafShift,
+						       -LeafShift,
+						       0.)));
 
-  CuboxCut4 = new G4SubtractionSolid("CuboxCut4", CuboxCut3, CuboxCut, 
-				     G4Transform3D(G4RotationMatrix(0., 0., 270.*deg),
-						   G4ThreeVector(-LeafShift,
-								 LeafShift,
-								 0.)));
+  CuboxCut4 = 
+    new G4SubtractionSolid("CuboxCut4", CuboxCut3, CuboxCut, 
+			   G4Transform3D(G4RotationMatrix(0., 0., 270.*deg),
+					 G4ThreeVector(-LeafShift,
+						       LeafShift,
+						       0.)));
 
   Cubox_log = new G4LogicalVolume(CuboxCut4,Cu,"Cubox_log",0,0,0);
 

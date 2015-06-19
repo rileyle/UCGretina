@@ -51,8 +51,8 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
 
   G4String name = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
 
-  if( name.substr(0,5)=="geCap" || name.substr(0,4)=="Leaf" ){ // GRETINA or Clover
-    
+  if( name.substr(0,5)=="geCap" || name.substr(12,4)=="Leaf" ){ 
+
     G4RunManager* runManager = G4RunManager::GetRunManager();
     DetectorConstruction* theDetector = (DetectorConstruction*)runManager->GetUserDetectorConstruction();
 
@@ -64,16 +64,19 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
        && aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() != "conv") 
       return false;
 
-    G4int detCode = aStep->GetPreStepPoint()->GetTouchable()->GetReplicaNumber(depth);
-    G4int detNum  = detCode%1000;
-
     G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();
 
     // Position of the interaction point in the solid reference frame
     G4StepPoint* preStepPoint = aStep->GetPreStepPoint();
     G4TouchableHandle theTouchable = preStepPoint->GetTouchableHandle();
-    G4VPhysicalVolume* topVolume = theTouchable->GetVolume(depth);
-  
+    G4VPhysicalVolume* topVolume;
+    if( name.substr(0,5)=="geCap" ) // GRETINA
+      topVolume = theTouchable->GetVolume(depth);
+    else if( name.substr(12,4)=="Leaf" ) // Clover
+      topVolume = theTouchable->GetVolume(0);
+    else
+      topVolume = NULL;
+
     G4ThreeVector frameTrans = topVolume->GetFrameTranslation();
 
     const G4RotationMatrix* rot = topVolume->GetFrameRotation();
@@ -86,9 +89,15 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
     posSol += frameRot( frameTrans );
 
     // Segment number
+    G4int detCode;
+    G4int detNum;
     G4int segCode = 0;
     if( name.substr(0,5)=="geCap" ){ // GRETINA
-      segCode = theDetector->GetGretina()->GetSegmentNumber( 0, detCode, posSol );
+      detCode = 
+	aStep->GetPreStepPoint()->GetTouchable()->GetReplicaNumber(depth);
+      detNum  = detCode%1000;
+      segCode = 
+	theDetector->GetGretina()->GetSegmentNumber( 0, detCode, posSol );
 
       // Modify sector number to match GRETINA data stream
       G4int slice  = segCode/10;
@@ -107,7 +116,27 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
       }
       segCode = sector + 6 * slice;
     } else { // Clover (no segmentation for now)
+
+      // The clovers are assigned slot numbers 31 and 32 
+      // (mounting ports 32 and 33, which don't exist)
+      //
+      // Crystal numbers (facing the clover)
+      //
+      //      0 @ lower left
+      //      1 @ lower right
+      //      2 @ upper right
+      //      3 @ upper left
+      //
+      // (The copy numbers from the Geometry Manager are 4,5,6,7. It's unclear why.)
+
+      detNum  = ( 31 + aStep->GetPreStepPoint()->GetTouchable()->GetCopyNumber(1) )*4
+	+ aStep->GetPreStepPoint()->GetTouchable()->GetCopyNumber() - 4;
       segCode = 0;
+
+      // G4cout << "detNum = " << detNum 
+      //  	     << ", crystal copy number = " << aStep->GetPreStepPoint()->GetTouchable()->GetCopyNumber()
+      //  	     << ", momCode = " << aStep->GetPreStepPoint()->GetTouchable()->GetCopyNumber(1)
+      //  	     << G4endl;
     }
 
     TrackerGammaHit* newHit = new TrackerGammaHit();

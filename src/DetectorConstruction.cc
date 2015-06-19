@@ -222,6 +222,7 @@ void DetectorConstruction::Placement()
     // Eventually fix this to place left, right, or both based on status.
     rightClover = new Clover_Detector(ExpHall_log, materials);
     rightClover->Construct();
+    rightClover->MakeSensitive(TrackerGamma);
   }
 #endif
 #endif

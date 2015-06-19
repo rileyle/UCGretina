@@ -4,23 +4,36 @@
 #include "TFile.h"
 
 TH1F *sim;
-TH1F *sim_addback;
-TH1F *crystal[4];
-TH2F *crys_xy[4];
-TH2F *crys_xz[4];
-TH2F *crys_yz[4];
-TH1F *crys_x[4];
-TH1F *crys_y[4];
-TH1F *crys_z[4];
+TH1F *crystal[12];
+TH2F *crys_xy[12];
+TH2F *crys_xz[12];
+TH2F *crys_yz[12];
+TH1F *crys_x[12];
+TH1F *crys_y[12];
+TH1F *crys_z[12];
 
-TH1F *mod_x[32];
-TH1F *mod_y[32];
-TH1F *mod_z[32];
+TH2F *crys_xy_lo[4];
+TH2F *crys_xz_lo[4];
+TH2F *crys_yz_lo[4];
+TH1F *crys_x_lo[4];
+TH1F *crys_y_lo[4];
+TH1F *crys_z_lo[4];
 
-Float_t sigmaPar0, sigmaPar1, sigmaPar2, sigmaPar3;
+TH2F *crys_xy_hi[4];
+TH2F *crys_xz_hi[4];
+TH2F *crys_yz_hi[4];
+TH1F *crys_x_hi[4];
+TH1F *crys_y_hi[4];
+TH1F *crys_z_hi[4];
+
 Float_t ecalPar0, ecalPar1;
-Float_t threshPar0[128] = {0.0};
-Float_t threshPar1[128] = {0.0};
+Float_t sigmaPar0[136] = {0.0};
+Float_t sigmaPar1[136] = {0.0};
+Float_t sigmaPar2[136] = {0.0};
+Float_t sigmaPar3[136] = {0.0};
+
+Float_t threshPar0[136] = {0.0};
+Float_t threshPar1[136] = {0.0};
 
 // Read beta, target offset, and resolution parameters
 void loadGretina(TString fileName) {
@@ -32,19 +45,24 @@ void loadGretina(TString fileName) {
   ifstream fp;
   fp.open(fileName);
 
-  // Resolution parameters
-  fp >> sigmaPar0 >> sigmaPar1 >> sigmaPar2 >> sigmaPar3;
-  fp.getline(line,1000);  // Advance to next line.
-
   // Energy calibration parameters
   fp >> ecalPar0  >> ecalPar1;
   fp.getline(line,1000);  // Advance to next line.
 
-  // Threshold parameters
+  cout << "Energy calibration parameters: "
+       << ecalPar0 << ", " << ecalPar1 << endl;
+
+  // Threshold and resolution parameters
   Int_t i;
-  while(fp >> i >> threshPar0[i] >> threshPar1[i]){
+  while( fp >> i >> threshPar0[i] >> threshPar1[i]
+	 >> sigmaPar0[i] >> sigmaPar1[i] 
+	 >> sigmaPar2[i] >> sigmaPar3[i] ){
     cout << "Crystal " << i << " threshold parameters: "
 	 << threshPar0[i] << ", " << threshPar1[i] << endl;
+    cout << "           resolution parameters: "
+	 << sigmaPar0[i] << ", " << sigmaPar1[i] 
+	 << sigmaPar2[i] << ", " << sigmaPar3[i] 
+	 << endl;
     fp.getline(line,1000);  // Advance to next line.
   }
   if(i == 0)
@@ -55,14 +73,14 @@ void loadGretina(TString fileName) {
 }
 
 // Simulate intrinsic detector energy resolution and energy (de)calibration
-Float_t measuredE(Float_t E){
+Float_t measuredE(Float_t E, Int_t det){
 
-  E = E*ecalPar1 + ecalPar0;
+  E = ecalPar0 + E*ecalPar1;
 
-  Float_t sigma = sigmaPar0 
-    + sigmaPar1*E
-    + sigmaPar2*E*E
-    + sigmaPar3*E*E*E;
+  Float_t sigma = sigmaPar0[det]
+    + sigmaPar1[det]*E
+    + sigmaPar2[det]*E*E
+    + sigmaPar3[det]*E*E*E;
 
   return E + gRandom->Gaus(0,sigma);
 }
@@ -93,19 +111,14 @@ void loadSim(TString fileName) {
   Name.Replace(Name.Index(".out",4,0,0),4,"",0);
   sim = new TH1F(Name,"", nChannels, float(lo), float(hi));
 
-  TString NameAB = fileName.Copy();
-  NameAB.Replace(NameAB.Index(".out",4,0,0),4,"_addback",8);
-  sim_addback = new TH1F(NameAB,"", nChannels, float(lo), float(hi));
-
-
-  Int_t nHoles = 1;
-  Int_t hole[] = { 31 };
-  Int_t holeNum[128];
+  Int_t nHoles = 3;
+  Int_t hole[] = { 31, 32, 33 };
+  Int_t holeNum[136];
 
   Int_t nCrystals = nHoles*4;
 
-  Int_t crystalID[128];
-  Int_t crystalNum[128];
+  Int_t crystalID[136];
+  Int_t crystalNum[136];
   for(Int_t i = 0; i < nHoles; i++){
     crystalID[4*i] = 4*hole[i];
     crystalID[4*i+1] = 4*hole[i]+1;
@@ -120,11 +133,11 @@ void loadSim(TString fileName) {
     // Initialize crystal spectra
     TString crystalName = Name.Copy();
     TString crystalLabel;
-    //    crystalLabel.Form("_%02d", i);
     crystalLabel.Form("_%d", crystalID[i]);
     crystalName += crystalLabel;
+
     crystal[i] = new TH1F(crystalName,"", nChannels, float(lo), float(hi));
-    //    crystal[i]->Sumw2();
+
     TString xyName = crystalName.Copy();
     xyName += "_xy";
     crys_xy[i] = new TH2F(xyName,"", 100, -50., 50., 100, -50., 50.);
@@ -139,13 +152,65 @@ void loadSim(TString fileName) {
 
     TString xName = crystalName.Copy();
     xName += "_x";
-    crys_x[i] = new TH1F(xName,"", 1000, -500., 500.);
+    crys_x[i] = new TH1F(xName,"", 1000, -50., 50.);
     TString yName = crystalName.Copy();
     yName += "_y";
-    crys_y[i] = new TH1F(yName,"", 1000, -500., 500.);
+    crys_y[i] = new TH1F(yName,"", 1000, -50., 50.);
     TString zName = crystalName.Copy();
     zName += "_z";
-    crys_z[i] = new TH1F(zName,"", 1000, -500., 500.);
+    crys_z[i] = new TH1F(zName,"", 1000, -50., 50.);
+
+  }
+
+  // Clover coincidence spectra
+  for(Int_t i = 0; i < 4; i++){
+
+    TString crystalName = Name.Copy();
+    TString crystalLabel;
+    crystalLabel.Form("_%d", crystalID[i]);
+    crystalName += crystalLabel;
+
+    TString xyName = crystalName.Copy();
+    xyName += "_xy_lo";
+    crys_xy_lo[i] = new TH2F(xyName,"", 100, -50., 50., 100, -50., 50.);
+    xyName = crystalName.Copy();
+    xyName += "_xy_hi";
+    crys_xy_hi[i] = new TH2F(xyName,"", 100, -50., 50., 100, -50., 50.);
+
+    TString xzName = crystalName.Copy();
+    xzName += "_xz_lo";
+    crys_xz_lo[i] = new TH2F(xzName,"", 100, -50., 50., 100, 0., 100.);
+    xzName = crystalName.Copy();
+    xzName += "_xz_hi";
+    crys_xz_hi[i] = new TH2F(xzName,"", 100, -50., 50., 100, 0., 100.);
+
+    TString yzName = crystalName.Copy();
+    yzName += "_yz_lo";
+    crys_yz_lo[i] = new TH2F(yzName,"", 100, -50., 50., 100, 0., 100.);
+    yzName = crystalName.Copy();
+    yzName += "_yz_hi";
+    crys_yz_hi[i] = new TH2F(yzName,"", 100, -50., 50., 100, 0., 100.);
+
+    TString xName = crystalName.Copy();
+    xName += "_x_lo";
+    crys_x_lo[i] = new TH1F(xName,"", 1000, -50., 50.);
+    xName = crystalName.Copy();
+    xName += "_x_hi";
+    crys_x_hi[i] = new TH1F(xName,"", 1000, -50., 50.);
+
+    TString yName = crystalName.Copy();
+    yName += "_y_lo";
+    crys_y_lo[i] = new TH1F(yName,"", 1000, -50., 50.);
+    yName = crystalName.Copy();
+    yName += "_y_hi";
+    crys_y_hi[i] = new TH1F(yName,"", 1000, -50., 50.);
+
+    TString zName = crystalName.Copy();
+    zName += "_z_lo";
+    crys_z_lo[i] = new TH1F(zName,"", 1000, 0., 100.);
+    zName = crystalName.Copy();
+    zName += "_z_hi";
+    crys_z_hi[i] = new TH1F(zName,"", 1000, 0., 100.);
 
   }
 
@@ -156,28 +221,10 @@ void loadSim(TString fileName) {
     holeNum[4*hole[i]+2] = i;
     holeNum[4*hole[i]+3] = i;
 
-    TString modName = Name.Copy();
-    TString modLabel;
-    modLabel.Form("_mod%02d", hole[i]);
-    modName += modLabel;
-
-    TString mxName = modName.Copy();
-    mxName += "_x";
-    mod_x[i] = new TH1F(mxName,"", 1000, -500., 500.);
-
-    TString myName = modName.Copy();
-    myName += "_y";
-    mod_y[i] = new TH1F(myName,"", 1000, -500., 500.);
-
-    TString mzName = modName.Copy();
-    mzName += "_z";
-    mod_z[i] = new TH1F(mzName,"", 1000, -500., 500.);
-
   }
  
   Int_t nGamma = 0;
   Int_t nReaction = 0;
-  Int_t nPhotopeak = 0;
   Int_t nGamma, nEvent;
   Int_t nHits;
   Int_t fullEnergy;
@@ -254,9 +301,22 @@ void loadSim(TString fileName) {
     nHits = k;
 
     Int_t nDets = 0;
-
+    Bool_t cloverLoHit = false;
+    Bool_t cloverHiHit = false;
     if(ElabAB > 0) {
-      ElabAB = 0; // (We'll recalculate it with simulated thresholds.)
+
+      // Check for Clover hits.
+      for(Int_t i = 0; i < nHits; i++) {
+	if( Edep[detNum[i]] > 0. ) {
+	  if( detNum[i] > 127 ) {
+	    if( detNum[i]%4 < 2)
+	      cloverLoHit = true;
+	    else
+	      cloverHiHit = true;
+	  }
+	}
+      }
+
       for(Int_t i = 0; i < nHits; i++){
 	Float_t E = Edep[detNum[i]];
 	if( E > 0.0 ){
@@ -266,35 +326,49 @@ void loadSim(TString fileName) {
 	      < (1.0 + tanh((E-threshPar0[detNum[i]])/threshPar1[detNum[i]]))/2.0 ){
 
 	    // No addback
-	    sim->Fill( measuredE(E) );
+	    sim->Fill( measuredE(E, detNum[i]) );
 	    // No addback
-	    crystal[crystalNum[detNum[i]]]->Fill( measuredE(E) );
+	    crystal[crystalNum[detNum[i]]]->Fill( measuredE(E, detNum[i]) );
 	    //	    cout << "(" << xHit[detNum[i]] << ", " 
 	    //		 << yHit[detNum[i]] << ")" << endl;
 
 	    crys_xy[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
 						 yHit[detNum[i]]);
-
 	    crys_xz[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
 						 zHit[detNum[i]]);
-
 	    crys_yz[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]],
 						 zHit[detNum[i]]);
 
-	    Float_t xH = xHit[detNum[i]];
-	    Float_t yH = yHit[detNum[i]];
-	    Float_t zH = zHit[detNum[i]];
+	    crys_x[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]]);
+	    crys_y[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]]);
+	    crys_z[crystalNum[detNum[i]]]->Fill(zHit[detNum[i]]);
 
-	    crys_x[crystalNum[detNum[i]]]->Fill(xH);
-	    crys_y[crystalNum[detNum[i]]]->Fill(yH);
-	    crys_z[crystalNum[detNum[i]]]->Fill(zH);
+	    // Register clover conicidences
+	    if(cloverLoHit && detNum[i] < 128){
+	      crys_xy_lo[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
+						      yHit[detNum[i]]);
+	      crys_xz_lo[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
+						      zHit[detNum[i]]);
+	      crys_yz_lo[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]],
+						      zHit[detNum[i]]);
 
-	    mod_x[holeNum[detNum[i]]]->Fill(xH);
-	    mod_y[holeNum[detNum[i]]]->Fill(yH);
-	    mod_z[holeNum[detNum[i]]]->Fill(zH);
+	      crys_x_lo[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]]);
+	      crys_y_lo[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]]);
+	      crys_z_lo[crystalNum[detNum[i]]]->Fill(zHit[detNum[i]]);
+	    }
 
-	    // Addback			
-	    ElabAB += E;
+	    if(cloverHiHit && detNum[i] < 128){
+	      crys_xy_hi[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
+						      yHit[detNum[i]]);
+	      crys_xz_hi[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
+						      zHit[detNum[i]]);
+	      crys_yz_hi[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]],
+						      zHit[detNum[i]]);
+
+	      crys_x_hi[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]]);
+	      crys_y_hi[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]]);
+	      crys_z_hi[crystalNum[detNum[i]]]->Fill(zHit[detNum[i]]);
+	    }
 
 	  }
 
@@ -306,13 +380,6 @@ void loadSim(TString fileName) {
 
 	}
       }
-
-      // Addback
-      sim_addback->Fill( measuredE(ElabAB) );
-
-      // Photopeak events
-      if( abs(Egamma - ElabAB) < 0.02 )
-	nPhotopeak++;
     }
 
     nGamma++;
@@ -326,8 +393,7 @@ void loadSim(TString fileName) {
   fp.close();
 
   cout << "\r... sorted " 
-       << nGamma     << " gamma events, and " 
-       << nPhotopeak << " photopeak events ...\n" << endl;
+       << nGamma     << " gamma events, and " << endl;
 
   return;
 

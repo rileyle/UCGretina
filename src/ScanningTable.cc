@@ -135,119 +135,119 @@ G4VPhysicalVolume* ScanningTable::Construct()
   VisSlit2->SetVisibility(true);
   VisSlit2->SetForceWireframe(true);
 
-  CADFileName = CADModelPath + "/ZSlitsOnly.stl";
-  CADMesh *meshSlits = new CADMesh((char*)CADFileName.data(), (char*)"STL");
-  meshSlits->SetScale(mm);
-  meshSlits->SetOffset(G4ThreeVector(0.,zShift,0.));
+  // CADFileName = CADModelPath + "/ZSlitsOnly.stl";
+  // CADMesh *meshSlits = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+  // meshSlits->SetScale(mm);
+  // meshSlits->SetOffset(G4ThreeVector(0.,zShift,0.));
 
-  CADFileName = CADModelPath + "/SlitZAssemblyAll.stl";
-  CADMesh *meshSlitAssembly = new CADMesh((char*)CADFileName.data(), (char*)"STL");
-  meshSlitAssembly->SetScale(mm);
-  meshSlitAssembly->SetOffset(G4ThreeVector(0.,zShift,0.));
+  // CADFileName = CADModelPath + "/SlitZAssemblyAll.stl";
+  // CADMesh *meshSlitAssembly = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+  // meshSlitAssembly->SetScale(mm);
+  // meshSlitAssembly->SetOffset(G4ThreeVector(0.,zShift,0.));
 
-  G4VSolid *Slits = meshSlits->TessellatedMesh();
-  Slits_log = new G4LogicalVolume(Slits, materialSlits,
-				  "Slits_log", 0,0,0);
-  Slits_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), Slits_log,
-				 "Slits", expHall_log, false, 0);
-  Slits_log->SetVisAttributes(VisSlit);
+  // G4VSolid *Slits = meshSlits->TessellatedMesh();
+  // Slits_log = new G4LogicalVolume(Slits, materialSlits,
+  // 				  "Slits_log", 0,0,0);
+  // Slits_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), Slits_log,
+  // 				 "Slits", expHall_log, false, 0);
+  // Slits_log->SetVisAttributes(VisSlit);
 
-  G4VSolid *SlitAssembly = meshSlitAssembly->TessellatedMesh();
-  SlitAssembly_log = new G4LogicalVolume(SlitAssembly, materialSlitAssembly,
-					 "SlitAssembly_log", 0,0,0);
-  SlitAssembly_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), SlitAssembly_log,
-					"SlitAssembly", expHall_log, false, 0);
-  SlitAssembly_log->SetVisAttributes(VisSlit2);
+  // G4VSolid *SlitAssembly = meshSlitAssembly->TessellatedMesh();
+  // SlitAssembly_log = new G4LogicalVolume(SlitAssembly, materialSlitAssembly,
+  // 					 "SlitAssembly_log", 0,0,0);
+  // SlitAssembly_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), SlitAssembly_log,
+  // 					"SlitAssembly", expHall_log, false, 0);
+  // SlitAssembly_log->SetVisAttributes(VisSlit2);
   
   //--- And the Cs collimator assemblies --------------------------------------
 
-  G4Colour lgrey(0.7, 0.7, 0.7, 0.3);
-  G4VisAttributes* VisTranslation = new G4VisAttributes(lgrey);
-  VisTranslation->SetVisibility(true);
-  VisTranslation->SetForceWireframe(true);
+  // G4Colour lgrey(0.7, 0.7, 0.7, 0.3);
+  // G4VisAttributes* VisTranslation = new G4VisAttributes(lgrey);
+  // VisTranslation->SetVisibility(true);
+  // VisTranslation->SetForceWireframe(true);
 
-  CADFileName = CADModelPath + "/SourceTranslation1.stl";
-  CADMesh *meshTranslateX = new CADMesh((char*)CADFileName.data(), (char*)"STL");
-  meshTranslateX->SetScale(mm);
-  meshTranslateX->SetOffset(G4ThreeVector(xShift,0.,0.));
+  // CADFileName = CADModelPath + "/SourceTranslation1.stl";
+  // CADMesh *meshTranslateX = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+  // meshTranslateX->SetScale(mm);
+  // meshTranslateX->SetOffset(G4ThreeVector(xShift,0.,0.));
 
-  CADFileName = CADModelPath + "/SourceTranslation2.stl";
-  CADMesh *meshTranslateY = new CADMesh((char*)CADFileName.data(), (char*)"STL");
-  meshTranslateY->SetScale(mm);
-  meshTranslateY->SetOffset(G4ThreeVector(0.,0.,yShift));
+  // CADFileName = CADModelPath + "/SourceTranslation2.stl";
+  // CADMesh *meshTranslateY = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+  // meshTranslateY->SetScale(mm);
+  // meshTranslateY->SetOffset(G4ThreeVector(0.,0.,yShift));
 
-  CADFileName = CADModelPath + "/SourceTranslationAssembly.stl";
-  CADMesh *meshTranslate = new CADMesh((char*)CADFileName.data(), (char*)"STL");
-  meshTranslate->SetScale(mm);
-  meshTranslate->SetOffset(G4ThreeVector(xShift,0.,yShift));
+  // CADFileName = CADModelPath + "/SourceTranslationAssembly.stl";
+  // CADMesh *meshTranslate = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+  // meshTranslate->SetScale(mm);
+  // meshTranslate->SetOffset(G4ThreeVector(xShift,0.,yShift));
 
-  G4VSolid *TranslateX = meshTranslateX->TessellatedMesh();
-  TranslateX_log = new G4LogicalVolume(TranslateX, materialTranslation,
-				       "TranslateX_log", 0,0,0);
-  TranslateX_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), TranslateX_log,
-				      "TranslationX", expHall_log, false, 0);
-  TranslateX_log->SetVisAttributes(VisTranslation);
+  // G4VSolid *TranslateX = meshTranslateX->TessellatedMesh();
+  // TranslateX_log = new G4LogicalVolume(TranslateX, materialTranslation,
+  // 				       "TranslateX_log", 0,0,0);
+  // TranslateX_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), TranslateX_log,
+  // 				      "TranslationX", expHall_log, false, 0);
+  // TranslateX_log->SetVisAttributes(VisTranslation);
 
-  G4VSolid *TranslateY = meshTranslateY->TessellatedMesh();
-  TranslateY_log = new G4LogicalVolume(TranslateY, materialTranslation,
-				       "TranslateY_log", 0,0,0);
-  TranslateY_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), TranslateY_log,
-				      "TranslationY", expHall_log, false, 0);
-  TranslateY_log->SetVisAttributes(VisTranslation);
+  // G4VSolid *TranslateY = meshTranslateY->TessellatedMesh();
+  // TranslateY_log = new G4LogicalVolume(TranslateY, materialTranslation,
+  // 				       "TranslateY_log", 0,0,0);
+  // TranslateY_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), TranslateY_log,
+  // 				      "TranslationY", expHall_log, false, 0);
+  // TranslateY_log->SetVisAttributes(VisTranslation);
   
-  G4VSolid *Translate = meshTranslate->TessellatedMesh();
-  Translate_log = new G4LogicalVolume(Translate, materialTranslationAssembly,
-				      "Translate_log", 0,0,0);
-  Translate_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), Translate_log,
-				     "TranslationAssembly", expHall_log, false, 0);
-  Translate_log->SetVisAttributes(VisTranslation);
+  // G4VSolid *Translate = meshTranslate->TessellatedMesh();
+  // Translate_log = new G4LogicalVolume(Translate, materialTranslationAssembly,
+  // 				      "Translate_log", 0,0,0);
+  // Translate_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), Translate_log,
+  // 				     "TranslationAssembly", expHall_log, false, 0);
+  // Translate_log->SetVisAttributes(VisTranslation);
 
   CADFileName = CADModelPath + "/CsCollimatorBase.stl";
   CADMesh *meshCsCollBase = new CADMesh((char*)CADFileName.data(), 
-					(char*)"STL");
+  					(char*)"STL");
   meshCsCollBase->SetScale(mm);
   meshCsCollBase->SetOffset(G4ThreeVector(xShift,0.,yShift));
 
   G4VSolid *CsCollimatorBase = meshCsCollBase->TessellatedMesh();
   CsCollimatorBase_log = new G4LogicalVolume(CsCollimatorBase, 
-					     materialCsCollimator,
-					     "CsCollimatorBase_log", 0,0,0);
+  					     materialCsCollimator,
+  					     "CsCollimatorBase_log", 0,0,0);
   CsCollimatorBase_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0),
-					    CsCollimatorBase_log, 
-					    "CsCollimatorBase",
-					    expHall_log, false, 0);
+  					    CsCollimatorBase_log, 
+  					    "CsCollimatorBase",
+  					    expHall_log, false, 0);
   CsCollimatorBase_log->SetVisAttributes(VisSlit2);
 
   CADFileName = CADModelPath + "/CsCollimatorBody.stl";
   CADMesh *meshCsCollBody = new CADMesh((char*)CADFileName.data(), 
-					(char*)"STL");
+  					(char*)"STL");
   meshCsCollBody->SetScale(mm);
   meshCsCollBody->SetOffset(G4ThreeVector(xShift,0.,yShift));
 
   G4VSolid *CsCollimatorBody = meshCsCollBody->TessellatedMesh();
   CsCollimatorBody_log = new G4LogicalVolume(CsCollimatorBody, 
-					     materialCsCollimator,
-					     "CsCollimatorBody_log", 0,0,0);
+  					     materialCsCollimator,
+  					     "CsCollimatorBody_log", 0,0,0);
   CsCollimatorBody_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0),
-					    CsCollimatorBody_log, 
-					    "CsCollimatorBody",
-					    expHall_log, false, 0);
+  					    CsCollimatorBody_log, 
+  					    "CsCollimatorBody",
+  					    expHall_log, false, 0);
   CsCollimatorBody_log->SetVisAttributes(VisSlit2);
 
   CADFileName = CADModelPath + "/CsCollimatorPlug.stl";
   CADMesh *meshCsCollPlug = new CADMesh((char*)CADFileName.data(), 
-					(char*)"STL");
+  					(char*)"STL");
   meshCsCollPlug->SetScale(mm);
   meshCsCollPlug->SetOffset(G4ThreeVector(xShift,0.,yShift));
 
   G4VSolid *CsCollimatorPlug = meshCsCollPlug->TessellatedMesh();
   CsCollimatorPlug_log = new G4LogicalVolume(CsCollimatorPlug, 
-					     materialCsCollimator,
-					     "CsCollimatorPlug_log", 0,0,0);
+  					     materialCsCollimator,
+  					     "CsCollimatorPlug_log", 0,0,0);
   CsCollimatorPlug_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0),
-					    CsCollimatorPlug_log, 
-					    "CsCollimatorPlug",
-					    expHall_log, false, 0);
+  					    CsCollimatorPlug_log, 
+  					    "CsCollimatorPlug",
+  					    expHall_log, false, 0);
   CsCollimatorPlug_log->SetVisAttributes(VisSlit2);
 
   //--- Now the clover cart: base and elevator --------------------------------
@@ -340,15 +340,19 @@ G4VPhysicalVolume* ScanningTable::Construct()
     VisShield->SetForceWireframe(true);
 
     CADFileName = CADModelPath + "/Shield-Right.stl";
-    CADMesh *meshCloverRightShield = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+    CADMesh *meshCloverRightShield = new CADMesh((char*)CADFileName.data(), 
+						 (char*)"STL");
     meshCloverRightShield->SetScale(mm);
     meshCloverRightShield->SetOffset(G4ThreeVector(0.,zShift,0.));
 
     G4VSolid *CloverRightShield = meshCloverRightShield->TessellatedMesh();
-    CloverRightShield_log = new G4LogicalVolume(CloverRightShield, materialCloverShield, "CloverRightShield_log", 0,0,0);
+    CloverRightShield_log = new G4LogicalVolume(CloverRightShield, 
+						materialCloverShield, 
+						"CloverRightShield_log", 0,0,0);
     CloverRightShield_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0),
-					       CloverRightShield_log, "RightCloverShield",
-					       expHall_log, false, 0);
+    					       CloverRightShield_log, 
+    					       "RightCloverShield",
+    					       expHall_log, false, 0);
     CloverRightShield_log->SetVisAttributes(VisShield);
 
     G4cout << "CloverRightShield: center @" 
@@ -369,15 +373,19 @@ G4VPhysicalVolume* ScanningTable::Construct()
 
 
     CADFileName = CADModelPath + "/Shield-Left.stl";
-    CADMesh *meshCloverLeftShield = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+    CADMesh *meshCloverLeftShield = new CADMesh((char*)CADFileName.data(), 
+						(char*)"STL");
     meshCloverLeftShield->SetScale(mm);
     meshCloverLeftShield->SetOffset(G4ThreeVector(0.,zShift,0.));
 
     G4VSolid *CloverLeftShield = meshCloverLeftShield->TessellatedMesh();
-    CloverLeftShield_log = new G4LogicalVolume(CloverLeftShield, materialCloverShield, "CloverLeftShield_log", 0,0,0);
+    CloverLeftShield_log = new G4LogicalVolume(CloverLeftShield, 
+					       materialCloverShield, 
+					       "CloverLeftShield_log", 0,0,0);
     CloverLeftShield_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0),
-					      CloverLeftShield_log, "LeftCloverShield",
-  				       expHall_log, false, 0);
+    					      CloverLeftShield_log, 
+    					      "LeftCloverShield",
+    					      expHall_log, false, 0);
     CloverLeftShield_log->SetVisAttributes(VisShield);
 
   }
