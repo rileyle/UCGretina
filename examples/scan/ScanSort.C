@@ -240,6 +240,10 @@ void loadSim(TString fileName) {
 
     //    cout << "Ndecomp = " << Ndecomp << "  eventID = " << eventID << endl;
 
+    if(eventID%10000 == 0) {
+      cout << "Processed " << eventID << " events ...\r";
+    }
+
     Float_t ElabAB = 0;
     Float_t x,   y, z;
     Float_t xs, ys, zs;
@@ -331,6 +335,11 @@ void loadSim(TString fileName) {
 	    crystal[crystalNum[detNum[i]]]->Fill( measuredE(E, detNum[i]) );
 	    //	    cout << "(" << xHit[detNum[i]] << ", " 
 	    //		 << yHit[detNum[i]] << ")" << endl;
+
+
+	    // cout << "hit " << i << ", detNum[i] = " << detNum[i]
+	    // 	 << ", crystalNum[detNum[i]] = " 
+	    // 	 << crystalNum[detNum[i]] << endl;
 
 	    crys_xy[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
 						 yHit[detNum[i]]);

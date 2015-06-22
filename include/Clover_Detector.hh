@@ -140,7 +140,7 @@ public:
   G4ThreeVector Cuboxpos;
 
   G4Tubs* detector;
-  G4Tubs* minus;
+  G4Tubs* CCsub;
   G4Tubs* fill;
   G4Torus* torus;
   G4Tubs* cornerCut;
@@ -153,22 +153,16 @@ public:
   G4Box* Cubox;
   G4Box* torusbox;
   G4SubtractionSolid* cover;
-  G4SubtractionSolid* cover1;
-  G4SubtractionSolid* cover2;
-  G4SubtractionSolid* cover3;
-  G4SubtractionSolid* cover4;
+  G4SubtractionSolid* coversub;
   G4SubtractionSolid* CuboxCut1;
   G4SubtractionSolid* CuboxCut2;
   G4SubtractionSolid* CuboxCut3;
   G4SubtractionSolid* CuboxCut4;
   G4SubtractionSolid* torus2;
   G4SubtractionSolid* detector_cut;
-  G4UnionSolid* cover5;
-  G4UnionSolid* cover6;
-  G4UnionSolid* cover7;
-  G4UnionSolid* cover8;
+  G4UnionSolid* coveru;
   G4UnionSolid* torus1;
-  G4UnionSolid* detectorcurved;
+  G4UnionSolid* bevel;
   G4Box* wall;
   G4SubtractionSolid* subtract;
   G4IntersectionSolid* intersect;

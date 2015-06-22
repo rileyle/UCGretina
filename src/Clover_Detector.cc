@@ -14,7 +14,7 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   Length      = 8.0*cm;  // crystal length
   Radius      = 2.5*cm;  // crystal radius
   boxlength   = 4.5*cm;
-  torusradius = 0.5*cm; // "bevel" radius of front-face edges
+  torusradius = 0.5*cm;  // "bevel" radius of front-face edges
   covergap    = 0.5*cm;  // front face of cover to front faces of crystals
 
   startAngle    = 0.*deg;
@@ -30,7 +30,6 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   DetRot=G4RotationMatrix::IDENTITY;
   DetRot.rotateX(180.*deg);
   DetRot.rotateY(90.*deg+thetad);
-
 
   LeafShift = 2.23*cm; // x and y offset relative to central axis
   
@@ -123,11 +122,11 @@ G4VPhysicalVolume* Clover_Detector::Construct()
   detector = new G4Tubs("detector", 0, Radius, (Length-torusradius)/2., 
 			0., 360.*deg);
 
-  minus = new G4Tubs("minus", 0, CCradius, Length/2., 0., 360.*deg);
+  CCsub = new G4Tubs("CCsub", 0, CCradius, Length/2., 0., 360.*deg);
 
   box = new G4Box("box", boxlength/2., boxlength/2., 9.0*cm);
 
-  //creating curved top
+  // creating curved bevel on the front edge
 
   torus = new G4Torus("torus", 0, torusradius, Radius - torusradius,
 		      0., 360.*deg);
@@ -149,14 +148,14 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 
   //Actually building detector
 
-  detectorcurved = 
-    new G4UnionSolid("torus2",detector,torus2,
+  bevel = 
+    new G4UnionSolid("bevel", detector, torus2,
 		     G4Transform3D(G4RotationMatrix(),
 				   G4ThreeVector(0,0,
 						 -(Length-torusradius)/2.)));
 
   subtract = 
-    new G4SubtractionSolid("subtraction", detectorcurved, minus,
+    new G4SubtractionSolid("subtraction", bevel, CCsub,
 			   G4Transform3D(G4RotationMatrix(),
 					 G4ThreeVector(0.*cm,0.*cm,1.*cm)));
 
@@ -185,28 +184,28 @@ G4VPhysicalVolume* Clover_Detector::Construct()
   cornerCut = new G4Tubs("cornerCut", cornerRadius - coverthickness,
 			 cornerRadius*4., coverlength, 0*deg, 90.*deg);
 
-  cover1 = new G4SubtractionSolid("cover1", cover, cornerCut,
+  coversub = new G4SubtractionSolid("cover1", cover, cornerCut,
 				  G4Transform3D(G4RotationMatrix(),
 						G4ThreeVector(corneroffset, 
 							      corneroffset, 
 							      0.*cm)));
 
-  cover2 = 
-    new G4SubtractionSolid("cover2", cover1, cornerCut,
+  coversub = 
+    new G4SubtractionSolid("cover2", coversub, cornerCut,
 			   G4Transform3D(G4RotationMatrix(0., 0., 90.*deg),
 					 G4ThreeVector(corneroffset, 
 						       -corneroffset,
 						       0.)));
 
-  cover3 = 
-    new G4SubtractionSolid("cover3", cover2, cornerCut,
+  coversub = 
+    new G4SubtractionSolid("cover3", coversub, cornerCut,
 			   G4Transform3D(G4RotationMatrix(0., 0., 180.*deg),
 					 G4ThreeVector(-corneroffset,
 						       -corneroffset,
 						       0.)));
 
-  cover4 = 
-    new G4SubtractionSolid("cover4", cover3, cornerCut,
+  coversub = 
+    new G4SubtractionSolid("cover4", coversub, cornerCut,
 			   G4Transform3D(G4RotationMatrix(0., 0., 270.*deg),
 					 G4ThreeVector(-corneroffset,
 						       corneroffset,
@@ -217,31 +216,31 @@ G4VPhysicalVolume* Clover_Detector::Construct()
   corner = new G4Tubs("corner", cornerRadius - coverthickness,
 		      cornerRadius, coverlength/2., 0., 90.*deg);
 
-  cover5 = new G4UnionSolid("cover5", cover4, corner, 
+  coveru = new G4UnionSolid("cover5", coversub, corner, 
 			    G4Transform3D(G4RotationMatrix(),
 					  G4ThreeVector(corneroffset,
 							corneroffset,
 							0.)));
 
-  cover6 = new G4UnionSolid("cover6", cover5, corner, 
+  coveru = new G4UnionSolid("cover6", coveru, corner, 
 			    G4Transform3D(G4RotationMatrix(0., 0., 90.*deg),
 					  G4ThreeVector(corneroffset,
 							-corneroffset,
 							0.)));
 
-  cover7 = new G4UnionSolid("cover7", cover6, corner,
+  coveru = new G4UnionSolid("cover7", coveru, corner,
 			    G4Transform3D(G4RotationMatrix(0., 0., 180.*deg),
 					  G4ThreeVector(-corneroffset,
 							-corneroffset,
 							0.)));
   
-  cover8 = new G4UnionSolid("cover8", cover7, corner,
+  coveru = new G4UnionSolid("cover8", coveru, corner,
 			    G4Transform3D(G4RotationMatrix(0., 0., 270.*deg),
 					  G4ThreeVector(-corneroffset,
 							corneroffset,
 							0.)));
 
-  cover_log = new G4LogicalVolume(cover8, Al, "cover_log", 0, 0, 0);
+  cover_log = new G4LogicalVolume(coveru, Al, "cover_log", 0, 0, 0);
 
   // Copper Backing
 

@@ -135,22 +135,130 @@ G4VPhysicalVolume* ScanningTable::Construct()
   VisSlit2->SetVisibility(true);
   VisSlit2->SetForceWireframe(true);
 
-  // CADFileName = CADModelPath + "/ZSlitsOnly.stl";
-  // CADMesh *meshSlits = new CADMesh((char*)CADFileName.data(), (char*)"STL");
-  // meshSlits->SetScale(mm);
-  // meshSlits->SetOffset(G4ThreeVector(0.,zShift,0.));
+  CADFileName = CADModelPath + "/ZSlitsLeftBracket.stl";
+  CADMesh *meshSlitsLB = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+  meshSlitsLB->SetScale(mm);
+  meshSlitsLB->SetOffset(G4ThreeVector(0.,zShift,0.));
+ 
+  G4VSolid *SlitsLB = meshSlitsLB->TessellatedMesh();
+  ZSlitsLeftBracket_log = new G4LogicalVolume(SlitsLB, materialSlits,
+					      "ZSlitsLeftBracket_log", 0,0,0);
+  ZSlitsLeftBracket_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), ZSlitsLeftBracket_log,
+					     "ZSlitsLeftBracket", expHall_log, false, 0);
+  ZSlitsLeftBracket_log->SetVisAttributes(VisSlit);
+
+  CADFileName = CADModelPath + "/ZSlitsUpperLeftWall.stl";
+  CADMesh *meshSlitsULW = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+  meshSlitsULW->SetScale(mm);
+  meshSlitsULW->SetOffset(G4ThreeVector(0.,zShift,0.));
+ 
+  G4VSolid *SlitsULW = meshSlitsULW->TessellatedMesh();
+  ZSlitsUpperLeftWall_log = new G4LogicalVolume(SlitsULW, materialSlits,
+						"ZSlitsUpperLeftWall", 0,0,0);
+  ZSlitsUpperLeftWall_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), ZSlitsUpperLeftWall_log,
+					       "ZSlitsUpperLeftWall", expHall_log, false, 0);
+  ZSlitsUpperLeftWall_log->SetVisAttributes(VisSlit);
+
+  CADFileName = CADModelPath + "/ZSlitsMidLeftWall.stl";
+  CADMesh *meshSlitsMLW = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+  meshSlitsMLW->SetScale(mm);
+  meshSlitsMLW->SetOffset(G4ThreeVector(0.,zShift,0.));
+ 
+  G4VSolid *SlitsMLW = meshSlitsMLW->TessellatedMesh();
+  ZSlitsMidLeftWall_log = new G4LogicalVolume(SlitsMLW, materialSlits,
+					      "ZSlitsMidLeftWall", 0,0,0);
+  ZSlitsUpperLeftWall_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), ZSlitsMidLeftWall_log,
+					       "ZSlitsMidLeftWall", expHall_log, false, 0);
+  ZSlitsMidLeftWall_log->SetVisAttributes(VisSlit);
+
+  CADFileName = CADModelPath + "/ZSlitsLowerLeftWall.stl";
+  CADMesh *meshSlitsLLW = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+  meshSlitsLLW->SetScale(mm);
+  meshSlitsLLW->SetOffset(G4ThreeVector(0.,zShift,0.));
+ 
+  G4VSolid *SlitsLLW = meshSlitsLLW->TessellatedMesh();
+  ZSlitsLowerLeftWall_log = new G4LogicalVolume(SlitsLLW, materialSlits,
+						"ZSlitsLowerLeftWall", 0,0,0);
+  ZSlitsLowerLeftWall_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), ZSlitsLowerLeftWall_log,
+					       "ZSlitsLowerLeftWall", expHall_log, false, 0);
+  ZSlitsLowerLeftWall_log->SetVisAttributes(VisSlit);
+
+  CADFileName = CADModelPath + "/ZSlitsUpperRightWall.stl";
+  CADMesh *meshSlitsURW = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+  meshSlitsURW->SetScale(mm);
+  meshSlitsURW->SetOffset(G4ThreeVector(0.,zShift,0.));
+ 
+  G4VSolid *SlitsURW = meshSlitsURW->TessellatedMesh();
+  ZSlitsUpperRightWall_log = new G4LogicalVolume(SlitsURW, materialSlits,
+						 "ZSlitsUpperRightWall", 0,0,0);
+  ZSlitsUpperRightWall_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), ZSlitsUpperRightWall_log,
+						"ZSlitsUpperRightWall", expHall_log, false, 0);
+  ZSlitsUpperRightWall_log->SetVisAttributes(VisSlit);
+
+  CADFileName = CADModelPath + "/ZSlitsMidRightWall.stl";
+  CADMesh *meshSlitsMRW = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+  meshSlitsMRW->SetScale(mm);
+  meshSlitsMRW->SetOffset(G4ThreeVector(0.,zShift,0.));
+ 
+  G4VSolid *SlitsMRW = meshSlitsMRW->TessellatedMesh();
+  ZSlitsMidRightWall_log = new G4LogicalVolume(SlitsMRW, materialSlits,
+					       "ZSlitsMidRightWall", 0,0,0);
+  ZSlitsMidRightWall_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), ZSlitsMidRightWall_log,
+					      "ZSlitsMidRightWall", expHall_log, false, 0);
+  ZSlitsMidRightWall_log->SetVisAttributes(VisSlit);
+
+  CADFileName = CADModelPath + "/ZSlitsLowerRightWall.stl";
+  CADMesh *meshSlitsLRW = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+  meshSlitsLRW->SetScale(mm);
+  meshSlitsLRW->SetOffset(G4ThreeVector(0.,zShift,0.));
+ 
+  G4VSolid *SlitsLRW = meshSlitsLRW->TessellatedMesh();
+  ZSlitsLowerRightWall_log = new G4LogicalVolume(SlitsLRW, materialSlits,
+						 "ZSlitsLowerRightWall", 0,0,0);
+  ZSlitsLowerRightWall_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), ZSlitsLowerRightWall_log,
+						"ZSlitsLowerRightWall", expHall_log, false, 0);
+  ZSlitsLowerRightWall_log->SetVisAttributes(VisSlit);
+
+  CADFileName = CADModelPath + "/ZSlitsTopBracket.stl";
+  CADMesh *meshSlitsTB = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+  meshSlitsTB->SetScale(mm);
+  meshSlitsTB->SetOffset(G4ThreeVector(0.,zShift,0.));
+ 
+  G4VSolid *SlitsTB = meshSlitsTB->TessellatedMesh();
+  ZSlitsTopBracket_log = new G4LogicalVolume(SlitsTB, materialSlits,
+					     "ZSlitsTopBracket", 0,0,0);
+  ZSlitsTopBracket_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), ZSlitsTopBracket_log,
+					    "ZSlitsTopBracket", expHall_log, false, 0);
+  ZSlitsTopBracket_log->SetVisAttributes(VisSlit);
+
+  CADFileName = CADModelPath + "/ZSlitsBottomBracket.stl";
+  CADMesh *meshSlitsBB = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+  meshSlitsBB->SetScale(mm);
+  meshSlitsBB->SetOffset(G4ThreeVector(0.,zShift,0.));
+ 
+  G4VSolid *SlitsBB = meshSlitsBB->TessellatedMesh();
+  ZSlitsBottomBracket_log = new G4LogicalVolume(SlitsBB, materialSlits,
+						"ZSlitsBottomBracket", 0,0,0);
+  ZSlitsBottomBracket_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), ZSlitsBottomBracket_log,
+					       "ZSlitsBottomBracket", expHall_log, false, 0);
+  ZSlitsBottomBracket_log->SetVisAttributes(VisSlit);
+
+  CADFileName = CADModelPath + "/ZSlitsRightBracket.stl";
+  CADMesh *meshSlitsRB = new CADMesh((char*)CADFileName.data(), (char*)"STL");
+  meshSlitsRB->SetScale(mm);
+  meshSlitsRB->SetOffset(G4ThreeVector(0.,zShift,0.));
+ 
+  G4VSolid *SlitsRB = meshSlitsRB->TessellatedMesh();
+  ZSlitsRightBracket_log = new G4LogicalVolume(SlitsRB, materialSlits,
+					       "ZSlitsRightBracket", 0,0,0);
+  ZSlitsRightBracket_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), ZSlitsRightBracket_log,
+					      "ZSlitsRightBracket", expHall_log, false, 0);
+  ZSlitsRightBracket_log->SetVisAttributes(VisSlit);
 
   // CADFileName = CADModelPath + "/SlitZAssemblyAll.stl";
   // CADMesh *meshSlitAssembly = new CADMesh((char*)CADFileName.data(), (char*)"STL");
   // meshSlitAssembly->SetScale(mm);
   // meshSlitAssembly->SetOffset(G4ThreeVector(0.,zShift,0.));
-
-  // G4VSolid *Slits = meshSlits->TessellatedMesh();
-  // Slits_log = new G4LogicalVolume(Slits, materialSlits,
-  // 				  "Slits_log", 0,0,0);
-  // Slits_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0), Slits_log,
-  // 				 "Slits", expHall_log, false, 0);
-  // Slits_log->SetVisAttributes(VisSlit);
 
   // G4VSolid *SlitAssembly = meshSlitAssembly->TessellatedMesh();
   // SlitAssembly_log = new G4LogicalVolume(SlitAssembly, materialSlitAssembly,

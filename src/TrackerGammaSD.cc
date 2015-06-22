@@ -89,8 +89,8 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
     posSol += frameRot( frameTrans );
 
     // Segment number
-    G4int detCode;
-    G4int detNum;
+    G4int detCode = 0;
+    G4int detNum = 0;
     G4int segCode = 0;
     if( name.substr(0,5)=="geCap" ){ // GRETINA
       detCode = 
@@ -127,16 +127,34 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
       //      2 @ upper right
       //      3 @ upper left
       //
-      // (The copy numbers from the Geometry Manager are 4,5,6,7. It's unclear why.)
+      // (The copy numbers from the Geometry Manager are not assigned 
+      //  starting from 0, so we decode the set detector numbers based
+      //  on the names assigned to the clover crystals instead.)
 
-      detNum  = ( 31 + aStep->GetPreStepPoint()->GetTouchable()->GetCopyNumber(1) )*4
-	+ aStep->GetPreStepPoint()->GetTouchable()->GetCopyNumber() - 4;
-      segCode = 0;
+      G4int baseNum = 0;
+      if(name.substr(5,6) == "impr_1"){
+	baseNum = 124;
+      } else if(name.substr(5,6) == "impr_2"){
+	baseNum = 128;
+      }
 
-      // G4cout << "detNum = " << detNum 
-      //  	     << ", crystal copy number = " << aStep->GetPreStepPoint()->GetTouchable()->GetCopyNumber()
-      //  	     << ", momCode = " << aStep->GetPreStepPoint()->GetTouchable()->GetCopyNumber(1)
-      //  	     << G4endl;
+      if(name.substr(21,4) == "pv_0")
+	detNum = baseNum;
+      else if(name.substr(21,4) == "pv_1")
+	detNum = baseNum + 1;
+      else if(name.substr(21,4) == "pv_2")
+	detNum = baseNum + 2;
+      else if(name.substr(21,4) == "pv_3")
+	detNum = baseNum + 3;
+
+      // G4cout << "Vol name: " 
+      // 	     << aStep->GetPreStepPoint()->GetTouchable()->GetVolume()->GetName()
+      // 	     << ", detNum = " << detNum 
+      // 	     << ", crystal copy number = " 
+      //             << aStep->GetPreStepPoint()->GetTouchable()->GetCopyNumber()
+      // 	     << ", momCode = " 
+      //             << aStep->GetPreStepPoint()->GetTouchable()->GetCopyNumber(1)
+      // 	     << G4endl;
     }
 
     TrackerGammaHit* newHit = new TrackerGammaHit();
