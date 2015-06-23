@@ -56,7 +56,8 @@ public:
   void SetSourceEnergy(G4double);
   void SetWhiteSourceLowE(G4double energy){sourceWhiteLoE = energy;}
   void SetWhiteSourceHighE(G4double energy){sourceWhiteHiE = energy;}
-
+  void SetSourceCollAngle(G4double ang){collimationAngle = ang; isCollimated = true;}
+  void SetSourceCollDirection(G4ThreeVector dir){collimationDirection = dir; isCollimated = true;}
   G4double GetSourceEnergy();
   G4bool GetInBeam(){return inbeam;}
 
@@ -76,7 +77,7 @@ private:
   G4double frac;
   G4bool   fracOn;
   // source stuff
-  G4bool source,inbeam,background; 
+  G4bool source, inbeam, background, isCollimated; 
   G4String sourceType;
   G4ThreeVector sourcePosition;
   vector<SourceData*> TheSource;
@@ -85,6 +86,8 @@ private:
   G4double sourceWhiteHiE;
   G4double bgSphereRmin;
   G4double bgSphereRmax;
+  G4double collimationAngle;
+  G4ThreeVector collimationDirection;
 };
 
 

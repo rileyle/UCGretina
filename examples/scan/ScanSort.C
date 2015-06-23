@@ -12,6 +12,7 @@ TH1F *crys_x[12];
 TH1F *crys_y[12];
 TH1F *crys_z[12];
 
+TH1F *crystal_lo[4];
 TH2F *crys_xy_lo[4];
 TH2F *crys_xz_lo[4];
 TH2F *crys_yz_lo[4];
@@ -19,6 +20,7 @@ TH1F *crys_x_lo[4];
 TH1F *crys_y_lo[4];
 TH1F *crys_z_lo[4];
 
+TH1F *crystal_hi[4];
 TH2F *crys_xy_hi[4];
 TH2F *crys_xz_hi[4];
 TH2F *crys_yz_hi[4];
@@ -170,6 +172,13 @@ void loadSim(TString fileName) {
     crystalLabel.Form("_%d", crystalID[i]);
     crystalName += crystalLabel;
 
+    TString cName = crystalName.Copy();
+    cName += "_lo";
+    crystal_lo[i] = new TH1F(cName,"", nChannels, float(lo), float(hi));
+    cName = crystalName.Copy();
+    cName += "_hi";
+    crystal_hi[i] = new TH1F(cName,"", nChannels, float(lo), float(hi));
+
     TString xyName = crystalName.Copy();
     xyName += "_xy_lo";
     crys_xy_lo[i] = new TH2F(xyName,"", 100, -50., 50., 100, -50., 50.);
@@ -224,6 +233,7 @@ void loadSim(TString fileName) {
   }
  
   Int_t nGamma = 0;
+  Int_t nBuffer = 0;
   Int_t nReaction = 0;
   Int_t nGamma, nEvent;
   Int_t nHits;
@@ -232,6 +242,12 @@ void loadSim(TString fileName) {
 
   while( fp >> sBuffer ){
 
+    nBuffer++;
+    if(nBuffer%100000 == 0) {
+      cout << "Processed " << nBuffer << " events ...\r";
+      flush(cout);
+    }
+
     Int_t Ndecomp, eventID;
     if( sBuffer == "D" )
       fp >> Ndecomp >> eventID;
@@ -239,10 +255,6 @@ void loadSim(TString fileName) {
       continue;
 
     //    cout << "Ndecomp = " << Ndecomp << "  eventID = " << eventID << endl;
-
-    if(eventID%10000 == 0) {
-      cout << "Processed " << eventID << " events ...\r";
-    }
 
     Float_t ElabAB = 0;
     Float_t x,   y, z;
@@ -354,6 +366,7 @@ void loadSim(TString fileName) {
 
 	    // Register clover conicidences
 	    if(cloverLoHit && detNum[i] < 128){
+	      crystal_lo[crystalNum[detNum[i]]]->Fill( measuredE(E, detNum[i]) );
 	      crys_xy_lo[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
 						      yHit[detNum[i]]);
 	      crys_xz_lo[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
@@ -367,6 +380,7 @@ void loadSim(TString fileName) {
 	    }
 
 	    if(cloverHiHit && detNum[i] < 128){
+	      crystal_hi[crystalNum[detNum[i]]]->Fill( measuredE(E, detNum[i]) );
 	      crys_xy_hi[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
 						      yHit[detNum[i]]);
 	      crys_xz_hi[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
@@ -392,17 +406,14 @@ void loadSim(TString fileName) {
     }
 
     nGamma++;
-    if(nGamma%100000 == 0) {
-      cout << "\r... sorted " << nGamma << " gamma rays ...";
-      flush(cout);
-    }
 
   }
 
   fp.close();
 
   cout << "\r... sorted " 
-       << nGamma     << " gamma events, and " << endl;
+       << nBuffer    << " buffers and "
+       << nGamma     << " gamma events.\n" << endl;
 
   return;
 
@@ -424,7 +435,7 @@ void ScanSort(TString simFile){
 
   loadSim(simFile);
 
-  cout << "... writing Spectra to " << rootFile << " ...\n" << endl;
+  cout << "... writing spectra to " << rootFile << " ...\n" << endl;
 
   rF->Write();
 

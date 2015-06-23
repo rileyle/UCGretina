@@ -23,4 +23,4 @@
 /Mode2/GretinaCoords
 #/Mode2/Filename scan.dat
 /Output/Filename scan.out
-/run/beamOn 5000000
+/run/beamOn 1000000

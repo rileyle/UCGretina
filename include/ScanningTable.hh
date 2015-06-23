@@ -76,7 +76,15 @@ class ScanningTable
   //logical volume
   G4LogicalVolume* Cart8020_log;
   G4LogicalVolume* CartBase_log;
-  G4LogicalVolume* CartTop_log;
+  G4LogicalVolume* CartTopUBaseBottomLeft_log; 
+  G4LogicalVolume* CartTopUBaseBottomMid_log;
+  G4LogicalVolume* CartTopUBaseBottomRight_log;
+  G4LogicalVolume* CartTopUBaseUpperLeft_log;
+  G4LogicalVolume* CartTopUBaseUpperMid_log;
+  G4LogicalVolume* CartTopUBaseUpperRight_log;
+  G4LogicalVolume* CartTopFlange_log;
+  G4LogicalVolume* CartTopPlate_log;
+  G4LogicalVolume* CartTopBar_log;
   G4LogicalVolume* CartBack_log;
   G4LogicalVolume* Brake_log;
   G4LogicalVolume* ZSlitsLeftBracket_log;
@@ -100,15 +108,27 @@ class ScanningTable
   G4LogicalVolume* CloverElevator_log;
   G4LogicalVolume* CloverRight_log;
   G4LogicalVolume* CloverLeft_log;
-  G4LogicalVolume* CloverAssemblyLeft_log;
-  G4LogicalVolume* CloverAssemblyRight_log;
+  G4LogicalVolume* CloverAssemblyLeftBase_log;
+  G4LogicalVolume* CloverAssemblyLeftLeft_log;
+  G4LogicalVolume* CloverAssemblyLeftRight_log;
+  G4LogicalVolume* CloverAssemblyRightBase_log;
+  G4LogicalVolume* CloverAssemblyRightLeft_log;
+  G4LogicalVolume* CloverAssemblyRightRight_log;
   G4LogicalVolume* CloverRightShield_log;
   G4LogicalVolume* CloverLeftShield_log;
   
   //physical volume
   G4VPhysicalVolume* Cart8020_phys;
   G4VPhysicalVolume* CartBase_phys;
-  G4VPhysicalVolume* CartTop_phys;
+  G4VPhysicalVolume* CartTopUBaseBottomLeft_phys;
+  G4VPhysicalVolume* CartTopUBaseBottomMid_phys;
+  G4VPhysicalVolume* CartTopUBaseBottomRight_phys;
+  G4VPhysicalVolume* CartTopUBaseUpperLeft_phys;
+  G4VPhysicalVolume* CartTopUBaseUpperMid_phys;
+  G4VPhysicalVolume* CartTopUBaseUpperRight_phys;
+  G4VPhysicalVolume* CartTopFlange_phys;
+  G4VPhysicalVolume* CartTopPlate_phys;
+  G4VPhysicalVolume* CartTopBar_phys;
   G4VPhysicalVolume* CartBack_phys;
   G4VPhysicalVolume* Brake_phys;
   G4VPhysicalVolume* ZSlitsLeftBracket_phys;
@@ -132,8 +152,12 @@ class ScanningTable
   G4VPhysicalVolume* CloverElevator_phys;
   G4VPhysicalVolume* CloverRight_phys;
   G4VPhysicalVolume* CloverLeft_phys;
-  G4VPhysicalVolume* CloverAssemblyRight_phys;
-  G4VPhysicalVolume* CloverAssemblyLeft_phys;
+  G4VPhysicalVolume* CloverAssemblyRightBase_phys;
+  G4VPhysicalVolume* CloverAssemblyRightLeft_phys;
+  G4VPhysicalVolume* CloverAssemblyRightRight_phys;
+  G4VPhysicalVolume* CloverAssemblyLeftBase_phys;
+  G4VPhysicalVolume* CloverAssemblyLeftLeft_phys;
+  G4VPhysicalVolume* CloverAssemblyLeftRight_phys;
   G4VPhysicalVolume* CloverRightShield_phys;
   G4VPhysicalVolume* CloverLeftShield_phys;
 

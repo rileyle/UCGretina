@@ -10,7 +10,7 @@
 #include "G4UIcmdWithADouble.hh"
 #include "G4UIcmdWithoutParameter.hh"
 #include "G4UIcmdWithAnInteger.hh"
-
+#include "G4UIcmdWith3Vector.hh"
 
 class PrimaryGeneratorAction_Messenger: public G4UImessenger
 {
@@ -32,6 +32,8 @@ private:
   G4UIcmdWithADoubleAndUnit*   SrcXCmd;
   G4UIcmdWithADoubleAndUnit*   SrcYCmd;
   G4UIcmdWithADoubleAndUnit*   SrcZCmd;
+  G4UIcmdWithADoubleAndUnit*   SrcCollAngCmd;
+  G4UIcmdWith3Vector*          SrcCollDirCmd;
   G4UIcmdWithoutParameter*     PGASCmd;
   G4UIcmdWithoutParameter*     PGABCmd;
   G4UIcmdWithoutParameter*     SrcTFCmd;

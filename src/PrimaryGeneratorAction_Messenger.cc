@@ -61,6 +61,15 @@ PrimaryGeneratorAction_Messenger::PrimaryGeneratorAction_Messenger(PrimaryGenera
   SrcTBCmd = new G4UIcmdWithoutParameter("/Experiment/Source/OnTargetBack",this);
   SrcTBCmd->SetGuidance("Set source position on target back");
 
+  SrcCollAngCmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/CollimationAngle",this);
+  SrcCollAngCmd->SetGuidance("Set angle of collimation (about Z) for the source");
+  SrcCollAngCmd->SetParameterName("Collimation angle",false);
+  SrcCollAngCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  SrcCollDirCmd = new G4UIcmdWith3Vector("/Experiment/Source/CollimationDirection",this);
+  SrcCollDirCmd->SetGuidance("Set direction of collimation for the source");
+  SrcCollDirCmd->SetParameterName("X","Y","Z",false,false);
+  SrcCollDirCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   SrcRCmd = new G4UIcmdWithoutParameter("/Experiment/Source/Report",this);
   SrcRCmd->SetGuidance("Report source parameters");
@@ -97,6 +106,8 @@ PrimaryGeneratorAction_Messenger::~PrimaryGeneratorAction_Messenger()
   delete SrcZCmd;
   delete SrcTFCmd;
   delete SrcTBCmd;
+  delete SrcCollAngCmd;
+  delete SrcCollDirCmd;
   delete SrcRCmd;
   delete ROnCmd;
   delete ROfCmd;
@@ -141,6 +152,12 @@ void PrimaryGeneratorAction_Messenger::SetNewValue(G4UIcommand* command,G4String
 
   if( command == SrcTBCmd )
     {PGA ->SetSourceOnTargetBack();}
+
+  if( command == SrcCollAngCmd )
+    {PGA ->SetSourceCollAngle(SrcCollAngCmd->GetNewDoubleValue(newValue));}
+
+  if( command == SrcCollDirCmd )
+    {PGA ->SetSourceCollDirection(SrcCollDirCmd->GetNew3VectorValue(newValue));}
 
   if( command == SrcRCmd )
     {PGA ->SourceReport();}

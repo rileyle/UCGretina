@@ -14,6 +14,9 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction *detector, I
   frac=0;
   sourceWhiteLoE = 100.*keV;
   sourceWhiteHiE = 10000.*keV;
+  isCollimated         = false;
+  collimationDirection = G4ThreeVector(0., 0., 1.);
+  collimationAngle     = 0.;
 }
 
 PrimaryGeneratorAction::~PrimaryGeneratorAction()
@@ -72,7 +75,23 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	}
       else
 	{
-	  particleGun->SetParticleMomentumDirection(G4RandomDirection());
+	  if(isCollimated){
+	    G4double cosThetaMax = cos(collimationAngle);
+	    G4double dcosTheta = 1 - cos(collimationAngle);
+	    G4double cosTheta =  cosThetaMax + G4UniformRand()*dcosTheta;
+	    G4double sinTheta2 = 1. - cosTheta*cosTheta;
+	    if( sinTheta2 < 0.)  sinTheta2 = 0.;
+	    G4double sinTheta  = std::sqrt(sinTheta2); 
+	    G4double phi       = twopi*G4UniformRand();
+	    G4ThreeVector sourceDir = G4ThreeVector(sinTheta*std::cos(phi),
+						    sinTheta*std::sin(phi), 
+						    cosTheta).unit();
+	    sourceDir.rotateY(collimationDirection.theta());
+	    sourceDir.rotateZ(collimationDirection.phi());
+	    particleGun->SetParticleMomentumDirection(sourceDir);
+	  } else {
+	    particleGun->SetParticleMomentumDirection(G4RandomDirection());
+	  }
 	  particleGun->SetParticlePosition(sourcePosition);
 	}
 
