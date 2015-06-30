@@ -6,6 +6,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction *detector, I
   sourcePosition.setX(0);
   sourcePosition.setY(0);
   sourcePosition.setZ(0);
+  sourceRadius = 0;
   SetSourceEu152();
   sourceType = "eu152";
   n_particle = 1;
@@ -75,6 +76,20 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	}
       else
 	{
+	  // Pick a point on the source disk.
+	  G4ThreeVector sourceOffset = G4ThreeVector(0.,0.,0.);
+	  if(sourceRadius > 0){
+	    G4double xOffset, yOffset;
+	    G4double rOffset, phiOffset;
+	    phiOffset = G4UniformRand()*8.*atan(1.);
+	    rOffset   = G4UniformRand()+G4UniformRand();
+	    if(rOffset >= 1) rOffset =- (rOffset - 2.);
+	    xOffset = rOffset*cos(phiOffset)*sourceRadius;
+	    yOffset = rOffset*sin(phiOffset)*sourceRadius;
+	    sourceOffset.setX(xOffset);
+	    sourceOffset.setY(yOffset);
+	  }
+
 	  if(isCollimated){
 	    G4double cosThetaMax = cos(collimationAngle);
 	    G4double dcosTheta = 1 - cos(collimationAngle);
@@ -89,10 +104,14 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	    sourceDir.rotateY(collimationDirection.theta());
 	    sourceDir.rotateZ(collimationDirection.phi());
 	    particleGun->SetParticleMomentumDirection(sourceDir);
+	    if(sourceRadius > 0){
+	      sourceOffset.rotateY(collimationDirection.theta());
+	      sourceOffset.rotateZ(collimationDirection.phi());
+	    }
 	  } else {
 	    particleGun->SetParticleMomentumDirection(G4RandomDirection());
 	  }
-	  particleGun->SetParticlePosition(sourcePosition);
+	  particleGun->SetParticlePosition(sourcePosition+sourceOffset);
 	}
 
       particleGun->SetParticleEnergy(GetSourceEnergy());

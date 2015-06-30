@@ -5,10 +5,10 @@
 /Gretina/detector/enableCapsules
 /ScanningTable/CADModelPath ../../cadModels
 /ScanningTable/Clover right
-#/ScanningTable/IncludeCartFrame
-#/ScanningTable/IncludeCloverCart
+/ScanningTable/IncludeCartFrame
+/ScanningTable/IncludeCloverCart
+/ScanningTable/IncludeSlitMount
 /ScanningTable/IncludeShields
-#/Target/Construct
 /Gretina/update
 # Source parameters ============================================================
 /Experiment/RunSource

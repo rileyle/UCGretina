@@ -95,7 +95,8 @@ void loadSim(TString fileName) {
   Int_t   iBuffer[2];
   TString sBuffer;
 
-  Float_t Edep[1000] = {0.0};
+  Float_t Edep[1000]  = {0.0};
+  Float_t mEdep[1000] = {0.0};
   Float_t xHit[1000] = {0.0};
   Float_t yHit[1000] = {0.0};
   Float_t zHit[1000] = {0.0};
@@ -133,7 +134,7 @@ void loadSim(TString fileName) {
     crystalNum[crystalID[i]] = i;
 
     // Initialize crystal spectra
-    TString crystalName = Name.Copy();
+    TString crystalName = "crys";
     TString crystalLabel;
     crystalLabel.Form("_%d", crystalID[i]);
     crystalName += crystalLabel;
@@ -160,14 +161,14 @@ void loadSim(TString fileName) {
     crys_y[i] = new TH1F(yName,"", 1000, -50., 50.);
     TString zName = crystalName.Copy();
     zName += "_z";
-    crys_z[i] = new TH1F(zName,"", 1000, -50., 50.);
+    crys_z[i] = new TH1F(zName,"", 1000, 0., 100.);
 
   }
 
   // Clover coincidence spectra
   for(Int_t i = 0; i < 4; i++){
 
-    TString crystalName = Name.Copy();
+    TString crystalName = "crys";
     TString crystalLabel;
     crystalLabel.Form("_%d", crystalID[i]);
     crystalName += crystalLabel;
@@ -321,94 +322,96 @@ void loadSim(TString fileName) {
     Bool_t cloverHiHit = false;
     if(ElabAB > 0) {
 
-      // Check for Clover hits.
+      // Simulate intrinsic resolution and low-energy thresholds.
+      // Check for Clover hits and target GRETINA crystal hits.
       for(Int_t i = 0; i < nHits; i++) {
-	if( Edep[detNum[i]] > 0. ) {
+	//Simulate thresholds
+	if( gRandom->Rndm()
+	    < (1.0 + tanh((Edep[detNum[i]]-threshPar0[detNum[i]])/threshPar1[detNum[i]]))/2.0 )
+	  mEdep[detNum[i]] = measuredE(Edep[detNum[i]], detNum[i]);
+	else
+	  mEdep[detNum[i]] = 0.;
+	
+	if( mEdep[detNum[i]] > 0. ) {
 	  if( detNum[i] > 127 ) {
-	    if( detNum[i]%4 < 2)
+	    if( detNum[i]%4 < 2)         // Bottom-row clover crystal
 	      cloverLoHit = true;
-	    else
+	    else                         // Top-row clover crystal
 	      cloverHiHit = true;
 	  }
 	}
       }
 
       for(Int_t i = 0; i < nHits; i++){
-	Float_t E = Edep[detNum[i]];
+	Float_t E =  Edep[detNum[i]];
+	Float_t mE = mEdep[detNum[i]];
 	if( E > 0.0 ){
 
-	  // Simulate thresholds
-	  if( gRandom->Rndm()
-	      < (1.0 + tanh((E-threshPar0[detNum[i]])/threshPar1[detNum[i]]))/2.0 ){
-
-	    // No addback
-	    sim->Fill( measuredE(E, detNum[i]) );
-	    // No addback
-	    crystal[crystalNum[detNum[i]]]->Fill( measuredE(E, detNum[i]) );
-	    //	    cout << "(" << xHit[detNum[i]] << ", " 
-	    //		 << yHit[detNum[i]] << ")" << endl;
+	  // No addback
+	  sim->Fill( measuredE(E, detNum[i]) );
+	  // No addback
+	  crystal[crystalNum[detNum[i]]]->Fill( measuredE(E, detNum[i]) );
+	  //	    cout << "(" << xHit[detNum[i]] << ", " 
+	  //		 << yHit[detNum[i]] << ")" << endl;
 
 
-	    // cout << "hit " << i << ", detNum[i] = " << detNum[i]
-	    // 	 << ", crystalNum[detNum[i]] = " 
-	    // 	 << crystalNum[detNum[i]] << endl;
+	  // cout << "hit " << i << ", detNum[i] = " << detNum[i]
+	  // 	 << ", crystalNum[detNum[i]] = " 
+	  // 	 << crystalNum[detNum[i]] << endl;
 
-	    crys_xy[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
-						 yHit[detNum[i]]);
-	    crys_xz[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
-						 zHit[detNum[i]]);
-	    crys_yz[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]],
-						 zHit[detNum[i]]);
+	  crys_xy[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
+					       yHit[detNum[i]]);
+	  crys_xz[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
+					       zHit[detNum[i]]);
+	  crys_yz[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]],
+					       zHit[detNum[i]]);
 
-	    crys_x[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]]);
-	    crys_y[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]]);
-	    crys_z[crystalNum[detNum[i]]]->Fill(zHit[detNum[i]]);
+	  crys_x[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]]);
+	  crys_y[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]]);
+	  crys_z[crystalNum[detNum[i]]]->Fill(zHit[detNum[i]]);
 
-	    // Register clover conicidences
-	    if(cloverLoHit && detNum[i] < 128){
-	      crystal_lo[crystalNum[detNum[i]]]->Fill( measuredE(E, detNum[i]) );
-	      crys_xy_lo[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
-						      yHit[detNum[i]]);
-	      crys_xz_lo[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
-						      zHit[detNum[i]]);
-	      crys_yz_lo[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]],
-						      zHit[detNum[i]]);
+	  // Register clover conicidences
+	  if(cloverLoHit && detNum[i] < 128){
+	    crystal_lo[crystalNum[detNum[i]]]->Fill( measuredE(E, detNum[i]) );
+	    crys_xy_lo[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
+						    yHit[detNum[i]]);
+	    crys_xz_lo[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
+						    zHit[detNum[i]]);
+	    crys_yz_lo[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]],
+						    zHit[detNum[i]]);
 
-	      crys_x_lo[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]]);
-	      crys_y_lo[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]]);
-	      crys_z_lo[crystalNum[detNum[i]]]->Fill(zHit[detNum[i]]);
-	    }
-
-	    if(cloverHiHit && detNum[i] < 128){
-	      crystal_hi[crystalNum[detNum[i]]]->Fill( measuredE(E, detNum[i]) );
-	      crys_xy_hi[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
-						      yHit[detNum[i]]);
-	      crys_xz_hi[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
-						      zHit[detNum[i]]);
-	      crys_yz_hi[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]],
-						      zHit[detNum[i]]);
-
-	      crys_x_hi[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]]);
-	      crys_y_hi[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]]);
-	      crys_z_hi[crystalNum[detNum[i]]]->Fill(zHit[detNum[i]]);
-	    }
-
+	    crys_x_lo[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]]);
+	    crys_y_lo[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]]);
+	    crys_z_lo[crystalNum[detNum[i]]]->Fill(zHit[detNum[i]]);
 	  }
 
-	  nDets++;
-	  Edep[detNum[i]] = 0.0; // Very important to zero after use.
-	  xHit[detNum[i]] = 0.;
-	  yHit[detNum[i]] = 0.;
-	  zHit[detNum[i]] = 0.;
+	  if(cloverHiHit && detNum[i] < 128){
+	    crystal_hi[crystalNum[detNum[i]]]->Fill( measuredE(E, detNum[i]) );
+	    crys_xy_hi[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
+						    yHit[detNum[i]]);
+	    crys_xz_hi[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
+						    zHit[detNum[i]]);
+	    crys_yz_hi[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]],
+						    zHit[detNum[i]]);
+
+	    crys_x_hi[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]]);
+	    crys_y_hi[crystalNum[detNum[i]]]->Fill(yHit[detNum[i]]);
+	    crys_z_hi[crystalNum[detNum[i]]]->Fill(zHit[detNum[i]]);
+	  }
 
 	}
+
+	nDets++;
+	Edep[detNum[i]] = 0.0; // Very important to zero after use.
+	xHit[detNum[i]] = 0.;
+	yHit[detNum[i]] = 0.;
+	zHit[detNum[i]] = 0.;
+
       }
+      nGamma++;
     }
-
-    nGamma++;
-
   }
-
+  
   fp.close();
 
   cout << "\r... sorted " 

@@ -36,6 +36,7 @@ class ScanningTable
   void SetCADPath(G4String pth) { CADModelPath = pth; }
   void SetIncludeCloverCart() { includeCloverCart = true; }
   void SetIncludeCartFrame() { includeCartFrame = true; }
+  void SetIncludeSlitMount() { includeSlitMount = true; }
   void SetIncludeShield() { includeShield = true; }
   void SetXShift(G4double value) { xShift = value; }
   void SetYShift(G4double value) { yShift = value; }
@@ -46,9 +47,22 @@ class ScanningTable
   //flags
   G4bool includeCloverCart;
   G4bool includeCartFrame;
+  G4bool includeSlitMount;
   G4bool includeShield;
 
   G4String CADModelPath;
+  G4String SlitPart[10];
+  G4String CartPart[37];
+  G4String CollimatorPart[3];
+  G4String SlitZAssemblyPart[23];
+  G4String CloverAssemblyPart[6];
+  G4String CartTopPart[9];
+  int ZSlitParts;
+  int CartParts;
+  int CollimatorParts;
+  int SlitZAssemblyParts;
+  int CloverAssemblyParts;
+  int CartTopParts;
 
   G4double xShift;
   G4double yShift;
@@ -56,10 +70,17 @@ class ScanningTable
   
   //materials
   Materials* materials;
+  G4Material* ZSlitMaterial[10];
+  G4Material* CartMaterial[37];
+  G4Material* CollimatorMaterial[3];
+  G4Material* SlitZAssemblyMaterial[23];
+  G4Material* CloverAssemblyMaterial[6];
+  G4Material* CartTopMaterial[9];
   G4Material* material8020;
   G4Material* materialCartBase;
   G4Material* materialCartTop;
   G4Material* materialCartBack;
+  G4Material* materialSlitBrackets;
   G4Material* materialSlits;
   G4Material* materialSlitAssembly;
   G4Material* materialTranslation;
@@ -74,8 +95,13 @@ class ScanningTable
   G4ThreeVector *Pos0;
 
   //logical volume
+  G4LogicalVolume* Cart_log;
   G4LogicalVolume* Cart8020_log;
+  G4LogicalVolume* Collimator_log;
   G4LogicalVolume* CartBase_log;
+  G4LogicalVolume* SlitZAssembly_log;
+  G4LogicalVolume* CloverAssembly_log;
+  G4LogicalVolume* CartTop_log;
   G4LogicalVolume* CartTopUBaseBottomLeft_log; 
   G4LogicalVolume* CartTopUBaseBottomMid_log;
   G4LogicalVolume* CartTopUBaseBottomRight_log;
@@ -87,6 +113,7 @@ class ScanningTable
   G4LogicalVolume* CartTopBar_log;
   G4LogicalVolume* CartBack_log;
   G4LogicalVolume* Brake_log;
+  G4LogicalVolume* ZSlit_log;
   G4LogicalVolume* ZSlitsLeftBracket_log;
   G4LogicalVolume* ZSlitsUpperLeftWall_log;
   G4LogicalVolume* ZSlitsMidLeftWall_log;
@@ -118,8 +145,13 @@ class ScanningTable
   G4LogicalVolume* CloverLeftShield_log;
   
   //physical volume
+  G4VPhysicalVolume* Cart_phys;
   G4VPhysicalVolume* Cart8020_phys;
+  G4VPhysicalVolume* Collimator_phys;
   G4VPhysicalVolume* CartBase_phys;
+  G4VPhysicalVolume* SlitZAssembly_phys;
+  G4VPhysicalVolume* CloverAssembly_phys;
+  G4VPhysicalVolume* CartTop_phys;
   G4VPhysicalVolume* CartTopUBaseBottomLeft_phys;
   G4VPhysicalVolume* CartTopUBaseBottomMid_phys;
   G4VPhysicalVolume* CartTopUBaseBottomRight_phys;
@@ -131,6 +163,7 @@ class ScanningTable
   G4VPhysicalVolume* CartTopBar_phys;
   G4VPhysicalVolume* CartBack_phys;
   G4VPhysicalVolume* Brake_phys;
+  G4VPhysicalVolume* ZSlit_phys;
   G4VPhysicalVolume* ZSlitsLeftBracket_phys;
   G4VPhysicalVolume* SlitAssembly_phys;
   G4VPhysicalVolume* ZSlitsUpperLeftWall_phys;

@@ -14,7 +14,6 @@ DetectorConstruction::DetectorConstruction()
   gretaChamberStatus = false;
   WUChamberStatus = false;
 #else
-  scanningTableStatus = true;
   cloverStatus = "";
 #endif
 #endif
@@ -215,14 +214,18 @@ void DetectorConstruction::Placement()
 
 #else
   // Scanning Table
-  if( scanningTableStatus ) {
-    scanningTable->Construct();
-  }
-  if(cloverStatus != ""){
-    // Eventually fix this to place left, right, or both based on status.
-    rightClover = new Clover_Detector(ExpHall_log, materials);
+  scanningTable->Construct();
+  if( cloverStatus == "right" || cloverStatus == "both" ){
+    G4cout << "Constructing right clover detector." << G4endl;
+    rightClover = new Clover_Detector(ExpHall_log, materials, "right");
     rightClover->Construct();
     rightClover->MakeSensitive(TrackerGamma);
+  }
+  if( cloverStatus == "left"  || cloverStatus == "both" ){
+    G4cout << "Constructing left clover detector." << G4endl;
+    leftClover = new Clover_Detector(ExpHall_log, materials, "left");
+    leftClover->Construct();
+    leftClover->MakeSensitive(TrackerGamma);
   }
 #endif
 #endif
@@ -297,12 +300,6 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
   WUChamberCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
 #else
-  commandName = "/ScanningTable/Construct";
-  aLine = commandName.c_str();
-  ScanningTableCmd = new G4UIcmdWithoutParameter(aLine, this);
-  ScanningTableCmd->SetGuidance("Construct the scanning table.");
-  ScanningTableCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
   commandName = "/ScanningTable/Clover";
   aLine = commandName.c_str();
   CloverCmd = new G4UIcmdWithAString(aLine, this);
@@ -334,7 +331,6 @@ DetectorConstruction_Messenger::~DetectorConstruction_Messenger()
   delete GretaChamberCmd;
   delete WUChamberCmd;
 #else
-  delete ScanningTableCmd;
   delete CloverCmd;
 #endif
 #endif
@@ -360,9 +356,6 @@ void DetectorConstruction_Messenger::SetNewValue(G4UIcommand* command,G4String n
     myTarget->SetWUChamberStatus(true);
   }
 #else
-  if( command == ScanningTableCmd ) {
-    myTarget->SetScanningTableStatus(true);
-  }
   if( command == CloverCmd ) {
     myTarget->SetCloverStatus(newValue);
   }

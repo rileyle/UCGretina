@@ -132,9 +132,9 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
       //  on the names assigned to the clover crystals instead.)
 
       G4int baseNum = 0;
-      if(name.substr(5,6) == "impr_1"){
+      if(name.substr(0,4) == "av_1"){
 	baseNum = 124;
-      } else if(name.substr(5,6) == "impr_2"){
+      } else if(name.substr(0,4) == "av_2"){
 	baseNum = 128;
       }
 

@@ -4,7 +4,11 @@
 # Detector parameters ==========================================================
 /Gretina/detector/enableCapsules
 /ScanningTable/CADModelPath ../../cadModels
-#/Target/Construct
+/ScanningTable/Clover right
+/ScanningTable/IncludeCartFrame
+/ScanningTable/IncludeCloverCart
+/ScanningTable/IncludeSlitMount
+/ScanningTable/IncludeShields
 /Gretina/update
 # Source parameters ============================================================
 /Experiment/RunSource
@@ -12,15 +16,11 @@
 /Experiment/Source/setX 0. mm
 /Experiment/Source/setY 200. mm
 /Experiment/Source/setZ -37.05 mm
+/Experiment/Source/setR 1.0 mm
 # Print simulation parameters to stdout ========================================
 /ExpHall/Report
-# Tracking parameters ==========================================================
-#/GammaPrint/Track_Set
-#/IonPrint/Track_Set
 # Output parameters ============================================================
-#/Mode2/crmatFile crmat.LINUX
 /Mode2/crystalXforms
 /Mode2/GretinaCoords
-#/Mode2/Filename scan.dat
 /Output/Filename scan.out
 /run/beamOn 1000000

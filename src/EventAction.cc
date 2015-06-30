@@ -11,6 +11,7 @@ EventAction::EventAction()
   packingRes = 0.*mm;
   S800KE = 1.0;
   outFileName = "";
+  outDetsOnly = false;
   evOut = false;
   mode2FileName = "";
   mode2Out = false;
@@ -497,7 +498,7 @@ void EventAction::writeS800(long long int ts, G4double a, G4double b,
 
   }
 
-  if(evOut)
+  if(evOut && !outDetsOnly)
     evfile << "S    " 
 	   << std::fixed << std::setprecision(4) 
 	   << std::right << std::setw(12) 
@@ -669,7 +670,7 @@ void EventAction::writeSim(long long int ts, EventInformation* eventInfo)
 
   }
 
-  if(evOut){
+  if(evOut && !outDetsOnly){
     evfile << "E" << std::setw(4) << eventInfo->GetNEmittedGammas()  
 	   << std::setw(4) << eventInfo->GetFullEnergy()  
 	   << std::setw(12) << ts/10000 << G4endl;

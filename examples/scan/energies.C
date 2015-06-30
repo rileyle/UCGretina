@@ -1,20 +1,19 @@
-void energies(){
-  energies(31);
+void energies(TString fileName){
+  energies(fileName, 31);
 }
 
-void energies(Int_t mod){
+void energies(TString fileName, Int_t mod){
 
-  TCanvas * c1 = new TCanvas("c", "c", 800, 800);
+  TCanvas * c1 = new TCanvas(fileName, fileName, 800, 800);
   c1->Divide(2,2);
 
-  TString baseName = "cs137";
+  TString baseName = "crys";
 
   TH1F* e0;
   TH1F* e1;
   TH1F* e2;
   TH1F* e3;
 
-  TString fileName = baseName + ".root";
   TFile *rF = new TFile(fileName);
 
   TString e0Name = baseName + Form("_%i", 4*mod);

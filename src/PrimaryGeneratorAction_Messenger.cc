@@ -55,6 +55,11 @@ PrimaryGeneratorAction_Messenger::PrimaryGeneratorAction_Messenger(PrimaryGenera
   SrcZCmd->SetParameterName("Source Z position",false);
   SrcZCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  SrcRCmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/setR",this);
+  SrcRCmd->SetGuidance("Set the radius of the source disk");
+  SrcRCmd->SetParameterName("Source radius",false);
+  SrcRCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   SrcTFCmd = new G4UIcmdWithoutParameter("/Experiment/Source/OnTargetFace",this);
   SrcTFCmd->SetGuidance("Set source position on target face");
   
@@ -71,8 +76,8 @@ PrimaryGeneratorAction_Messenger::PrimaryGeneratorAction_Messenger(PrimaryGenera
   SrcCollDirCmd->SetParameterName("X","Y","Z",false,false);
   SrcCollDirCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  SrcRCmd = new G4UIcmdWithoutParameter("/Experiment/Source/Report",this);
-  SrcRCmd->SetGuidance("Report source parameters");
+  SrcRepCmd = new G4UIcmdWithoutParameter("/Experiment/Source/Report",this);
+  SrcRepCmd->SetGuidance("Report source parameters");
 
   ROfCmd = new G4UIcmdWithoutParameter("/Experiment/Reaction/Off",this);
   ROfCmd->SetGuidance("Simulate only unreacted ions.");
@@ -104,11 +109,12 @@ PrimaryGeneratorAction_Messenger::~PrimaryGeneratorAction_Messenger()
   delete SrcXCmd;
   delete SrcYCmd;
   delete SrcZCmd;
+  delete SrcRCmd;
   delete SrcTFCmd;
   delete SrcTBCmd;
   delete SrcCollAngCmd;
   delete SrcCollDirCmd;
-  delete SrcRCmd;
+  delete SrcRepCmd;
   delete ROnCmd;
   delete ROfCmd;
   delete SFrCmd;
@@ -147,6 +153,9 @@ void PrimaryGeneratorAction_Messenger::SetNewValue(G4UIcommand* command,G4String
   if( command == SrcZCmd )
     {PGA ->SetSourceZ(SrcZCmd->GetNewDoubleValue(newValue));}
 
+  if( command == SrcRCmd )
+    {PGA ->SetSourceR(SrcRCmd->GetNewDoubleValue(newValue));}
+
   if( command == SrcTFCmd )
     {PGA ->SetSourceOnTargetFace();}
 
@@ -159,7 +168,7 @@ void PrimaryGeneratorAction_Messenger::SetNewValue(G4UIcommand* command,G4String
   if( command == SrcCollDirCmd )
     {PGA ->SetSourceCollDirection(SrcCollDirCmd->GetNew3VectorValue(newValue));}
 
-  if( command == SrcRCmd )
+  if( command == SrcRepCmd )
     {PGA ->SourceReport();}
 
   if( command == ROnCmd )

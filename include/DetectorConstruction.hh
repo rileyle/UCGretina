@@ -77,7 +77,6 @@ public:
   void SetGretaChamberStatus(G4bool stat){gretaChamberStatus = stat;}
   void SetWUChamberStatus(G4bool stat){WUChamberStatus = stat;}
 #else
-  void SetScanningTableStatus(G4bool stat){scanningTableStatus = stat;}
   void SetCloverStatus(G4String stat){cloverStatus = stat;}
   Clover_Detector* rightClover;
   Clover_Detector* leftClover;
@@ -111,7 +110,6 @@ private:
   G4bool WUChamberStatus;
   WU_Chamber* WUChamber;
 #else
-  G4bool scanningTableStatus;
   ScanningTable* scanningTable;
   G4String cloverStatus;
 #endif
@@ -174,7 +172,6 @@ private:
   G4UIcmdWithoutParameter*     GretaChamberCmd;
   G4UIcmdWithoutParameter*     WUChamberCmd;
 #else
-  G4UIcmdWithoutParameter*     ScanningTableCmd;
   G4UIcmdWithAString*          CloverCmd;
 #endif
 #endif

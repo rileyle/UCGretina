@@ -31,6 +31,7 @@ public:
   void SetSourceX(G4double x){sourcePosition.setX(x);}
   void SetSourceY(G4double y){sourcePosition.setY(y);}
   void SetSourceZ(G4double z){sourcePosition.setZ(z);}
+  void SetSourceR(G4double r){sourceRadius=r;}
   void SetSourceOnTargetFace();
   void SetSourceOnTargetBack();
   void SourceReport();
@@ -80,6 +81,7 @@ private:
   G4bool source, inbeam, background, isCollimated; 
   G4String sourceType;
   G4ThreeVector sourcePosition;
+  G4double sourceRadius;
   vector<SourceData*> TheSource;
   G4double sourceBranchingSum;
   G4double sourceWhiteLoE;
@@ -92,6 +94,3 @@ private:
 
 
 #endif
-
-
-           

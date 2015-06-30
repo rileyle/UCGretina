@@ -2,8 +2,10 @@
 #include "Clover_Detector.hh"
 
 Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
-			   Materials* mat)
+				 Materials* mat, G4String orient)
 {
+  orientation = orient;
+
   materials=mat;
   expHall_log=experimentalHall_log;
 
@@ -99,15 +101,20 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   Cuboxpos = DetPos + Cuboxshift;
 
   // Final Clover placement
-  assemblyshift.setX(  -59.96*mm );
+  if(orientation == "right")
+    assemblyshift.setX(  -59.96*mm );
+  else if(orientation == "left")
+    assemblyshift.setX(   59.96*mm );
   assemblyshift.setY(  343.88*mm ); // Shield y position
   assemblyshift.setZ( -122.19*mm );
   assemblypos = assemblyshift;
   
   assemblyrot=G4RotationMatrix::IDENTITY;
   assemblyrot.rotateZ(0.*deg);
-  assemblyrot.rotateY(200.*deg);
-
+  if(orientation == "right")
+    assemblyrot.rotateY(200.*deg);
+  else if(orientation == "left")
+    assemblyrot.rotateY(160.*deg);
 }
 
 Clover_Detector::~Clover_Detector()

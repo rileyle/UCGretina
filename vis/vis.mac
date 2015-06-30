@@ -19,7 +19,7 @@
 /vis/viewer/set/style surface
 /vis/viewer/set/hiddenEdge
 #/vis/scene/add/axes 
-/vis/scene/add/trajectories
+#/vis/scene/add/trajectories
 #/vis/scene/add/hits
 /vis/scene/endOfEventAction accumulate 
 
@@ -30,4 +30,5 @@
 # Re-establish auto refreshing and verbosity
 /vis/viewer/set/autoRefresh true
 /vis/verbose warnings
+
 

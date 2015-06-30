@@ -38,7 +38,7 @@ public:
   G4LogicalVolume *expHall_log;
   Materials* materials;
   
-  Clover_Detector(G4LogicalVolume*, Materials*);
+  Clover_Detector(G4LogicalVolume*, Materials*, G4String);
   ~Clover_Detector();
 
   G4VPhysicalVolume *Construct();
@@ -50,6 +50,8 @@ public:
   void MakeSensitive(TrackerGammaSD*);
 
   private:
+
+  G4String orientation;
 
   // Logical volumes
 

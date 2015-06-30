@@ -26,6 +26,7 @@ private:
   G4UIcmdWithoutParameter* ConstructCmd;
   G4UIcmdWithoutParameter* CloverCartCmd;
   G4UIcmdWithoutParameter* CartFrameCmd;  
+  G4UIcmdWithoutParameter* SlitMountCmd;
   G4UIcmdWithoutParameter* ShieldCmd;
   G4UIcmdWithADoubleAndUnit* XShiftCmd;
   G4UIcmdWithADoubleAndUnit* YShiftCmd;
