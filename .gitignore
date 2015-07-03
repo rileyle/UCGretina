@@ -2,9 +2,8 @@ DEVNOTES
 *~
 *.out
 *.log
-*_sim.root
-*_sim_histos.root
-example_spectrum.root
+*.root
+*.root
 *.rad
 *.spe
 *.wrl

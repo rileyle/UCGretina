@@ -55,15 +55,29 @@ PrimaryGeneratorAction_Messenger::PrimaryGeneratorAction_Messenger(PrimaryGenera
   SrcZCmd->SetParameterName("Source Z position",false);
   SrcZCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  SrcRCmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/setR",this);
+  SrcRCmd->SetGuidance("Set the radius of the source disk");
+  SrcRCmd->SetParameterName("Source radius",false);
+  SrcRCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   SrcTFCmd = new G4UIcmdWithoutParameter("/Experiment/Source/OnTargetFace",this);
   SrcTFCmd->SetGuidance("Set source position on target face");
   
   SrcTBCmd = new G4UIcmdWithoutParameter("/Experiment/Source/OnTargetBack",this);
   SrcTBCmd->SetGuidance("Set source position on target back");
 
+  SrcCollAngCmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/CollimationAngle",this);
+  SrcCollAngCmd->SetGuidance("Set angle of collimation (about Z) for the source");
+  SrcCollAngCmd->SetParameterName("Collimation angle",false);
+  SrcCollAngCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  SrcRCmd = new G4UIcmdWithoutParameter("/Experiment/Source/Report",this);
-  SrcRCmd->SetGuidance("Report source parameters");
+  SrcCollDirCmd = new G4UIcmdWith3Vector("/Experiment/Source/CollimationDirection",this);
+  SrcCollDirCmd->SetGuidance("Set direction of collimation for the source");
+  SrcCollDirCmd->SetParameterName("X","Y","Z",false,false);
+  SrcCollDirCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  SrcRepCmd = new G4UIcmdWithoutParameter("/Experiment/Source/Report",this);
+  SrcRepCmd->SetGuidance("Report source parameters");
 
   ROfCmd = new G4UIcmdWithoutParameter("/Experiment/Reaction/Off",this);
   ROfCmd->SetGuidance("Simulate only unreacted ions.");
@@ -95,9 +109,12 @@ PrimaryGeneratorAction_Messenger::~PrimaryGeneratorAction_Messenger()
   delete SrcXCmd;
   delete SrcYCmd;
   delete SrcZCmd;
+  delete SrcRCmd;
   delete SrcTFCmd;
   delete SrcTBCmd;
-  delete SrcRCmd;
+  delete SrcCollAngCmd;
+  delete SrcCollDirCmd;
+  delete SrcRepCmd;
   delete ROnCmd;
   delete ROfCmd;
   delete SFrCmd;
@@ -136,13 +153,22 @@ void PrimaryGeneratorAction_Messenger::SetNewValue(G4UIcommand* command,G4String
   if( command == SrcZCmd )
     {PGA ->SetSourceZ(SrcZCmd->GetNewDoubleValue(newValue));}
 
+  if( command == SrcRCmd )
+    {PGA ->SetSourceR(SrcRCmd->GetNewDoubleValue(newValue));}
+
   if( command == SrcTFCmd )
     {PGA ->SetSourceOnTargetFace();}
 
   if( command == SrcTBCmd )
     {PGA ->SetSourceOnTargetBack();}
 
-  if( command == SrcRCmd )
+  if( command == SrcCollAngCmd )
+    {PGA ->SetSourceCollAngle(SrcCollAngCmd->GetNewDoubleValue(newValue));}
+
+  if( command == SrcCollDirCmd )
+    {PGA ->SetSourceCollDirection(SrcCollDirCmd->GetNew3VectorValue(newValue));}
+
+  if( command == SrcRepCmd )
     {PGA ->SourceReport();}
 
   if( command == ROnCmd )

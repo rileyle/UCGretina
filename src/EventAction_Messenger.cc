@@ -10,6 +10,9 @@ EventAction_Messenger::EventAction_Messenger(EventAction* EA):theEventAction(EA)
   OutFileCmd = new G4UIcmdWithAString("/Output/Filename",this);
   OutFileCmd->SetGuidance("Output file name.");
 
+  OutDetCmd = new G4UIcmdWithoutParameter("/Output/DetectorsOnly",this);
+  OutDetCmd->SetGuidance("Only print detected gamma-ray information.");
+
   Mode2Dir = new G4UIdirectory("/Mode2/");
   Mode2Dir->SetGuidance("Parameters for simulating Mode2 data.");
 
@@ -44,6 +47,7 @@ EventAction_Messenger::~EventAction_Messenger()
 
   delete OutputDir;
   delete OutFileCmd;
+  delete OutDetCmd;
   delete Mode2Dir;
   delete Mode2FileCmd;
   delete crmatCmd;
@@ -62,6 +66,8 @@ void EventAction_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
 
   if( command == OutFileCmd )
     {theEventAction->SetOutFile(newValue);}
+  if( command == OutDetCmd )
+    {theEventAction->SetOutDetsOnly();}
   if( command == Mode2FileCmd )
     {theEventAction->SetMode2File(newValue);}
   if( command == crmatCmd )

@@ -8,11 +8,18 @@
 #include "Background_Sphere.hh"
 #include "Background_Sphere_Messenger.hh"
 #ifndef LHTARGET
+#ifndef SCANNING
   #include "Beam_Tube.hh"
   #include "Beam_Tube_Messenger.hh"
   #include "Greta_Chamber.hh"
   #include "Greta_Chamber_Messenger.hh"
   #include "WU_Chamber.hh"
+#else
+  #include "ScanningTable.hh"
+  #include "ScanningTable_Messenger.hh"
+  #include "Clover_Detector.hh"
+#endif
+  #include "Target.hh"
   #include "Target_Messenger.hh"
 #else
   #include "Target_LH.hh"
@@ -65,13 +72,21 @@ public:
   void SetTargetStatus(G4bool stat){targetStatus = stat;}
 
 #ifndef LHTARGET
+#ifndef SCANNING
   void SetBeamTubeStatus(G4bool stat){beamTubeStatus = stat;}
   void SetGretaChamberStatus(G4bool stat){gretaChamberStatus = stat;}
   void SetWUChamberStatus(G4bool stat){WUChamberStatus = stat;}
+#else
+  void SetCloverStatus(G4String stat){cloverStatus = stat;}
+  Clover_Detector* rightClover;
+  Clover_Detector* leftClover;
+#endif
 #endif
 
+#ifndef SCANNING
   void SetShellStatus(G4String stat){shellStatus = stat;}
-
+#endif
+  
   void Placement();
 
 private:
@@ -85,6 +100,7 @@ private:
   Background_Sphere* BackgroundSphere;
 
 #ifndef LHTARGET
+#ifndef SCANNING
   G4bool beamTubeStatus;
   Beam_Tube* BeamTube;
 
@@ -93,10 +109,16 @@ private:
 
   G4bool WUChamberStatus;
   WU_Chamber* WUChamber;
+#else
+  ScanningTable* scanningTable;
+  G4String cloverStatus;
+#endif
 #endif
 
+#ifndef SCANNING
   G4String shellStatus;
- 
+#endif
+  
   Gretina_Array*   the_Gretina_Array;
 
   // Logical volumes
@@ -112,10 +134,15 @@ private:
   TrackerGammaSD_Messenger* TrackerGammaSDMessenger;
   TrackerIonSD* TrackerIon;
   TrackerIonSD_Messenger* TrackerIonSDMessenger;
+
   Gretina_Array_Messenger*  the_Gretina_Array_Messenger;
 #ifndef LHTARGET
+#ifndef SCANNING
   Beam_Tube_Messenger* BeamTubeMessenger;
   Greta_Chamber_Messenger* GretaChamberMessenger;
+#else
+  ScanningTable_Messenger* ScanningTableMessenger;
+#endif
 #endif
 };
 
@@ -126,25 +153,31 @@ private:
 
 class DetectorConstruction_Messenger: public G4UImessenger
 {
-  public:
-    DetectorConstruction_Messenger(DetectorConstruction*);
-    ~DetectorConstruction_Messenger();
-    
-  private:
-    DetectorConstruction*        myTarget;
-    
-  private:
-    G4UIcmdWithoutParameter*     UpdateCmd;
-    G4UIcmdWithoutParameter*     TargetCmd;
-    G4UIcmdWithAString*          ShellCmd;
-#ifndef LHTARGET
-    G4UIcmdWithoutParameter*     BeamTubeCmd;
-    G4UIcmdWithoutParameter*     GretaChamberCmd;
-    G4UIcmdWithoutParameter*     WUChamberCmd;
+public:
+  DetectorConstruction_Messenger(DetectorConstruction*);
+  ~DetectorConstruction_Messenger();
+  
+private:
+  DetectorConstruction*        myTarget;
+  
+private:
+  G4UIcmdWithoutParameter*     UpdateCmd;
+  G4UIcmdWithoutParameter*     TargetCmd;
+#ifndef SCANNING
+  G4UIcmdWithAString*          ShellCmd;
 #endif
-    
-  public:
-    void SetNewValue(G4UIcommand*, G4String);
+#ifndef LHTARGET
+#ifndef SCANNING
+  G4UIcmdWithoutParameter*     BeamTubeCmd;
+  G4UIcmdWithoutParameter*     GretaChamberCmd;
+  G4UIcmdWithoutParameter*     WUChamberCmd;
+#else
+  G4UIcmdWithAString*          CloverCmd;
+#endif
+#endif
+  
+public:
+  void SetNewValue(G4UIcommand*, G4String);
 };
 
 #endif

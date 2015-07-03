@@ -30,6 +30,7 @@ class EventAction : public G4UserEventAction
     void BeginOfEventAction(const G4Event*);
     void EndOfEventAction(const G4Event*);
     void SetOutFile(G4String);
+    void SetOutDetsOnly() { outDetsOnly = true; }
     G4String GetOutFileName(){return outFileName;}
     G4bool EvOut(){return evOut;}
     void openEvfile();
@@ -66,6 +67,7 @@ class EventAction : public G4UserEventAction
     G4int ionCollectionID;
     G4int gammaCollectionID;
     G4String outFileName;
+    G4bool   outDetsOnly;
     std::ofstream evfile;
     G4bool evOut;
     G4String crmatFileName;

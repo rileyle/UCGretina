@@ -1,0 +1,26 @@
+/ExpHall/X_length 2. m
+/ExpHall/Y_length 2. m
+/ExpHall/Z_length 2. m
+# Detector parameters ==========================================================
+/Gretina/detector/enableCapsules
+/ScanningTable/CADModelPath ../../cadModels
+/ScanningTable/Clover right
+/ScanningTable/IncludeCartFrame
+/ScanningTable/IncludeCloverCart
+/ScanningTable/IncludeSlitMount
+/ScanningTable/IncludeShields
+/Gretina/update
+# Source parameters ============================================================
+/Experiment/RunSource
+/Experiment/Source/Set cs137
+/Experiment/Source/setX 0. mm
+/Experiment/Source/setY 200. mm
+/Experiment/Source/setZ -37.05 mm
+/Experiment/Source/setR 1.0 mm
+# Print simulation parameters to stdout ========================================
+/ExpHall/Report
+# Output parameters ============================================================
+/Mode2/crystalXforms
+/Mode2/GretinaCoords
+/Output/Filename scan.out
+/run/beamOn 1000000

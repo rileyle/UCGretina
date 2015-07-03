@@ -1,0 +1,86 @@
+solid Mesh
+  facet normal 0.000000 -0.000000 1.000000
+    outer loop
+      vertex 260.350006 546.099976 260.350006
+      vertex 260.350006 571.500000 260.350006
+      vertex 209.550003 571.500000 260.350006
+    endloop
+  endfacet
+  facet normal 0.000000 0.000000 1.000000
+    outer loop
+      vertex 209.550003 546.099976 260.350006
+      vertex 260.350006 546.099976 260.350006
+      vertex 209.550003 571.500000 260.350006
+    endloop
+  endfacet
+  facet normal 0.000000 1.000000 0.000000
+    outer loop
+      vertex 209.550003 571.500000 -260.350006
+      vertex 209.550003 571.500000 260.350006
+      vertex 260.350006 571.500000 260.350006
+    endloop
+  endfacet
+  facet normal 0.000000 1.000000 -0.000000
+    outer loop
+      vertex 260.350006 571.500000 -260.350006
+      vertex 209.550003 571.500000 -260.350006
+      vertex 260.350006 571.500000 260.350006
+    endloop
+  endfacet
+  facet normal -1.000000 0.000000 0.000000
+    outer loop
+      vertex 209.550003 571.500000 -260.350006
+      vertex 209.550003 546.099976 260.350006
+      vertex 209.550003 571.500000 260.350006
+    endloop
+  endfacet
+  facet normal -1.000000 0.000000 0.000000
+    outer loop
+      vertex 209.550003 571.500000 -260.350006
+      vertex 209.550003 546.099976 -260.350006
+      vertex 209.550003 546.099976 260.350006
+    endloop
+  endfacet
+  facet normal 0.000000 -1.000000 0.000000
+    outer loop
+      vertex 260.350006 546.099976 -260.350006
+      vertex 260.350006 546.099976 260.350006
+      vertex 209.550003 546.099976 260.350006
+    endloop
+  endfacet
+  facet normal 0.000000 -1.000000 0.000000
+    outer loop
+      vertex 209.550003 546.099976 -260.350006
+      vertex 260.350006 546.099976 -260.350006
+      vertex 209.550003 546.099976 260.350006
+    endloop
+  endfacet
+  facet normal 1.000000 0.000000 0.000000
+    outer loop
+      vertex 260.350006 546.099976 -260.350006
+      vertex 260.350006 571.500000 260.350006
+      vertex 260.350006 546.099976 260.350006
+    endloop
+  endfacet
+  facet normal 1.000000 0.000000 0.000000
+    outer loop
+      vertex 260.350006 546.099976 -260.350006
+      vertex 260.350006 571.500000 -260.350006
+      vertex 260.350006 571.500000 260.350006
+    endloop
+  endfacet
+facet normal 0.000000 0.000000 -1.000000
+    outer loop
+      vertex 209.550003 571.500000 -260.350006
+      vertex 260.350006 546.099976 -260.350006
+      vertex 209.550003 546.099976 -260.350006
+    endloop
+  endfacet
+  facet normal 0.000000 0.000000 -1.000000
+    outer loop
+      vertex 209.550003 571.500000 -260.350006
+      vertex 260.350006 571.500000 -260.350006
+      vertex 260.350006 546.099976 -260.350006
+    endloop
+  endfacet
+endsolid Mesh
