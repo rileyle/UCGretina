@@ -3,7 +3,7 @@
 #include "TRandom.h"
 #include "TFile.h"
 
-TH1F *sim;
+TH1F *clover;
 TH1F *crystal[12];
 TH2F *crys_xy[12];
 TH2F *crys_xz[12];
@@ -110,9 +110,7 @@ void loadSim(TString fileName) {
   Int_t lo = 0;
   Int_t hi = lo+nChannels*keVperChannel;
 
-  TString Name = fileName.Copy();
-  Name.Replace(Name.Index(".out",4,0,0),4,"",0);
-  sim = new TH1F(Name,"", nChannels, float(lo), float(hi));
+  sim = new TH1F("clover","clover", nChannels, float(lo), float(hi));
 
   Int_t nHoles = 3;
   Int_t hole[] = { 31, 32, 33 };
@@ -342,15 +340,18 @@ void loadSim(TString fileName) {
 	}
       }
 
+      Float_t cloverTotalE = 0.;
       for(Int_t i = 0; i < nHits; i++){
 	Float_t E =  Edep[detNum[i]];
 	Float_t mE = mEdep[detNum[i]];
-	if( E > 0.0 ){
+	if( mE > 0.0 ){
+
+	  // Cover addback
+	  if(detNum[i]>127 && mE > 0.)
+	    cloverTotalE += mE;
 
 	  // No addback
-	  sim->Fill( measuredE(E, detNum[i]) );
-	  // No addback
-	  crystal[crystalNum[detNum[i]]]->Fill( measuredE(E, detNum[i]) );
+	  crystal[crystalNum[detNum[i]]]->Fill( mE );
 	  //	    cout << "(" << xHit[detNum[i]] << ", " 
 	  //		 << yHit[detNum[i]] << ")" << endl;
 
@@ -372,7 +373,7 @@ void loadSim(TString fileName) {
 
 	  // Register clover conicidences
 	  if(cloverLoHit && detNum[i] < 128){
-	    crystal_lo[crystalNum[detNum[i]]]->Fill( measuredE(E, detNum[i]) );
+	    crystal_lo[crystalNum[detNum[i]]]->Fill( mE );
 	    crys_xy_lo[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
 						    yHit[detNum[i]]);
 	    crys_xz_lo[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
@@ -386,7 +387,7 @@ void loadSim(TString fileName) {
 	  }
 
 	  if(cloverHiHit && detNum[i] < 128){
-	    crystal_hi[crystalNum[detNum[i]]]->Fill( measuredE(E, detNum[i]) );
+	    crystal_hi[crystalNum[detNum[i]]]->Fill( mE );
 	    crys_xy_hi[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
 						    yHit[detNum[i]]);
 	    crys_xz_hi[crystalNum[detNum[i]]]->Fill(xHit[detNum[i]],
@@ -408,6 +409,8 @@ void loadSim(TString fileName) {
 	zHit[detNum[i]] = 0.;
 
       }
+      if(cloverTotalE > 0.)
+	sim->Fill( cloverTotalE );
       nGamma++;
     }
   }
