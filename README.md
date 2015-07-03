@@ -1,4 +1,4 @@
-# UCGretina v2.9.1 #
+# UCGretina v3.0 #
 
 ## Compile and install ##
 
