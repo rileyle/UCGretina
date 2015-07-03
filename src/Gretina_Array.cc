@@ -18,13 +18,16 @@ void Gretina_Array::InitData()
   iniPath = path;
 
   cryostatStatus        = false;
-  // Slot 1 Position (starting point for Euler angle rotations)
-  //  cryostatPos0.setX(0.);   // new geometry
-  //  cryostatPos0.setY(0.);   // new geometry
-  //  cryostatPos0.setZ(406.); // new geometry
-  cryostatPos0.setX(204.741*mm);
-  cryostatPos0.setY( 60.337*mm);
-  cryostatPos0.setZ(345.364*mm);
+
+  // Slot 0 Position (starting point for Euler angle rotations)    
+  cryostatPos0.setX(0.);
+  cryostatPos0.setY(0.);
+  cryostatPos0.setZ(406.); 
+
+  // Slot 1 Position (starting point for Euler angle rotations)    
+  //  cryostatPos0.setX(204.741*mm);  // old geometry spec
+  //  cryostatPos0.setY( 60.337*mm);  // old geometry spec
+  //  cryostatPos0.setZ(345.364*mm);  // old geometry spec
 
   // approximate polygonal feed-through space with cylinder
   G4double extend = 93.*mm;

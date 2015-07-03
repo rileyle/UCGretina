@@ -40,96 +40,96 @@ Greta_Shell::Greta_Shell()
   // Theta
   // Phi
   
-  ModuleEuler[0][0] =  288.00*deg;    //  0    North
-  ModuleEuler[0][1] =    0.00*deg;
-  ModuleEuler[0][2] =    0.00*deg;
-  ModuleEuler[1][0] =    0.00*deg;    //  1    North
-  ModuleEuler[1][1] =    0.00*deg;
-  ModuleEuler[1][2] =    0.00*deg;
-  ModuleEuler[2][0] =   72.00*deg;    //  2    Split
-  ModuleEuler[2][1] =    0.00*deg;
-  ModuleEuler[2][2] =    0.00*deg;
-  ModuleEuler[3][0] =  144.00*deg;    //  3    South
-  ModuleEuler[3][1] =    0.00*deg;
-  ModuleEuler[3][2] =    0.00*deg;
-  ModuleEuler[4][0] =  216.00*deg;    //  4    South
-  ModuleEuler[4][1] =    0.00*deg;
-  ModuleEuler[4][2] =    0.00*deg;
-  ModuleEuler[5][0] =  235.58*deg;    //  5    North
-  ModuleEuler[5][1] =   63.43495*deg;
-  ModuleEuler[5][2] =   16.420*deg;
-  ModuleEuler[6][0] =   91.58*deg;    //  6    North
-  ModuleEuler[6][1] =   63.43495*deg;
-  ModuleEuler[6][2] =   16.420*deg;
-  ModuleEuler[7][0] =   91.58*deg;    //  7    South
-  ModuleEuler[7][1] =   63.43495*deg;
-  ModuleEuler[7][2] =   88.420*deg;
-  ModuleEuler[8][0] =   91.58*deg;    //  8    South
-  ModuleEuler[8][1] =   63.43495*deg;
-  ModuleEuler[8][2] =  160.420*deg;
-  ModuleEuler[9][0] =   91.58*deg;    //  9    Split
-  ModuleEuler[9][1] =   63.43495*deg;
-  ModuleEuler[9][2] =  232.420*deg;
-  ModuleEuler[10][0] = -52.42*deg;    // 10    North
-  ModuleEuler[10][1] =   63.43495*deg;
-  ModuleEuler[10][2] =  304.420*deg;
-  ModuleEuler[11][0] = -340.42*deg;   // 11    North
-  ModuleEuler[11][1] =   63.43495*deg;
-  ModuleEuler[11][2] =  304.420*deg;
-  ModuleEuler[12][0] =  -52.42*deg;   // 12    North
-  ModuleEuler[12][1] =   63.43495*deg;
-  ModuleEuler[12][2] =   16.420*deg;
-  ModuleEuler[13][0] =   19.58*deg;   // 13    North
-  ModuleEuler[13][1] =   63.43495*deg;
-  ModuleEuler[13][2] =   16.420*deg;
-  ModuleEuler[14][0] =  -52.42*deg;   // 14    North
-  ModuleEuler[14][1] =   63.43495*deg;
-  ModuleEuler[14][2] =   88.420*deg;
-  ModuleEuler[15][0] =   19.58*deg;   // 15    South
-  ModuleEuler[15][1] =   63.43495*deg;
-  ModuleEuler[15][2] =   88.420*deg;
-  ModuleEuler[16][0] =   -52.42*deg;  // 16    South
-  ModuleEuler[16][1] =   63.43495*deg;
-  ModuleEuler[16][2] =   160.420*deg;
-  ModuleEuler[17][0] =   19.58*deg;   // 17    South
-  ModuleEuler[17][1] =   63.43495*deg;
-  ModuleEuler[17][2] =   160.420*deg;
-  ModuleEuler[18][0] =   -52.42*deg;  // 18    South
-  ModuleEuler[18][1] =   63.43495*deg;
-  ModuleEuler[18][2] =   232.420*deg;
-  ModuleEuler[19][0] =   19.58*deg;   // 19    South
-  ModuleEuler[19][1] =   63.43495*deg;
-  ModuleEuler[19][2] =   232.420*deg;
-  ModuleEuler[20][0] =   55.58*deg;   // 20    North
-  ModuleEuler[20][1] =  116.56505*deg;
-  ModuleEuler[20][2] =  268.420*deg;
-  ModuleEuler[21][0] =  -88.42*deg;   // 21    North
-  ModuleEuler[21][1] =  116.56505*deg;
-  ModuleEuler[21][2] =   52.420*deg;
-  ModuleEuler[22][0] =   55.58*deg;   // 22    Split
-  ModuleEuler[22][1] =  116.56505*deg;
-  ModuleEuler[22][2] =   52.420*deg;
-  ModuleEuler[23][0] =   55.58*deg;   // 23    South
-  ModuleEuler[23][1] =  116.56505*deg;
-  ModuleEuler[23][2] =  124.420*deg;
-  ModuleEuler[24][0] =   55.58*deg;   // 24    South
-  ModuleEuler[24][1] =  116.56505*deg;
-  ModuleEuler[24][2] =  196.420*deg;
-  ModuleEuler[25][0] =  -16.42*deg;   // 25    North
-  ModuleEuler[25][1] =  116.56505*deg;
-  ModuleEuler[25][2] =  340.420*deg;
-  ModuleEuler[26][0] =  -16.42*deg;   // 26    North
-  ModuleEuler[26][1] =  116.56505*deg;
-  ModuleEuler[26][2] =   52.420*deg;
-  ModuleEuler[27][0] =   -16.42*deg;  // 27    South
-  ModuleEuler[27][1] =   116.56505*deg;
-  ModuleEuler[27][2] =   124.420*deg;
-  ModuleEuler[28][0] =   -16.42*deg;  // 28    South
-  ModuleEuler[28][1] =   116.56505*deg;
-  ModuleEuler[28][2] =   196.420*deg;
-  ModuleEuler[29][0] =  -16.42*deg;   // 29    Split
-  ModuleEuler[29][1] =  116.56505*deg;
-  ModuleEuler[29][2] =  268.420*deg;
+  ModuleEuler[0][0] =     0.000000*deg;   //  0    North
+  ModuleEuler[0][1] =    31.717473*deg;
+  ModuleEuler[0][2] =   -54.000000*deg;
+  ModuleEuler[1][0] =     0.000000*deg;   //  1    North
+  ModuleEuler[1][1] =    31.717473*deg;
+  ModuleEuler[1][2] =    18.000000*deg;
+  ModuleEuler[2][0] =     0.000000*deg;   //  2    Split
+  ModuleEuler[2][1] =    31.717473*deg;
+  ModuleEuler[2][2] =    90.000000*deg;
+  ModuleEuler[3][0] =     0.000000*deg;   //  3    South
+  ModuleEuler[3][1] =    31.717473*deg;
+  ModuleEuler[3][2] =   162.000000*deg;
+  ModuleEuler[4][0] =     0.000000*deg;   //  4    South
+  ModuleEuler[4][1] =    31.717473*deg;
+  ModuleEuler[4][2] =  -126.000000*deg;
+  ModuleEuler[5][0] =    90.000000*deg;   //  5    North
+  ModuleEuler[5][1] =    58.282526*deg;
+  ModuleEuler[5][2] =   -18.000000*deg;
+  ModuleEuler[6][0] =    90.000000*deg;   //  6    North
+  ModuleEuler[6][1] =    58.282526*deg;
+  ModuleEuler[6][2] =    54.000000*deg;
+  ModuleEuler[7][0] =    90.000000*deg;   //  7    South
+  ModuleEuler[7][1] =    58.282526*deg;
+  ModuleEuler[7][2] =   126.000000*deg;
+  ModuleEuler[8][0] =    90.000000*deg;   //  8    South
+  ModuleEuler[8][1] =    58.282526*deg;
+  ModuleEuler[8][2] =  -162.000000*deg;
+  ModuleEuler[9][0] =    90.000000*deg;   //  9    Split
+  ModuleEuler[9][1] =    58.282526*deg;
+  ModuleEuler[9][2] =   -90.000000*deg;
+  ModuleEuler[10][0] =  -31.750000*deg;   // 10    North
+  ModuleEuler[10][1] =   90.000000*deg;
+  ModuleEuler[10][2] =  -72.000000*deg;
+  ModuleEuler[11][0] =   31.750000*deg;   // 11    North
+  ModuleEuler[11][1] =   90.000000*deg;
+  ModuleEuler[11][2] =  -36.000000*deg;
+  ModuleEuler[12][0] =  -31.750000*deg;   // 12    North
+  ModuleEuler[12][1] =   90.000000*deg;
+  ModuleEuler[12][2] =    0.000000*deg;
+  ModuleEuler[13][0] =   31.750000*deg;   // 13    North
+  ModuleEuler[13][1] =   90.000000*deg;
+  ModuleEuler[13][2] =   36.000000*deg;
+  ModuleEuler[14][0] =  -31.750000*deg;   // 14    North
+  ModuleEuler[14][1] =   90.000000*deg;
+  ModuleEuler[14][2] =   72.000000*deg;
+  ModuleEuler[15][0] =   31.750000*deg;   // 15    South
+  ModuleEuler[15][1] =   90.000000*deg;
+  ModuleEuler[15][2] =  108.000000*deg;
+  ModuleEuler[16][0] =  -31.750000*deg;   // 16    South
+  ModuleEuler[16][1] =   90.000000*deg;
+  ModuleEuler[16][2] =  144.000000*deg;
+  ModuleEuler[17][0] =   31.750000*deg;   // 17    South
+  ModuleEuler[17][1] =   90.000000*deg;
+  ModuleEuler[17][2] =  180.000000*deg;
+  ModuleEuler[18][0] =  -31.750000*deg;   // 18    South
+  ModuleEuler[18][1] =   90.000000*deg;
+  ModuleEuler[18][2] = -144.000000*deg;
+  ModuleEuler[19][0] =   31.750000*deg;   // 19    South
+  ModuleEuler[19][1] =   90.000000*deg; 
+  ModuleEuler[19][2] = -108.000000*deg;
+  ModuleEuler[20][0] =  -90.000000*deg;   // 20    North
+  ModuleEuler[20][1] =  121.717475*deg;
+  ModuleEuler[20][2] =  -54.000000*deg;
+  ModuleEuler[21][0] =  -90.000000*deg;   // 21    North
+  ModuleEuler[21][1] =  121.717475*deg;
+  ModuleEuler[21][2] =   18.000000*deg;
+  ModuleEuler[22][0] =  -90.000000*deg;   // 22    Split
+  ModuleEuler[22][1] =  121.717475*deg;
+  ModuleEuler[22][2] =   90.000000*deg;
+  ModuleEuler[23][0] =  -90.000000*deg;   // 23    South
+  ModuleEuler[23][1] =  121.717475*deg;
+  ModuleEuler[23][2] =  162.000000*deg;
+  ModuleEuler[24][0] =  -90.000000*deg;   // 24    South
+  ModuleEuler[24][1] =  121.717475*deg;
+  ModuleEuler[24][2] = -126.000000*deg;
+  ModuleEuler[25][0] =  180.000000*deg;   // 25    North
+  ModuleEuler[25][1] =  148.282526*deg;
+  ModuleEuler[25][2] =  -18.000000*deg;
+  ModuleEuler[26][0] =  180.000000*deg;   // 26    North
+  ModuleEuler[26][1] =  148.282526*deg;
+  ModuleEuler[26][2] =   54.000000*deg;
+  ModuleEuler[27][0] =  180.000000*deg;   // 27    South
+  ModuleEuler[27][1] =  148.282526*deg;
+  ModuleEuler[27][2] =  126.000000*deg;
+  ModuleEuler[28][0] =  180.000000*deg;   // 28    South
+  ModuleEuler[28][1] =  148.282526*deg;
+  ModuleEuler[28][2] = -162.000000*deg;
+  ModuleEuler[29][0] =  180.000000*deg;   // 29    Split
+  ModuleEuler[29][1] =  148.282526*deg;
+  ModuleEuler[29][2] =  -90.000000*deg;
 
   // North: -1,  Split: 0,  South: 1
   ModulePortStatus[0]  = -1;
@@ -168,9 +168,12 @@ Greta_Shell::Greta_Shell()
 
   // This is the postion of the center of the front faces of a cluster before
   // it is placed according to its euler angles (the center of Slot 0).
-  Pos0.setX(90.734*mm);
-  Pos0.setY(26.7389*mm);
-  Pos0.setZ(153.053*mm);
+  Pos0.setX(0.);
+  Pos0.setY(0.);
+  Pos0.setZ(180.0*mm);
+  //  Pos0.setX(90.734*mm);
+  //  Pos0.setY(26.7389*mm);
+  //  Pos0.setZ(153.053*mm);
   // Rescale to place the Tubs at a radial distance from the origin in the 
   // middle of the mounting shell. 
   Pos0.setMag((Rmin+Rmax)/2.*mm);
