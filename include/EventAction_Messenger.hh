@@ -22,9 +22,10 @@ class EventAction_Messenger: public G4UImessenger
     void SetNewValue(G4UIcommand*, G4String);
     
   private:
-    EventAction*          theEventAction;    
-    G4UIdirectory*        OutputDir;
-    G4UIcmdWithAString*   OutFileCmd;
+    EventAction*               theEventAction;  
+    G4UIdirectory*             OutputDir;
+    G4UIcmdWithAString*        OutFileCmd;
+    G4UIcmdWithoutParameter*   OutDetCmd;
     G4UIdirectory*             Mode2Dir;
     G4UIcmdWithAString*        Mode2FileCmd;
     G4UIcmdWithAString*        crmatCmd;

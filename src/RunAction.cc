@@ -20,10 +20,12 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   G4cout<<" Beginning of run "<<G4endl;
 
   evaction->SetNTotalevents(run->GetNumberOfEventToBeProcessed());
-  if(run->GetNumberOfEventToBeProcessed() > 1000)
-    evaction->SetEveryNEvents((int)run->GetNumberOfEventToBeProcessed()/1000);
+  if(run->GetNumberOfEventToBeProcessed() > 1000000)
+    evaction->SetEveryNEvents(10000);
+  else if(run->GetNumberOfEventToBeProcessed() > 1000)
+    evaction->SetEveryNEvents(1000);
   else if(run->GetNumberOfEventToBeProcessed() > 100)
-    evaction->SetEveryNEvents((int)run->GetNumberOfEventToBeProcessed()/100);
+    evaction->SetEveryNEvents(100);
   else
     evaction->SetEveryNEvents(1);
 

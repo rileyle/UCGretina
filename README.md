@@ -9,7 +9,12 @@ the data files for low energy electromagnetic processes.
 _Important note: UCGretina is not yet compatible with the latest
 version (4.10.x) of the Geant4 libraries._
 
-Set up your environment (consider adding this to your .bashrc):
+Simulating the LBL scanning table requires the external
+[CADMesh](https://github.com/christopherpoole/cadmesh) package. Paths
+to the CADMesh `include` and `lib` directories must be set in the
+GNUMakefile.
+
+Set up your environment (consider adding this to your `.bashrc`):
 
     $ source <G4INSTALL>/share/Geant4-9.6.3/geant4make/geant4make.sh
 
@@ -17,18 +22,23 @@ Compile:
 
     $ make
 
+To use the LBL scanning table:
+
+    $ make SCANNING=1
+
+(produces the binary UCGretina_Scan)
+
 To use the liquid hydrogen target:
 
     $ make LHTARGET=1
 
 (produces the binary UCGretina_LH)
 
-The executables UCGretina and UCGretina_LH are automatically installed
-in
+Executables are automatically installed in
 
     $G4WORKDIR/bin/$G4SYSTEM
 
-(which is added to your path when you source geant4make.sh)
+(which is added to your path when you source `geant4make.sh`)
 
 ## Examples ##
 
@@ -102,49 +112,6 @@ Mandatory command after setting any GRETINA parameters:
 
     /Gretina/update
 
-### LH Target Geometry ###
-
-(UCGretina_LH only)
-
-Optional commands for setting LH target parameters (must precede
-/Target/Construct):
-
-    /Target/Cell < thick || thin || empty || notarget >
-
-> The "empty" type is the cell body with no window frames. (To
-  construct an empty cell with frames, set "thick" or "thin" and set
-  the target material to vacuum.) The "notarget" type constructs only
-  the LH-target beam pipe without the target assembly.
-
-    /Target/Bulge <double> <unit>
-
-> Set the maximum target thickness (at the center) added to the target
-  by the window bulge. (This increases the total target thickness
-  along the beam axis by twice the bulge thickness.)
-
-    /Target/Windows
-
-> Include the Kapton cell windows (125 micron).
-
-    /Target/Angle <double> <unit>
-
-> Set the angle of tilt about the beam axis of the entire target
-  assembly (30 degrees for Gretina at the NSCL).
-
-    /Target/SetDensity <double>
-
-> Set target density in mg/cc.
-
-    /Target/Material <material>
-
-> Only "vacuum" or "G4_Galactic" are allowed with the LH target. (This
-  is provided to enable source simulations with an empty cell with
-  window frames installed.)
-
-Mandatory command for building the LH target (UCGretina_LH):
-
-    /Target/Construct
-
 ### In-beam Simulations ###
 
 Commands related to the incoming beam:
@@ -163,7 +130,7 @@ Commands related to the incoming beam:
 > you are providing the dta spectrum of the incoming beam using the
 > /BeamIn/dtaFile command.)
 
-    /BeamIn/dtaFile
+    /BeamIn/dtaFile <filename>
 
 > file name for the dta spectrum of the incoming beam. This is a text
 > file with format: 
@@ -176,9 +143,9 @@ Commands related to the incoming beam:
 
 > If this command is present, the incoming beam energy is set by
 > drawing randomly from the dta distribution centered on the beam
-> energy specified by the /BeamIn/KEu command. (The dta spectrum
+> energy specified by the `/BeamIn/KEu` command. (The dta spectrum
 > specifies the momentum acceptance of the incoming beam, so the
-> momentum acceptance parameter should be set to zero: /BeamIn/Dpp 0.)
+> momentum acceptance parameter should be set to zero: `/BeamIn/Dpp 0`.)
 
     /BeamIn/Focus/X <double> <unit> /BeamIn/Focus/Y <double> <unit>
 
@@ -228,7 +195,7 @@ Commands related to the outgoing reaction product:
 
 > Excitation energy of the target-like reaction product. (The
 > beam-like reaction product is not excited.) The energy parameter is
-> superseded by a level scheme file if a /BeamOut/LevelSchemeFile
+> superseded by a level scheme file if a `/BeamOut/LevelSchemeFile`
 > command is present.
 
     /BeamOut/XsectFile <filename>
@@ -246,7 +213,7 @@ Commands related to the outgoing reaction product:
 > If this file is presnet, the 2-body reaction will draw from this
 > distribution to determine the scattering-angle for each event. The
 > minimum and maximum scattering angles read from this file supersede
-> values set with the /BeamOut/ThetaMin and /BeamOut/ThetaMax
+> values set with the `/BeamOut/ThetaMin` and `/BeamOut/ThetaMax`
 > commands.
 
     /BeamOut/AngDistSigmaA <double> <unit>
@@ -258,7 +225,7 @@ Commands related to the outgoing reaction product:
 > and nondispersive directions, respectively. The 2-body reaction
 > kinematics draw from this scattering-angle distribution. This is
 > the alternative to providing a lab-frame scattering-angle distribution 
-> with the /BeamOut/XsectFile command.
+> with the `/BeamOut/XsectFile` command.
 
     /BeamOut/ThetaMin <double> <unit>
 
@@ -266,7 +233,7 @@ Commands related to the outgoing reaction product:
 
 > Limits of the scattering angle distribution used in the 2-body
 > reaction kinematics. If a scattering-angle distribution is supplied
-> with the /BeamOut/XsectFile command, these values are superseded.
+> with the `/BeamOut/XsectFile` command, these values are superseded.
 
     /BeamOut/seta0 <double> 
 
@@ -281,7 +248,7 @@ Commands related to the outgoing reaction product:
     /BeamOut/tau <double> <unit>
 
 > Mean lifetime of the excitation. This command is superseded by a
-> level scheme file if a /BeamOut/LevelSchemeFile command is present.
+> level scheme file if a `/BeamOut/LevelSchemeFile` command is present.
 
     /BeamOut/LevelSchemeFile <filename>
 
@@ -303,8 +270,8 @@ Commands related to the outgoing reaction product:
 > the reaction.
 
 > NOTE: This command supersedes values set with the
-> /BeamOut/ProjectileExcitation, /BeamOut/TargetExcitation,
-> /BeamOut/seta0, /BeamOut/seta2, /BeamOut/seta4, and /BeamOut/tau
+> `/BeamOut/ProjectileExcitation`, `/BeamOut/TargetExcitation`,
+> `/BeamOut/seta0`, `/BeamOut/seta2`, `/BeamOut/seta4`, and `/BeamOut/tau`
 > commands described above. 
 
     /BeamOut/Source
@@ -333,8 +300,8 @@ Mandatory commands
 
 > The white source type emits gamma rays in a uniform energy
 > distribution between 100 keV and 10 MeV. These limits can be set
-> with the /Experiment/Source/setWhiteLowE and
-> /Experiment/Source/setWhiteHighE commands.
+> with the `/Experiment/Source/setWhiteLowE` and
+> `/Experiment/Source/setWhiteHighE` commands.
 
 > eu152_peaks, co56_peaks, and photopeaks sources produce selected
 > gamma-rays from 152Eu, 56Co, and both, respectively. The gamma rays
@@ -347,6 +314,29 @@ Optional commands
 
 > Set the energy of the "simple" source type
 
+    /Experiment/Source/setX <double> <unit>
+    /Experiment/Source/setY <double> <unit>
+    /Experiment/Source/setZ <double> <unit>
+
+> Set the position of the source.
+
+    /Experiment/Source/setR <double> <unit>
+
+> Set the radius of the source disk. 
+
+    /Experiment/Source/CollimationAngle <double> <unit>
+
+> Set the angular spread of the collimated beam (about the collimation
+  direction).
+
+    /Experiment/Source/CollimationDirection <double> <double> <double>
+
+> Set the X, Y, and Z components of a vector specifying the direction
+> of the collimated beam. 
+
+> (The above position, radius, and collimation commands have no effect
+> with the "white", "background", "bgwhite", and "muon" source types.)
+
     /Experiment/Source/setWhiteLowE  <double> <unit>
 
     /Experiment/Source/setWhiteHighE <double> <unit>
@@ -355,7 +345,7 @@ Optional commands
 
     /Target/sourceFrame <frame type>
 
-> Optionally include the source frame (/Target/Construct command required).
+> Optionally include the source frame (`/Target/Construct` command required).
 
 > Currently implemented frames: eu152_Z2707, cs137_E2879, and co56_2012
 
@@ -365,19 +355,20 @@ Mandatory commands for running background simulations
 
     /Experiment/RunSource
 
-    /Experiment/Source/Set <background || bgwhite || muon>
+    /Experiment/Source/Set < background || bgwhite || muon >
 
-> The background source type emits several gamma rays from a solid
-> spherical shell surrounding GRETINA. The bgwhite source type emits
-> gamma rays from a uniform energy distribution from the solid
-> shell. The muon source type emits 4.0 GeV muons vertically from
-> above GRETINA. 
+> The `background` source type emits several gamma rays
+> from a solid spherical shell surrounding GRETINA. The `bgwhite` source
+> type emits gamma rays from a uniform energy distribution from the
+> solid shell. The `muon` source type emits 4.0 GeV muons vertically from
+> above GRETINA.
 
-Optional commands describing the spherical shell surrounding GRETINA from which background gamma-rays are emitted.
+Optional commands describing the spherical shell surrounding GRETINA
+from which background gamma-rays are emitted.
 
     /BackgroundSphere/Material <material name>
 
-> Set material for the background sphere (default: G4_Galactic).
+> Set material for the background sphere (default: `G4_Galactic`).
 
     /BackgroundSphere/R_min <double> <unit>
 
@@ -386,17 +377,139 @@ Optional commands describing the spherical shell surrounding GRETINA from which 
 > Set the inner and outer radii of the background sphere 
 > (default: 3.0 m, 3.4 m). 
 
-## Tracking ##
+### LBL Scanning Table ###
 
-    /GammaPrint/Track_Set
+(UCGretina_Scan only)
 
-> Print gamma-ray tracking information to standard output.
+Mandatory command for building the scanning table:
 
-    /IonPrint/Track_Set
+    /ScanningTable/CADModelPath <path>
 
-> Print ion tracking information to standard output.
+> Path to the STL files (usually the cadModels directory of the
+> UCGretina source tree).
 
-## Mode 2 Output ##
+Optional commands for the scanning table:
+
+    /ScanningTable/Clover < left || right || both >
+
+> Construct the clover detector(s).
+
+    /ScanningTable/IncludeCartFrame
+
+> Construct the scanning table frame and GRETINA mount.
+
+    /ScanningTable/IncludeSlitMount
+
+> Construct the slit assembly mount.
+
+    /ScanningTable/IncludeCloverCart
+
+> Construct the Clover cart.
+
+    /ScanningTable/IncludeShields
+
+> Construct the BGO anti-Compton shields.
+
+    /ScanningTable/SetXShift <double> <unit>
+
+    /ScanningTable/SetYShift <double> <unit>
+
+> Set the horizontal shifts of the source from nominal.
+
+    /ScanningTable/SetZShift <double> <unit>
+
+> Set the vertical shift of the slits from nominal.
+
+### Liquid Hydrogen Target ###
+
+(UCGretina_LH only)
+
+Optional commands for setting LH target parameters (must precede
+/Target/Construct):
+
+    /Target/Cell < thick || thin || empty || notarget >
+
+> The "empty" type is the cell body with no window frames. (To
+> construct an empty cell with frames, set "thick" or "thin" and set
+> the target material to vacuum.) The "notarget" type constructs only
+> the LH-target beam pipe without the target assembly.
+
+    /Target/Bulge <double> <unit>
+
+> Set the maximum target thickness (at the center) added to the target
+> by the window bulge. (This increases the total target thickness
+> along the beam axis by twice the bulge thickness.)
+
+    /Target/Windows
+
+> Include the Kapton cell windows (125 micron).
+
+    /Target/Angle <double> <unit>
+
+> Set the angle of tilt about the beam axis of the entire target
+>  assembly (30 degrees for Gretina at the NSCL).
+
+    /Target/SetDensity <double>
+
+> Set target density in mg/cc.
+
+    /Target/Material <material>
+
+> Only `vacuum` or `G4_Galactic` are allowed with the LH target. (This
+> is provided to enable source simulations with an empty cell with
+> window frames installed.)
+
+Mandatory command for building the LH target (UCGretina_LH):
+
+    /Target/Construct
+
+## Output ##
+
+Output can be written in ASCII and/or "Mode 2" binary format. Raw
+tracking information can also be written to standard output.
+
+### ASCII Output ###
+
+The optional command
+
+    /Output/Filename <filename>
+
+activates ASCII output.
+
+If energy was deposited in GRETINA in the event, S800 data and
+decomposed gamma-ray information are written: 
+
+    S   <ATA>   <BTA>   <DTA>   <YTA>   <Event #>
+    D   <# of decomposed gamma events>   <Event #>
+    C   <Crystal ID>   <# of interaction points>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>
+    C   <Crystal ID>   <# of interaction points>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>
+    ...
+
+The energy, emission position, emission direction, and the velocity of
+the projectile are written for each gamma ray emitted in every event:
+
+    E   <# of emitted gamma rays>    <Full Energy>     <Event #>
+        <Energy>   <X>   <Y>   <Z>   <theta>   <phi>   <beta>
+        <Energy>   <X>   <Y>   <Z>   <theta>   <phi>   <beta>
+        ...
+
+`<Full Energy> = 1` if a single gamma ray is emitted and its
+full energy is deposited in a single crystal. `<Full Energy> = 0` if a
+single gamma ray is emitted and only part of its energy is deposited
+in any one crystal. `<Full Energy> = -1` otherwise.
+
+The optional command
+
+    /Output/DetectorsOnly
+
+writes detected gamma-ray information only. Simulated S800 and emitted
+gamma-ray information is suppressed.
+
+### Mode 2 Output ###
 
 Mode 2 output from in-beam simulations contains S800 tracking events
 (GEB type 9), decomposed gamma-ray events (GEB type 1), and emitted
@@ -416,7 +529,7 @@ Energies are expressed in keV, and positions are expressed in mm.
 
     /Mode2/crmatFile <filename>
 
-> The file "crmat.LINUX" is provided. It specifies the rotation
+> The file `crmat.LINUX` is provided. It specifies the rotation
 > matrices and translation vectors from each crystal frame into the
 > world coordinate system. UCGretina inverts this transformation to
 > produce data in the crystal frames, as expected in Mode 2 data.
@@ -459,55 +572,37 @@ Energies are expressed in keV, and positions are expressed in mm.
 > This command triggers printing of information on Mode 2 data to
 > stdout. 
 
-### ASCII Output ###
+### Raw Tracking Information ###
 
-The optional command
+    /GammaPrint/Track_Set
 
-    /Output/Filename <filename>
+> Print gamma-ray tracking information to standard output.
 
-activates ASCII output.
+    /IonPrint/Track_Set
 
-If energy was deposited in GRETINA in the event, S800 data and
-decomposed gamma-ray information are written: 
+> Print ion tracking information to standard output.
 
-    S   <ATA>   <BTA>   <DTA>   <YTA>   <Event #>
-    D   <# of decomposed gamma events>   <Event #>
-    C   <Crystal ID>   <# of interaction points>
-        <Segment ID>   <Energy>   <X>   <Y>   <Z>
-        <Segment ID>   <Energy>   <X>   <Y>   <Z>
-    C   <Crystal ID>   <# of interaction points>
-        <Segment ID>   <Energy>   <X>   <Y>   <Z>
-        <Segment ID>   <Energy>   <X>   <Y>   <Z>
-    ...
+## Visualization ##
 
-The energy, emission position, emission direction, and the
-velocity of the projectile are written for each gamma ray emitted in
-every event:
-
-    E   <# of emitted gamma rays>    <Full Energy>     <Event #>
-        <Energy>   <X>   <Y>   <Z>   <theta>   <phi>   <beta>
-        <Energy>   <X>   <Y>   <Z>   <theta>   <phi>   <beta>
-        ...
-
-<Full Energy> = 1 if a single gamma ray is emitted and its
-full energy is deposited in a single crystal. <Full Energy> = 0 if a
-single gamma ray is emitted and only part of its energy is deposited
-in any one crystal. <Full Energy> = -1 otherwise.
-
-## Visualize the array ##
-
-Run the macro file "vis/vis.mac" an interactive session:
+Run the macro file `vis/vis.mac` an interactive session:
 
     $ UCGretina
 
     Idle> /control/execute vis/vis.mac
     Idle> exit
 
-This generates a VRML 2 file named g4_XX.wrl which can be viewed
-with a VRML viewer (like mayavi2).
+This generates a VRML 2 file named `g4_XX.wrl` which can be viewed
+with a VRML viewer (like mayavi2). Macro files are included for
+visualizing GRETA, the LBL scanning table, and the liquid-hydrogen
+target setups. These scripts must be run in a directory with soft
+links (aclust, euler, aslice, asolid, awalls) to the appropriate
+GRETINA geometry files. 
 
-Within mayavi2, the python scripts ./vis/mlab.animate.py and
-./vis/mlab.movie.py can be run (File -> Run Python Script). The
+The macro file `./vis/trajectories.mac` illustrates how to add particle
+trajectories to visulatizations.
+
+Within mayavi2, the python scripts `./vis/mlab.animate.py` and
+`./vis/mlab.movie.py` can be run (File -> Run Python Script). The
 former animates the scene, and the latter saves the animation frames
 as a series of .png files which can be stitched together into an
 animated png or gif.

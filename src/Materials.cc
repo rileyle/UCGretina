@@ -4,25 +4,26 @@
 {
   // Elements
  
-  elementH  = new G4Element("Hydrogen",  "H",  1.,  1.0079*g/mole);
-  elementD  = new G4Element("Deuterium", "D",  1.,  2.0141*g/mole);
-  elementC  = new G4Element("Carbon",    "C",  6.,  12.011*g/mole);
-  elementN  = new G4Element("Nitrogen",  "N",  7.,  14.007*g/mole);
-  elementO  = new G4Element("Oxygen",    "O",  8., 15.9994*g/mole);
-  elementMg = new G4Element("Magnesium", "Mg",12., 24.3050*g/mole);
-  elementAl = new G4Element("Aluminium", "Al",13., 26.9815*g/mole);
-  elementSi = new G4Element("Silicon",   "Si",14., 28.0855*g/mole);
-  elementTi = new G4Element("Titanium",  "Ti",22.,   47.90*g/mole);
-  elementV  = new G4Element("Vanadium",  "V", 23., 50.9415*g/mole);
-  elementFe = new G4Element("Iron",      "Fe",26.,  55.845*g/mole);
-  elementCo = new G4Element("Cobalt",    "Co",27., 58.9332*g/mole);
-  elementNi = new G4Element("Nickel",    "Ni",28., 58.6934*g/mole);
-  elementCu = new G4Element("Copper",    "Cu",29.,   63.55*g/mole);
-  elementMo = new G4Element("Molybdenum","Mo",42.,   95.94*g/mole);
-  elementSn = new G4Element("Tin",       "Sn",50., 118.710*g/mole);
-  elementPt = new G4Element("Platinum",  "Pt",78.,  195.08*g/mole);
-  elementAu = new G4Element("Gold",      "Au",79.,  196.97*g/mole);
-
+  elementH  = new G4Element("Hydrogen",   "H",   1.,  1.0079*g/mole);
+  elementD  = new G4Element("Deuterium",  "D",   1.,  2.0141*g/mole);
+  elementC  = new G4Element("Carbon",     "C",   6.,  12.011*g/mole);
+  elementN  = new G4Element("Nitrogen",   "N",   7.,  14.007*g/mole);
+  elementO  = new G4Element("Oxygen",     "O",   8.,  15.9994*g/mole);
+  elementMg = new G4Element("Magnesium",  "Mg", 12.,  24.3050*g/mole);
+  elementAl = new G4Element("Aluminium",  "Al", 13.,  26.9815*g/mole);
+  elementSi = new G4Element("Silicon",    "Si", 14.,  28.0855*g/mole);
+  elementTi = new G4Element("Titanium",   "Ti", 22.,  47.90*g/mole);
+  elementV  = new G4Element("Vanadium",   "V",  23.,  50.9415*g/mole);
+  elementFe = new G4Element("Iron",       "Fe", 26.,  55.845*g/mole);
+  elementCo = new G4Element("Cobalt",     "Co", 27.,  58.9332*g/mole);
+  elementNi = new G4Element("Nickel",     "Ni", 28.,  58.6934*g/mole);
+  elementCu = new G4Element("Copper",     "Cu", 29.,  63.55*g/mole);
+  elementMo = new G4Element("Molybdenum", "Mo", 42.,  95.94*g/mole);
+  elementSn = new G4Element("Tin",        "Sn", 50., 118.710*g/mole);
+  elementTa = new G4Element("Tantalum",   "Ta", 73., 180.94788*g/mole);
+  elementW  = new G4Element("Tungsten",   "W",  74., 183.84*g/mole);
+  elementPt = new G4Element("Platinum",   "Pt", 78., 195.08*g/mole);
+  elementAu = new G4Element("Gold",       "Au", 79., 196.97*g/mole);
   // Materials
 
   HpGe = new G4Material("HpGe", 32., 72.61*g/mole, 5.323*g/cm3);
@@ -33,6 +34,11 @@
   G10->AddElement(elementO, 2);
   G10->AddElement(elementC, 3);
   G10->AddElement(elementH, 3);
+
+  Hevimet = new G4Material("Hevimet", 17.0*g/cm3, 3);
+  Hevimet->AddElement(elementW,  0.90);
+  Hevimet->AddElement(elementNi, 0.06);
+  Hevimet->AddElement(elementCu, 0.04);
 
   CD2 = new G4Material("CD2", 1.08*g/cm3, 2);
   CD2->AddElement(elementC, 1);

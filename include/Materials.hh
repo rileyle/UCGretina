@@ -33,6 +33,8 @@ private:
   G4Element* elementNi;
   G4Element* elementMo;
   G4Element* elementSn;
+  G4Element* elementTa;
+  G4Element* elementW;
   G4Element* elementPt;
   G4Element* elementAu;
 
@@ -43,6 +45,7 @@ private:
   G4Material* HpGe;
   G4Material* preampMat;
   G4Material* G10;
+  G4Material* Hevimet;
   G4Material* polyethylene;
   G4Material* polypropylene;
   G4Material* kapton;
