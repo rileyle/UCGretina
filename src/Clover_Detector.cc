@@ -22,16 +22,16 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   startAngle    = 0.*deg;
   spanningAngle = 360.*deg;
 
-  DetPos.setX(0);
-  DetPos.setY(0); 
-  DetPos.setZ(0);
+  Pos0.setX(0);
+  Pos0.setY(0); 
+  Pos0.setZ(0);
 
   thetad = 90.*deg;
   phid = 90.*deg;
 
-  DetRot=G4RotationMatrix::IDENTITY;
-  DetRot.rotateX(180.*deg);
-  DetRot.rotateY(90.*deg+thetad);
+  Rot0=G4RotationMatrix::IDENTITY;
+  Rot0.rotateX(180.*deg);
+  Rot0.rotateY(90.*deg+thetad);
 
   LeafShift = 2.23*cm; // x and y offset relative to central axis
   
@@ -39,25 +39,25 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   Leaf0Shift.setX(-LeafShift);
   Leaf0Shift.setY(-LeafShift);
   Leaf0Shift.setZ((Length + torusradius)/2. + covergap);
-  Leaf0Pos = DetPos + Leaf0Shift;
+  Leaf0Pos = Pos0 + Leaf0Shift;
 
   // Lower right (facing clover)
   Leaf1Shift.setX(LeafShift);
   Leaf1Shift.setY(-LeafShift);
   Leaf1Shift.setZ((Length + torusradius)/2. + covergap);
-  Leaf1Pos = DetPos + Leaf1Shift;
+  Leaf1Pos = Pos0 + Leaf1Shift;
 
   // Upper right (facing clover)
   Leaf2Shift.setX(LeafShift);
   Leaf2Shift.setY(LeafShift);
   Leaf2Shift.setZ((Length + torusradius)/2. + covergap);
-  Leaf2Pos = DetPos + Leaf2Shift;
+  Leaf2Pos = Pos0 + Leaf2Shift;
 
   // Upper left (facing clover)
   Leaf3Shift.setX(-LeafShift);
   Leaf3Shift.setY(LeafShift);
   Leaf3Shift.setZ((Length + torusradius)/2. + covergap);
-  Leaf3Pos = DetPos + Leaf3Shift;
+  Leaf3Pos = Pos0 + Leaf3Shift;
 
   CCoffset = 0.06*cm; // central contact x and y offset relative to the box
   CCradius = .6*cm; // central contact radius
@@ -70,7 +70,7 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   coverwidth     = 10.1*cm;
   coverthickness = .2*cm;
   covershift.setZ(coverlength/2.);
-  coverpos = DetPos + covershift;
+  coverpos = Pos0 + covershift;
 
   cornerRadius = 1.55*cm;
   corneroffset = coverwidth/2. - cornerRadius;
@@ -80,41 +80,39 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   cornershift.setX(-corneroffset);
   cornershift.setY(corneroffset);
   cornershift.setZ(wallZoffset);
-  cornerpos = DetPos + cornershift;
+  cornerpos = Pos0 + cornershift;
 
   corner1shift.setX(-corneroffset);
   corner1shift.setY(-corneroffset);
   corner1shift.setZ(wallZoffset);
-  corner1pos = DetPos + corner1shift;
+  corner1pos = Pos0 + corner1shift;
 
   corner2shift.setX(corneroffset);
   corner2shift.setY(-corneroffset);
   corner2shift.setZ(wallZoffset);
-  corner2pos = DetPos + corner2shift;
+  corner2pos = Pos0 + corner2shift;
 
   corner3shift.setX(corneroffset);
   corner3shift.setY(corneroffset);
   corner3shift.setZ(wallZoffset);
-  corner3pos = DetPos + corner3shift;
+  corner3pos = Pos0 + corner3shift;
 
   Cuboxshift.setZ(Length + covergap + Cuboxlength/2.);
-  Cuboxpos = DetPos + Cuboxshift;
+  Cuboxpos = Pos0 + Cuboxshift;
 
   // Final Clover placement
   if(orientation == "right")
-    assemblyshift.setX(  -59.96*mm );
+    DetPos.setX(  -72.06*mm );
   else if(orientation == "left")
-    assemblyshift.setX(   59.96*mm );
-  assemblyshift.setY(  343.88*mm ); // Shield y position
-  assemblyshift.setZ( -122.19*mm );
-  assemblypos = assemblyshift;
+    DetPos.setX(   72.06*mm );
+  DetPos.setY(  343.88*mm ); // Shield y position
+  DetPos.setZ( -155.44*mm );
   
-  assemblyrot=G4RotationMatrix::IDENTITY;
-  assemblyrot.rotateZ(0.*deg);
+  DetRot=G4RotationMatrix::IDENTITY;
   if(orientation == "right")
-    assemblyrot.rotateY(200.*deg);
+    DetRot.rotateY(200.*deg);
   else if(orientation == "left")
-    assemblyrot.rotateY(160.*deg);
+    DetRot.rotateY(160.*deg);
 }
 
 Clover_Detector::~Clover_Detector()
@@ -289,25 +287,25 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 
   assemblyclover = new G4AssemblyVolume();
 
-  assemblyclover->AddPlacedVolume(detector_log,Leaf0Pos,&DetRot);
+  assemblyclover->AddPlacedVolume(detector_log,Leaf0Pos,&Rot0);
  
-  DetRot.rotateZ(90.*deg);
+  Rot0.rotateZ(90.*deg);
 
-  assemblyclover->AddPlacedVolume(detector_log,Leaf1Pos,&DetRot);
+  assemblyclover->AddPlacedVolume(detector_log,Leaf1Pos,&Rot0);
 
-  DetRot.rotateZ(90.*deg);
+  Rot0.rotateZ(90.*deg);
   
-  assemblyclover->AddPlacedVolume(detector_log,Leaf2Pos,&DetRot);
+  assemblyclover->AddPlacedVolume(detector_log,Leaf2Pos,&Rot0);
 
-  DetRot.rotateZ(90.*deg);
+  Rot0.rotateZ(90.*deg);
 
-  assemblyclover->AddPlacedVolume(detector_log,Leaf3Pos,&DetRot);
+  assemblyclover->AddPlacedVolume(detector_log,Leaf3Pos,&Rot0);
 
   assemblyclover->AddPlacedVolume(cover_log,coverpos,&wallrot);
 
   assemblyclover->AddPlacedVolume(Cubox_log,Cuboxpos,&wallrot);
 
-  assemblyclover->MakeImprint(expHall_log,assemblypos,&assemblyrot);
+  assemblyclover->MakeImprint(expHall_log, DetPos, &DetRot);
 
   //Visualization Attributes
 
@@ -339,19 +337,19 @@ void Clover_Detector::MakeSensitive(TrackerGammaSD* TrackerGamma)
 void Clover_Detector::setX(G4double x)
 {
   DetPos.setX(x);
-  detector_phys->SetTranslation(DetPos);
+  //  detector_phys->SetTranslation(DetPos);
 }
 //---------------------------------------------------------------------
 void Clover_Detector::setY(G4double y)
 {
   DetPos.setY(y);
-  detector_phys->SetTranslation(DetPos);
+  //  detector_phys->SetTranslation(DetPos);
 }
 //---------------------------------------------------------------------
 void Clover_Detector::setZ(G4double z)
 {
   DetPos.setZ(z);
-  detector_phys->SetTranslation(DetPos);
+  //  detector_phys->SetTranslation(DetPos);
 }
 //---------------------------------------------------------------------
 #endif

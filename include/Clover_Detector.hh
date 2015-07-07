@@ -107,18 +107,18 @@ public:
 
   //here
   G4Transform3D Dassembly;
-  G4ThreeVector assemblypos;
-  G4RotationMatrix assemblyrot;
   G4ThreeVector assemblyshift;
   G4AssemblyVolume* assemblyclover;
 
   // position
+  G4RotationMatrix Rot0;
   G4RotationMatrix DetRot;
   G4RotationMatrix wallrot;
   G4ThreeVector detShift;
   G4ThreeVector Leaf1Shift;
   G4ThreeVector Leaf2Shift;
   G4ThreeVector Leaf3Shift;
+  G4ThreeVector Pos0;
   G4ThreeVector DetPos;
   G4ThreeVector Leaf1Pos;
   G4ThreeVector Leaf2Pos;

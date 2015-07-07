@@ -27,10 +27,14 @@ private:
   G4UIcmdWithoutParameter* CloverCartCmd;
   G4UIcmdWithoutParameter* CartFrameCmd;  
   G4UIcmdWithoutParameter* SlitMountCmd;
+  G4UIcmdWithoutParameter* CollimatorCmd;
+  G4UIcmdWithoutParameter* CollimatorInsertCmd;
   G4UIcmdWithoutParameter* ShieldCmd;
   G4UIcmdWithADoubleAndUnit* XShiftCmd;
   G4UIcmdWithADoubleAndUnit* YShiftCmd;
   G4UIcmdWithADoubleAndUnit* ZShiftCmd;
+  G4UIcmdWithADoubleAndUnit* CloverZCmd;
+  G4UIcmdWithADoubleAndUnit* CollRCmd;
 };
 
 #endif

@@ -19,6 +19,12 @@ ScanningTable_Messenger::ScanningTable_Messenger(ScanningTable* ST)
   SlitMountCmd = new G4UIcmdWithoutParameter("/ScanningTable/IncludeSlitMount", this);
   SlitMountCmd->SetGuidance("Include the slit assembly mount.");
 
+  CollimatorCmd = new G4UIcmdWithoutParameter("/ScanningTable/IncludeCollimator", this);
+  CollimatorCmd->SetGuidance("Include the collimator.");
+
+  CollimatorInsertCmd = new G4UIcmdWithoutParameter("/ScanningTable/IncludeCollimatorInsert", this);
+  CollimatorInsertCmd->SetGuidance("Include the collimator insert.");
+
   ShieldCmd = new G4UIcmdWithoutParameter("/ScanningTable/IncludeShields", this);
   ShieldCmd->SetGuidance("Include the BGO anti-Compton shields.");
 
@@ -36,6 +42,16 @@ ScanningTable_Messenger::ScanningTable_Messenger(ScanningTable* ST)
   ZShiftCmd->SetGuidance("Set the vertical shift of the slits from nominal.");
   ZShiftCmd->SetParameterName("choice", false);
   ZShiftCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  CloverZCmd = new G4UIcmdWithADoubleAndUnit("/ScanningTable/SetCloverZ", this);
+  CloverZCmd->SetGuidance("Set the vertical position of the Clover(s).");
+  CloverZCmd->SetParameterName("choice", false);
+  CloverZCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  CollRCmd = new G4UIcmdWithADoubleAndUnit("/ScanningTable/SetCollimatorRadius", this);
+  CollRCmd->SetGuidance("Set the inner radius of the collimator insert.");
+  CollRCmd->SetParameterName("choice", false);
+  CollRCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 }
 
 ScanningTable_Messenger::~ScanningTable_Messenger()
@@ -45,10 +61,14 @@ ScanningTable_Messenger::~ScanningTable_Messenger()
   delete CADPathCmd;
   delete CartFrameCmd;
   delete SlitMountCmd;
+  delete CollimatorCmd;
+  delete CollimatorInsertCmd;
   delete ShieldCmd;
   delete XShiftCmd;
   delete YShiftCmd;
   delete ZShiftCmd;
+  delete CloverZCmd;
+  delete CollRCmd;
 }
 
 void ScanningTable_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
@@ -61,6 +81,10 @@ void ScanningTable_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { scanningTable->SetIncludeCartFrame(); }
   if ( command == SlitMountCmd )
     { scanningTable->SetIncludeSlitMount(); }
+  if ( command == CollimatorCmd )
+    { scanningTable->SetIncludeCollimator(); }
+  if ( command == CollimatorInsertCmd )
+    { scanningTable->SetIncludeCollimatorInsert(); }
   if ( command == ShieldCmd )
     { scanningTable->SetIncludeShield(); }
   if ( command == XShiftCmd )
@@ -69,6 +93,10 @@ void ScanningTable_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { scanningTable->SetYShift(YShiftCmd->GetNewDoubleValue(newValue)); }
   if ( command == ZShiftCmd )
     { scanningTable->SetZShift(ZShiftCmd->GetNewDoubleValue(newValue)); }
+  if ( command == CloverZCmd )
+    { scanningTable->SetCloverZ(CloverZCmd->GetNewDoubleValue(newValue)); }
+  if ( command == CollRCmd )
+    { scanningTable->SetCollR(CollRCmd->GetNewDoubleValue(newValue)); }
   
 }
 #endif

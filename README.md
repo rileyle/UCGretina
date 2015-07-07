@@ -400,7 +400,15 @@ Optional commands for the scanning table:
 
     /ScanningTable/IncludeSlitMount
 
-> Construct the slit assembly mount.
+> Construct the scanning table frame and GRETINA mount.
+
+    /ScanningTable/IncludeCollimator
+
+> Construct the collimator.
+
+    /ScanningTable/IncludeCollimatorInsert
+
+> Construct the collimator insert.
 
     /ScanningTable/IncludeCloverCart
 
@@ -419,6 +427,10 @@ Optional commands for the scanning table:
     /ScanningTable/SetZShift <double> <unit>
 
 > Set the vertical shift of the slits from nominal.
+
+    /ScanningTable/SetCollimatorRadius <double> <unit>
+
+> Set the inner radius of the collimator insert.
 
 ### Liquid Hydrogen Target ###
 
