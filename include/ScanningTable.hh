@@ -11,6 +11,7 @@
 #include "G4UnionSolid.hh"
 #include "G4LogicalVolume.hh"
 #include "G4VPhysicalVolume.hh"
+#include "G4ExtrudedSolid.hh"
 #include "G4Box.hh"
 #include "G4ThreeVector.hh"
 #include "G4PVPlacement.hh"
@@ -37,10 +38,13 @@ class ScanningTable
   void SetIncludeCloverCart() { includeCloverCart = true; }
   void SetIncludeCartFrame() { includeCartFrame = true; }
   void SetIncludeSlitMount() { includeSlitMount = true; }
+  void SetIncludeCollimator() { includeCollimator = true; }
+  void SetIncludeCollimatorInsert() { includeCollimatorInsert = true; }
   void SetIncludeShield() { includeShield = true; }
   void SetXShift(G4double value) { xShift = value; }
   void SetYShift(G4double value) { yShift = value; }
   void SetZShift(G4double value) { zShift = value; }
+  void SetCollR(G4double value) { collimatorRadius = value; }
   void Report();
   
     private:
@@ -48,13 +52,15 @@ class ScanningTable
   G4bool includeCloverCart;
   G4bool includeCartFrame;
   G4bool includeSlitMount;
+  G4bool includeCollimator;
+  G4bool includeCollimatorInsert;
   G4bool includeShield;
 
   G4String CADModelPath;
-  G4String SlitPart[10];
+  G4String ZSlitPart[10];
   G4String CartPart[37];
   G4String CollimatorPart[3];
-  G4String SlitZAssemblyPart[23];
+  G4String SlitZAssemblyPart[19];
   G4String CloverAssemblyPart[6];
   G4String CartTopPart[9];
   int ZSlitParts;
@@ -67,13 +73,15 @@ class ScanningTable
   G4double xShift;
   G4double yShift;
   G4double zShift;
+
+  G4double collimatorRadius;
   
   //materials
   Materials* materials;
   G4Material* ZSlitMaterial[10];
   G4Material* CartMaterial[37];
   G4Material* CollimatorMaterial[3];
-  G4Material* SlitZAssemblyMaterial[23];
+  G4Material* SlitZAssemblyMaterial[19];
   G4Material* CloverAssemblyMaterial[6];
   G4Material* CartTopMaterial[9];
   G4Material* material8020;
@@ -89,10 +97,35 @@ class ScanningTable
   G4Material* materialClover;
   G4Material* materialCloverShield;
 
+  //G4 Objects
+  G4Box* CloverMountBase;
+  G4Box* CloverMountwall;
+  G4UnionSolid* CloverMount;
+  G4UnionSolid* CloverMount2;
+  G4Tubs* CloverMountCut;
+  G4SubtractionSolid* CloverMountSub;
+  G4ExtrudedSolid* CloverMountExt;
+  G4ExtrudedSolid* ZSlitAssemblyTriangle;
+
   //default position
   G4RotationMatrix NoRot;
   G4RotationMatrix Rot;
   G4ThreeVector *Pos0;
+  G4ThreeVector *Pos1;
+  G4ThreeVector *Pos2;
+  G4ThreeVector *Pos3;
+  G4ThreeVector *BotPos;
+  G4ThreeVector *MidPos;
+  G4ThreeVector *TopPos;
+  G4ThreeVector *UsePos;
+  G4ThreeVector CloverMountShift;
+  G4ThreeVector ZSlitAssemblyTriangle1Shift;
+  G4ThreeVector ZSlitAssemblyTriangle2Shift;
+  G4RotationMatrix CloverMountRot;
+  G4RotationMatrix ZSlitAssemblyTriangleRot;
+  G4ThreeVector CloverMountPos;
+  G4ThreeVector ZSlitAssemblyTriangle1Pos;
+  G4ThreeVector ZSlitAssemblyTriangle2Pos;
 
   //logical volume
   G4LogicalVolume* Cart_log;
@@ -143,6 +176,8 @@ class ScanningTable
   G4LogicalVolume* CloverAssemblyRightRight_log;
   G4LogicalVolume* CloverRightShield_log;
   G4LogicalVolume* CloverLeftShield_log;
+  G4LogicalVolume* CloverMount_log;
+  G4LogicalVolume* ZSlitAssemblyTriangle_log;
   
   //physical volume
   G4VPhysicalVolume* Cart_phys;
@@ -193,7 +228,9 @@ class ScanningTable
   G4VPhysicalVolume* CloverAssemblyLeftRight_phys;
   G4VPhysicalVolume* CloverRightShield_phys;
   G4VPhysicalVolume* CloverLeftShield_phys;
-
+  G4VPhysicalVolume* CloverMount_phys;
+  G4VPhysicalVolume* ZSlitAssemblyTriangle1_phys;
+  G4VPhysicalVolume* ZSlitAssemblyTriangle2_phys;
 };
 
 #endif

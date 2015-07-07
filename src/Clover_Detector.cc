@@ -106,7 +106,7 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   else if(orientation == "left")
     assemblyshift.setX(   59.96*mm );
   assemblyshift.setY(  343.88*mm ); // Shield y position
-  assemblyshift.setZ( -122.19*mm );
+  assemblyshift.setZ( -175.44*mm );
   assemblypos = assemblyshift;
   
   assemblyrot=G4RotationMatrix::IDENTITY;
