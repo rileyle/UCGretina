@@ -18,6 +18,8 @@ DetectorConstruction::DetectorConstruction()
 #endif
 #endif
 
+  gretinaStatus = true;
+
   myMessenger = new DetectorConstruction_Messenger(this);
 }
 
@@ -254,8 +256,9 @@ void DetectorConstruction::Placement()
     Shell->Placement(shellStatus);
   }
 #endif
-  
-  the_Gretina_Array->Placement();
+
+  if(gretinaStatus)
+    the_Gretina_Array->Placement();
 
 }
 

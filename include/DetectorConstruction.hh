@@ -95,6 +95,7 @@ private:
   Materials* materials;
 
   G4bool targetStatus;
+  G4bool gretinaStatus;
   Target* aTarget;
 
   Background_Sphere* BackgroundSphere;

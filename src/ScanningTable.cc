@@ -17,11 +17,13 @@ ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,Materials* ma
   includeCollimator       = false;
   includeCollimatorInsert = false;
   includeShield           = false;
+  includeCuTarget         = false;
 
   xShift  = 0.0*mm;
   yShift  = 0.0*mm;
   zShift  = 0.0*mm;
-  cloverZ = 343.88*mm; // Shield y position
+  cloverZ = 0.0*mm;
+  cloverOffset = 343.88*mm; // Shield y position
 
   collimatorRadius = 1.0*mm;
 
@@ -37,6 +39,7 @@ ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,Materials* ma
   materialCsCollimator = materials->FindMaterial("Hevimet");
   materialClover = materials->FindMaterial("HpGe");
   materialCloverShield = materials->FindMaterial("Al");
+  materialCuTarget = materials->FindMaterial("Cu");
 }
 
 ScanningTable::~ScanningTable()
@@ -217,9 +220,17 @@ G4VPhysicalVolume* ScanningTable::Construct()
   }
   
   //--- Now the slit assembly -------------------------------------------------
-  BotPos = new G4ThreeVector(0., 90.335*mm, -8.8*mm);
-  MidPos = new G4ThreeVector(0., 46.335*mm, -8.8*mm);
-  TopPos = new G4ThreeVector(0., -44.335*mm, -8.8*mm);
+
+  // Slits on top
+  // BotPos = new G4ThreeVector(0., 90.335*mm, -8.8*mm);
+  // MidPos = new G4ThreeVector(0., 46.335*mm, -8.8*mm);
+  // TopPos = new G4ThreeVector(0., -44.335*mm, -8.8*mm);
+
+  // Slites on the bottom
+  BotPos = new G4ThreeVector(0., 0., -8.8*mm);
+  MidPos = new G4ThreeVector(0., 0., -8.8*mm);
+  TopPos = new G4ThreeVector(0., 0., -8.8*mm);
+
   const int ZSlitParts = 10;
   G4String ZSlitPart[ZSlitParts];
   G4Material* ZSlitMaterial[ZSlitParts];
@@ -374,15 +385,15 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	}
   
 	std::vector<G4TwoVector> polygon2;
-	polygon2.push_back( G4TwoVector(0*cm,        0*cm) );
-	polygon2.push_back( G4TwoVector(15.24*cm,    0*cm) );
-	polygon2.push_back( G4TwoVector(15.24*cm,  -45.72*cm) );
-	polygon2.push_back( G4TwoVector(13.335*cm, -45.72*cm) );
-	polygon2.push_back( G4TwoVector(0*cm,      -1.905*cm) );
+	polygon2.push_back( G4TwoVector(0*mm,        0*mm) );
+	polygon2.push_back( G4TwoVector(152.4*mm,    0*mm) );
+	polygon2.push_back( G4TwoVector(152.4*mm,  -457.2*mm) );
+	polygon2.push_back( G4TwoVector(133.35*mm, -457.2*mm) );
+	polygon2.push_back( G4TwoVector(0*mm,      -19.05*mm) );
 
 	std::vector<G4ExtrudedSolid::ZSection> zsections2;
 	zsections2.push_back( G4ExtrudedSolid::ZSection(0.,       0., 1.) );
-	zsections2.push_back( G4ExtrudedSolid::ZSection(1.905*cm, 0., 1.) );
+	zsections2.push_back( G4ExtrudedSolid::ZSection(19.05*mm, 0., 1.) );
 
 	ZSlitAssemblyTriangle = new G4ExtrudedSolid("ZSlitAssemblyTriangle", 
 						    polygon2,
@@ -395,14 +406,14 @@ G4VPhysicalVolume* ScanningTable::Construct()
 				0, 0, 0);
 	ZSlitAssemblyTriangle_log->SetVisAttributes(VisSlit2);
 
-	ZSlitAssemblyTriangle1Shift.setX(17.12*cm);
-	ZSlitAssemblyTriangle1Shift.setY(39.75*cm+zShift);
-	ZSlitAssemblyTriangle1Shift.setZ(-0.80*cm);
+	ZSlitAssemblyTriangle1Shift.setX(171.2*mm);
+	ZSlitAssemblyTriangle1Shift.setY(397.5*mm + zShift);
+	ZSlitAssemblyTriangle1Shift.setZ(-8.0*mm);
 	ZSlitAssemblyTriangle1Pos = ZSlitAssemblyTriangle1Shift;
 
-	ZSlitAssemblyTriangle2Shift.setX(-15.215*cm);
-	ZSlitAssemblyTriangle2Shift.setY( 39.75*cm+zShift);
-	ZSlitAssemblyTriangle2Shift.setZ( -0.80*cm);
+	ZSlitAssemblyTriangle2Shift.setX(-152.15*mm);
+	ZSlitAssemblyTriangle2Shift.setY( 397.5*mm + zShift);
+	ZSlitAssemblyTriangle2Shift.setZ( -8.0*mm);
 	ZSlitAssemblyTriangle2Pos = ZSlitAssemblyTriangle2Shift;
   
 	ZSlitAssemblyTriangleRot=G4RotationMatrix::IDENTITY;
@@ -623,7 +634,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
 				    (char*)"STL");
 	mesh->SetScale(mm);
-	mesh->SetOffset(G4ThreeVector(0., cloverZ - 323.88*mm, 0.));
+	mesh->SetOffset(G4ThreeVector(0., cloverZ, 0.));
      
 	G4VSolid *CloverElevator = mesh->TessellatedMesh();
 
@@ -693,7 +704,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	CloverMountRot.rotateY(20.*deg);
 
 	CloverMountShift.setX(-19.7256*cm);
-	CloverMountShift.setY(17.7*cm + cloverZ - 323.88*mm);
+	CloverMountShift.setY(17.7*cm + cloverZ);
 	CloverMountShift.setZ(-52.475*cm);
 	CloverMountPos = CloverMountShift;
 
@@ -701,7 +712,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	CloverMount1Rot.rotateY(-20.*deg);
 
 	CloverMount1Shift.setX(19.7256*cm);
-	CloverMount1Shift.setY(17.7*cm + cloverZ - 323.88*mm);
+	CloverMount1Shift.setY(17.7*cm + cloverZ);
 	CloverMount1Shift.setZ(-52.475*cm);
 	CloverMount1Pos = CloverMount1Shift;
 
@@ -718,6 +729,29 @@ G4VPhysicalVolume* ScanningTable::Construct()
       }
     }
   }
+
+ if (includeCuTarget) {
+ 
+  CuTarget = new G4Box("CuTarget", 3.65/2*cm, 8.41375/2*cm, 3.49/2*cm);
+
+  CuTarget_log = new G4LogicalVolume(CuTarget,
+					      materialCuTarget,
+					      "CuTarget_log",
+					      0, 0, 0);
+
+  CuTarget_log->SetVisAttributes(VisSlit2);
+
+        CuTargetShift.setX(Pos0->getX() + xShift);
+	CuTargetShift.setY(Pos0->getY() + 249.301*mm + 148.2625*mm);
+	CuTargetShift.setZ(Pos0->getZ() -  81.502*mm + yShift);
+	CuTargetPos = CuTargetShift;
+
+  CuTarget_phys = new G4PVPlacement(G4Transform3D(NoRot, 
+							    CuTargetPos),
+					      CuTarget_log, "CuTarget_phys",
+					      expHall_log, false, 0);
+  }
+
     
   //--- Now the shields -- just for show right now ------------------------
 

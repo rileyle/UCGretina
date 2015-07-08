@@ -28,6 +28,9 @@ ScanningTable_Messenger::ScanningTable_Messenger(ScanningTable* ST)
   ShieldCmd = new G4UIcmdWithoutParameter("/ScanningTable/IncludeShields", this);
   ShieldCmd->SetGuidance("Include the BGO anti-Compton shields.");
 
+  CuTargetCmd = new G4UIcmdWithoutParameter("/ScanningTable/IncludeCuTarget", this);
+  CuTargetCmd->SetGuidance("Include the Cu Target.");
+
   XShiftCmd = new G4UIcmdWithADoubleAndUnit("/ScanningTable/SetXShift", this);
   XShiftCmd->SetGuidance("Set the horizontal (X) shift of the source from nominal.");
   XShiftCmd->SetParameterName("choice", false);
@@ -64,6 +67,7 @@ ScanningTable_Messenger::~ScanningTable_Messenger()
   delete CollimatorCmd;
   delete CollimatorInsertCmd;
   delete ShieldCmd;
+  delete CuTargetCmd;
   delete XShiftCmd;
   delete YShiftCmd;
   delete ZShiftCmd;
@@ -87,6 +91,8 @@ void ScanningTable_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { scanningTable->SetIncludeCollimatorInsert(); }
   if ( command == ShieldCmd )
     { scanningTable->SetIncludeShield(); }
+  if ( command == CuTargetCmd )
+    { scanningTable->SetIncludeCuTarget(); }
   if ( command == XShiftCmd )
     { scanningTable->SetXShift(XShiftCmd->GetNewDoubleValue(newValue)); }
   if ( command == YShiftCmd )
