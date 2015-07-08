@@ -23,7 +23,7 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   spanningAngle = 360.*deg;
 
   Pos0.setX(0);
-  Pos0.setY(0); 
+  Pos0.setY(0);
   Pos0.setZ(0);
 
   thetad = 90.*deg;
@@ -34,7 +34,7 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   Rot0.rotateY(90.*deg+thetad);
 
   LeafShift = 2.23*cm; // x and y offset relative to central axis
-  
+
   // Lower left (facing clover)
   Leaf0Shift.setX(-LeafShift);
   Leaf0Shift.setY(-LeafShift);

@@ -307,7 +307,6 @@ G4VPhysicalVolume* ScanningTable::Construct()
     SlitZAssemblyMaterial[3] = materialSlitAssembly;
     SlitZAssemblyPart[4] = "SlitZAssemblyCenterCylinderPlug";
     SlitZAssemblyMaterial[4] = materialSlitAssembly;
-    //    SlitZAssemblyPart[5] = "SlitZAssemblyCirclePlate"; // until the overlap with the crystals is fixed
     SlitZAssemblyPart[5] = "";
     SlitZAssemblyMaterial[5] = materialSlitAssembly;
     SlitZAssemblyPart[6] = "SlitZAssemblyLeftCrescentWithHoles";
@@ -320,26 +319,18 @@ G4VPhysicalVolume* ScanningTable::Construct()
     SlitZAssemblyMaterial[9] = materialSlitAssembly;
     SlitZAssemblyPart[10] = "SlitZAssemblyLeftPlate";
     SlitZAssemblyMaterial[10] = materialSlitAssembly;
-    //SlitZAssemblyPart[11] = "SlitZAssemblyLeftScrew";
-    //SlitZAssemblyMaterial[11] = materialSlitAssembly;
-    //SlitZAssemblyPart[14] = "SlitZAssemblyCrescentLeft";
-    //SlitZAssemblyMaterial[14] = materialSlitAssembly;
     SlitZAssemblyPart[11] = "SlitZAssemblyPlateWithHoles";
     SlitZAssemblyMaterial[11] = materialSlitAssembly;
-    SlitZAssemblyPart[12] = "SlitZAssemblyPlug";
-    SlitZAssemblyMaterial[12] = materialSlitAssembly;
+    SlitZAssemblyPart[12] = "";                          //  Get rid of this
+    SlitZAssemblyMaterial[12] = materialSlitAssembly;    //  Get rid of this
     SlitZAssemblyPart[13] = "SlitZAssemblyRightBrace";
     SlitZAssemblyMaterial[13] = materialSlitAssembly;
     SlitZAssemblyPart[14] = "SlitZAssemblyRightClamp";
     SlitZAssemblyMaterial[14] = materialSlitAssembly;
-    //SlitZAssemblyPart[19] = "SlitZAssemblyRightCrescentClip";
-    //SlitZAssemblyMaterial[19] = materialSlitAssembly;
     SlitZAssemblyPart[15] = "SlitZAssemblyRightCrescentWithHoles";
     SlitZAssemblyMaterial[15] = materialSlitAssembly;
     SlitZAssemblyPart[16] = "SlitZAssemblyRightPlate";
     SlitZAssemblyMaterial[16] = materialSlitAssembly;
-    //SlitZAssemblyPart[18] = "SlitZAssemblyScrew";
-    //SlitZAssemblyMaterial[18] = materialSlitAssembly;
     SlitZAssemblyPart[17] = "SlitZAssemblyTPlate";
     SlitZAssemblyMaterial[17] = materialSlitAssembly;
     SlitZAssemblyPart[18] = "SlitZAssemblyUPlate";
@@ -352,8 +343,14 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	CADFileName += ".stl";
 	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
 				    (char*)"STL");
+	if(i < 5 || i == 6 || i == 8 || i == 14 || i == 15 || i== 17 		|| i == 18){
 	mesh->SetScale(mm);
 	mesh->SetOffset(G4ThreeVector(0., zShift, 0.));
+	}
+	else{
+	mesh->SetScale(mm);
+	mesh->SetOffset(G4ThreeVector(0., 0., 0.));
+	}
      
 	G4VSolid *SlitAssembly = mesh->TessellatedMesh();
 	SlitZAssembly_log = new G4LogicalVolume(SlitAssembly, 
@@ -399,12 +396,12 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	ZSlitAssemblyTriangle_log->SetVisAttributes(VisSlit2);
 
 	ZSlitAssemblyTriangle1Shift.setX(17.12*cm);
-	ZSlitAssemblyTriangle1Shift.setY(39.75*cm);
+	ZSlitAssemblyTriangle1Shift.setY(39.75*cm+zShift);
 	ZSlitAssemblyTriangle1Shift.setZ(-0.80*cm);
 	ZSlitAssemblyTriangle1Pos = ZSlitAssemblyTriangle1Shift;
 
 	ZSlitAssemblyTriangle2Shift.setX(-15.215*cm);
-	ZSlitAssemblyTriangle2Shift.setY( 39.75*cm);
+	ZSlitAssemblyTriangle2Shift.setY( 39.75*cm+zShift);
 	ZSlitAssemblyTriangle2Shift.setZ( -0.80*cm);
 	ZSlitAssemblyTriangle2Pos = ZSlitAssemblyTriangle2Shift;
   
@@ -541,51 +538,48 @@ G4VPhysicalVolume* ScanningTable::Construct()
   //--- Now the clover cart: base and elevator --------------------------------
 
   if (includeCloverCart) {
-    /**const int CloverAssemblyParts = 6;
-    G4String CloverAssemblyPart[CloverAssemblyParts];
-    G4Material* CloverAssemblyMaterial[CloverAssemblyParts];
-    CloverAssemblyPart[0] = "CloverAssemblyLeftBase";
-    CloverAssemblyMaterial[0] = materialCartBase;
-    CloverAssemblyPart[1] = "CloverAssemblyLeftLeft";
-    CloverAssemblyMaterial[1] = materialCartBase;
-    CloverAssemblyPart[2] = "CloverAssemblyLeftRight";
-    CloverAssemblyMaterial[2] = materialCartBase;
-    CloverAssemblyPart[3] = "CloverAssemblyRightBase";
-    CloverAssemblyMaterial[3] = materialCartBase;
-    CloverAssemblyPart[4] = "CloverAssemblyRightLeft";
-    CloverAssemblyMaterial[4] = materialCartBase;
-    CloverAssemblyPart[5] = "CloverAssemblyRightRight";
-    CloverAssemblyMaterial[5] = materialCartBase;**/
 
-    G4Colour lpurpleBlue (0.3, 0.2, 1.0, 0.3);
-    G4VisAttributes* VisCloverCart = new G4VisAttributes(lpurpleBlue);
-    VisCloverCart->SetVisibility(true);
-    VisCloverCart->SetForceWireframe(true);
+    // This is the mount for the BGO anti-compton shields (keep just un case they are ever used).
+    
+    // const int CloverAssemblyParts = 6;
+    // G4String CloverAssemblyPart[CloverAssemblyParts];
+    // G4Material* CloverAssemblyMaterial[CloverAssemblyParts];
+    // CloverAssemblyPart[0] = "CloverAssemblyLeftBase";
+    // CloverAssemblyMaterial[0] = materialCartBase;
+    // CloverAssemblyPart[1] = "CloverAssemblyLeftLeft";
+    // CloverAssemblyMaterial[1] = materialCartBase;
+    // CloverAssemblyPart[2] = "CloverAssemblyLeftRight";
+    // CloverAssemblyMaterial[2] = materialCartBase;
+    // CloverAssemblyPart[3] = "CloverAssemblyRightBase";
+    // CloverAssemblyMaterial[3] = materialCartBase;
+    // CloverAssemblyPart[4] = "CloverAssemblyRightLeft";
+    // CloverAssemblyMaterial[4] = materialCartBase;
+    // CloverAssemblyPart[5] = "CloverAssemblyRightRight";
+    // CloverAssemblyMaterial[5] = materialCartBase;
 
-    /**for(int i=0; i < CloverAssemblyParts; i++){
-      if(CloverAssemblyPart[i] != ""){
-	CADFileName = CADModelPath + "/";
-	CADFileName += CloverAssemblyPart[i];
-	CADFileName += ".stl";
-	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
-				    (char*)"STL");
-	mesh->SetScale(mm);
-	mesh->SetOffset(G4ThreeVector(xShift, 0., yShift));
-     
-	G4VSolid *CloverAssembly = mesh->TessellatedMesh();
-
-	CloverAssembly_log = new G4LogicalVolume(CloverAssembly,
-						 CloverAssemblyMaterial[i], 
-						 CloverAssemblyPart[i], 0, 0, 0);
-	CloverAssembly_phys = new G4PVPlacement(G4Transform3D(NoRot, 
-							      *Pos0),
-						CloverAssembly_log,
-						CloverAssemblyPart[i],
-						expHall_log,false,0);
-	CloverAssembly_log->SetVisAttributes(VisSlit2);
-      }
-    }
-  }**/
+    // for(int i=0; i < CloverAssemblyParts; i++){
+    //   if(CloverAssemblyPart[i] != ""){
+    // 	CADFileName = CADModelPath + "/";
+    // 	CADFileName += CloverAssemblyPart[i];
+    // 	CADFileName += ".stl";
+    // 	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
+    // 				    (char*)"STL");
+    // 	mesh->SetScale(mm);
+    // 	mesh->SetOffset(G4ThreeVector(xShift, 0., yShift));
+	
+    // 	G4VSolid *CloverAssembly = mesh->TessellatedMesh();
+	
+    // 	CloverAssembly_log = new G4LogicalVolume(CloverAssembly,
+    // 						 CloverAssemblyMaterial[i], 
+    // 						 CloverAssemblyPart[i], 0, 0, 0);
+    // 	CloverAssembly_phys = new G4PVPlacement(G4Transform3D(NoRot, 
+    // 							      *Pos0),
+    // 						CloverAssembly_log,
+    // 						CloverAssemblyPart[i],
+    // 						expHall_log,false,0);
+    // 	CloverAssembly_log->SetVisAttributes(VisSlit2);
+    //   }
+    // }
 
     const int CloverElevatorParts = 15;
     G4String CloverElevatorPart[CloverElevatorParts];
@@ -629,7 +623,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
 				    (char*)"STL");
 	mesh->SetScale(mm);
-	mesh->SetOffset(G4ThreeVector(xShift, 0., yShift));
+	mesh->SetOffset(G4ThreeVector(0., cloverZ - 323.88*mm, 0.));
      
 	G4VSolid *CloverElevator = mesh->TessellatedMesh();
 
@@ -642,49 +636,84 @@ G4VPhysicalVolume* ScanningTable::Construct()
 						CloverElevatorPart[i],
 						expHall_log,false,0);
 	CloverElevator_log->SetVisAttributes(VisSlit2);
-CloverMountBase = new G4Box("CloverMountBase",12.86*cm,.953*cm, 20.40*cm);
 
-CloverMountwall = new G4Box("CloverMountBase", 12.86*cm,8.017*cm,.953*cm);
+	CloverMountBase = new G4Box("CloverMountBase", 
+				    12.86*cm, 0.953*cm, 20.40*cm);
 
-CloverMountCut = new G4Tubs("CloverMountCut",0,5.675*2*cm,2.0*cm,0*deg,360.*deg);
+	CloverMountwall = new G4Box("CloverMountBase", 
+				    12.86*cm, 8.017*cm, 0.953*cm);
 
-CloverMountSub = new G4SubtractionSolid("CloverMountSub",CloverMountwall, CloverMountCut,G4Transform3D(G4RotationMatrix(),G4ThreeVector(0,9.252*cm,0)));
+	CloverMountCut = new G4Tubs("CloverMountCut",
+				    0, 5.675*2*cm, 2.0*cm,
+				    0*deg, 360.*deg);
 
-std::vector<G4TwoVector> polygon;
-polygon.push_back( G4TwoVector(-12.86*cm,0*cm) );
-polygon.push_back( G4TwoVector(-12.86*cm,2.70*cm) );
-polygon.push_back( G4TwoVector(-8.10*cm,15.527*cm) );
-polygon.push_back( G4TwoVector(-6.67*cm,15.527*cm) );
-polygon.push_back( G4TwoVector(-6.67*cm,9.02*cm) );
-polygon.push_back( G4TwoVector(6.67*cm,9.02*cm) );
-polygon.push_back( G4TwoVector(6.66*cm,15.527*cm) );
-polygon.push_back( G4TwoVector(8.10*cm,15.527*cm) );
-polygon.push_back( G4TwoVector(12.86*cm,2.70*cm) );
-polygon.push_back( G4TwoVector(12.86*cm,0*cm) );
+	CloverMountSub 
+	  = new G4SubtractionSolid("CloverMountSub", CloverMountwall, 
+				   CloverMountCut, 
+				   G4Transform3D(G4RotationMatrix(),
+						 G4ThreeVector(0, 9.252*cm, 0)));
 
-std::vector<G4ExtrudedSolid::ZSection> zsections;
-zsections.push_back( G4ExtrudedSolid::ZSection(-.9525*cm,0, 1) );
-zsections.push_back( G4ExtrudedSolid::ZSection(.9525*cm,0, 1) );
+	std::vector<G4TwoVector> polygon;
+	polygon.push_back( G4TwoVector(-12.86*cm, 0*cm) );
+	polygon.push_back( G4TwoVector(-12.86*cm, 2.70*cm) );
+	polygon.push_back( G4TwoVector(-8.10*cm, 15.527*cm) );
+	polygon.push_back( G4TwoVector(-6.67*cm, 15.527*cm) );
+	polygon.push_back( G4TwoVector(-6.67*cm,  9.02*cm) );
+	polygon.push_back( G4TwoVector( 6.67*cm,  9.02*cm) );
+	polygon.push_back( G4TwoVector( 6.66*cm, 15.527*cm) );
+	polygon.push_back( G4TwoVector( 8.10*cm, 15.527*cm) );
+	polygon.push_back( G4TwoVector(12.86*cm,  2.70*cm) );
+	polygon.push_back( G4TwoVector(12.86*cm,  0*cm) );
 
-CloverMountExt = new G4ExtrudedSolid("CloverMountExt", polygon,
-zsections);
+	std::vector<G4ExtrudedSolid::ZSection> zsections;
+	zsections.push_back( G4ExtrudedSolid::ZSection(-0.9525*cm, 0, 1) );
+	zsections.push_back( G4ExtrudedSolid::ZSection( 0.9525*cm, 0, 1) );
 
-CloverMount = new G4UnionSolid("CloverMount",CloverMountBase,CloverMountSub,G4Transform3D(G4RotationMatrix(),G4ThreeVector(0,8.017*cm,-19.45*cm)));
+	CloverMountExt = new G4ExtrudedSolid("CloverMountExt", polygon,
+					     zsections);
 
-CloverMount2 = new G4UnionSolid("CloverMount2",CloverMount,CloverMountExt,G4Transform3D(G4RotationMatrix(),G4ThreeVector(0,0*cm,5.45*cm)));
+	CloverMount 
+	  = new G4UnionSolid("CloverMount", CloverMountBase, 
+			     CloverMountSub,
+			     G4Transform3D(G4RotationMatrix(),
+					   G4ThreeVector(0, 8.017*cm, -19.45*cm)));
 
-CloverMount_log = new G4LogicalVolume(CloverMount2,materialCartBase,"CloverMount_log",0,0,0);
+	CloverMount2 
+	  = new G4UnionSolid("CloverMount2", CloverMount, CloverMountExt,
+			     G4Transform3D(G4RotationMatrix(),
+					   G4ThreeVector(0, 0*cm, 5.45*cm)));
 
-CloverMountRot=G4RotationMatrix::IDENTITY;
-CloverMountRot.rotateY(20.*deg);
+	CloverMount_log = new G4LogicalVolume(CloverMount2,
+					      materialCartBase,
+					      "CloverMount_log",
+					      0, 0, 0);
+	CloverMount_log->SetVisAttributes(VisSlit2);
 
-CloverMountShift.setX(-19.7256*cm);
-CloverMountShift.setY(17.7*cm);
-CloverMountShift.setZ(-52.475*cm);
-CloverMountPos = CloverMountShift;
+	CloverMountRot=G4RotationMatrix::IDENTITY;
+	CloverMountRot.rotateY(20.*deg);
 
-CloverMount_phys = new G4PVPlacement(G4Transform3D(CloverMountRot,CloverMountPos),CloverMount_log,"CloverMount_phys",expHall_log,false,0);
+	CloverMountShift.setX(-19.7256*cm);
+	CloverMountShift.setY(17.7*cm + cloverZ - 323.88*mm);
+	CloverMountShift.setZ(-52.475*cm);
+	CloverMountPos = CloverMountShift;
 
+	CloverMount1Rot=G4RotationMatrix::IDENTITY;
+	CloverMount1Rot.rotateY(-20.*deg);
+
+	CloverMount1Shift.setX(19.7256*cm);
+	CloverMount1Shift.setY(17.7*cm + cloverZ - 323.88*mm);
+	CloverMount1Shift.setZ(-52.475*cm);
+	CloverMount1Pos = CloverMount1Shift;
+
+	CloverMount_phys = new G4PVPlacement(G4Transform3D(CloverMountRot, 
+							   CloverMountPos),
+					     CloverMount_log, "CloverMount_phys",
+					     expHall_log, false, 0);
+
+	CloverMount1_phys = new G4PVPlacement(G4Transform3D(CloverMount1Rot, 
+							    CloverMount1Pos),
+					      CloverMount_log, "CloverMount1_phys",
+					      expHall_log, false, 0);
 
       }
     }

@@ -125,11 +125,14 @@ class ScanningTable
   G4ThreeVector *TopPos;
   G4ThreeVector *UsePos;
   G4ThreeVector CloverMountShift;
+  G4ThreeVector CloverMount1Shift;
   G4ThreeVector ZSlitAssemblyTriangle1Shift;
   G4ThreeVector ZSlitAssemblyTriangle2Shift;
   G4RotationMatrix CloverMountRot;
+  G4RotationMatrix CloverMount1Rot;
   G4RotationMatrix ZSlitAssemblyTriangleRot;
   G4ThreeVector CloverMountPos;
+  G4ThreeVector CloverMount1Pos;
   G4ThreeVector ZSlitAssemblyTriangle1Pos;
   G4ThreeVector ZSlitAssemblyTriangle2Pos;
 
@@ -235,6 +238,7 @@ class ScanningTable
   G4VPhysicalVolume* CloverRightShield_phys;
   G4VPhysicalVolume* CloverLeftShield_phys;
   G4VPhysicalVolume* CloverMount_phys;
+  G4VPhysicalVolume* CloverMount1_phys;
   G4VPhysicalVolume* ZSlitAssemblyTriangle1_phys;
   G4VPhysicalVolume* ZSlitAssemblyTriangle2_phys;
 };
