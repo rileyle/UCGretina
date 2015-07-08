@@ -354,7 +354,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	CADFileName += ".stl";
 	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
 				    (char*)"STL");
-	if(i < 5 || i == 6 || i == 8 || i == 14 || i == 15 || i== 17 		|| i == 18){
+	if((i != 0) && (i < 5 || i == 6 || i == 8 || i == 9 || i == 10 || i == 11 || i > 14)){
 	mesh->SetScale(mm);
 	mesh->SetOffset(G4ThreeVector(0., zShift, 0.));
 	}
@@ -508,7 +508,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
 				    (char*)"STL");
 	mesh->SetScale(mm);
-	mesh->SetOffset(G4ThreeVector(xShift, 0., yShift));
+	mesh->SetOffset(G4ThreeVector(xShift, 0., 37.05*mm + yShift));
      
 	G4VSolid *Collimator = mesh->TessellatedMesh();
 
@@ -532,13 +532,17 @@ G4VPhysicalVolume* ScanningTable::Construct()
 					   materialCsCollimator, 
 					   "CollimatorInsert_log", 
 					   0, 0, 0);
-      G4ThreeVector *collPos 
+      // G4ThreeVector *collPos 
+      // 	= new G4ThreeVector(Pos0->getX() + xShift, 
+      // 			    Pos0->getY() + 249.301*mm, 
+      // 			    Pos0->getZ() -  81.502*mm + yShift);
+      G4ThreeVector *collIPos 
 	= new G4ThreeVector(Pos0->getX() + xShift, 
 			    Pos0->getY() + 249.301*mm, 
-			    Pos0->getZ() -  81.502*mm + yShift);
+			    Pos0->getZ() - 44.45*mm + yShift);
       G4RotationMatrix collRot = G4RotationMatrix::IDENTITY;
       collRot.rotateX(90.*deg);
-      Collimator_phys = new G4PVPlacement(G4Transform3D(collRot, *collPos),
+      Collimator_phys = new G4PVPlacement(G4Transform3D(collRot, *collIPos),
 					  Collimator_log,
 					  "CollimatorInsert",
 					  expHall_log,false,0);
