@@ -100,13 +100,17 @@ Optional commands for setting GRETA chamber geometry:
 
     /GretaChamber/R_max <double> <unit>
 
-Optional commands for including Gretina-related dead material:
+Optional commands for including GRETINA-related dead material:
 
     /Gretina/detector/enableCapsules
 
     /Gretina/detector/enableCryostats
 
     /Gretina/Shell < full || north || south || Greta || GretaLH || Greta_North || Greta_South || GretaLH_North || GretaLH_South >
+
+Optional command to omit the GRETINA detectors:
+
+    /Gretina/NoDetectors
 
 Mandatory command after setting any GRETINA parameters:
 
@@ -422,11 +426,15 @@ Optional commands for the scanning table:
 
     /ScanningTable/SetYShift <double> <unit>
 
-> Set the horizontal shifts of the source from nominal.
+> Set the horizontal shifts of the source relative to the central axis of the GRETINA module. (These positions correspond to those reported by the stepper motor controller.)
 
     /ScanningTable/SetZShift <double> <unit>
 
-> Set the vertical shift of the slits from nominal.
+> Set the vertical shift of the slit assembly. (This position corresponds to that reported by the stepper motor controller.)
+
+    /ScanningTable/SetCloverZ <double> <unit>
+
+> Set the vertical shift of the Clover detector assembly. (This position corresponds to the distance between the upper surface of the brackets on the scanning table frame and the bottom surface of the coupler to the clover cart.)
 
     /ScanningTable/SetCollimatorRadius <double> <unit>
 
@@ -459,7 +467,7 @@ Optional commands for setting LH target parameters (must precede
     /Target/Angle <double> <unit>
 
 > Set the angle of tilt about the beam axis of the entire target
->  assembly (30 degrees for Gretina at the NSCL).
+>  assembly (30 degrees for GRETINA at the NSCL).
 
     /Target/SetDensity <double>
 

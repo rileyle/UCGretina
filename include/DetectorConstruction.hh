@@ -70,6 +70,7 @@ public:
   void DefineMaterials();
 
   void SetTargetStatus(G4bool stat){targetStatus = stat;}
+  void SetGretinaStatus(G4bool stat){gretinaStatus = stat;}
 
 #ifndef LHTARGET
 #ifndef SCANNING
@@ -164,6 +165,7 @@ private:
 private:
   G4UIcmdWithoutParameter*     UpdateCmd;
   G4UIcmdWithoutParameter*     TargetCmd;
+  G4UIcmdWithoutParameter*     NoGretCmd;
 #ifndef SCANNING
   G4UIcmdWithAString*          ShellCmd;
 #endif

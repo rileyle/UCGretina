@@ -217,19 +217,19 @@ void DetectorConstruction::Placement()
 #else
   // Scanning Table
   scanningTable->Construct();
-  if( cloverStatus == "right" || cloverStatus == "both" ){
-    G4cout << "Constructing right clover detector." << G4endl;
-    rightClover = new Clover_Detector(ExpHall_log, materials, "right");
-    rightClover->setY(scanningTable->GetCloverZ());
-    rightClover->Construct();
-    rightClover->MakeSensitive(TrackerGamma);
-  }
   if( cloverStatus == "left"  || cloverStatus == "both" ){
     G4cout << "Constructing left clover detector." << G4endl;
     leftClover = new Clover_Detector(ExpHall_log, materials, "left");
     leftClover->setY(scanningTable->GetCloverZ());
     leftClover->Construct();
     leftClover->MakeSensitive(TrackerGamma);
+  }
+  if( cloverStatus == "right" || cloverStatus == "both" ){
+    G4cout << "Constructing right clover detector." << G4endl;
+    rightClover = new Clover_Detector(ExpHall_log, materials, "right");
+    rightClover->setY(scanningTable->GetCloverZ());
+    rightClover->Construct();
+    rightClover->MakeSensitive(TrackerGamma);
   }
 #endif
 #endif
@@ -284,6 +284,12 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
   TargetCmd->SetGuidance("Construct the target.");
   TargetCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  commandName = "/Gretina/NoDetectors";
+  aLine = commandName.c_str();
+  NoGretCmd = new G4UIcmdWithoutParameter(aLine, this);
+  NoGretCmd->SetGuidance("Omit the GRETINA detectors.");
+  NoGretCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
 #ifndef LHTARGET
 #ifndef SCANNING
   commandName = "/BeamTube/Construct";
@@ -327,6 +333,7 @@ DetectorConstruction_Messenger::~DetectorConstruction_Messenger()
 {
   delete UpdateCmd;
   delete TargetCmd;
+  delete NoGretCmd;
 #ifndef SCANNING
   delete ShellCmd;
 #endif
@@ -349,6 +356,9 @@ void DetectorConstruction_Messenger::SetNewValue(G4UIcommand* command,G4String n
   if( command == TargetCmd ) {
     myTarget->SetTargetStatus(true);
   } 
+  if( command == NoGretCmd ) {
+    myTarget->SetGretinaStatus(false);
+  }
 #ifndef LHTARGET
 #ifndef SCANNING
   if( command == BeamTubeCmd ) {

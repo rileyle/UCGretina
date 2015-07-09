@@ -40,6 +40,7 @@ ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,Materials* ma
   materialCsCollimator = materials->FindMaterial("Hevimet");
   materialClover = materials->FindMaterial("HpGe");
   materialCloverShield = materials->FindMaterial("Al");
+  materialRollers = materials->FindMaterial("G4_TEFLON");
   materialCuTarget = materials->FindMaterial("Cu");
 }
 
@@ -618,17 +619,17 @@ G4VPhysicalVolume* ScanningTable::Construct()
     CloverElevatorPart[7] = "CloverElevatorPlateRight";
     CloverElevatorMaterial[7] = materialCartBase;
     CloverElevatorPart[8] = "CloverElevatorRollerLeftBack";
-    CloverElevatorMaterial[8] = materialCartBase;
+    CloverElevatorMaterial[8] = materialRollers;
     CloverElevatorPart[9] = "CloverElevatorRollerLeftFront";
-    CloverElevatorMaterial[9] = materialCartBase;
+    CloverElevatorMaterial[9] = materialRollers;
     CloverElevatorPart[10] = "CloverElevatorRollerLeftMid";
-    CloverElevatorMaterial[10] = materialCartBase;
+    CloverElevatorMaterial[10] = materialRollers;
     CloverElevatorPart[11] = "CloverElevatorRollerRightBack";
-    CloverElevatorMaterial[11] = materialCartBase;
+    CloverElevatorMaterial[11] = materialRollers;
     CloverElevatorPart[12] = "CloverElevatorRollerRightFront";
-    CloverElevatorMaterial[12] = materialCartBase;
+    CloverElevatorMaterial[12] = materialRollers;
     CloverElevatorPart[13] = "CloverElevatorRollerRightMid";
-    CloverElevatorMaterial[13] = materialCartBase;
+    CloverElevatorMaterial[13] = materialRollers;
     CloverElevatorPart[14] = "CloverElevatorScrew";
     CloverElevatorMaterial[14] = materialCartBase;
 
@@ -747,10 +748,10 @@ G4VPhysicalVolume* ScanningTable::Construct()
 
   CuTarget_log->SetVisAttributes(VisSlit2);
 
-        CuTargetShift.setX(Pos0->getX() + xShift);
-	CuTargetShift.setY(Pos0->getY() + 249.301*mm + 148.2625*mm);
-	CuTargetShift.setZ(Pos0->getZ() -  44.45*mm + yShift);
-	CuTargetPos = CuTargetShift;
+  CuTargetShift.setX(Pos0->getX() + xShift);
+  CuTargetShift.setY(Pos0->getY() + 249.301*mm + 148.2625*mm);
+  CuTargetShift.setZ(Pos0->getZ() -  44.45*mm + yShift);
+  CuTargetPos = CuTargetShift;
 
   CuTarget_phys = new G4PVPlacement(G4Transform3D(NoRot, 
 							    CuTargetPos),

@@ -93,7 +93,6 @@ class ScanningTable
   G4Material* CloverAssemblyMaterial[6];
   G4Material* CloverElevatorMaterial[15];
   G4Material* CartTopMaterial[9];
-  G4Material* materialCuTarget;
   G4Material* material8020;
   G4Material* materialCartBase;
   G4Material* materialCartTop;
@@ -106,6 +105,8 @@ class ScanningTable
   G4Material* materialCsCollimator;
   G4Material* materialClover;
   G4Material* materialCloverShield;
+  G4Material* materialRollers;
+  G4Material* materialCuTarget;
 
   //G4 Objects
   G4Box* CloverMountBase;

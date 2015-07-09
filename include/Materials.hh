@@ -48,6 +48,7 @@ private:
   G4Material* Hevimet;
   G4Material* polyethylene;
   G4Material* polypropylene;
+  G4Material* teflon;
   G4Material* kapton;
   G4Material* CD2;
   G4Material* ssteel;
