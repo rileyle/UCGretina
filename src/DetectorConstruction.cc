@@ -18,7 +18,7 @@ DetectorConstruction::DetectorConstruction()
 #endif
 #endif
 
-  gretinaStatus = true;
+  gretinaStatus = false;
 
   myMessenger = new DetectorConstruction_Messenger(this);
 }
