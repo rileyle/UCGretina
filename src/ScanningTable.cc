@@ -23,7 +23,8 @@ ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,Materials* ma
   yShift  = 0.0*mm;
   zShift  = 0.0*mm;
   cloverZ = 0.0*mm;
-  cloverOffset = 343.88*mm; // Shield y position
+  //  cloverOffset = 343.88*mm; // Shield y position
+  cloverOffset = 336.10*mm; // Mounts without shields
 
   collimatorRadius = 1.0*mm;
 
@@ -354,7 +355,8 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	CADFileName += ".stl";
 	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
 				    (char*)"STL");
-	if((i != 0) && (i < 5 || i == 6 || i == 8 || i == 9 || i == 10 || i == 11 || i > 14)){
+	if((i != 0) && (   i < 5   || i == 6  || i == 8 || i == 9 
+			|| i == 10 || i == 11 || i > 13)){
 	mesh->SetScale(mm);
 	mesh->SetOffset(G4ThreeVector(0., zShift, 0.));
 	}
@@ -747,7 +749,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 
         CuTargetShift.setX(Pos0->getX() + xShift);
 	CuTargetShift.setY(Pos0->getY() + 249.301*mm + 148.2625*mm);
-	CuTargetShift.setZ(Pos0->getZ() -  81.502*mm + yShift);
+	CuTargetShift.setZ(Pos0->getZ() -  44.45*mm + yShift);
 	CuTargetPos = CuTargetShift;
 
   CuTarget_phys = new G4PVPlacement(G4Transform3D(NoRot, 
