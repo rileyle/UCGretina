@@ -434,7 +434,7 @@ Optional commands for the scanning table:
 
     /ScanningTable/SetCloverZ <double> <unit>
 
-> Set the vertical shift of the Clover detector assembly. (This position corresponds to the distance between the upper surface of the brackets on the scanning table frame and the bottom surface of the coupler to the clover cart.)
+> Set the vertical shift of the Clover detector assembly. (This position corresponds to the vertical position of the Clover assembly relative to its lowest position, determined by the brackets on the scanning table frame.)
 
     /ScanningTable/SetCollimatorRadius <double> <unit>
 

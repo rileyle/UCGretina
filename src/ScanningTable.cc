@@ -1,9 +1,10 @@
 #ifdef SCANNING
 #include "ScanningTable.hh"
 
-ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,Materials* mat)
+ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,
+			     Materials* mat)
 {
-  CADModelPath = "../";
+  CADModelPath = "./cadModels/";
 
   materials=mat;
   expHall_log=experimentalHall_log;
@@ -58,8 +59,6 @@ G4VPhysicalVolume* ScanningTable::Construct()
   G4String CADFileName;
 
   if (includeCartFrame) {
-
-    Pos3 = new G4ThreeVector(0., -360*mm, -424.45*mm);
 
     const int CartParts = 39;
     G4String CartPart[CartParts];
@@ -161,16 +160,18 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	G4VSolid *Cart = mesh->TessellatedMesh();
 	Cart_log = new G4LogicalVolume(Cart, CartMaterial[i], 
 				       CartPart[i], 0, 0, 0);
-	if(i<37)
-	Cart_phys = new G4PVPlacement(G4Transform3D(NoRot, *Pos0),
-				      Cart_log,
-				      CartPart[i],
-				      expHall_log,false,0);
-	else
-	Cart_phys = new G4PVPlacement(G4Transform3D(NoRot, *Pos3),
-				      Cart_log,
-				      CartPart[i],
-				      expHall_log,false,0);
+	if(i<37) {
+	  Cart_phys = new G4PVPlacement(G4Transform3D(NoRot, *Pos0),
+					Cart_log,
+					CartPart[i],
+					expHall_log,false,0);
+	} else { // Front braces limiting the Clover stand vertically
+	  Pos3 = new G4ThreeVector(0., -360*mm, -424.45*mm);
+	  Cart_phys = new G4PVPlacement(G4Transform3D(NoRot, *Pos3),
+					Cart_log,
+					CartPart[i],
+					expHall_log,false,0);
+	}
 	Cart_log->SetVisAttributes(VisCart);
       }
     }
@@ -307,7 +308,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 
     Pos1 = new G4ThreeVector(0., 0., 44.6*mm);
 
-    const int SlitZAssemblyParts = 19;
+    const int SlitZAssemblyParts = 18;
     G4String SlitZAssemblyPart[SlitZAssemblyParts];
     G4Material* SlitZAssemblyMaterial[SlitZAssemblyParts];
     SlitZAssemblyPart[0] = "SlitZAssemblyBelt";
@@ -320,34 +321,32 @@ G4VPhysicalVolume* ScanningTable::Construct()
     SlitZAssemblyMaterial[3] = materialSlitAssembly;
     SlitZAssemblyPart[4] = "SlitZAssemblyCenterCylinderPlug";
     SlitZAssemblyMaterial[4] = materialSlitAssembly;
-    SlitZAssemblyPart[5] = "";
+    SlitZAssemblyPart[5] = "SlitZAssemblyLeftCrescentWithHoles";
     SlitZAssemblyMaterial[5] = materialSlitAssembly;
-    SlitZAssemblyPart[6] = "SlitZAssemblyLeftCrescentWithHoles";
+    SlitZAssemblyPart[6] = "SlitZAssemblyLeftBrace";
     SlitZAssemblyMaterial[6] = materialSlitAssembly;
-    SlitZAssemblyPart[7] = "SlitZAssemblyLeftBrace";
+    SlitZAssemblyPart[7] = "SlitZAssemblyLeftClamp";
     SlitZAssemblyMaterial[7] = materialSlitAssembly;
-    SlitZAssemblyPart[8] = "SlitZAssemblyLeftClamp";
+    SlitZAssemblyPart[8] = "SlitZAssemblyLeftPlate2";
     SlitZAssemblyMaterial[8] = materialSlitAssembly;
-    SlitZAssemblyPart[9] = "SlitZAssemblyLeftPlate2";
+    SlitZAssemblyPart[9] = "SlitZAssemblyLeftPlate";
     SlitZAssemblyMaterial[9] = materialSlitAssembly;
-    SlitZAssemblyPart[10] = "SlitZAssemblyLeftPlate";
+    SlitZAssemblyPart[10] = "SlitZAssemblyPlateWithHoles";
     SlitZAssemblyMaterial[10] = materialSlitAssembly;
-    SlitZAssemblyPart[11] = "SlitZAssemblyPlateWithHoles";
+    SlitZAssemblyPart[11] = "SlitZAssemblyRightBrace";
     SlitZAssemblyMaterial[11] = materialSlitAssembly;
-    SlitZAssemblyPart[12] = "";                          //  Get rid of this
-    SlitZAssemblyMaterial[12] = materialSlitAssembly;    //  Get rid of this
-    SlitZAssemblyPart[13] = "SlitZAssemblyRightBrace";
+    SlitZAssemblyPart[12] = "SlitZAssemblyRightClamp";
+    SlitZAssemblyMaterial[12] = materialSlitAssembly;
+    SlitZAssemblyPart[13] = "SlitZAssemblyRightCrescentWithHoles";
     SlitZAssemblyMaterial[13] = materialSlitAssembly;
-    SlitZAssemblyPart[14] = "SlitZAssemblyRightClamp";
+    SlitZAssemblyPart[14] = "SlitZAssemblyRightPlate";
     SlitZAssemblyMaterial[14] = materialSlitAssembly;
-    SlitZAssemblyPart[15] = "SlitZAssemblyRightCrescentWithHoles";
+    SlitZAssemblyPart[15] = "SlitZAssemblyTPlate";
     SlitZAssemblyMaterial[15] = materialSlitAssembly;
-    SlitZAssemblyPart[16] = "SlitZAssemblyRightPlate";
+    SlitZAssemblyPart[16] = "SlitZAssemblyUPlate";
     SlitZAssemblyMaterial[16] = materialSlitAssembly;
-    SlitZAssemblyPart[17] = "SlitZAssemblyTPlate";
+    SlitZAssemblyPart[17] = "CartBack";    
     SlitZAssemblyMaterial[17] = materialSlitAssembly;
-    SlitZAssemblyPart[18] = "SlitZAssemblyUPlate";
-    SlitZAssemblyMaterial[18] = materialSlitAssembly;
     
     for(int i=0; i < SlitZAssemblyParts; i++){
       if(SlitZAssemblyPart[i] != ""){
@@ -356,29 +355,30 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	CADFileName += ".stl";
 	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
 				    (char*)"STL");
-	if((i != 0) && (   i < 5   || i == 6  || i == 8 || i == 9 
-			|| i == 10 || i == 11 || i > 13)){
-	mesh->SetScale(mm);
-	mesh->SetOffset(G4ThreeVector(0., zShift, 0.));
-	}
-	else{
-	mesh->SetScale(mm);
-	mesh->SetOffset(G4ThreeVector(0., 0., 0.));
+
+        // Parts that translate
+	if((i != 0) && (   i < 5  || i == 5  || i == 7 || i == 8 
+			|| i == 9 || i == 10 || i > 11)){
+	  mesh->SetScale(mm);
+	  mesh->SetOffset(G4ThreeVector(0., zShift, 0.));
+	} else { // and parts that don't
+	  mesh->SetScale(mm);
+	  mesh->SetOffset(G4ThreeVector(0., 0., 0.));
 	}
      
 	G4VSolid *SlitAssembly = mesh->TessellatedMesh();
 	SlitZAssembly_log = new G4LogicalVolume(SlitAssembly, 
 						SlitZAssemblyMaterial[i], 
-						SlitZAssemblyPart[i], 0, 0, 0);
-	if(i == 6 || i == 8 || i == 14 || i == 15){
+						SlitZAssemblyPart[i], 
+						0, 0, 0);
+	if(i == 5 || i == 7 || i == 12 || i == 13){
 	  SlitZAssembly_phys = new G4PVPlacement(G4Transform3D(NoRot, 
 							       *Pos1),
 						 SlitZAssembly_log,
 						 SlitZAssemblyPart[i],
 						 expHall_log,false,0);
 	  SlitZAssembly_log->SetVisAttributes(VisSlit2);
-	}
-	else{
+	} else {
 	  SlitZAssembly_phys = new G4PVPlacement(G4Transform3D(NoRot, 
 							       *Pos0),
 						 SlitZAssembly_log,
@@ -397,7 +397,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	std::vector<G4ExtrudedSolid::ZSection> zsections2;
 	zsections2.push_back( G4ExtrudedSolid::ZSection(0.,       0., 1.) );
 	zsections2.push_back( G4ExtrudedSolid::ZSection(19.05*mm, 0., 1.) );
-
+	
 	ZSlitAssemblyTriangle = new G4ExtrudedSolid("ZSlitAssemblyTriangle", 
 						    polygon2,
 						    zsections2);
@@ -535,10 +535,6 @@ G4VPhysicalVolume* ScanningTable::Construct()
 					   materialCsCollimator, 
 					   "CollimatorInsert_log", 
 					   0, 0, 0);
-      // G4ThreeVector *collPos 
-      // 	= new G4ThreeVector(Pos0->getX() + xShift, 
-      // 			    Pos0->getY() + 249.301*mm, 
-      // 			    Pos0->getZ() -  81.502*mm + yShift);
       G4ThreeVector *collIPos 
 	= new G4ThreeVector(Pos0->getX() + xShift, 
 			    Pos0->getY() + 249.301*mm, 
@@ -557,7 +553,8 @@ G4VPhysicalVolume* ScanningTable::Construct()
 
   if (includeCloverCart) {
 
-    // This is the mount for the BGO anti-compton shields (keep just un case they are ever used).
+    // This is the mount for the BGO anti-compton shields.
+    //      (keep just un case they are ever used)
     
     // const int CloverAssemblyParts = 6;
     // G4String CloverAssemblyPart[CloverAssemblyParts];
@@ -589,7 +586,8 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	
     // 	CloverAssembly_log = new G4LogicalVolume(CloverAssembly,
     // 						 CloverAssemblyMaterial[i], 
-    // 						 CloverAssemblyPart[i], 0, 0, 0);
+    // 						 CloverAssemblyPart[i], 
+    //                                           0, 0, 0);
     // 	CloverAssembly_phys = new G4PVPlacement(G4Transform3D(NoRot, 
     // 							      *Pos0),
     // 						CloverAssembly_log,
@@ -647,7 +645,8 @@ G4VPhysicalVolume* ScanningTable::Construct()
 
 	CloverElevator_log = new G4LogicalVolume(CloverElevator,
 						 CloverElevatorMaterial[i], 
-						 CloverElevatorPart[i], 0, 0, 0);
+						 CloverElevatorPart[i], 
+						 0, 0, 0);
 	CloverElevator_phys = new G4PVPlacement(G4Transform3D(NoRot, 
 							      *Pos0),
 						CloverElevator_log,
@@ -669,7 +668,9 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	  = new G4SubtractionSolid("CloverMountSub", CloverMountwall, 
 				   CloverMountCut, 
 				   G4Transform3D(G4RotationMatrix(),
-						 G4ThreeVector(0, 9.252*cm, 0)));
+						 G4ThreeVector(0, 
+							       9.252*cm, 
+							       0)));
 
 	std::vector<G4TwoVector> polygon;
 	polygon.push_back( G4TwoVector(-12.86*cm, 0*cm) );
@@ -694,7 +695,9 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	  = new G4UnionSolid("CloverMount", CloverMountBase, 
 			     CloverMountSub,
 			     G4Transform3D(G4RotationMatrix(),
-					   G4ThreeVector(0, 8.017*cm, -19.45*cm)));
+					   G4ThreeVector(0, 
+							 8.017*cm, 
+							 -19.45*cm)));
 
 	CloverMount2 
 	  = new G4UnionSolid("CloverMount2", CloverMount, CloverMountExt,
@@ -725,12 +728,14 @@ G4VPhysicalVolume* ScanningTable::Construct()
 
 	CloverMount_phys = new G4PVPlacement(G4Transform3D(CloverMountRot, 
 							   CloverMountPos),
-					     CloverMount_log, "CloverMount_phys",
+					     CloverMount_log, 
+					     "CloverMount_phys",
 					     expHall_log, false, 0);
 
 	CloverMount1_phys = new G4PVPlacement(G4Transform3D(CloverMount1Rot, 
 							    CloverMount1Pos),
-					      CloverMount_log, "CloverMount1_phys",
+					      CloverMount_log, 
+					      "CloverMount1_phys",
 					      expHall_log, false, 0);
 
       }
