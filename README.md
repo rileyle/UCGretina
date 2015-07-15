@@ -385,6 +385,11 @@ from which background gamma-rays are emitted.
 
 (UCGretina_Scan only)
 
+_The geometries specified in `./GretinaGeometry/Scan0`, 
+`./GretinaGeometry/Scan1`, `./GretinaGeometry/Scan2`, and 
+`./GretinaGeometry/Scan3` orient the GRETINA module such that the 
+corresponding crystal is centered on the slits._
+
 Mandatory command for building the scanning table:
 
     /ScanningTable/CADModelPath <path>

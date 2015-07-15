@@ -53,12 +53,16 @@ G4VPhysicalVolume* ScanningTable::Construct()
 
   //--- First the physical cart: 8020 frame, base, top and back panel ---------
 
-  G4cout << "Loading STL files from directory:\n" << CADModelPath 
-	 << "\nand building Tessellated solids ... " << G4endl;
+  G4cout << "Constructing the LBL scanning table." << G4endl;
+
+  G4cout << "   Loading STL files from directory:\n   " << CADModelPath 
+	 << "\n   and building Tessellated solids ... " << G4endl;
 
   G4String CADFileName;
 
   if (includeCartFrame) {
+
+    G4cout << "   ... cart frame ... " << G4endl;
 
     const int CartParts = 39;
     G4String CartPart[CartParts];
@@ -229,6 +233,8 @@ G4VPhysicalVolume* ScanningTable::Construct()
   // MidPos = new G4ThreeVector(0., 46.335*mm, -8.8*mm);
   // TopPos = new G4ThreeVector(0., -44.335*mm, -8.8*mm);
 
+  G4cout << "   ... slit assembly ... " << G4endl;
+
   // Slites on the bottom
   BotPos = new G4ThreeVector(0., 0., -8.8*mm);
   MidPos = new G4ThreeVector(0., 0., -8.8*mm);
@@ -305,6 +311,8 @@ G4VPhysicalVolume* ScanningTable::Construct()
 //-------------------------------------------------------------
 
   if(includeSlitMount){
+
+    G4cout << "   ... slit mount ... " << G4endl;
 
     Pos1 = new G4ThreeVector(0., 0., 44.6*mm);
 
@@ -493,6 +501,10 @@ G4VPhysicalVolume* ScanningTable::Construct()
   // Translate_log->SetVisAttributes(VisTranslation);
 
   if(includeCollimator){
+
+    G4cout << "   ... collimator (x, y = " 
+	   << xShift << ", " << yShift << " mm) ... " << G4endl;
+
     const int CollimatorParts = 2;
     G4String CollimatorPart[CollimatorParts];
     G4Material* CollimatorMaterial[CollimatorParts];
@@ -527,6 +539,10 @@ G4VPhysicalVolume* ScanningTable::Construct()
     }
 
     if(includeCollimatorInsert){
+
+      G4cout << "   ... collimator insert (" 
+	     << collimatorRadius << " mm radius) ... " << G4endl;
+
       G4Tubs* CollimatorInsert = new G4Tubs("CollimatorInsert_vol",
 					    collimatorRadius, 
 					    7.5946*mm, 76.20*mm/2.0, 
@@ -552,6 +568,10 @@ G4VPhysicalVolume* ScanningTable::Construct()
   //--- Now the clover cart: base and elevator --------------------------------
 
   if (includeCloverCart) {
+
+    G4cout << "   ... Clover cart (z = " 
+	   << zShift
+	   << " mm) ... " << G4endl;
 
     // This is the mount for the BGO anti-compton shields.
     //      (keep just un case they are ever used)
@@ -697,12 +717,14 @@ G4VPhysicalVolume* ScanningTable::Construct()
 			     G4Transform3D(G4RotationMatrix(),
 					   G4ThreeVector(0, 
 							 8.017*cm, 
-							 -19.45*cm)));
+							 -17.228*cm)));
 
 	CloverMount2 
 	  = new G4UnionSolid("CloverMount2", CloverMount, CloverMountExt,
 			     G4Transform3D(G4RotationMatrix(),
-					   G4ThreeVector(0, 0*cm, 5.45*cm)));
+					   G4ThreeVector(0, 
+							 0, 
+							 2.69375*cm)));
 
 	CloverMount_log = new G4LogicalVolume(CloverMount2,
 					      materialCartBase,
@@ -713,17 +735,17 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	CloverMountRot=G4RotationMatrix::IDENTITY;
 	CloverMountRot.rotateY(20.*deg);
 
-	CloverMountShift.setX(-19.7256*cm);
+	CloverMountShift.setX(-20.4232*cm);
 	CloverMountShift.setY(17.7*cm + cloverZ);
-	CloverMountShift.setZ(-52.475*cm);
+	CloverMountShift.setZ(-52.2643*cm);
 	CloverMountPos = CloverMountShift;
 
 	CloverMount1Rot=G4RotationMatrix::IDENTITY;
 	CloverMount1Rot.rotateY(-20.*deg);
 
-	CloverMount1Shift.setX(19.7256*cm);
+	CloverMount1Shift.setX(20.4232*cm);
 	CloverMount1Shift.setY(17.7*cm + cloverZ);
-	CloverMount1Shift.setZ(-52.475*cm);
+	CloverMount1Shift.setZ(-52.2643*cm);
 	CloverMount1Pos = CloverMount1Shift;
 
 	CloverMount_phys = new G4PVPlacement(G4Transform3D(CloverMountRot, 
@@ -742,32 +764,35 @@ G4VPhysicalVolume* ScanningTable::Construct()
     }
   }
 
- if (includeCuTarget) {
- 
-  CuTarget = new G4Box("CuTarget", 3.65/2*cm, 8.41375/2*cm, 3.49/2*cm);
+  if (includeCuTarget) {
+    
+    G4cout << "   ... Cu target ... " << G4endl;
 
-  CuTarget_log = new G4LogicalVolume(CuTarget,
-					      materialCuTarget,
-					      "CuTarget_log",
-					      0, 0, 0);
+    CuTarget = new G4Box("CuTarget", 3.65/2*cm, 8.41375/2*cm, 3.49/2*cm);
 
-  CuTarget_log->SetVisAttributes(VisSlit2);
+    CuTarget_log = new G4LogicalVolume(CuTarget,
+				       materialCuTarget,
+				       "CuTarget_log",
+				       0, 0, 0);
 
-  CuTargetShift.setX(Pos0->getX() + xShift);
-  CuTargetShift.setY(Pos0->getY() + 249.301*mm + 148.2625*mm);
-  CuTargetShift.setZ(Pos0->getZ() -  44.45*mm + yShift);
-  CuTargetPos = CuTargetShift;
+    CuTarget_log->SetVisAttributes(VisSlit2);
 
-  CuTarget_phys = new G4PVPlacement(G4Transform3D(NoRot, 
-							    CuTargetPos),
-					      CuTarget_log, "CuTarget_phys",
-					      expHall_log, false, 0);
+    CuTargetShift.setX(Pos0->getX() + xShift);
+    CuTargetShift.setY(Pos0->getY() + 249.301*mm + 148.2625*mm);
+    CuTargetShift.setZ(Pos0->getZ() -  44.45*mm + yShift);
+    CuTargetPos = CuTargetShift;
+
+    CuTarget_phys = new G4PVPlacement(G4Transform3D(NoRot, 
+						    CuTargetPos),
+				      CuTarget_log, "CuTarget_phys",
+				      expHall_log, false, 0);
   }
-
     
   //--- Now the shields -- just for show right now ------------------------
 
   if(includeShield){
+
+    G4cout << "   ... clover anti-Compton shields ... " << G4endl;
 
     G4Colour lgreen (0.0, 1.0, 0.5, 0.3);
     G4VisAttributes* VisShield = new G4VisAttributes(lgreen);
