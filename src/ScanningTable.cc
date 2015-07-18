@@ -505,93 +505,38 @@ G4VPhysicalVolume* ScanningTable::Construct()
     G4cout << "   ... collimator (x, y = " 
 	   << xShift << ", " << yShift << " mm) ... " << G4endl;
 
-    // const int CollimatorParts = 2;
-    // G4String CollimatorPart[CollimatorParts];
-    // G4Material* CollimatorMaterial[CollimatorParts];
-    // CollimatorPart[0] = "CsCollimatorBase";
-    // CollimatorMaterial[0] = materialCsCollimator;
-    // CollimatorPart[1] = "CsCollimatorBody";
-    // CollimatorMaterial[1] = materialCsCollimator;
+    const int CollimatorParts = 2;
+    G4String CollimatorPart[CollimatorParts];
+    G4Material* CollimatorMaterial[CollimatorParts];
+    CollimatorPart[0] = "CsCollimatorBase";
+    CollimatorMaterial[0] = materialCsCollimator;
+    CollimatorPart[1] = "CsCollimatorBody";
+    CollimatorMaterial[1] = materialCsCollimator;
     //  CollimatorPart[2] = "CsCollimatorPlug";
     //  CollimatorMaterial[2] = materialCsCollimator;
     
-    // for(int i=0; i < CollimatorParts; i++){
-    //   if(CollimatorPart[i] != ""){
-    // 	CADFileName = CADModelPath + "/";
-    // 	CADFileName += CollimatorPart[i];
-    // 	CADFileName += ".stl";
-    // 	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
-    // 				    (char*)"STL");
-    // 	mesh->SetScale(mm);
-    // 	mesh->SetOffset(G4ThreeVector(xShift, 0., 37.05*mm + yShift));
+    for(int i=0; i < CollimatorParts; i++){
+      if(CollimatorPart[i] != ""){
+	CADFileName = CADModelPath + "/";
+	CADFileName += CollimatorPart[i];
+	CADFileName += ".stl";
+	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
+				    (char*)"STL");
+	mesh->SetScale(mm);
+	mesh->SetOffset(G4ThreeVector(xShift, 0., 37.05*mm + yShift));
      
-    // 	G4VSolid *Collimator = mesh->TessellatedMesh();
+	G4VSolid *Collimator = mesh->TessellatedMesh();
 
-    // 	Collimator_log = new G4LogicalVolume(Collimator,
-    // 					     CollimatorMaterial[i], 
-    // 					     CollimatorPart[i], 0, 0, 0);
-    // 	Collimator_phys = new G4PVPlacement(G4Transform3D(NoRot, *Pos0),
-    // 					    Collimator_log,
-    // 					    CollimatorPart[i],
-    // 					    expHall_log,false,0);
-    // 	Collimator_log->SetVisAttributes(VisSlit2);
-    //   }
-    // }
-
-    G4double  cbz[6] = {0.,            2.0*25.4*mm,   2.0*25.4*mm,
-			2.25*25.4*mm,  2.25*25.4*mm,  2.5*25.4*mm};
-    G4double cbRi[6] = {0.,            0.,            0.,
-                        0.,            0.75*25.4*mm,  0.75*25.4*mm};
-    G4double cbRo[6] = {2.0*25.4*mm,   2.0*25.4*mm,   25.4*mm,
-                        25.4*mm,       25.4*mm,       25.4*mm};
-
-    G4Polycone* CollimatorBase 
-      = new G4Polycone("CollimatorBase_vol", 0., 360.*deg, 
-		       6, cbz, cbRi, cbRo);
-    CollimatorBase_log = new G4LogicalVolume(CollimatorBase,
-					     materialCsCollimator, 
-					     "CollimatorBase_log", 
-					     0, 0, 0);
-
-    G4ThreeVector *collBasePos 
-      = new G4ThreeVector(Pos0->getX() + xShift, 
-			  Pos0->getY() + 138.222*mm, 
-			  Pos0->getZ() - 44.45*mm + yShift);
-    G4RotationMatrix collRot = G4RotationMatrix::IDENTITY;
-    collRot.rotateX(-90.*deg);
-    CollimatorBase_phys = new G4PVPlacement(G4Transform3D(collRot, 
-					    		  *collBasePos),
-					    CollimatorBase_log,
-					    "CollimatorBase",
+	Collimator_log = new G4LogicalVolume(Collimator,
+					     CollimatorMaterial[i], 
+					     CollimatorPart[i], 0, 0, 0);
+	Collimator_phys = new G4PVPlacement(G4Transform3D(NoRot, *Pos0),
+					    Collimator_log,
+					    CollimatorPart[i],
 					    expHall_log,false,0);
-    CollimatorBase_log->SetVisAttributes(VisSlit2);
-
-
-    G4double cbdz[6]  = {0.,            14.*mm,         14.*mm,
-			 22.179*mm,     22.179*mm,      3.875*25.4*mm};
-    G4double cbdRi[6] = {1.005*25.4*mm, 1.005*25.4*mm,  0.125*25.4*mm,
-			 0.125*25.4*mm, 0.1505*25.4*mm, 0.1505*25.4*mm};
-    G4double cbdRo[6] = {2.0*25.4*mm,   2.0*25.4*mm,    2.0*25.4*mm,
-			 2.0*25.4*mm,   2.0*25.4*mm,    2.0*25.4*mm};
-
-    G4Polycone* CollimatorBody
-      = new G4Polycone("CollimatorBody_vol", 0., 360.*deg, 
-		       6, cbdz, cbdRi, cbdRo);
-    CollimatorBody_log = new G4LogicalVolume(CollimatorBody,
-					     materialCsCollimator, 
-					     "CollimatorBody_log", 
-					     0, 0, 0);
-
-    G4ThreeVector *collBodyPos 
-      = new G4ThreeVector(Pos0->getX() + xShift, 
-			  Pos0->getY() + 188.976*mm, 
-			  Pos0->getZ() - 44.45*mm + yShift);
-    CollimatorBody_phys = new G4PVPlacement(G4Transform3D(collRot, 
-							  *collBodyPos),
-					    CollimatorBody_log,
-					    "CollimatorBody",
-					    expHall_log,false,0);
-    CollimatorBody_log->SetVisAttributes(VisSlit2);
+	Collimator_log->SetVisAttributes(VisSlit2);
+      }
+    }
 
     if(includeCollimatorInsert){
 
@@ -610,6 +555,8 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	= new G4ThreeVector(Pos0->getX() + xShift, 
 			    Pos0->getY() + 249.301*mm, 
 			    Pos0->getZ() - 44.45*mm + yShift);
+      G4RotationMatrix collRot = G4RotationMatrix::IDENTITY;
+      collRot.rotateX(90.*deg);
       Collimator_phys = new G4PVPlacement(G4Transform3D(collRot, *collIPos),
 					  Collimator_log,
 					  "CollimatorInsert",

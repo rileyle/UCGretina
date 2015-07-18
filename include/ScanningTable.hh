@@ -148,8 +148,6 @@ class ScanningTable
   G4LogicalVolume* Cart_log;
   G4LogicalVolume* Cart8020_log;
   G4LogicalVolume* Collimator_log;
-  G4LogicalVolume* CollimatorBase_log;
-  G4LogicalVolume* CollimatorBody_log;
   G4LogicalVolume* CartBase_log;
   G4LogicalVolume* SlitZAssembly_log;
   G4LogicalVolume* CloverAssembly_log;
@@ -181,6 +179,9 @@ class ScanningTable
   G4LogicalVolume* TranslateX_log;
   G4LogicalVolume* TranslateY_log;
   G4LogicalVolume* Translate_log;
+  G4LogicalVolume* CsCollimatorBase_log;
+  G4LogicalVolume* CsCollimatorBody_log;
+  G4LogicalVolume* CsCollimatorPlug_log;
   G4LogicalVolume* CloverBase_log;
   G4LogicalVolume* CloverElevator_log;
   G4LogicalVolume* CloverRight_log;
@@ -200,8 +201,6 @@ class ScanningTable
   G4VPhysicalVolume* Cart_phys;
   G4VPhysicalVolume* Cart8020_phys;
   G4VPhysicalVolume* Collimator_phys;
-  G4VPhysicalVolume* CollimatorBase_phys;
-  G4VPhysicalVolume* CollimatorBody_phys;
   G4VPhysicalVolume* CartBase_phys;
   G4VPhysicalVolume* SlitZAssembly_phys;
   G4VPhysicalVolume* CloverAssembly_phys;
