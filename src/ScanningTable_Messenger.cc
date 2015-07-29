@@ -25,6 +25,9 @@ ScanningTable_Messenger::ScanningTable_Messenger(ScanningTable* ST)
   CollimatorInsertCmd = new G4UIcmdWithoutParameter("/ScanningTable/IncludeCollimatorInsert", this);
   CollimatorInsertCmd->SetGuidance("Include the collimator insert.");
 
+  CollimatorMountCmd = new G4UIcmdWithoutParameter("/ScanningTable/IncludeCollimatorMount", this);
+  CollimatorMountCmd->SetGuidance("Include the collimator mount.");
+
   ShieldCmd = new G4UIcmdWithoutParameter("/ScanningTable/IncludeShields", this);
   ShieldCmd->SetGuidance("Include the BGO anti-Compton shields.");
 
@@ -66,6 +69,7 @@ ScanningTable_Messenger::~ScanningTable_Messenger()
   delete SlitMountCmd;
   delete CollimatorCmd;
   delete CollimatorInsertCmd;
+  delete CollimatorMountCmd;
   delete ShieldCmd;
   delete CuTargetCmd;
   delete XShiftCmd;
@@ -89,6 +93,8 @@ void ScanningTable_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { scanningTable->SetIncludeCollimator(); }
   if ( command == CollimatorInsertCmd )
     { scanningTable->SetIncludeCollimatorInsert(); }
+  if ( command == CollimatorMountCmd )
+    { scanningTable->SetIncludeCollimatorMount(); }
   if ( command == ShieldCmd )
     { scanningTable->SetIncludeShield(); }
   if ( command == CuTargetCmd )
