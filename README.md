@@ -419,6 +419,10 @@ Optional commands for the scanning table:
 
 > Construct the collimator insert.
 
+    /ScanningTable/IncludeCollimatorMount
+
+> Construct the collimator mount and x/y translation assemblies.
+
     /ScanningTable/IncludeCloverCart
 
 > Construct the Clover cart.

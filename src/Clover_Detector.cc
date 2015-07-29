@@ -325,7 +325,13 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 
   assemblyclover->AddPlacedVolume(Cubox_log,Cuboxpos,&wallrot);
 
-  assemblyclover->MakeImprint(expHall_log, DetPos, &DetRot);
+  G4int index = 0;
+  if(orientation == "left")
+    index = 31000 + 4*31 - 1;
+  else if(orientation == "right")
+    index = 31000 + 4*32 - 1;
+
+  assemblyclover->MakeImprint(expHall_log, DetPos, &DetRot, index);
 
   //Visualization Attributes
 

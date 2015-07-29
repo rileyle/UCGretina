@@ -29,6 +29,7 @@ private:
   G4UIcmdWithoutParameter* SlitMountCmd;
   G4UIcmdWithoutParameter* CollimatorCmd;
   G4UIcmdWithoutParameter* CollimatorInsertCmd;
+  G4UIcmdWithoutParameter* CollimatorMountCmd;
   G4UIcmdWithoutParameter* CuTargetCmd;
   G4UIcmdWithoutParameter* ShieldCmd;
   G4UIcmdWithADoubleAndUnit* XShiftCmd;

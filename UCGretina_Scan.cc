@@ -70,8 +70,9 @@ int main(int argc,char** argv)
   TrackingAction* trackingAction = new TrackingAction(eventAction);
   runManager->SetUserAction(trackingAction);
 
-  SteppingAction* steppingAction = new SteppingAction();
-  runManager->SetUserAction(steppingAction);
+  //  User Stepping Action only needed for in-beam simulations.
+  //  SteppingAction* steppingAction = new SteppingAction();
+  //  runManager->SetUserAction(steppingAction);
 
   G4UIsession* session=0;
 

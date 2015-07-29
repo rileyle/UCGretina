@@ -40,6 +40,7 @@ class ScanningTable
   void SetIncludeSlitMount() { includeSlitMount = true; }
   void SetIncludeCollimator() { includeCollimator = true; }
   void SetIncludeCollimatorInsert() { includeCollimatorInsert = true; }
+  void SetIncludeCollimatorMount() { includeCollimatorMount = true; }
   void SetIncludeShield() { includeShield = true; }
   void SetIncludeCuTarget() { includeCuTarget = true; }
   void SetXShift(G4double value) { xShift = value; }
@@ -57,6 +58,7 @@ class ScanningTable
   G4bool includeSlitMount;
   G4bool includeCollimator;
   G4bool includeCollimatorInsert;
+  G4bool includeCollimatorMount;
   G4bool includeShield;
   G4bool includeCuTarget;
 
@@ -103,6 +105,7 @@ class ScanningTable
   G4Material* materialTranslation;
   G4Material* materialTranslationAssembly;
   G4Material* materialCsCollimator;
+  G4Material* materialCsCollimatorMount;
   G4Material* materialClover;
   G4Material* materialCloverShield;
   G4Material* materialRollers;
@@ -179,9 +182,12 @@ class ScanningTable
   G4LogicalVolume* TranslateX_log;
   G4LogicalVolume* TranslateY_log;
   G4LogicalVolume* Translate_log;
-  G4LogicalVolume* CsCollimatorBase_log;
-  G4LogicalVolume* CsCollimatorBody_log;
-  G4LogicalVolume* CsCollimatorPlug_log;
+  G4LogicalVolume* CollimatorBase_log;
+  G4LogicalVolume* CollimatorMid1_log;
+  G4LogicalVolume* CollimatorMid2_log;
+  G4LogicalVolume* CollimatorMid3_log;
+  G4LogicalVolume* CollimatorBody_log;
+  G4LogicalVolume* CollMount_log;
   G4LogicalVolume* CloverBase_log;
   G4LogicalVolume* CloverElevator_log;
   G4LogicalVolume* CloverRight_log;
@@ -232,9 +238,12 @@ class ScanningTable
   G4VPhysicalVolume* TranslateX_phys;
   G4VPhysicalVolume* TranslateY_phys;
   G4VPhysicalVolume* Translate_phys;
-  G4VPhysicalVolume* CsCollimatorBase_phys;
-  G4VPhysicalVolume* CsCollimatorBody_phys;
-  G4VPhysicalVolume* CsCollimatorPlug_phys;
+  G4VPhysicalVolume* CollimatorBase_phys;
+  G4VPhysicalVolume* CollimatorMid1_phys;
+  G4VPhysicalVolume* CollimatorMid2_phys;
+  G4VPhysicalVolume* CollimatorMid3_phys;
+  G4VPhysicalVolume* CollimatorBody_phys;
+  G4VPhysicalVolume* CollMount_phys;
   G4VPhysicalVolume* CloverBase_phys;
   G4VPhysicalVolume* CloverElevator_phys;
   G4VPhysicalVolume* CloverRight_phys;
