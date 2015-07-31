@@ -29,6 +29,8 @@ ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,
 
   collimatorRadius = 1.0*mm;
 
+  slitWidth = 2.0*mm;
+
   material8020 = materials->FindMaterial("Al");
   materialCartBase = materials->FindMaterial("ssteel");
   materialCartTop = materials->FindMaterial("ssteel");
@@ -234,12 +236,18 @@ G4VPhysicalVolume* ScanningTable::Construct()
   // MidPos = new G4ThreeVector(0., 46.335*mm, -8.8*mm);
   // TopPos = new G4ThreeVector(0., -44.335*mm, -8.8*mm);
 
-  G4cout << "   ... slit assembly ... " << G4endl;
+  G4cout << "   ... slit assembly (slit width "
+	 << slitWidth << " mm) ... " << G4endl;
 
-  // Slites on the bottom
+  // Slits on the bottom
   BotPos = new G4ThreeVector(0., 0., -8.8*mm);
   MidPos = new G4ThreeVector(0., 0., -8.8*mm);
   TopPos = new G4ThreeVector(0., 0., -8.8*mm);
+
+  // (The STL files have 2 mm slits.)
+  G4ThreeVector *slitShift = new G4ThreeVector(0., slitWidth - 2.0*mm, 0.);
+  (*MidPos) += (*slitShift);
+  (*TopPos) += 2.0*(*slitShift);
 
   const int ZSlitParts = 10;
   G4String ZSlitPart[ZSlitParts];

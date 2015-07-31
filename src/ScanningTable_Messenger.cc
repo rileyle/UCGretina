@@ -58,6 +58,11 @@ ScanningTable_Messenger::ScanningTable_Messenger(ScanningTable* ST)
   CollRCmd->SetGuidance("Set the inner radius of the collimator insert.");
   CollRCmd->SetParameterName("choice", false);
   CollRCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  SlitWCmd = new G4UIcmdWithADoubleAndUnit("/ScanningTable/SetSlitWidth", this);
+  SlitWCmd->SetGuidance("Set the slit width.");
+  SlitWCmd->SetParameterName("choice", false);
+  SlitWCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 }
 
 ScanningTable_Messenger::~ScanningTable_Messenger()
@@ -77,6 +82,7 @@ ScanningTable_Messenger::~ScanningTable_Messenger()
   delete ZShiftCmd;
   delete CloverZCmd;
   delete CollRCmd;
+  delete SlitWCmd;
 }
 
 void ScanningTable_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
@@ -109,6 +115,7 @@ void ScanningTable_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { scanningTable->SetCloverZ(CloverZCmd->GetNewDoubleValue(newValue)); }
   if ( command == CollRCmd )
     { scanningTable->SetCollR(CollRCmd->GetNewDoubleValue(newValue)); }
-  
+  if ( command == SlitWCmd )
+    { scanningTable->SetSlitWidth(SlitWCmd->GetNewDoubleValue(newValue)); }
 }
 #endif

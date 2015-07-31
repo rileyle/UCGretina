@@ -37,6 +37,7 @@ private:
   G4UIcmdWithADoubleAndUnit* ZShiftCmd;
   G4UIcmdWithADoubleAndUnit* CloverZCmd;
   G4UIcmdWithADoubleAndUnit* CollRCmd;
+  G4UIcmdWithADoubleAndUnit* SlitWCmd;
 };
 
 #endif

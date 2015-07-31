@@ -47,6 +47,7 @@ class ScanningTable
   void SetYShift(G4double value) { yShift = value; }
   void SetZShift(G4double value) { zShift = value; }
   void SetCollR(G4double value)  { collimatorRadius = value; }
+  void SetSlitWidth(G4double value)  { slitWidth = value; }
   void SetCloverZ(G4double value){ cloverZ = value; }
   G4double GetCloverZ() { return cloverZ + cloverOffset; }
   void Report();
@@ -85,6 +86,8 @@ class ScanningTable
   G4double cloverOffset;
 
   G4double collimatorRadius;
+
+  G4double slitWidth;
   
   //materials
   Materials* materials;
