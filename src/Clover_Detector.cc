@@ -35,45 +35,29 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
 
   LeafShift = 2.23*cm; // x and y offset relative to central axis
 
-  // Lower left (facing clover)
-  // Leaf0Shift.setX(-LeafShift);
-  // Leaf0Shift.setY(-LeafShift);
-  // Leaf0Shift.setZ((Length + torusradius)/2. + covergap);
-  // Leaf0Pos = Pos0 + Leaf0Shift;
-  Leaf3Shift.setX(-LeafShift);
-  Leaf3Shift.setY(-LeafShift);
-  Leaf3Shift.setZ((Length + torusradius)/2. + covergap);
-  Leaf3Pos = Pos0 + Leaf3Shift;
-
-  // Lower right (facing clover)
-  // Leaf1Shift.setX(LeafShift);
-  // Leaf1Shift.setY(-LeafShift);
-  // Leaf1Shift.setZ((Length + torusradius)/2. + covergap);
-  // Leaf1Pos = Pos0 + Leaf1Shift;
-  Leaf2Shift.setX(LeafShift);
-  Leaf2Shift.setY(-LeafShift);
-  Leaf2Shift.setZ((Length + torusradius)/2. + covergap);
-  Leaf2Pos = Pos0 + Leaf2Shift;
+  // Upper left (facing clover)
+  Leaf0Shift.setX(LeafShift);
+  Leaf0Shift.setY(LeafShift);
+  Leaf0Shift.setZ((Length + torusradius)/2. + covergap);
+  Leaf0Pos = Pos0 + Leaf0Shift;
 
   // Upper right (facing clover)
-  // Leaf2Shift.setX(LeafShift);
-  // Leaf2Shift.setY(LeafShift);
-  // Leaf2Shift.setZ((Length + torusradius)/2. + covergap);
-  // Leaf2Pos = Pos0 + Leaf2Shift;
-  Leaf1Shift.setX(LeafShift);
+  Leaf1Shift.setX(-LeafShift);
   Leaf1Shift.setY(LeafShift);
   Leaf1Shift.setZ((Length + torusradius)/2. + covergap);
   Leaf1Pos = Pos0 + Leaf1Shift;
 
-  // Upper left (facing clover)
-  // Leaf3Shift.setX(-LeafShift);
-  // Leaf3Shift.setY(LeafShift);
-  // Leaf3Shift.setZ((Length + torusradius)/2. + covergap);
-  // Leaf3Pos = Pos0 + Leaf3Shift;
-  Leaf0Shift.setX(-LeafShift);
-  Leaf0Shift.setY(LeafShift);
-  Leaf0Shift.setZ((Length + torusradius)/2. + covergap);
-  Leaf0Pos = Pos0 + Leaf0Shift;
+  // Lower right (facing clover)
+  Leaf2Shift.setX(-LeafShift);
+  Leaf2Shift.setY(-LeafShift);
+  Leaf2Shift.setZ((Length + torusradius)/2. + covergap);
+  Leaf2Pos = Pos0 + Leaf2Shift;
+
+  // Lower left (facing clover)
+  Leaf3Shift.setX( LeafShift);
+  Leaf3Shift.setY(-LeafShift);
+  Leaf3Shift.setZ((Length + torusradius)/2. + covergap);
+  Leaf3Pos = Pos0 + Leaf3Shift;
 
   CCoffset = 0.06*cm; // central contact x and y offset relative to the box
   CCradius = .6*cm; // central contact radius
@@ -303,23 +287,21 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 
   assemblyclover = new G4AssemblyVolume();
 
-  //  assemblyclover->AddPlacedVolume(detector_log,Leaf0Pos,&Rot0);
-  assemblyclover->AddPlacedVolume(detector_log,Leaf3Pos,&Rot0);
+  Rot0.rotateZ(180.*deg);
+
+  assemblyclover->AddPlacedVolume(detector_log,Leaf0Pos,&Rot0);
  
   Rot0.rotateZ(90.*deg);
 
-  //  assemblyclover->AddPlacedVolume(detector_log,Leaf1Pos,&Rot0);
-  assemblyclover->AddPlacedVolume(detector_log,Leaf2Pos,&Rot0);
-
-  Rot0.rotateZ(90.*deg);
-  
-  //  assemblyclover->AddPlacedVolume(detector_log,Leaf2Pos,&Rot0);
   assemblyclover->AddPlacedVolume(detector_log,Leaf1Pos,&Rot0);
 
   Rot0.rotateZ(90.*deg);
+  
+  assemblyclover->AddPlacedVolume(detector_log,Leaf2Pos,&Rot0);
 
-  //  assemblyclover->AddPlacedVolume(detector_log,Leaf3Pos,&Rot0);
-  assemblyclover->AddPlacedVolume(detector_log,Leaf0Pos,&Rot0);
+  Rot0.rotateZ(90.*deg);
+
+  assemblyclover->AddPlacedVolume(detector_log,Leaf3Pos,&Rot0);
 
   assemblyclover->AddPlacedVolume(cover_log,coverpos,&wallrot);
 
