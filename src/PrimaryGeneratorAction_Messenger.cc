@@ -180,10 +180,5 @@ void PrimaryGeneratorAction_Messenger::SetNewValue(G4UIcommand* command,G4String
  if( command == SFrCmd )
     {PGA ->SetFraction(SFrCmd->GetNewDoubleValue(newValue));}
 
-
-
-
-
-
 }
 

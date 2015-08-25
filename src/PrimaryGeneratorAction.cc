@@ -228,6 +228,8 @@ void PrimaryGeneratorAction::SetSourceType(G4String name) //LR
     SetSourceCo60();
   } else if (name == "ra226") {
     SetSourceRa226();
+  } else if (name == "am241") {
+    SetSourceAm241();
   } else if (name == "photopeaks") {
     SetSourcePhotopeaks();
   } else if (name == "eu152_peaks") {
@@ -521,6 +523,30 @@ void PrimaryGeneratorAction::SetSourceRa226()
   e=2204.071*keV;sourceBranchingSum+=0.0489;
   TheSource.push_back(new SourceData(e,sourceBranchingSum));
   e=2447.673*keV;sourceBranchingSum+=0.01536;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+
+}
+//-------------------------------------------------------------
+void PrimaryGeneratorAction::SetSourceAm241()
+{
+  sourceType = "am241";
+
+  G4double e;
+  sourceBranchingSum=0.;
+
+  // start from the beginning of the array
+  vector<SourceData*>::iterator itPos = TheSource.begin();
+  // clear all elements from the array
+  for(; itPos < TheSource.end(); itPos++)
+    delete *itPos;    // free the element from memory
+   // finally, clear all elements from the array
+  TheSource.clear();
+
+  e=26.3446*keV;sourceBranchingSum+=0.0240;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=33.1963*keV;sourceBranchingSum+=0.00121;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=59.5409*keV;sourceBranchingSum+=0.3578;
   TheSource.push_back(new SourceData(e,sourceBranchingSum));
 
 }

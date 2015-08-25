@@ -38,6 +38,8 @@ ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,
   materialSlitBrackets = materials->FindMaterial("Al");
   materialSlits = materials->FindMaterial("Hevimet");
   materialSlitAssembly = materials->FindMaterial("Al");
+  materialSlitAssemblyCollimator = materials->FindMaterial("Cu");
+  materialSlitAssemblyPlug = materials->FindMaterial("Hevimet");
   materialTranslation = materials->FindMaterial("G10");
   materialTranslationAssembly = materials->FindMaterial("ssteel");
   materialCsCollimator = materials->FindMaterial("Hevimet");
@@ -310,6 +312,48 @@ G4VPhysicalVolume* ScanningTable::Construct()
 				     ZSlit_log,
 				     ZSlitPart[i],
 				     expHall_log,false,0);
+
+      // if(i>3){
+      // 	// This doubles the slit wall thickness with additional copies
+      // 	G4ThreeVector* BP = new G4ThreeVector(0., 0., -8.8*mm + 16.22*mm);
+      // 	G4ThreeVector* MP = new G4ThreeVector(0., 0., -8.8*mm + 16.22*mm);
+      // 	G4ThreeVector* TP = new G4ThreeVector(0., 0., -8.8*mm + 16.22*mm);
+      // 	if(i == 4 || i == 5)
+      // 	  UsePos = BP;
+      // 	else if(i == 6 || i == 7)
+      // 	  UsePos = MP;
+      // 	else if(i == 8 || i == 9)
+      // 	  UsePos = TP;
+      // 	// (The STL files have 2 mm slits.)
+      // 	(*MP) += (*slitShift);
+      // 	(*TP) += 2.0*(*slitShift);
+
+      // 	G4VPhysicalVolume* ZS_phys 
+      // 	  = new G4PVPlacement(G4Transform3D(NoRot, *UsePos),
+      // 			      ZSlit_log,
+      // 			      ZSlitPart[i],
+      // 			      expHall_log,false,0);
+      // 	// ... and this triples it.
+      // 	BP->setZ(-8.8*mm + 2.0*16.22*mm);
+      // 	MP->setZ(-8.8*mm + 2.0*16.22*mm);
+      // 	TP->setZ(-8.8*mm + 2.0*16.22*mm);
+      //        // (The STL files have 2 mm slits.)  
+      //	(*MP) += (*slitShift);
+      //	(*TP) += 2.0*(*slitShift);
+      //
+      // 	if(i == 4 || i == 5)
+      // 	  UsePos = BP;
+      // 	else if(i == 6 || i == 7)
+      // 	  UsePos = MP;
+      // 	else if(i == 8 || i == 9)
+      // 	  UsePos = TP;
+      // 	ZS_phys 
+      // 	  = new G4PVPlacement(G4Transform3D(NoRot, *UsePos),
+      // 			      ZSlit_log,
+      // 			      ZSlitPart[i],
+      // 			      expHall_log,false,0);
+      //      }
+
       if(i<4)
 	ZSlit_log->SetVisAttributes(VisSlit2);
       else
@@ -331,13 +375,13 @@ G4VPhysicalVolume* ScanningTable::Construct()
     SlitZAssemblyPart[0] = "SlitZAssemblyBelt";
     SlitZAssemblyMaterial[0] = materialSlitAssembly;
     SlitZAssemblyPart[1] = "SlitZAssemblyCenterCylinder";
-    SlitZAssemblyMaterial[1] = materialSlitAssembly;
+    SlitZAssemblyMaterial[1] = materialSlitAssemblyCollimator;
     SlitZAssemblyPart[2] = "SlitZAssemblyCenterCylinderBase";
-    SlitZAssemblyMaterial[2] = materialSlitAssembly;
+    SlitZAssemblyMaterial[2] = materialSlitAssemblyCollimator;
     SlitZAssemblyPart[3] = "SlitZAssemblyCenterCylinderDisk";
-    SlitZAssemblyMaterial[3] = materialSlitAssembly;
+    SlitZAssemblyMaterial[3] = materialSlitAssemblyCollimator;
     SlitZAssemblyPart[4] = "SlitZAssemblyCenterCylinderPlug";
-    SlitZAssemblyMaterial[4] = materialSlitAssembly;
+    SlitZAssemblyMaterial[4] = materialSlitAssemblyPlug;
     SlitZAssemblyPart[5] = "SlitZAssemblyLeftCrescentWithHoles";
     SlitZAssemblyMaterial[5] = materialSlitAssembly;
     SlitZAssemblyPart[6] = "SlitZAssemblyLeftBrace"; // Multiple solids

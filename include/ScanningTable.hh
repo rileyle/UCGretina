@@ -105,6 +105,8 @@ class ScanningTable
   G4Material* materialSlitBrackets;
   G4Material* materialSlits;
   G4Material* materialSlitAssembly;
+  G4Material* materialSlitAssemblyCollimator;
+  G4Material* materialSlitAssemblyPlug;
   G4Material* materialTranslation;
   G4Material* materialTranslationAssembly;
   G4Material* materialCsCollimator;
