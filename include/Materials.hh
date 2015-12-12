@@ -37,6 +37,7 @@ private:
   G4Element* elementW;
   G4Element* elementPt;
   G4Element* elementAu;
+  G4Element* elementPb;
 
   G4NistManager* NISTman;
 
@@ -62,6 +63,7 @@ private:
   G4Material* gC;
   G4Material* Sn;
   G4Material* Au;
+  G4Material* Pb;
   G4Material* Ir;
   G4Material* Si;
   G4Material* Ni;

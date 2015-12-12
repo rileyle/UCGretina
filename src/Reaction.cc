@@ -68,8 +68,10 @@ G4VParticleChange* Reaction::PostStepDoIt(
 
 	aParticleChange.ProposeTrackStatus(fStopAndKill);
 
-	aParticleChange.SetNumberOfSecondaries(1);
-	aParticleChange.AddSecondary(BeamOut->ReactionProduct(),BeamOut->ReactionPosition(),true);
+	if(BeamOut->AboveThreshold()){
+	  aParticleChange.SetNumberOfSecondaries(1);
+	  aParticleChange.AddSecondary(BeamOut->ReactionProduct(),BeamOut->ReactionPosition(),true);
+	}
 
 	BeamOut->SetReactionFlag(1);
 

@@ -75,6 +75,7 @@ public:
   G4double getTFrac(){return TFrac;};
   G4int    GetReactionFlag(){return ReactionFlag;}
   void     SetReactionFlag(G4int f){ReactionFlag=f;}
+  G4int    AboveThreshold(){return ThresholdFlag;}
   void     SetNQ(G4int n){NQ=n;SetUpChargeStates();}
   void     SetUpChargeStates();
   void     SelectQ(G4int q){SQ=q;G4cout<<" Charge state "<<SQ<<" selected for setup"<<G4endl;}
@@ -99,7 +100,7 @@ private:
   G4ThreeVector posOut;
   G4ThreeVector pIn;
   G4int  ReactionFlag;
- 
+  G4int  ThresholdFlag;
 
   G4double      tauIn;
   G4double      KEIn;

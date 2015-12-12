@@ -24,6 +24,7 @@
   elementW  = new G4Element("Tungsten",   "W",  74., 183.84*g/mole);
   elementPt = new G4Element("Platinum",   "Pt", 78., 195.08*g/mole);
   elementAu = new G4Element("Gold",       "Au", 79., 196.97*g/mole);
+  elementPb = new G4Element("Lead",       "Pb", 82., 207.2*g/mole);
   // Materials
 
   HpGe = new G4Material("HpGe", 32., 72.61*g/mole, 5.323*g/cm3);
@@ -83,6 +84,7 @@
   Sn = new G4Material("Sn",       50., 118.710*g/mole,  7.365*g/cm3);
   Ir = new G4Material("Ir",       77., 192.217*g/mole,  22.65*g/cm3);
   Au = new G4Material("Au",       79., 196.9*g/mole,    19.32*g/cm3);
+  Pb = new G4Material("Pb",       82., 207.2*g/mole,    11.34*g/cm3);
 
 }
 

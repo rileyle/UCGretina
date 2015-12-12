@@ -283,9 +283,12 @@ void Outgoing_Beam::ScanInitialConditions(const G4Track & aTrack)
   ReactionFlag=-1;
   if(aTrack.GetVolume()->GetLogicalVolume()->GetName()=="target_log")
     ReactionFlag=0;
+  ThresholdFlag = 1;
+  if( KEIn < Ex/2/m2*(m1+m2+m3+m4) )
+    ThresholdFlag = 0;
   ET = KEIn + m1 + m2;                                      // Total E
   p1 = sqrt( (KEIn + m1)*(KEIn + m1) - m1*m1 );          // Incoming p
-  // Lab-grame scattering angle limit
+  // Lab-frame scattering angle limit
   sin2theta3_max = 
     ( (ET*ET - p1*p1 + m3*m3 - m4*m4)*(ET*ET - p1*p1 + m3*m3 - m4*m4)
       -4*m3*m3*((m1 + m2)*(m1 + m2) + 2*m2*KEIn) )/( 4*m3*m3*p1*p1 );
