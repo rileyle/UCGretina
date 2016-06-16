@@ -1,4 +1,4 @@
-# UCGretina v3.0 #
+# UCGretina v3.3 #
 
 ## Compile and install ##
 
@@ -635,4 +635,3 @@ Within mayavi2, the python scripts `./vis/mlab.animate.py` and
 former animates the scene, and the latter saves the animation frames
 as a series of .png files which can be stitched together into an
 animated png or gif.
-
