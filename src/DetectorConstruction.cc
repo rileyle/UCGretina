@@ -162,7 +162,12 @@ void DetectorConstruction::DefineMaterials()
   G4Material* Ge = new G4Material(name="Germanium", density=5.323 *g/cm3, nelements=1);
   Ge->AddElement(elGe, natoms=1);
   myMaterials.push_back(Ge);
-  
+
+  //LR TMP
+  G4Material* GeLite = new G4Material(name="GermaniumLite", density=4.7907 *g/cm3, nelements=1);
+  GeLite->AddElement(elGe, natoms=1);
+  myMaterials.push_back(GeLite);
+
   G4Element* elCu = new G4Element(name="Copper",   symbol="Cu", z=29., a=63.546    *g/mole);
   myElements.push_back(elCu);
 
