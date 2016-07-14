@@ -168,6 +168,29 @@ void DetectorConstruction::DefineMaterials()
   GeLite->AddElement(elGe, natoms=1);
   myMaterials.push_back(GeLite);
 
+  G4Material* Alplus5 = new G4Material(name="AluminiumPlus5", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*1.05);
+  myMaterials.push_back(Alplus5);
+
+  G4Material* Alplus10 = new G4Material(name="AluminiumPlus10", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*1.10);
+  myMaterials.push_back(Alplus10);
+
+  G4Material* Alplus20 = new G4Material(name="AluminiumPlus20", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*1.20);
+  myMaterials.push_back(Alplus20);
+
+  G4Material* Alplus50 = new G4Material(name="AluminiumPlus50", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*1.50);
+  myMaterials.push_back(Alplus50);
+
+  G4Material* Alplus100 = new G4Material(name="AluminiumPlus100", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*2.0);
+  myMaterials.push_back(Alplus100);
+
+  G4Material* Alplus150 = new G4Material(name="AluminiumPlus150", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*2.5);
+  myMaterials.push_back(Alplus150);
+
+  G4Material* Alplus200 = new G4Material(name="AluminiumPlus200", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*3.0);
+  myMaterials.push_back(Alplus200);
+
+  //END LR TMP
+  
   G4Element* elCu = new G4Element(name="Copper",   symbol="Cu", z=29., a=63.546    *g/mole);
   myElements.push_back(elCu);
 
