@@ -70,8 +70,8 @@ void Gretina_Array::InitData()
 
   matWallsName       = "Aluminium";
 
-  //  matBackWallsName   = "BackWallMaterial";
-  matBackWallsName   = "Aluminium";
+  matBackWallsName   = "BackWallMaterial";
+  //  matBackWallsName   = "Aluminium";
 
   matHoleName        = "Vacuum";
 
@@ -3130,6 +3130,22 @@ void Gretina_Array::SetWallsMate(G4String materialName)
   }
 }
 
+void Gretina_Array::SetBackWallsMate(G4String materialName)
+{
+  // search the material by its name
+  G4Material* ptMaterial = G4Material::GetMaterial(materialName);
+  if (ptMaterial) {
+    matBackWallsName = materialName;
+    G4cout << "\n ----> The back walls material is "
+          << materialName << G4endl;
+  }
+  else {
+    G4cout << " Material not found! " << G4endl;
+    G4cout << " ----> Keeping previously set walls material ("
+           << matBackWalls->GetName() << ")" << G4endl;
+  }
+}
+
 void Gretina_Array::SetThetaShift( G4double angle )
 {
   thetaShift = angle;
@@ -3294,6 +3310,13 @@ Gretina_Array_Messenger::Gretina_Array_Messenger(Gretina_Array* pTarget)
   WalMatCmd->SetParameterName("choice",false);
   WalMatCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  commandName = directoryName + "backWallsMaterial";
+  BackWalMatCmd = new G4UIcmdWithAString(aLine, this);
+  BackWalMatCmd->SetGuidance("Select Material of the back walls.");
+  BackWalMatCmd->SetGuidance("Required parameters: 1 string.");
+  BackWalMatCmd->SetParameterName("choice",false);
+  BackWalMatCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  
   commandName = directoryName + "rotateArray";
   aLine = commandName.c_str();
   RotateArrayCmd = new G4UIcmdWithAString(aLine, this);
@@ -3421,6 +3444,7 @@ Gretina_Array_Messenger::~Gretina_Array_Messenger()
 {
   delete DetMatCmd;
   delete WalMatCmd;
+  delete BackWalMatCmd;
   delete RotateArrayCmd;
   delete RotatePrismaCmd;
   delete TraslateArrayCmd;
@@ -3467,6 +3491,9 @@ void Gretina_Array_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
   }
   if( command == WalMatCmd ) {
     myTarget->SetWallsMate(newValue);
+  }
+  if( command == BackWalMatCmd ) {
+    myTarget->SetBackWallsMate(newValue);
   }
   if( command == RotateArrayCmd ) {
     float e1, e2;

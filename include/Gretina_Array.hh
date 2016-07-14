@@ -297,6 +297,7 @@ class Gretina_Array
   public:       
     void SetDetMate             ( G4String );
     void SetWallsMate           ( G4String );
+    void SetBackWallsMate       ( G4String );
 
   public:      
     void SetThetaShift          ( G4double );
@@ -362,6 +363,7 @@ class Gretina_Array_Messenger: public G4UImessenger
     G4UIcmdWithAString*        SetSliceCmd;
     G4UIcmdWithAString*        DetMatCmd;
     G4UIcmdWithAString*        WalMatCmd;
+    G4UIcmdWithAString*        BackWalMatCmd;
     G4UIcmdWithAString*        RotateArrayCmd;
     G4UIcmdWithADouble*        RotatePrismaCmd;
     G4UIcmdWith3Vector*        TraslateArrayCmd;
