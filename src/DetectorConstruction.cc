@@ -171,14 +171,26 @@ void DetectorConstruction::DefineMaterials()
   G4Material* Alplus5 = new G4Material(name="AluminiumPlus5", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*1.05);
   myMaterials.push_back(Alplus5);
 
+  G4Material* Alminus5 = new G4Material(name="AluminiumMinus5", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*0.95);
+  myMaterials.push_back(Alminus5);
+
   G4Material* Alplus10 = new G4Material(name="AluminiumPlus10", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*1.10);
   myMaterials.push_back(Alplus10);
 
+  G4Material* Alminus10 = new G4Material(name="AluminiumMinus10", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*0.90);
+  myMaterials.push_back(Alminus10);
+  
   G4Material* Alplus20 = new G4Material(name="AluminiumPlus20", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*1.20);
   myMaterials.push_back(Alplus20);
 
+  G4Material* Alminus20 = new G4Material(name="AluminiumMinus20", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*0.80);
+  myMaterials.push_back(Alminus20);
+
   G4Material* Alplus50 = new G4Material(name="AluminiumPlus50", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*1.50);
   myMaterials.push_back(Alplus50);
+
+  G4Material* Alminus50 = new G4Material(name="AluminiumMinus50", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*0.50);
+  myMaterials.push_back(Alminus50);
 
   G4Material* Alplus100 = new G4Material(name="AluminiumPlus100", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*2.0);
   myMaterials.push_back(Alplus100);
