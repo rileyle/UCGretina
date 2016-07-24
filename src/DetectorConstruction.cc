@@ -6,6 +6,7 @@ DetectorConstruction::DetectorConstruction()
   targetStatus   = false;
 #ifndef SCANNING
   shellStatus    = "";
+  s800Status     = false;
 #endif
   
 #ifndef LHTARGET
@@ -96,6 +97,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 #endif
 #endif
 
+#ifndef SCANNING  
+  // S800 Quadrupole
+  the_S800 = new S800(ExpHall_log,materials);
+  
+#endif
+  
   // Target
 
   aTarget = new Target(ExpHall_log,materials);
@@ -295,6 +302,9 @@ void DetectorConstruction::Placement()
     Greta_Shell* Shell = new Greta_Shell();
     Shell->Placement(shellStatus);
   }
+  if( s800Status ){
+    the_S800->Construct();
+  }
 #endif
 
   if(gretinaStatus)
@@ -365,6 +375,12 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
   ShellCmd = new G4UIcmdWithAString(aLine, this);
   ShellCmd->SetGuidance("Construct the GRETINA mounting shell (full/north/south).");
   ShellCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  commandName = "/Gretina/S800";
+  aLine = commandName.c_str();
+  S800Cmd = new G4UIcmdWithoutParameter(aLine, this);
+  S800Cmd->SetGuidance("Construct the S800 Quadrupole.");
+  S800Cmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 #endif
   
 }
@@ -376,6 +392,7 @@ DetectorConstruction_Messenger::~DetectorConstruction_Messenger()
   delete NoGretCmd;
 #ifndef SCANNING
   delete ShellCmd;
+  delete S800Cmd;
 #endif
 #ifndef LHTARGET
 #ifndef SCANNING
@@ -421,6 +438,10 @@ void DetectorConstruction_Messenger::SetNewValue(G4UIcommand* command,G4String n
   if( command == ShellCmd ) {
     myTarget->SetShellStatus(newValue);
   }
+  if( command == S800Cmd ) {
+    myTarget->SetS800Status(true);
+  } 
+
 #endif
 
 }
