@@ -77,7 +77,8 @@ class EventAction : public G4UserEventAction
     G4bool mode2Out;  
     G4float crmat[MAXDETPOS][MAXCRYSTALNO][4][4];
     G4bool gretinaCoords;
-    G4bool crystalXforms;  
+    G4bool crystalXforms;
+    G4double hitTolerance;
     G4double packingRes;
     G4double S800KE;
     const G4Event* evt;

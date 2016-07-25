@@ -8,6 +8,7 @@ EventAction::EventAction()
 { 
   ionCollectionID=-1;
   gammaCollectionID=-1;
+  hitTolerance = 0.00001*mm;
   packingRes = 0.*mm;
   S800KE = 1.0;
   outFileName = "";
@@ -149,9 +150,9 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	  // Combine multiple gamma hits at the same position.
 	  // (This is rare, but it happens.)
 	  if(i > 0 
-	     && (x - measuredX[i-1])*(x - measuredX[i-1]) < 0.001*mm*0.001*mm
-	     && (y - measuredY[i-1])*(y - measuredY[i-1]) < 0.001*mm*0.001*mm
-	     && (z - measuredZ[i-1])*(z - measuredZ[i-1]) < 0.001*mm*0.001*mm){
+	     && (x - measuredX[i-1])*(x - measuredX[i-1]) < hitTolerance*hitTolerance
+	     && (y - measuredY[i-1])*(y - measuredY[i-1]) < hitTolerance*hitTolerance
+	     && (z - measuredZ[i-1])*(z - measuredZ[i-1]) < hitTolerance*hitTolerance){
 
 	    measuredEdep[NMeasured-1] += en; 
 	    processed = true;
@@ -205,9 +206,9 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	    // 	   << "   detNum[" << j << "] = " << detNum[j] << G4endl;
 
 	    if( (*gammaCollection)[i]->GetParentTrackID() == trackID[j]  // correct parent
-		&& (x0 - X0[j])*(x0 - X0[j]) < 0.001*mm*0.001*mm
-		&& (y0 - Y0[j])*(y0 - Y0[j]) < 0.001*mm*0.001*mm
-		&& (z0 - Z0[j])*(z0 - Z0[j]) < 0.001*mm*0.001*mm // correct interaction point
+		&& (x0 - X0[j])*(x0 - X0[j]) < hitTolerance*hitTolerance
+		&& (y0 - Y0[j])*(y0 - Y0[j]) < hitTolerance*hitTolerance
+		&& (z0 - Z0[j])*(z0 - Z0[j]) < hitTolerance*hitTolerance // correct interaction point
 		&& (*gammaCollection)[i]->GetDetNumb() == detNum[j]){        // same crystal
 
 	      // Energy-weighted average position (barycenter)
