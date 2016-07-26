@@ -9,7 +9,7 @@ S800::S800(G4LogicalVolume* experimentalHall_log,Materials* mat)
   S800_Dz = 100.*mm;
   Pos0 = new G4ThreeVector(0., 0., 0.6*m);
 
-  S800Material = materials->FindMaterial("Al");
+  S800Material = materials->FindMaterial("Steel");
 }
 
 S800::~S800()
