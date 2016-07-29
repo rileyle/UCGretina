@@ -18,6 +18,7 @@ LaBr::~LaBr()
 G4VPhysicalVolume* LaBr::Construct()
 {
 
+
   LaBr_Crys = new G4Tubs("LaBr", 0., LaBr_R, LaBr_Dz, 0., 360.*deg);
   
   LaBr_log = new G4LogicalVolume(LaBr_Crys, LaBrMaterial,
