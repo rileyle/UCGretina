@@ -37,6 +37,8 @@ G4VPhysicalVolume* LaBr::Construct()
 
   LaBr_log->SetVisAttributes(Vis);
 
+  Report();
+  
   return LaBr_phys;
 }
 //-----------------------------------------------------------------------------
@@ -57,9 +59,10 @@ void LaBr::setLength(G4double length)
 //-----------------------------------------------------------------------------
 void LaBr::Report()
 {
-     G4cout<<"----> LaBr material set to     "<<LaBrMaterial->GetName()<< G4endl;     
-     G4cout<<"----> LaBr quadrupole radius set to "<<G4BestUnit(LaBr_R,"Length")<< G4endl;
-     G4cout<<"----> LaBr length set to       "<<G4BestUnit(2.*LaBr_Dz,"Length")<< G4endl;
+     G4cout<<"Including the LaBr"<<G4endl; 
+     G4cout<<" ----> LaBr material set to     "<<LaBrMaterial->GetName()<< G4endl;     
+     G4cout<<" ----> LaBr quadrupole radius set to "<<G4BestUnit(LaBr_R,"Length")<< G4endl;
+     G4cout<<" ----> LaBr length set to       "<<G4BestUnit(2.*LaBr_Dz,"Length")<< G4endl;
 }
 //---------------------------------------------------------------------
 void LaBr::setMaterial(G4String materialName)

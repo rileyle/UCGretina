@@ -177,7 +177,7 @@ void DetectorConstruction::DefineMaterials()
   Ge->AddElement(elGe, natoms=1);
   myMaterials.push_back(Ge);
 
-  G4Material* LaBr3 = new G4Material(name="LaBr3", density=5.08*mg/cm3, nelements=2);
+  G4Material* LaBr3 = new G4Material(name="LaBr3", density=5.08 *g/cm3, nelements=2);
   LaBr3->AddElement(elLa, 0.25);
   LaBr3->AddElement(elBr, 0.75);
   myMaterials.push_back(LaBr3);

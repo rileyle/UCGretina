@@ -36,6 +36,8 @@ G4VPhysicalVolume* S800::Construct()
 
   S800_log->SetVisAttributes(Vis);
 
+  Report();
+  
   return S800_phys;
 }
 //-----------------------------------------------------------------------------
@@ -56,9 +58,10 @@ void S800::setLength(G4double length)
 //-----------------------------------------------------------------------------
 void S800::Report()
 {
-     G4cout<<"----> S800 material set to     "<<S800Material->GetName()<< G4endl;     
-     G4cout<<"----> S800 quadrupole radius set to "<<G4BestUnit(S800_R,"Length")<< G4endl;
-     G4cout<<"----> S800 length set to       "<<G4BestUnit(2.*S800_Dz,"Length")<< G4endl;
+     G4cout<<"Including the S800 Quadrupole"<<G4endl; 
+     G4cout<<" ----> S800 material set to     "<<S800Material->GetName()<< G4endl;     
+     G4cout<<" ----> S800 quadrupole radius set to "<<G4BestUnit(S800_R,"Length")<< G4endl;
+     G4cout<<" ----> S800 length set to       "<<G4BestUnit(2.*S800_Dz,"Length")<< G4endl;
 }
 //---------------------------------------------------------------------
 void S800::setMaterial(G4String materialName)
