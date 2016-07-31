@@ -40,6 +40,11 @@ class Beam_Tube
   G4double BTDz;
   G4double BTSPhi;
   G4double BTDPhi; 
+  G4double BTOffset;
+  G4double BTFlangeRmin;
+  G4double BTFlangeRmax;
+  G4double BTFlangeDz;
+  G4double BTFlangeOffset;
 
   //materials
   Materials* materials;
@@ -48,15 +53,20 @@ class Beam_Tube
   //default position
   G4RotationMatrix NoRot;
   G4ThreeVector *Pos0;
+  G4ThreeVector *BTPos;
+  G4ThreeVector *BTFlangePos;
 
   //the tube
   G4Tubs* BeamTube;
+  G4Tubs* BeamTubeFlange;
 
   //logical volume
   G4LogicalVolume* BeamTube_log;
+  G4LogicalVolume* BeamTubeFlange_log;
  
   //physical volume
   G4VPhysicalVolume* BeamTube_phys;
+  G4VPhysicalVolume* BeamTubeFlange_phys;
 
 };
 

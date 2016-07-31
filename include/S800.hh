@@ -5,6 +5,8 @@
 #include "G4Material.hh"
 #include "Materials.hh"
 #include "G4Tubs.hh"
+#include "G4Box.hh"
+#include "G4SubtractionSolid.hh"
 #include "G4LogicalVolume.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4ThreeVector.hh"
@@ -35,6 +37,12 @@ class S800
   // dimensions
   G4double S800_R;
   G4double S800_Dz;
+  G4double S800GateValve_Dx;
+  G4double S800GateValve_Dy;
+  G4double S800GateValve_Dz;
+  G4double S800GateValve_yOffset;
+  G4double S800GateValve_zOffset;
+  G4double S800_Offset;
 
   //materials
   Materials* materials;
@@ -42,16 +50,23 @@ class S800
 
   //default position
   G4RotationMatrix NoRot;
-  G4ThreeVector *Pos0;
+  //  G4ThreeVector *Pos0;
+  G4ThreeVector *S800_Pos;
+  G4ThreeVector *S800GateValve_Pos;
 
-  //the tube
-  G4Tubs* S800_Quad;
+  // solids
+  G4Tubs*             S800_Quad;
+  G4Box*              S800GateValve_Box;
+  G4Tubs*             S800GateValve_Hole;
+  G4SubtractionSolid* S800GateValve;
 
-  //logical volume
+  // logical volumes
   G4LogicalVolume* S800_log;
+  G4LogicalVolume* S800GateValve_log;
  
-  //physical volume
+  // physical volumes
   G4VPhysicalVolume* S800_phys;
+  G4VPhysicalVolume* S800GateValve_phys;
 
 };
 
