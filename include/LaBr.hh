@@ -35,23 +35,30 @@ class LaBr
   // dimensions
   G4double LaBr_R;
   G4double LaBr_Dz;
+  G4double LaBrPMT_R;
+  G4double LaBrPMT_Dz;
 
   //materials
   Materials* materials;
   G4Material* LaBrMaterial;
+  G4Material* LaBrPMTMaterial;
 
   //default position
   G4RotationMatrix NoRot;
-  G4ThreeVector *Pos0;
+  G4ThreeVector *LaBrPos;
+  G4ThreeVector *LaBrPMTPos;
 
-  //the tube
+  //solids
   G4Tubs* LaBr_Crys;
+  G4Tubs* LaBrPMT;
 
-  //logical volume
+  //logical volumes
   G4LogicalVolume* LaBr_log;
+  G4LogicalVolume* LaBrPMT_log;
  
-  //physical volume
+  //physical volumes
   G4VPhysicalVolume* LaBr_phys;
+  G4VPhysicalVolume* LaBrPMT_phys;
 
 };
 

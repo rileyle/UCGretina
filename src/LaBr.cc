@@ -5,11 +5,21 @@ LaBr::LaBr(G4LogicalVolume* experimentalHall_log,Materials* mat)
   materials=mat;
   expHall_log=experimentalHall_log;
 
-  LaBr_R  = 2*2.54*cm;
-  LaBr_Dz = 2.54*cm;
-  Pos0 = new G4ThreeVector(0., 0., -3*2.54*cm);
+  LaBr_R  = 0.75*2.54*cm;
+  LaBr_Dz = 0.75*2.54*cm;
+
+  LaBrPos = new G4ThreeVector(0., 0., -1.5*2.54*cm);
 
   LaBrMaterial = materials->FindMaterial("LaBr3");
+
+  LaBrPMT_R  = 1.*2.54*cm;
+  LaBrPMT_Dz = 3.*2.54*cm;
+
+  LaBrPMTMaterial = materials->FindMaterial("Aluminium");
+
+  LaBrPMTPos = new G4ThreeVector(0., 0.,
+				 -LaBr_Dz-LaBrPMT_Dz-1.5*2.54*cm);
+  
 }
 
 LaBr::~LaBr()
@@ -24,9 +34,19 @@ G4VPhysicalVolume* LaBr::Construct()
   LaBr_log = new G4LogicalVolume(LaBr_Crys, LaBrMaterial,
 				 "LaBr_log", 0, 0, 0);
 
-  LaBr_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0),
+  LaBr_phys = new G4PVPlacement(G4Transform3D(NoRot,*LaBrPos),
 				LaBr_log, "LaBr",
 				expHall_log, false, 0);
+
+  LaBrPMT = new G4Tubs("LaBrPMT", 0., LaBrPMT_R, LaBrPMT_Dz,
+			 0., 360.*deg);
+  
+  LaBrPMT_log = new G4LogicalVolume(LaBrPMT, LaBrPMTMaterial,
+				 "LaBrPMT_log", 0, 0, 0);
+
+  LaBrPMT_phys = new G4PVPlacement(G4Transform3D(NoRot,*LaBrPMTPos),
+				   LaBrPMT_log, "LaBrPMT",
+				   expHall_log, false, 0);
 
   // Visualization Attributes
 
@@ -36,6 +56,7 @@ G4VPhysicalVolume* LaBr::Construct()
   Vis->SetForceSolid(false);
 
   LaBr_log->SetVisAttributes(Vis);
+  LaBrPMT_log->SetVisAttributes(Vis);
 
   Report();
   
