@@ -116,6 +116,7 @@ void Beam_Tube::setMaterial(G4String materialName)
   // search the material by its name 
   BeamTubeMaterial = materials->FindMaterial(materialName);  
   BeamTube_log->SetMaterial(BeamTubeMaterial);
-  G4cout<<"----> Beam Tube material set to     "<<BeamTube_log->GetMaterial()->GetName()<< G4endl;                 
+  BeamTubeFlange_log->SetMaterial(BeamTubeMaterial);
+  G4cout<<" ----> Beam Tube material set to     "<<BeamTube_log->GetMaterial()->GetName()<< G4endl;                 
 }
 #endif
