@@ -131,6 +131,9 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
   a2Targetcmd = new G4UIcmdWithADouble("/BeamOut/setTargeta2",this);
   a4Targetcmd = new G4UIcmdWithADouble("/BeamOut/setTargeta4",this);
 
+  UpdateCmd = new G4UIcmdWithoutParameter("/BeamOut/Update",this);
+  UpdateCmd->SetGuidance("Set decay properties and report parameters for the incoming and outgoing beams.");
+  
 }
 
 
@@ -168,6 +171,7 @@ Outgoing_Beam_Messenger::~Outgoing_Beam_Messenger()
   delete a0cmd;
   delete a2cmd;
   delete a4cmd;
+  delete UpdateCmd;
 }
 
 
@@ -238,4 +242,6 @@ void Outgoing_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamOut->SetTargetCoeff(2,a2Targetcmd->GetNewDoubleValue(newValue));}
   if( command == a4Targetcmd )
     { BeamOut->SetTargetCoeff(4,a4Targetcmd->GetNewDoubleValue(newValue));}
+  if( command == UpdateCmd )
+    { BeamOut->Update();}
 }

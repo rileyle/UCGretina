@@ -118,7 +118,11 @@ Mandatory command after setting any GRETINA parameters:
 
 ### In-beam Simulations ###
 
-Commands related to the incoming beam:
+Mandatory command after all /BeamOut/ and /BeamIn/ commands:
+
+    /BeamOut/Update
+
+Optional commands related to the incoming beam:
 
     /BeamIn/A <A> /BeamIn/Z <Z>
 

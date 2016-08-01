@@ -55,6 +55,7 @@ class Outgoing_Beam_Messenger: public G4UImessenger
     G4UIcmdWithADouble*        a0cmd;
     G4UIcmdWithADouble*        a2cmd;
     G4UIcmdWithADouble*        a4cmd;
+    G4UIcmdWithoutParameter*   UpdateCmd;
 };
 
 
