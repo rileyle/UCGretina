@@ -32,13 +32,13 @@ Incoming_Beam::~Incoming_Beam()
 void Incoming_Beam::Report()
 {
 
-G4cout<<"----> Z of the incoming beam set to  "<<Z<< G4endl;
-G4cout<<"----> A of the incoming beam set to  "<<A<< G4endl;
-G4cout<<"----> Kin. En. of the incoming beam set to "<<
- G4BestUnit(KE,"Energy")<<G4endl;
-G4cout<<"----> Kin. En. per nucleon of the incoming beam set to "<<
- G4BestUnit(KEu,"Energy")<<G4endl;
- G4cout<<"----> momentum acceptance for the incoming beam set to  "<<Dpp<< G4endl;
+  G4cout<<"----> Z of the incoming beam set to  "<<Z<< G4endl;
+  G4cout<<"----> A of the incoming beam set to  "<<A<< G4endl;
+  G4cout<<"----> Kin. En. of the incoming beam set to "<<
+  G4BestUnit(KE,"Energy")<<G4endl;
+  G4cout<<"----> Kin. En. per nucleon of the incoming beam set to "<<
+  G4BestUnit(KEu,"Energy")<<G4endl;
+  G4cout<<"----> momentum acceptance for the incoming beam set to  "<<Dpp<< G4endl;
   G4cout<<"----> focal point X position for the incoming beam set to  "<<G4BestUnit(fcX,"Length")<< G4endl;
   G4cout<<"----> focal point DX size for the incoming beam set to  "<<G4BestUnit(fcDX,"Length")<< G4endl;
   G4cout<<"----> focal point Y position for the incoming beam set to  "<<G4BestUnit(fcY,"Length")<< G4endl;
@@ -52,7 +52,7 @@ void Incoming_Beam::setA(G4int Ain)
 {
 
   A=Ain;
-  G4cout<<"----> A of the incoming beam set to  "<<A<< G4endl;
+  //  G4cout<<"----> A of the incoming beam set to  "<<A<< G4endl;
   
 }
 //---------------------------------------------------------
@@ -60,7 +60,7 @@ void Incoming_Beam::setZ(G4int Zin)
 {
 
   Z=Zin;
-  G4cout<<"----> Z of the incoming beam set to  "<<Z<< G4endl;
+  //  G4cout<<"----> Z of the incoming beam set to  "<<Z<< G4endl;
   
 }
 //---------------------------------------------------------
@@ -68,56 +68,56 @@ void Incoming_Beam::setDpp(G4double d)
 {
 
   Dpp=d;
-  G4cout<<"----> momentum acceptance for the incoming beam set to  "<<Dpp<< G4endl;
+  //  G4cout<<"----> momentum acceptance for the incoming beam set to  "<<Dpp<< G4endl;
 }
 //---------------------------------------------------------
 void Incoming_Beam::setfcX(G4double d)
 {
 
   fcX=d;
-  G4cout<<"----> focal point X position for the incoming beam set to  "<<G4BestUnit(fcX,"Length")<< G4endl;
+  //  G4cout<<"----> focal point X position for the incoming beam set to  "<<G4BestUnit(fcX,"Length")<< G4endl;
 }
 //---------------------------------------------------------
 void Incoming_Beam::setfcDX(G4double d)
 {
 
   fcDX=d;
-  G4cout<<"----> focal point DX size for the incoming beam set to  "<<G4BestUnit(fcDX,"Length")<< G4endl;
+  //  G4cout<<"----> focal point DX size for the incoming beam set to  "<<G4BestUnit(fcDX,"Length")<< G4endl;
 }
 //---------------------------------------------------------
 void Incoming_Beam::setfcDY(G4double d)
 {
 
   fcDY=d;
-  G4cout<<"----> focal point DY size for the incoming beam set to  "<<G4BestUnit(fcDY,"Length")<< G4endl;
+  //  G4cout<<"----> focal point DY size for the incoming beam set to  "<<G4BestUnit(fcDY,"Length")<< G4endl;
 }
 //---------------------------------------------------------
 void Incoming_Beam::setfcY(G4double d)
 {
 
   fcY=d;
-  G4cout<<"----> focal point Y position for the incoming beam set to  "<<G4BestUnit(fcY,"Length")<< G4endl;
+  //  G4cout<<"----> focal point Y position for the incoming beam set to  "<<G4BestUnit(fcY,"Length")<< G4endl;
 }
 //---------------------------------------------------------
 void Incoming_Beam::setfcZ(G4double d)
 {
 
   fcZ=d;
-  G4cout<<"----> focal point Z position for the incoming beam set to  "<<G4BestUnit(fcZ,"Length")<< G4endl;
+  //  G4cout<<"----> focal point Z position for the incoming beam set to  "<<G4BestUnit(fcZ,"Length")<< G4endl;
 }
 //---------------------------------------------------------
 void Incoming_Beam::setmaxAta(G4double d)
 {
 
   maxAta=d;
-  G4cout<<"----> dispersive direction angular divergence for the incoming beam set to  "<<maxAta/mrad<<" mrad = "<<maxAta/deg<<" deg"<< G4endl;
+  //  G4cout<<"----> dispersive direction angular divergence for the incoming beam set to  "<<maxAta/mrad<<" mrad = "<<maxAta/deg<<" deg"<< G4endl;
 }
 //---------------------------------------------------------
 void Incoming_Beam::setmaxBta(G4double d)
 {
 
   maxBta=d;
-  G4cout<<"----> non dispersive direction angular divergence for the incoming beam set to  "<<maxBta/mrad<<" mrad = "<<maxBta/deg<<" deg"<< G4endl;
+  //  G4cout<<"----> non dispersive direction angular divergence for the incoming beam set to  "<<maxBta/mrad<<" mrad = "<<maxBta/deg<<" deg"<< G4endl;
 }
 //---------------------------------------------------------
 void Incoming_Beam::setKE(G4double KEin)
@@ -125,10 +125,10 @@ void Incoming_Beam::setKE(G4double KEin)
 
   KE=KEin;
   KEu=KE/A;
-G4cout<<"----> Kin. En. of the incoming beam set to "<<
- G4BestUnit(KE,"Energy")<<G4endl;
-G4cout<<"----> Kin. En. per nucleon of the incoming beam set to "<<
- G4BestUnit(KEu,"Energy")<<G4endl;
+  //G4cout<<"----> Kin. En. of the incoming beam set to "<<
+  // G4BestUnit(KE,"Energy")<<G4endl;
+  //G4cout<<"----> Kin. En. per nucleon of the incoming beam set to "<<
+  // G4BestUnit(KEu,"Energy")<<G4endl;
 }
 //-----------------------------------------------------------------
 void Incoming_Beam::setKEu(G4double KEuin)
@@ -136,10 +136,10 @@ void Incoming_Beam::setKEu(G4double KEuin)
 
   KEu=KEuin;
   KE=KEu*A;
-G4cout<<"----> Kin. En. of the incoming beam set to "<<
- G4BestUnit(KE,"Energy")<<G4endl;
-G4cout<<"----> Kin. En. per nucleon of the incoming beam set to "<<
- G4BestUnit(KEu,"Energy")<<G4endl; 
+  //G4cout<<"----> Kin. En. of the incoming beam set to "<<
+  // G4BestUnit(KE,"Energy")<<G4endl;
+  //G4cout<<"----> Kin. En. per nucleon of the incoming beam set to "<<
+  // G4BestUnit(KEu,"Energy")<<G4endl; 
 }
 //-----------------------------------------------------------------
 void Incoming_Beam::setDTAFile(G4String fileName)
