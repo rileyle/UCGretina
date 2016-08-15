@@ -86,6 +86,7 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	     << ", " << eventInfo->GetEmittedGammaPosZ(i)
 	     << " direction = " << eventInfo->GetEmittedGammaPhi(i)
 	     << ", " << eventInfo->GetEmittedGammaTheta(i)
+	     << " beta = " << eventInfo->GetBeta(i)
 	     << G4endl;
   }
 
