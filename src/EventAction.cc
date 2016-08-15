@@ -26,6 +26,7 @@ EventAction::EventAction()
   timerCount = 0;
   eventsPerSecond = 0;
   everyNevents = 1000;
+  posRes = 0.;
 }
 
 
@@ -376,6 +377,18 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 		  eventInfo->GetDTA(), 
 		  eventInfo->GetYTA());
 
+      // Fold position resolution measuredX, measuredY, measuredZ
+      // WARNING: this "smears" positions across the boundaries of
+      //          the active volume, which doesn't correspond to
+      //          the behavior of signal decomposition.
+      if(posRes > 0){
+	for(int i=0; i<NMeasured; i++) {
+	  measuredX[i] += CLHEP::RandGauss::shoot(0, posRes);
+	  measuredY[i] += CLHEP::RandGauss::shoot(0, posRes);
+	  measuredZ[i] += CLHEP::RandGauss::shoot(0, posRes);
+	}
+      }
+      
       // Write decomposed gamma event(s) to the output file
       writeDecomp(timestamp, 
 		  NMeasured, 

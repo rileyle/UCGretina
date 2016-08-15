@@ -501,6 +501,15 @@ Mandatory command for building the LH target (UCGretina_LH):
 Output can be written in ASCII and/or "Mode 2" binary format. Raw
 tracking information can also be written to standard output.
 
+### Position Resolution ###
+
+The optional command
+
+    /Output/PositionResolution <double> <unit>
+
+sets the sigma parameter of a random Gaussian distribution folded
+into the simulated gamma-ray interaction positions (default = 0). 
+
 ### ASCII Output ###
 
 The optional command
