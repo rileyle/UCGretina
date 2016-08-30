@@ -23,9 +23,8 @@
 /BeamOut/LevelSchemeFile sm152.lvl
 /BeamOut/Source
 /BeamOut/tau 0 ps
+/BeamOut/Update
 # Print simulation parameters to stdout ========================================
-/BeamIn/Report
-/BeamOut/Report
 /Target/Report
 /ExpHall/Report
 # Tracking parameters ==========================================================
