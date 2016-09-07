@@ -28,8 +28,6 @@
 /BeamOut/AngDistSigmaB 0.012 rad
 /BeamOut/Update
 # Print simulation parameters to stdout ========================================
-/BeamIn/Report
-/BeamOut/Report
 /Target/Report
 /ExpHall/Report
 # Tracking parameters ==========================================================

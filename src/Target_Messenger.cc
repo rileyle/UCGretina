@@ -33,6 +33,16 @@ Target_Messenger::Target_Messenger(Target* Tar)
   ScDTarCmd->SetParameterName("choice",false);
   ScDTarCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  PosXCmd = new G4UIcmdWithADoubleAndUnit("/Target/SetPosition_X",this);
+  PosXCmd->SetGuidance("Select the position of the target along the X axis.");
+  PosXCmd->SetParameterName("choice",false);
+  PosXCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  PosYCmd = new G4UIcmdWithADoubleAndUnit("/Target/SetPosition_Y",this);
+  PosYCmd->SetGuidance("Select the position of the target along the Y axis.");
+  PosYCmd->SetParameterName("choice",false);
+  PosYCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   PosZCmd = new G4UIcmdWithADoubleAndUnit("/Target/SetPosition_Z",this);
   PosZCmd->SetGuidance("Select the position of the target along the beam axis (Z direction.");
   PosZCmd->SetParameterName("choice",false);
@@ -66,6 +76,8 @@ Target_Messenger::~Target_Messenger()
   delete MatCmd;
   delete TargetDir;
   delete RepCmd;
+  delete PosXCmd;
+  delete PosYCmd;
   delete PosZCmd;
   delete ScDTarCmd;
   delete NSCmd;
@@ -84,10 +96,14 @@ void Target_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
    { aTarget->setY(YCmd->GetNewDoubleValue(newValue));}
   if( command == ZCmd )
    { aTarget->setZ(ZCmd->GetNewDoubleValue(newValue));}
- if( command == ScDTarCmd )
+  if( command == ScDTarCmd )
    { aTarget->ScaleDensity(ScDTarCmd->GetNewDoubleValue(newValue));}
- if( command == PosZCmd )
-   { aTarget->SetPositionZ(PosZCmd->GetNewDoubleValue(newValue));}
+  if( command == PosXCmd )
+   { aTarget->SetPosition(PosXCmd->GetNewDoubleValue(newValue), 0., 0.);}
+  if( command == PosYCmd )
+   { aTarget->SetPosition(0., PosYCmd->GetNewDoubleValue(newValue), 0.);}
+  if( command == PosZCmd )
+   { aTarget->SetPosition(0., 0., PosZCmd->GetNewDoubleValue(newValue));}
   if( command == NSCmd )
    { aTarget->setNStep(NSCmd->GetNewIntValue(newValue));}
   if( command == RepCmd )

@@ -59,6 +59,10 @@ Optional commands for setting target parameters:
 
     /Target/Y_length <double> <unit>
 
+    /Target/SetPosition_X <double> <unit>
+
+    /Target/SetPosition_Y <double> <unit>
+
     /Target/SetPosition_Z <double> <unit>
 
     /Target/Thickness <double> <unit>
@@ -111,6 +115,10 @@ Optional commands for including GRETINA-related dead material:
 Optional command to omit the GRETINA detectors:
 
     /Gretina/NoDetectors
+
+Optional command to include a model of the S800 quadrupole:
+
+    /Gretina/S800
 
 Mandatory command after setting any GRETINA parameters:
 

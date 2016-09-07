@@ -42,7 +42,8 @@ class Target
   G4VPhysicalVolume* GetTargetPlacement(){return Target_phys;}
   void setTargetReactionDepth(G4double);
   void ScaleDensity(G4double);
-  void SetPositionZ(G4double);
+  //  void SetPositionZ(G4double);
+  void SetPosition(G4double, G4double, G4double);
   G4double GetTargetThickness(){return Target_thickness;}
   G4ThreeVector* GetPos(){return Pos;}
 
