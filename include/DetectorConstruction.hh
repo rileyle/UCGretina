@@ -29,6 +29,8 @@
 #include "Gretina_NSCL_Shell.hh"
 #include "Greta_Shell.hh"
 #include "Gretina_Array.hh"
+#include "S800.hh"
+#include "LaBr.hh"
 #include "G4LogicalVolume.hh"
 #include "G4VPhysicalVolume.hh"
 #include "TrackerIonSD.hh"
@@ -86,6 +88,8 @@ public:
 
 #ifndef SCANNING
   void SetShellStatus(G4String stat){shellStatus = stat;}
+  void SetS800Status(G4bool stat){s800Status = stat;}
+  void SetLaBrStatus(G4bool stat){laBrStatus = stat;}
 #endif
   
   void Placement();
@@ -105,7 +109,7 @@ private:
 #ifndef SCANNING
   G4bool beamTubeStatus;
   Beam_Tube* BeamTube;
-
+  
   G4bool gretaChamberStatus;
   Greta_Chamber* GretaChamber;
 
@@ -119,6 +123,10 @@ private:
 
 #ifndef SCANNING
   G4String shellStatus;
+  G4bool   s800Status;
+  S800*    the_S800;
+  G4bool   laBrStatus;
+  LaBr*    the_LaBr;
 #endif
   
   Gretina_Array*   the_Gretina_Array;
@@ -168,6 +176,8 @@ private:
   G4UIcmdWithoutParameter*     NoGretCmd;
 #ifndef SCANNING
   G4UIcmdWithAString*          ShellCmd;
+  G4UIcmdWithoutParameter*     S800Cmd;
+  G4UIcmdWithoutParameter*     LaBrCmd;
 #endif
 #ifndef LHTARGET
 #ifndef SCANNING
@@ -178,7 +188,7 @@ private:
   G4UIcmdWithAString*          CloverCmd;
 #endif
 #endif
-  
+ 
 public:
   void SetNewValue(G4UIcommand*, G4String);
 };

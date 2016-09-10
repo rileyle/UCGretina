@@ -120,16 +120,59 @@ void Target::setTargetReactionDepth(G4double depth)
   target_limits->SetUserMinRange(depth);
 }
 //-----------------------------------------------------------------------------
-void Target::SetPositionZ(G4double d)
+void Target::SetPosition(G4double x, G4double y, G4double z)
 {
-  Pos->setZ(d);
+
   G4ThreeVector Sep;
-  Sep.setX(Pos->getX());
-  Sep.setY(Pos->getY()); 
-  Sep.setZ(Pos->getZ());
+  Sep.setX(Pos->getX() + x);
+  Sep.setY(Pos->getY() + y);
+  Sep.setZ(Pos->getZ() + z);
   Target_phys->SetTranslation(Sep);
-  d=Target_phys->GetTranslation().getZ();
-  G4cout<<"----> Target position is set to "<<G4BestUnit(d,"Length")<<G4endl;
+
+  if(sledFrame_phys != NULL){
+    sledFrame_phys->SetTranslation(sledFrame_phys->GetTranslation() + Sep);
+  }
+  if(sledRunner1_phys != NULL){
+    sledRunner1_phys->SetTranslation(sledRunner1_phys->GetTranslation() + Sep);
+  }
+  if(sledRunner2_phys != NULL){
+    sledRunner2_phys->SetTranslation(sledRunner2_phys->GetTranslation() + Sep);
+  }  
+  if(sledBar != NULL){
+    std::vector<G4VPhysicalVolume*>::iterator it
+      = sledBar->GetVolumesIterator();
+    for (unsigned int i = 0; i < sledBar->TotalImprintedVolumes(); i++){
+      (*it)->SetTranslation((*it)->GetTranslation() + Sep);
+      it++;
+    }
+  }
+  if(euFrame_phys != NULL){
+    euFrame_phys->SetTranslation(euFrame_phys->GetTranslation() + Sep);
+  }
+  if(euTape_phys != NULL){
+    euTape_phys->SetTranslation(euTape_phys->GetTranslation() + Sep);
+  }
+  if(csFrame_phys != NULL){
+    csFrame_phys->SetTranslation(csFrame_phys->GetTranslation() + Sep);
+  }
+  if(csRing_phys != NULL){
+    csRing_phys->SetTranslation(csRing_phys->GetTranslation() + Sep);
+  }
+  if(csTape_phys != NULL){
+    csTape_phys->SetTranslation(csTape_phys->GetTranslation() + Sep);
+  }
+  if(coFrame_phys != NULL){
+    coFrame_phys->SetTranslation(coFrame_phys->GetTranslation() + Sep);
+  }
+
+  x=Target_phys->GetTranslation().getX();
+  y=Target_phys->GetTranslation().getY();
+  z=Target_phys->GetTranslation().getZ();
+  G4cout <<"----> Target position is set to "
+	 << G4BestUnit(x,"Length") << ", "
+    	 << G4BestUnit(y,"Length") << ", "
+	 << G4BestUnit(z,"Length") << ", "
+	 << G4endl;
 }
 //---------------------------------------------------------------------
 void Target::ScaleDensity(G4double scale)
@@ -326,7 +369,7 @@ void Target::setSled()
   Rot0 = G4RotationMatrix::IDENTITY;  
   Rot0.rotateZ(45.*deg);
   sledBar->MakeImprint(expHall_log, *Pos0, &Rot0);
-
+  
   G4cout << "----> Including the target sled." << G4endl;
 }
 //-------------------------------------------------------------------

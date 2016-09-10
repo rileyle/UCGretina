@@ -7,10 +7,19 @@ Beam_Tube::Beam_Tube(G4LogicalVolume* experimentalHall_log,Materials* mat)
   expHall_log=experimentalHall_log;
   BTrmin = 3.0*2.54*cm - 0.058*2.54*cm;
   BTrmax = 3.0*2.54*cm;
-  BTDz=44.*cm; //LR (approx target to gate valve flange)
-  BTSPhi=0.*deg;
-  BTDPhi=360*deg; 
-  Pos0 = new G4ThreeVector(0.,0.,0.);
+  BTDz   = 40.65/2.*2.54*cm; 
+  BTSPhi = 0.*deg;
+  BTDPhi = 360*deg;
+  BTOffset = -5.605*2.54*cm;
+
+  BTFlangeRmin   = BTrmax;
+  BTFlangeRmax   = 13.19/2.0*2.54*cm;
+  BTFlangeDz     = 0.55/2.0*2.54*cm;
+  BTFlangeOffset = (14.762-0.3)*2.54*cm;
+
+  //  Pos0 = new G4ThreeVector(0.,0.,0.);
+  BTPos       = new G4ThreeVector(0., 0., BTOffset);
+  BTFlangePos = new G4ThreeVector(0., 0., BTFlangeOffset);
   BeamTubeMaterial = materials->FindMaterial("Al");
 
 }
@@ -23,10 +32,29 @@ G4VPhysicalVolume* Beam_Tube::Construct()
 
   BeamTube = new G4Tubs("BeamTube",BTrmin,BTrmax,BTDz,BTSPhi,BTDPhi);
   
-  BeamTube_log = new G4LogicalVolume(BeamTube,BeamTubeMaterial,"BeamTube_log",0,0,0);
+  BeamTube_log = new G4LogicalVolume(BeamTube,
+				     BeamTubeMaterial,
+				     "BeamTube_log",
+				     0,0,0);
 
-  BeamTube_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos0),
-			     BeamTube_log,"BeamTube",expHall_log,false,0);
+  BeamTube_phys = new G4PVPlacement(G4Transform3D(NoRot, *BTPos),
+				    BeamTube_log,
+				    "BeamTube",
+				    expHall_log, false, 0);
+
+  BeamTubeFlange = new  G4Tubs("BeamTubeFlange",
+			       BTFlangeRmin, BTFlangeRmax, BTFlangeDz,
+			       BTSPhi, BTDPhi);
+  
+  BeamTubeFlange_log = new G4LogicalVolume(BeamTubeFlange,
+					   BeamTubeMaterial,
+					   "BeamTubeFlange_log",
+					   0,0,0);
+
+  BeamTubeFlange_phys = new G4PVPlacement(G4Transform3D(NoRot,*BTFlangePos),
+					  BeamTubeFlange_log,
+					  "BeamTubeFlange",
+					  expHall_log, false, 0);
 
   // Visualization Attributes
 
@@ -36,6 +64,7 @@ G4VPhysicalVolume* Beam_Tube::Construct()
   Vis->SetForceSolid(false);
 
   BeamTube_log->SetVisAttributes(Vis);
+  BeamTubeFlange_log->SetVisAttributes(Vis);
 
   return BeamTube_phys;
 }
@@ -87,6 +116,7 @@ void Beam_Tube::setMaterial(G4String materialName)
   // search the material by its name 
   BeamTubeMaterial = materials->FindMaterial(materialName);  
   BeamTube_log->SetMaterial(BeamTubeMaterial);
-  G4cout<<"----> Beam Tube material set to     "<<BeamTube_log->GetMaterial()->GetName()<< G4endl;                 
+  BeamTubeFlange_log->SetMaterial(BeamTubeMaterial);
+  G4cout<<" ----> Beam Tube material set to     "<<BeamTube_log->GetMaterial()->GetName()<< G4endl;                 
 }
 #endif

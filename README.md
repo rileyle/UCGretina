@@ -59,6 +59,10 @@ Optional commands for setting target parameters:
 
     /Target/Y_length <double> <unit>
 
+    /Target/SetPosition_X <double> <unit>
+
+    /Target/SetPosition_Y <double> <unit>
+
     /Target/SetPosition_Z <double> <unit>
 
     /Target/Thickness <double> <unit>
@@ -112,13 +116,21 @@ Optional command to omit the GRETINA detectors:
 
     /Gretina/NoDetectors
 
+Optional command to include a model of the S800 quadrupole:
+
+    /Gretina/S800
+
 Mandatory command after setting any GRETINA parameters:
 
     /Gretina/update
 
 ### In-beam Simulations ###
 
-Commands related to the incoming beam:
+Mandatory command after all /BeamOut/ and /BeamIn/ commands:
+
+    /BeamOut/Update
+
+Optional commands related to the incoming beam:
 
     /BeamIn/A <A> /BeamIn/Z <Z>
 
@@ -496,6 +508,15 @@ Mandatory command for building the LH target (UCGretina_LH):
 
 Output can be written in ASCII and/or "Mode 2" binary format. Raw
 tracking information can also be written to standard output.
+
+### Position Resolution ###
+
+The optional command
+
+    /Output/PositionResolution <double> <unit>
+
+sets the sigma parameter of a random Gaussian distribution folded
+into the simulated gamma-ray interaction positions (default = 0). 
 
 ### ASCII Output ###
 

@@ -63,6 +63,8 @@ class EventAction : public G4UserEventAction
     void SetEveryNEvents(G4int n){everyNevents = n;}
     G4int GetEveryNEvents(){return everyNevents;}
 
+    void SetPosRes(G4double res){posRes = res;}
+  
   private:
     G4int ionCollectionID;
     G4int gammaCollectionID;
@@ -85,7 +87,8 @@ class EventAction : public G4UserEventAction
     G4bool print;
     G4bool fisInBeam;
     G4int NTotalEvents;
-
+    G4double posRes;
+  
     G4int timerCount;
     G4int everyNevents;
     G4double eventsPerSecond;

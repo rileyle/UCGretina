@@ -31,6 +31,8 @@ private:
   G4UIcmdWithADoubleAndUnit* XCmd;
   G4UIcmdWithADoubleAndUnit* YCmd;
   G4UIcmdWithADoubleAndUnit* ZCmd;
+  G4UIcmdWithADoubleAndUnit* PosXCmd;
+  G4UIcmdWithADoubleAndUnit* PosYCmd;
   G4UIcmdWithADoubleAndUnit* PosZCmd;
   G4UIcmdWithADouble*        ScDTarCmd;
   G4UIcmdWithoutParameter*   RepCmd;

@@ -32,6 +32,7 @@ Outgoing_Beam::Outgoing_Beam()
   NQ=1;SQ=0;
   SetUpChargeStates();
   beamIn = NULL;
+  DecTab = NULL;
 }
 
 Outgoing_Beam::~Outgoing_Beam()
@@ -155,7 +156,6 @@ void Outgoing_Beam::setDecayProperties()
       m4 = tarOutGS->GetPDGMass();
   }
 
-  G4DecayTable *DecTab = NULL;
   GammaDecayChannel *GamDec = NULL;
   G4ProcessManager *pm = NULL;
   G4ParticleDefinition* product;
@@ -170,7 +170,7 @@ void Outgoing_Beam::setDecayProperties()
     relPop[0] = 1.0;
 
     G4cout << "Constructing decay properties for Z = " << product->GetAtomicNumber()
-	   << " A = " << product->GetAtomicMass() << " with excitation energy " << Ex/keV << " keV" << G4endl;
+    	   << " A = " << product->GetAtomicMass() << " with excitation energy " << Ex/keV << " keV" << G4endl;
     G4cout << "Direct gamma decay to the ground state." << G4endl;
 
     product->SetPDGStable(false);
@@ -207,11 +207,11 @@ void Outgoing_Beam::setDecayProperties()
     Nlevels = 0;
     while(lvlSchemeFile >> levelEnergy[Nlevels] >> nBranch >> meanLife >> relPop[Nlevels]){
       G4cout << "Constructing decay properties for Z=" << Zin + DZ
-	     << " A=" << Ain + DA 
-	     << " with excitation " << levelEnergy[Nlevels] 
-	     << " keV, mean lifetime " << meanLife
-	     << " ps, relative population " << relPop[Nlevels]
-	     << G4endl;
+      	     << " A=" << Ain + DA 
+      	     << " with excitation " << levelEnergy[Nlevels] 
+      	     << " keV, mean lifetime " << meanLife
+      	     << " ps, relative population " << relPop[Nlevels]
+      	     << G4endl;
       if(Nlevels>0) relPop[Nlevels] += relPop[Nlevels-1];
       for(G4int j = 0; j < nBranch; j++){
 	lvlSchemeFile >> BR >> Exf >> a0 >> a2 >> a4;
@@ -480,7 +480,7 @@ void Outgoing_Beam::setXsectFile(G4String fileName)
 //---------------------------------------------------------
 void Outgoing_Beam::Report()
 {
-  setDecayProperties();
+  //  setDecayProperties();
 
   G4cout<<"----> Delta A for the outgoing beam set to  "<<DA<< G4endl;
   G4cout<<"----> Delta Z for the outgoing beam set to  "<<DZ<< G4endl;
@@ -495,10 +495,9 @@ void Outgoing_Beam::Report()
   G4cout<<"----> Mass of the outgoing beam-like reaction product is " <<ion->GetPDGMass()<<" MeV"<<G4endl;
   if(tarOut != NULL)
     G4cout<<"----> Mass of the outgoing target-like reaction product is " <<tarOut->GetPDGMass()<<" MeV"<<G4endl;
-  G4cout<<"----> Lifetime of the excited state for the outgoing beam set to "<<
-    G4BestUnit(tau,"Time")<<G4endl; 
   G4cout<<"----> Sigma for ata distribution set to "<<sigma_a<<G4endl;
   G4cout<<"----> Sigma for bta distribution set to "<<sigma_b<<G4endl;
+
   G4cout<<"----> Number of charge states "<<NQ<<G4endl;
   vector<Charge_State*>::iterator itPos = Q.begin();
   for(; itPos < Q.end(); itPos++) 
@@ -524,14 +523,14 @@ void Outgoing_Beam::setDA(G4int da)
 {
 
   DA=da;
- G4cout<<"----> Delta A for the outgoing beam set to  "<<DA<< G4endl; 
+  // G4cout<<"----> Delta A for the outgoing beam set to  "<<DA<< G4endl; 
 }
 //---------------------------------------------------------
 void Outgoing_Beam::setDZ(G4int dz)
 {
 
   DZ=dz;
-  G4cout<<"----> Delta Z for the outgoing beam set to  "<<DZ<< G4endl;
+  //  G4cout<<"----> Delta Z for the outgoing beam set to  "<<DZ<< G4endl;
   
 }
 //---------------------------------------------------------
@@ -540,8 +539,8 @@ void Outgoing_Beam::setEx(G4double ex)
 
   Ex=ex;
   
-G4cout<<"----> Excitation energy of the outgoing beam set to "<<
- G4BestUnit(Ex,"Energy")<<G4endl;
+  //  G4cout<<"----> Excitation energy of the outgoing beam set to "<<
+  //  G4BestUnit(Ex,"Energy")<<G4endl;
 
 }
 //---------------------------------------------------------
@@ -550,7 +549,7 @@ void Outgoing_Beam::setTarEx(G4double ex)
 
   TarEx=ex;
   
-G4cout<<"----> Target excitation energy set to "<< G4BestUnit(TarEx,"Energy")<<G4endl;
+  //G4cout<<"----> Target excitation energy set to "<< G4BestUnit(TarEx,"Energy")<<G4endl;
 
 }
 //---------------------------------------------------------
@@ -559,7 +558,7 @@ void Outgoing_Beam::setTarA(G4int a)
 
   TarA = a;
   
-  G4cout<<"----> Target A set to "<< TarA <<G4endl;
+  //  G4cout<<"----> Target A set to "<< TarA <<G4endl;
 
 }
 //---------------------------------------------------------
@@ -568,7 +567,7 @@ void Outgoing_Beam::setTarZ(G4int z)
 
   TarZ = z;
   
-  G4cout<<"----> Target Z set to "<< TarZ <<G4endl;
+  //  G4cout<<"----> Target Z set to "<< TarZ <<G4endl;
 
 }
 //---------------------------------------------------------
@@ -579,7 +578,7 @@ void Outgoing_Beam::setTFrac(G4double ex)
   if(TFrac<0) TFrac=0.;
 
   
-G4cout<<"----> Fraction of target excitations set to "<<TFrac<<G4endl;
+  //G4cout<<"----> Fraction of target excitations set to "<<TFrac<<G4endl;
 
 }
 //-----------------------------------------------------------------
@@ -588,8 +587,8 @@ void Outgoing_Beam::settau(G4double t)
 
   tau=t;
 
-G4cout<<"----> Lifetime of the excited state for the outgoing beam set to "<<
- G4BestUnit(tau,"Time")<<G4endl; 
+  //G4cout<<"----> Lifetime of the excited state for the outgoing beam set to "<<
+  // G4BestUnit(tau,"Time")<<G4endl; 
 }
 //---------------------------------------------------------
 void Outgoing_Beam::SetUpChargeStates()

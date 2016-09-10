@@ -32,6 +32,7 @@ public:
   ~Outgoing_Beam();
 
   void Report();
+  void Update(){ beamIn->Report(); setDecayProperties(); Report(); }
   void defaultIncomingIon(Incoming_Beam *);
   void setDecayProperties(void);
   void setDA(G4int);
@@ -40,7 +41,7 @@ public:
   void setProjectileExcitation(){ targetExcitation = false; }
   void setTargetExcitation(){ targetExcitation = true; }
   G4bool TargetExcitation(){ return targetExcitation; }
-  void setLvlSchemeFile(G4String name){lvlSchemeFileName = name;}
+  void setLvlSchemeFile(G4String name){ lvlSchemeFileName = name; }
   void openLvlSchemeFile();
   void closeLvlSchemeFile();
   void setTarA(G4int);
@@ -136,7 +137,9 @@ private:
   G4ParticleDefinition* tarIn;
   G4ParticleDefinition* tarOut;
   G4ParticleDefinition* tarOutGS;
- 
+  
+  G4DecayTable *DecTab;
+  
   static G4Decay decay;
   G4bool  reacted;
   G4bool  source;

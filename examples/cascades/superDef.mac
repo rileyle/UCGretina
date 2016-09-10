@@ -26,6 +26,7 @@
 /BeamOut/tau 0 ps
 /BeamOut/AngDistSigmaA 0.012 rad
 /BeamOut/AngDistSigmaB 0.012 rad
+/BeamOut/Update
 # Print simulation parameters to stdout ========================================
 /BeamIn/Report
 /BeamOut/Report

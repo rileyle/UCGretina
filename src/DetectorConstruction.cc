@@ -6,6 +6,8 @@ DetectorConstruction::DetectorConstruction()
   targetStatus   = false;
 #ifndef SCANNING
   shellStatus    = "";
+  s800Status     = false;
+  laBrStatus     = false;
 #endif
   
 #ifndef LHTARGET
@@ -96,6 +98,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 #endif
 #endif
 
+#ifndef SCANNING  
+  // S800 Quadrupole
+  the_S800 = new S800(ExpHall_log,materials);
+  the_LaBr = new LaBr(ExpHall_log,materials);
+#endif
+  
   // Target
 
   aTarget = new Target(ExpHall_log,materials);
@@ -133,6 +141,12 @@ void DetectorConstruction::DefineMaterials()
   G4Element* elO  = new G4Element(name="Oxigen",   symbol="O",  z=8.,  a= 15.9994 *g/mole);
   myElements.push_back(elO);
 
+  G4Element* elBr = new G4Element(name="Bromine", symbol="Br", z=35, a=79.904 *g/mole);
+  myElements.push_back(elBr);
+
+  G4Element* elLa = new G4Element(name="Lanthanum", symbol="La", z=57, a=138.90547*g/mole);
+  myElements.push_back(elLa);
+
   G4Material* Air = new G4Material(name="Air", density=1.29*mg/cm3, nelements=2);
   Air->AddElement(elN, .7);
   Air->AddElement(elO, .3);
@@ -163,6 +177,11 @@ void DetectorConstruction::DefineMaterials()
   Ge->AddElement(elGe, natoms=1);
   myMaterials.push_back(Ge);
 
+  G4Material* LaBr3 = new G4Material(name="LaBr3", density=5.08 *g/cm3, nelements=2);
+  LaBr3->AddElement(elLa, 0.25);
+  LaBr3->AddElement(elBr, 0.75);
+  myMaterials.push_back(LaBr3);
+  
   //LR TMP
   G4Material* GeLite = new G4Material(name="GermaniumLite", density=4.7907 *g/cm3, nelements=1);
   GeLite->AddElement(elGe, natoms=1);
@@ -201,8 +220,6 @@ void DetectorConstruction::DefineMaterials()
   G4Material* Alplus200 = new G4Material(name="AluminiumPlus200", z=13., a= 26.98154*g/mole, density= 2.70  *g/cm3*3.0);
   myMaterials.push_back(Alplus200);
 
-  //END LR TMP
-  
   G4Element* elCu = new G4Element(name="Copper",   symbol="Cu", z=29., a=63.546    *g/mole);
   myElements.push_back(elCu);
 
@@ -295,6 +312,12 @@ void DetectorConstruction::Placement()
     Greta_Shell* Shell = new Greta_Shell();
     Shell->Placement(shellStatus);
   }
+  if( s800Status ){
+    the_S800->Construct();
+  }
+  if( laBrStatus ){
+    the_LaBr->Construct();
+  }
 #endif
 
   if(gretinaStatus)
@@ -365,6 +388,18 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
   ShellCmd = new G4UIcmdWithAString(aLine, this);
   ShellCmd->SetGuidance("Construct the GRETINA mounting shell (full/north/south).");
   ShellCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  commandName = "/Gretina/S800";
+  aLine = commandName.c_str();
+  S800Cmd = new G4UIcmdWithoutParameter(aLine, this);
+  S800Cmd->SetGuidance("Construct the S800 Quadrupole.");
+  S800Cmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  commandName = "/Gretina/LaBr";
+  aLine = commandName.c_str();
+  LaBrCmd = new G4UIcmdWithoutParameter(aLine, this);
+  LaBrCmd->SetGuidance("Construct the LaBr.");
+  LaBrCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 #endif
   
 }
@@ -376,6 +411,8 @@ DetectorConstruction_Messenger::~DetectorConstruction_Messenger()
   delete NoGretCmd;
 #ifndef SCANNING
   delete ShellCmd;
+  delete S800Cmd;
+  delete LaBrCmd;
 #endif
 #ifndef LHTARGET
 #ifndef SCANNING
@@ -421,6 +458,13 @@ void DetectorConstruction_Messenger::SetNewValue(G4UIcommand* command,G4String n
   if( command == ShellCmd ) {
     myTarget->SetShellStatus(newValue);
   }
+  if( command == S800Cmd ) {
+    myTarget->SetS800Status(true);
+  } 
+  if( command == LaBrCmd ) {
+    myTarget->SetLaBrStatus(true);
+  } 
+
 #endif
 
 }
