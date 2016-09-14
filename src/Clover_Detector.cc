@@ -9,7 +9,7 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   materials=mat;
   expHall_log=experimentalHall_log;
 
-  HpGe = materials->FindMaterial("HpGe");
+  HpGe = materials->FindMaterial("Germanium");
   Al = materials->FindMaterial("Al");
   Cu = materials->FindMaterial("Cu");
 

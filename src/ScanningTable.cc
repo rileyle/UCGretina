@@ -44,7 +44,7 @@ ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,
   materialTranslationAssembly = materials->FindMaterial("ssteel");
   materialCsCollimator = materials->FindMaterial("Hevimet");
   materialCsCollimatorMount = materials->FindMaterial("Al");
-  materialClover = materials->FindMaterial("HpGe");
+  materialClover = materials->FindMaterial("Germanium");
   materialCloverShield = materials->FindMaterial("Al");
   materialRollers = materials->FindMaterial("G4_TEFLON");
   materialCuTarget = materials->FindMaterial("Cu");

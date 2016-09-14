@@ -15,7 +15,7 @@ LaBr::LaBr(G4LogicalVolume* experimentalHall_log,Materials* mat)
   LaBrPMT_R  = 1.*2.54*cm;
   LaBrPMT_Dz = 3.*2.54*cm;
 
-  LaBrPMTMaterial = materials->FindMaterial("Aluminium");
+  LaBrPMTMaterial = materials->FindMaterial("Al");
 
   LaBrPMTPos = new G4ThreeVector(0., 0.,
 				 -LaBr_Dz-LaBrPMT_Dz-1.5*2.54*cm);

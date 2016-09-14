@@ -68,14 +68,14 @@ void Gretina_Array::InitData()
 
   matCrystName       = "Germanium";
 
-  matWallsName       = "Aluminium";
+  matWallsName       = "Al";
 
   matBackWallsName   = "BackWallMaterial";
-  //  matBackWallsName   = "Aluminium";
+  //  matBackWallsName   = "Al";
 
-  matHoleName        = "Vacuum";
+  matHoleName        = "G4_Galactic";
 
-  matCryoName        = "Aluminium";
+  matCryoName        = "Al";
 
   nEuler             = 0;
   eulerFile          = iniPath + "aeuler";
