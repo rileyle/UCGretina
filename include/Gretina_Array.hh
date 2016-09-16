@@ -274,7 +274,7 @@ class Gretina_Array
   /// public interface to the private method!
   ////////////////////////////////////////////////
   public:
-    G4int     GetSegmentNumber         ( G4int, G4int, G4ThreeVector );    
+    G4int     GetSegmentNumber         ( G4int, G4ThreeVector );    
   
   //////////////////////////////////
   /// writes out the information

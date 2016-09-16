@@ -106,7 +106,7 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
       = (DetectorConstruction*)runManager->GetUserDetectorConstruction();
 
     segCode = 
-      theDetector->GetGretina()->GetSegmentNumber( 0, detCode, posSol );
+      theDetector->GetGretina()->GetSegmentNumber( detCode, posSol );
 
     // Modify sector number to match GRETINA data stream
     G4int slice  = segCode/10;

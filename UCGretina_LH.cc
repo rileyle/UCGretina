@@ -37,7 +37,7 @@ int main(int argc,char** argv)
 
   cout << "Instantiating DetectorConstruction ..." << endl;
   // set mandatory initialization classes
-  DetectorConstruction* detector=new DetectorConstruction();
+  DetectorConstruction* detector = new DetectorConstruction();
   runManager->SetUserInitialization(detector);
 
   PhysicsList *physicsList = new PhysicsList(detector);
@@ -49,8 +49,7 @@ int main(int argc,char** argv)
   Incoming_Beam* BeamIn = new Incoming_Beam();
   Incoming_Beam_Messenger* IncomingBeamMessenger = new Incoming_Beam_Messenger(BeamIn);
 
-  Outgoing_Beam* BeamOut=new Outgoing_Beam();
-  BeamOut=new Outgoing_Beam();
+  Outgoing_Beam* BeamOut = new Outgoing_Beam();
   BeamOut->defaultIncomingIon(BeamIn);
   physicsList->SetOutgoingBeam(BeamOut);
   Outgoing_Beam_Messenger* OutgoingBeamMessenger = new Outgoing_Beam_Messenger(BeamOut);
@@ -60,7 +59,7 @@ int main(int argc,char** argv)
   EventAction_Messenger* eventActionMessenger = new EventAction_Messenger(eventAction);
   runManager->SetUserAction(eventAction);
 
-  PrimaryGeneratorAction* generatorAction= new PrimaryGeneratorAction(detector,BeamIn,BeamOut);
+  PrimaryGeneratorAction* generatorAction = new PrimaryGeneratorAction(detector,BeamIn,BeamOut);
   PrimaryGeneratorAction_Messenger* generatorActionMessenger = new PrimaryGeneratorAction_Messenger(generatorAction);
 
   runManager->SetUserAction(generatorAction);
@@ -128,9 +127,19 @@ int main(int argc,char** argv)
 #endif
   }
 
+  delete runManager;
+
+  delete BeamIn;
+
+  delete IncomingBeamMessenger;
+
   delete BeamOut;
 
-  delete runManager;
+  delete OutgoingBeamMessenger;
+
+  delete eventActionMessenger;
+
+  delete generatorActionMessenger;
 
   return 0;
 }

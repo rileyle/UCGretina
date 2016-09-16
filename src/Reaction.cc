@@ -22,9 +22,13 @@ Reaction::~Reaction()
 }                                     
 
 // In-flight reaction
+// G4VParticleChange* Reaction::PostStepDoIt(
+// 			     const G4Track& aTrack,
+// 			     const G4Step& aStep
+// 			    )
 G4VParticleChange* Reaction::PostStepDoIt(
 			     const G4Track& aTrack,
-			     const G4Step& aStep
+			     const G4Step&           // (unused parameter)
 			    )
 {
 
@@ -182,9 +186,13 @@ G4double Reaction::PostStepGetPhysicalInteractionLength(
 }
 
 // Stationary source decay
+// G4VParticleChange* Reaction::AtRestDoIt(
+// 			     const G4Track& aTrack,
+// 			     const G4Step& aStep
+// 			    )
 G4VParticleChange* Reaction::AtRestDoIt(
 			     const G4Track& aTrack,
-			     const G4Step& aStep
+			     const G4Step&          // unused parameter
 			    )
 {
 
@@ -223,8 +231,12 @@ G4VParticleChange* Reaction::AtRestDoIt(
 }
 
 // Trigger the decay of a stationary source
+// G4double Reaction::AtRestGetPhysicalInteractionLength(
+//                              const G4Track& aTrack,
+//                              G4ForceCondition* condition
+//                             )
 G4double Reaction::AtRestGetPhysicalInteractionLength(
-                             const G4Track& aTrack,
+		             const G4Track& ,              // unused parameter
                              G4ForceCondition* condition
                             )
 {

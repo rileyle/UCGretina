@@ -30,8 +30,10 @@ TrackerGammaSD_Messenger::~TrackerGammaSD_Messenger()
 
 
 
+//void TrackerGammaSD_Messenger::SetNewValue(G4UIcommand* command,
+//					   G4String newValue)
 void TrackerGammaSD_Messenger::SetNewValue(G4UIcommand* command,
-					   G4String newValue)
+					   G4String )
 { 
 
   if( command == PrtGSCmd )

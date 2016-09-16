@@ -259,9 +259,9 @@ void Gretina_NSCL_Shell::Placement(G4String status)
 
   shell = new G4SubtractionSolid ("Shell",shell,s800notch,G4Transform3D(Rot,PosNotch));
 
-  G4Tubs* s800plane = new G4Tubs( "s800plane", 0., 1.1*Rmax, Rmax, 0., 360.*deg);
+  //  G4Tubs* s800plane = new G4Tubs( "s800plane", 0., 1.1*Rmax, Rmax, 0., 360.*deg);
 
-  Rot = G4RotationMatrix::IDENTITY;
+  //  Rot = G4RotationMatrix::IDENTITY;
 
   //  G4LogicalVolume* logicPlane = new G4LogicalVolume(s800plane, matShell, "Plane_log", 0, 0, 0 );
 
