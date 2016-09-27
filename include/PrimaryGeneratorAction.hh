@@ -6,6 +6,7 @@
 #include "G4Event.hh"
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
+#include "G4IonTable.hh"
 #include "G4ParticleDefinition.hh"
 #include "DetectorConstruction.hh"
 #include "Incoming_Beam.hh"
@@ -69,6 +70,7 @@ private:
   G4int n_particle;
   G4ParticleGun* particleGun;
   G4ParticleTable* particleTable;
+  G4IonTable* ionTable;
   G4ParticleDefinition* ion;
   G4ThreeVector  direction;
   G4ThreeVector  position;

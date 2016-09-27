@@ -9,14 +9,14 @@ AngularDistribution::AngularDistribution() {
 	ai[0] = 1;
 	ai[1] = 0;
 	ai[2] = 0;
-	FillPDF();
+	//	FillPDF();
 }
 /***************************************************************/
 AngularDistribution::AngularDistribution(double a0,double a2,double a4) {
 	ai[0] = a0;
 	ai[1] = a2;
 	ai[2] = a4;
-	FillPDF();
+	//	FillPDF();
 }
 /***************************************************************/
 AngularDistribution::~AngularDistribution() {
@@ -29,7 +29,7 @@ double AngularDistribution::GetCoeff(int index) {
 void AngularDistribution::SetCoeff(int index,double value) {
   //	printf("inside SetCoeff(%i,%f)\n",index,value);
 	ai[index/2] = value;
-	FillPDF();
+	//	FillPDF();
 	return;
 }
 /***************************************************************/
@@ -37,7 +37,7 @@ void AngularDistribution::SetCoeffs(double a0, double a2, double a4) {
 	ai[0] = a0;
 	ai[1] = a2;
 	ai[2] = a4;
-	FillPDF();
+	//	FillPDF();
 	return;
 }
 /***************************************************************/

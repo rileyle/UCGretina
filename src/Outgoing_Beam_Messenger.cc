@@ -32,8 +32,14 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
   SrcCmd->SetGuidance("Simulate a stationary source.");
   SrcCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  LvlCmd = new G4UIcmdWithAString("/BeamOut/LevelSchemeFile",this);
-  LvlCmd->SetGuidance("Set the level scheme filename.");
+  //REMOVE
+  // LvlCmd = new G4UIcmdWithAString("/BeamOut/LevelSchemeFile",this);
+  // LvlCmd->SetGuidance("Set the level scheme filename.");
+  // LvlCmd->SetParameterName("choice",false);
+  // LvlCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  LvlCmd = new G4UIcmdWithAString("/BeamOut/LevelDataFile",this);
+  LvlCmd->SetGuidance("Set the level data filename.");
   LvlCmd->SetParameterName("choice",false);
   LvlCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
@@ -52,10 +58,11 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
   TExFCmd->SetParameterName("choice",false);
   TExFCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  tauCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/tau",this);
-  tauCmd->SetGuidance("Set lifetime of the excited state of the reaction product.");
-  tauCmd->SetParameterName("choice",false);
-  tauCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  //REMOVE
+  // tauCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/tau",this);
+  // tauCmd->SetGuidance("Set lifetime of the excited state of the reaction product.");
+  // tauCmd->SetParameterName("choice",false);
+  // tauCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   RepCmd = new G4UIcmdWithoutParameter("/BeamOut/Report",this);
   RepCmd->SetGuidance("Report parameters for the outgoing beam.");
@@ -86,50 +93,44 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
   XsectCmd->SetParameterName("choice",false);
   XsectCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  QDir = new G4UIdirectory("/BeamOut/Q/");
-  QDir->SetGuidance("Charge state control for the outgoing beam.");
+  //REMOVE
+  // QDir = new G4UIdirectory("/BeamOut/Q/");
+  // QDir->SetGuidance("Charge state control for the outgoing beam.");
 
-  NQCmd = new G4UIcmdWithAnInteger("/BeamOut/Q/SetNumberOfChargeStates",this);
-  NQCmd->SetGuidance("Set number of charge states for the outgoing beam.");
-  NQCmd->SetParameterName("choice",false);
-  NQCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  // NQCmd = new G4UIcmdWithAnInteger("/BeamOut/Q/SetNumberOfChargeStates",this);
+  // NQCmd->SetGuidance("Set number of charge states for the outgoing beam.");
+  // NQCmd->SetParameterName("choice",false);
+  // NQCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
   
-  SQCmd = new G4UIcmdWithAnInteger("/BeamOut/Q/ChargeStateSelect",this);
-  SQCmd->SetGuidance("Select a charge state to be setup.");
-  SQCmd->SetParameterName("choice",false);
-  SQCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  // SQCmd = new G4UIcmdWithAnInteger("/BeamOut/Q/ChargeStateSelect",this);
+  // SQCmd->SetGuidance("Select a charge state to be setup.");
+  // SQCmd->SetParameterName("choice",false);
+  // SQCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  SCCmd = new G4UIcmdWithAnInteger("/BeamOut/Q/Charge",this);
-  SCCmd->SetGuidance("Set charge for the charge state to be setup.");
-  SCCmd->SetParameterName("choice",false);
-  SCCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  // SCCmd = new G4UIcmdWithAnInteger("/BeamOut/Q/Charge",this);
+  // SCCmd->SetGuidance("Set charge for the charge state to be setup.");
+  // SCCmd->SetParameterName("choice",false);
+  // SCCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  QUFCmd = new G4UIcmdWithADouble("/BeamOut/Q/UnReactedFraction",this);
-  QUFCmd->SetGuidance("Set a fraction of the selected charge state in the unreacted beam");
-  QUFCmd->SetParameterName("choice",false);
-  QUFCmd->AvailableForStates(G4State_PreInit,G4State_Idle);  
+  // QUFCmd = new G4UIcmdWithADouble("/BeamOut/Q/UnReactedFraction",this);
+  // QUFCmd->SetGuidance("Set a fraction of the selected charge state in the unreacted beam");
+  // QUFCmd->SetParameterName("choice",false);
+  // QUFCmd->AvailableForStates(G4State_PreInit,G4State_Idle);  
 
-  QRFCmd = new G4UIcmdWithADouble("/BeamOut/Q/ReactedFraction",this);
-  QRFCmd->SetGuidance("Set a fraction of the selected charge state in the reacted beam");
-  QRFCmd->SetParameterName("choice",false);
-  QRFCmd->AvailableForStates(G4State_PreInit,G4State_Idle);  
+  // QRFCmd = new G4UIcmdWithADouble("/BeamOut/Q/ReactedFraction",this);
+  // QRFCmd->SetGuidance("Set a fraction of the selected charge state in the reacted beam");
+  // QRFCmd->SetParameterName("choice",false);
+  // QRFCmd->AvailableForStates(G4State_PreInit,G4State_Idle);  
 
-  QKECmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/Q/KE",this);
-  QKECmd->SetGuidance("Set kinetic energy of the central S800 trajectory for the selected charge state");
-  QKECmd->SetParameterName("choice",false);
-  QKECmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  // QKECmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/Q/KE",this);
+  // QKECmd->SetGuidance("Set kinetic energy of the central S800 trajectory for the selected charge state");
+  // QKECmd->SetParameterName("choice",false);
+  // QKECmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  QKEuCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/Q/KEu",this);
-  QKEuCmd->SetGuidance("Set kinetic energy per nucleon of the central S800 trajectory for the selected charge state");
-  QKEuCmd->SetParameterName("choice",false);
-  QKEuCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-  a0cmd = new G4UIcmdWithADouble("/BeamOut/seta0",this);
-  a2cmd = new G4UIcmdWithADouble("/BeamOut/seta2",this);
-  a4cmd = new G4UIcmdWithADouble("/BeamOut/seta4",this);
-  a0Targetcmd = new G4UIcmdWithADouble("/BeamOut/setTargeta0",this);
-  a2Targetcmd = new G4UIcmdWithADouble("/BeamOut/setTargeta2",this);
-  a4Targetcmd = new G4UIcmdWithADouble("/BeamOut/setTargeta4",this);
+  // QKEuCmd = new G4UIcmdWithADoubleAndUnit("/BeamOut/Q/KEu",this);
+  // QKEuCmd->SetGuidance("Set kinetic energy per nucleon of the central S800 trajectory for the selected charge state");
+  // QKEuCmd->SetParameterName("choice",false);
+  // QKEuCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   UpdateCmd = new G4UIcmdWithoutParameter("/BeamOut/Update",this);
   UpdateCmd->SetGuidance("Set decay properties and report parameters for the incoming and outgoing beams.");
@@ -141,7 +142,7 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
 Outgoing_Beam_Messenger::~Outgoing_Beam_Messenger()
 {
   delete BeamOutDir;
-  delete tauCmd;
+  //  delete tauCmd;
   delete ExCmd;
   delete SrcCmd;
   delete LvlCmd;
@@ -157,20 +158,15 @@ Outgoing_Beam_Messenger::~Outgoing_Beam_Messenger()
   delete DistSigACmd;
   delete DistSigBCmd;
   delete XsectCmd;
-  delete QDir;
-  delete NQCmd;
-  delete SQCmd;
-  delete SCCmd;
-  delete QUFCmd;
-  delete QRFCmd;
-  delete QKECmd;
-  delete QKEuCmd;
-  delete a0Targetcmd;
-  delete a2Targetcmd;
-  delete a4Targetcmd;
-  delete a0cmd;
-  delete a2cmd;
-  delete a4cmd;
+  //REMOVE
+  // delete QDir;
+  // delete NQCmd;
+  // delete SQCmd;
+  // delete SCCmd;
+  // delete QUFCmd;
+  // delete QRFCmd;
+  // delete QKECmd;
+  // delete QKEuCmd;
   delete UpdateCmd;
 }
 
@@ -194,16 +190,19 @@ void Outgoing_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
   }
   if( command == SrcCmd )
     { BeamOut->SetSource();}
+  //REMOVE
+  // if( command == LvlCmd )
+  //   { BeamOut->setLvlSchemeFile(newValue);}
   if( command == LvlCmd )
-    { BeamOut->setLvlSchemeFile(newValue);}
+    { BeamOut->setLvlDataFile(newValue);}
   if( command == TACmd )
     { BeamOut->setTarA(TACmd->GetNewIntValue(newValue));}
   if( command == TZCmd )
     { BeamOut->setTarZ(TACmd->GetNewIntValue(newValue));}
   if( command == TExFCmd )
     { BeamOut->setTFrac(TExFCmd->GetNewDoubleValue(newValue));}
-  if( command == tauCmd )
-    { BeamOut->settau(tauCmd->GetNewDoubleValue(newValue));}
+  //  if( command == tauCmd )
+  //    { BeamOut->settau(tauCmd->GetNewDoubleValue(newValue));}
   if( command == RepCmd )
     { BeamOut->Report();}
   if( command == ThMinCmd )
@@ -216,32 +215,21 @@ void Outgoing_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamOut->SetThetaSigmaB(DistSigBCmd->GetNewDoubleValue(newValue));}
   if( command == XsectCmd )
     { BeamOut->setXsectFile(newValue);}
-  if( command == NQCmd )
-    { BeamOut->SetNQ(NQCmd->GetNewIntValue(newValue));}
-  if( command == SQCmd )
-    { BeamOut->SelectQ(SQCmd->GetNewIntValue(newValue));}
-  if( command == SCCmd )
-    { BeamOut->SetQCharge(SCCmd->GetNewIntValue(newValue));}
-  if( command == QUFCmd )
-    { BeamOut->SetQUnReactedFraction(QUFCmd->GetNewDoubleValue(newValue));}
-  if( command == QRFCmd )
-    { BeamOut->SetQReactedFraction(QRFCmd->GetNewDoubleValue(newValue));}
-  if( command == QKECmd )
-    { BeamOut->SetQKE(QKECmd->GetNewDoubleValue(newValue));}
-  if( command == QKEuCmd )
-    { BeamOut->SetQKEu(QKEuCmd->GetNewDoubleValue(newValue));}
-  if( command == a0cmd )
-    { BeamOut->SetCoeff(0,a0cmd->GetNewDoubleValue(newValue));}
-  if( command == a2cmd )
-    { BeamOut->SetCoeff(2,a2cmd->GetNewDoubleValue(newValue));}
-  if( command == a4cmd )
-    { BeamOut->SetCoeff(4,a4cmd->GetNewDoubleValue(newValue));}
-  if( command == a0Targetcmd )
-    { BeamOut->SetTargetCoeff(0,a0Targetcmd->GetNewDoubleValue(newValue));}
-  if( command == a2Targetcmd )
-    { BeamOut->SetTargetCoeff(2,a2Targetcmd->GetNewDoubleValue(newValue));}
-  if( command == a4Targetcmd )
-    { BeamOut->SetTargetCoeff(4,a4Targetcmd->GetNewDoubleValue(newValue));}
+  //REMOVE
+  // if( command == NQCmd )
+  //   { BeamOut->SetNQ(NQCmd->GetNewIntValue(newValue));}
+  // if( command == SQCmd )
+  //   { BeamOut->SelectQ(SQCmd->GetNewIntValue(newValue));}
+  // if( command == SCCmd )
+  //   { BeamOut->SetQCharge(SCCmd->GetNewIntValue(newValue));}
+  // if( command == QUFCmd )
+  //   { BeamOut->SetQUnReactedFraction(QUFCmd->GetNewDoubleValue(newValue));}
+  // if( command == QRFCmd )
+  //   { BeamOut->SetQReactedFraction(QRFCmd->GetNewDoubleValue(newValue));}
+  // if( command == QKECmd )
+  //   { BeamOut->SetQKE(QKECmd->GetNewDoubleValue(newValue));}
+  // if( command == QKEuCmd )
+  //   { BeamOut->SetQKEu(QKEuCmd->GetNewDoubleValue(newValue));}
   if( command == UpdateCmd )
     { BeamOut->Update();}
 }

@@ -21,8 +21,6 @@
 #include "G4VisAttributes.hh"
 #include <iomanip>
 
-
-
 class TrackerIonHit : public G4VHit
 {
   public:

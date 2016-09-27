@@ -33,7 +33,7 @@ class ScanningTable
   ScanningTable(G4LogicalVolume*,Materials*);
   ~ScanningTable();
   
-  G4VPhysicalVolume *Construct();
+  void Construct();
   void SetCADPath(G4String pth) { CADModelPath = pth; }
   void SetIncludeCloverCart() { includeCloverCart = true; }
   void SetIncludeCartFrame() { includeCartFrame = true; }
@@ -64,20 +64,6 @@ class ScanningTable
   G4bool includeCuTarget;
 
   G4String CADModelPath;
-  G4String ZSlitPart[10];
-  G4String CartPart[37];
-  G4String CollimatorPart[3];
-  G4String SlitZAssemblyPart[19];
-  G4String CloverAssemblyPart[6];
-  G4String CloverElevatorPart[15];
-  G4String CartTopPart[9];
-  int ZSlitParts;
-  int CartParts;
-  int CollimatorParts;
-  int SlitZAssemblyParts;
-  int CloverAssemblyParts;
-  int CloverElevatorParts;
-  int CartTopParts;
 
   G4double xShift;
   G4double yShift;
@@ -91,13 +77,6 @@ class ScanningTable
   
   //materials
   Materials* materials;
-  G4Material* ZSlitMaterial[10];
-  G4Material* CartMaterial[37];
-  G4Material* CollimatorMaterial[3];
-  G4Material* SlitZAssemblyMaterial[19];
-  G4Material* CloverAssemblyMaterial[6];
-  G4Material* CloverElevatorMaterial[15];
-  G4Material* CartTopMaterial[9];
   G4Material* material8020;
   G4Material* materialCartBase;
   G4Material* materialCartTop;
@@ -137,7 +116,7 @@ class ScanningTable
   G4ThreeVector *BotPos;
   G4ThreeVector *MidPos;
   G4ThreeVector *TopPos;
-  G4ThreeVector *UsePos;
+  //  G4ThreeVector *UsePos;
   G4ThreeVector CuTargetShift;
   G4ThreeVector CuTargetPos;
   G4ThreeVector CloverMountShift;

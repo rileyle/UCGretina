@@ -74,7 +74,9 @@ G4VParticleChange* Reaction::PostStepDoIt(
 
 	if(BeamOut->AboveThreshold()){
 	  aParticleChange.SetNumberOfSecondaries(1);
-	  aParticleChange.AddSecondary(BeamOut->ReactionProduct(),BeamOut->ReactionPosition(),true);
+	  aParticleChange.AddSecondary(BeamOut->ReactionProduct(),
+				       BeamOut->ReactionPosition(),
+				       true);
 	}
 
 	BeamOut->SetReactionFlag(1);
@@ -135,8 +137,8 @@ G4double Reaction::PostStepGetPhysicalInteractionLength(
 
 	  // Target excitations:
 	  // Stop and kill the decay product once it reaches its ground state.
-	  if( target_reaction 
-	      && aTrack.GetDynamicParticle()->GetParticleDefinition()->GetPDGStable() ){
+	  if( target_reaction &&
+	      !aTrack.GetDynamicParticle()->GetParticleDefinition()->GetParticleName().contains('[') ){
 	    ground_state = true;
 	    target_reaction = false;  //Reset for next decay
 	    return 0;
@@ -175,8 +177,11 @@ G4double Reaction::PostStepGetPhysicalInteractionLength(
 
   // Sationary sources:
   // Stop and kill the decay product once it reaches its ground state.
-  if( BeamOut->Source()
-     && aTrack.GetDynamicParticle()->GetParticleDefinition()->GetPDGStable() ){
+  if( BeamOut->Source() &&
+      !aTrack.GetDynamicParticle()->GetParticleDefinition()->GetParticleName().contains('[') ){
+
+    //    G4cout << "Stop and kill stationary source in its ground state." << G4endl;
+    
     ground_state=true;
     decayed_at_rest=false;    //Reset for next decay
     return 0;
@@ -208,15 +213,18 @@ G4VParticleChange* Reaction::AtRestDoIt(
 
   if(BeamOut->Source()){
 
+    //    G4cout << "I'm a stationary source." << G4endl;
+
     BeamOut->ScanInitialConditions(aTrack);
 
     aParticleChange.ProposeTrackStatus(fStopAndKill);
     aParticleChange.SetNumberOfSecondaries(1);
-    aParticleChange.AddSecondary(BeamOut->ReactionProduct(),aTrack.GetPosition(),true);
+    aParticleChange.AddSecondary(BeamOut->ReactionProduct(),
+				 aTrack.GetPosition(), true);
 
   } 
   // If the reaction product comes to rest after emitting its gamma(s), kill it.
-  else if( aTrack.GetDefinition()->GetPDGStable() ) { 
+  else if( !aTrack.GetDynamicParticle()->GetParticleDefinition()->GetParticleName().contains('[') ) { 
 
     // G4cout << "************************* AtRestDoIt: terminating track in "
     // 	   << aStep.GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetName()

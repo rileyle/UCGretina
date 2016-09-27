@@ -53,7 +53,7 @@ ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,
 ScanningTable::~ScanningTable()
 {;}
 //-----------------------------------------------------------------------------
-G4VPhysicalVolume* ScanningTable::Construct()
+void ScanningTable::Construct()
 {
 
   //--- First the physical cart: 8020 frame, base, top and back panel ---------
@@ -155,17 +155,17 @@ G4VPhysicalVolume* ScanningTable::Construct()
     G4VisAttributes* VisCart = new G4VisAttributes(lpurple);
     VisCart->SetVisibility(true);
     VisCart->SetForceWireframe(true);
-
+    
     for(int i=0;i<CartParts;i++){
       if(CartPart[i] != ""){
 	CADFileName = CADModelPath + "/";
 	CADFileName += CartPart[i];
 	CADFileName += ".stl";
+
 	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
 				    (char*)"STL");
 	mesh->SetScale(mm);
 	mesh->SetOffset(G4ThreeVector(0., 0., 0.));
-     
 	G4VSolid *Cart = mesh->TessellatedMesh();
 	Cart_log = new G4LogicalVolume(Cart, CartMaterial[i], 
 				       CartPart[i], 0, 0, 0);
@@ -636,7 +636,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 	= new G4ThreeVector(Pos0->getX() + xShift, 
 			    Pos0->getY() + 249.301*mm, 
 			    Pos0->getZ() - 44.45*mm + yShift);
-      G4RotationMatrix collRot = G4RotationMatrix::IDENTITY;
+      collRot = G4RotationMatrix::IDENTITY;
       collRot.rotateX(90.*deg);
       Collimator_phys = new G4PVPlacement(G4Transform3D(collRot, *collIPos),
 					  Collimator_log,
@@ -1027,7 +1027,7 @@ G4VPhysicalVolume* ScanningTable::Construct()
 
   G4cout << "Done." << G4endl;
   
-  return Cart8020_phys;
+  return;
 }
 //-----------------------------------------------------------------------------
 #endif

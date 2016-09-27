@@ -1,0 +1,41 @@
+# Detector parameters ==========================================================
+/Gretina/detector/enableCapsules
+/Gretina/detector/enableCryostats
+/Gretina/Shell full
+/Target/Construct
+/Target/Sled
+/BeamTube/Construct
+/Gretina/update
+# Set reaction parameters ======================================================
+/Experiment/Reaction/On
+/Target/Material Be
+/Target/Thickness 2034.6 um  # 376 mg/cm^2
+/BeamIn/A 44
+/BeamIn/Z 16
+/BeamIn/KEu 100.0 MeV
+/BeamIn/Dpp 0.02
+/BeamIn/Focus/DX 4. mm
+/BeamIn/Focus/DY 8. mm
+/BeamOut/TargetA 9
+/BeamOut/TargetZ 4
+/BeamOut/DA 0
+/BeamOut/DZ 0
+/BeamOut/LevelDataFile z16.a44.ad.lvldata
+/BeamOut/ProjectileExcitation 2457 keV
+/BeamOut/AngDistSigmaA 0.006 rad
+/BeamOut/AngDistSigmaB 0.006 rad
+/BeamOut/Update
+# Print simulation parameters to stdout ========================================
+/Target/Report
+/ExpHall/Report
+# Tracking parameters ==========================================================
+#/GammaPrint/Track_Set
+#/IonPrint/Track_Set
+# Output parameters ============================================================
+#/Mode2/PackingRes 6.0 mm
+/Mode2/crmatFile crmat.LINUX
+/Mode2/GretinaCoords
+/Mode2/S800KE 3.798 GeV
+#/Mode2/Print
+/Mode2/Filename s44_2457.dat
+/run/beamOn 5000

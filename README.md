@@ -1,22 +1,21 @@
-# UCGretina v3.3 #
+# UCGretina v4.0 #
 
 ## Compile and install ##
 
-Install version 4.9.6.p03 of the Geant4 libraries from
+Install version 4.10.02.p02 of the Geant4 libraries from
 http://geant4.web.cern.ch/geant4/support/download.shtml. You will need
 the data files for low energy electromagnetic processes. 
-
-_Important note: UCGretina is not yet compatible with the latest
-version (4.10.x) of the Geant4 libraries._
 
 Simulating the LBL scanning table requires the external
 [CADMesh](https://github.com/christopherpoole/cadmesh) package. Paths
 to the CADMesh `include` and `lib` directories must be set in the
-GNUMakefile.
+GNUMakefile. _However, as of Geant4.10.02.p02, instantiating the 
+G4TessellatedSolid objects results in malloc errors. UCGretina v3 is
+current solution._
 
 Set up your environment (consider adding this to your `.bashrc`):
 
-    $ source <G4INSTALL>/share/Geant4-9.6.3/geant4make/geant4make.sh
+    $ source <G4INSTALL>/share/Geant4-10.2.2/geant4make/geant4make.sh
 
 Compile:
 
@@ -251,45 +250,6 @@ Commands related to the outgoing reaction product:
 > reaction kinematics. If a scattering-angle distribution is supplied
 > with the `/BeamOut/XsectFile` command, these values are superseded.
 
-    /BeamOut/seta0 <double> 
-
-    /BeamOut/seta2 <double> 
-
-    /BeamOut/seta4 <double>
-
-> Angular distribution coefficients for the emitted gamma rays.
-> These commands are superseded by a level scheme file if a
-> /BeamOut/LevelSchemeFile command is present.
-
-    /BeamOut/tau <double> <unit>
-
-> Mean lifetime of the excitation. This command is superseded by a
-> level scheme file if a `/BeamOut/LevelSchemeFile` command is present.
-
-    /BeamOut/LevelSchemeFile <filename>
-
-> The level scheme file describes the portion of the level scheme to
->  be simulated. The format of the level scheme file:
-
->       <Level energy [keV]> <Number of gamma-decay Branches> <Lifetime [ps]> <Relative direct population> 
->       <BR 1> <Final-state energy [keV]> <A0> <A2> <A4> 
->       <BR 2> <Final-state energy [keV]> <A0> <A2> <A4> 
->       ...  
->       <Level energy [keV]> <Number of gamma-decay Branches> <Lifetime [ps]> <Relative direct population> 
->       <BR 1> <Final-state energy [keV]> <A0> <A2> <A4>
->       <BR 2> <Final-state energy [keV]> <A0> <A2> <A4>
->       ...
-
-> where <BR N> are branching ratios, <A0>, <A2>, <A4> are gamma-ray
-> angular distribution coefficients. The <Relative direct population>
-> parameters determine how often the level is populated directly by
-> the reaction.
-
-> NOTE: This command supersedes values set with the
-> `/BeamOut/ProjectileExcitation`, `/BeamOut/TargetExcitation`,
-> `/BeamOut/seta0`, `/BeamOut/seta2`, `/BeamOut/seta4`, and `/BeamOut/tau`
-> commands described above. 
-
     /BeamOut/Source
 
 > Simulate a stationary source using the in-beam simulation framework.
@@ -323,6 +283,12 @@ Mandatory commands
 > gamma-rays from 152Eu, 56Co, and both, respectively. The gamma rays
 > are emitted in equal quantities to facilitiate determining photopeak
 > efficiencies by fitting the photopeaks directly.
+
+> _Note: The eu152, co56, co60 source types reproduce empirical
+> relative intensities. However, the total number of gamma rays
+> simulated does not correspond to the number of decays of the source,
+> because these simulated sources emit a single gamma-ray per event,
+> while some gamma rays from these sources are emitted in cascades._
 
 Optional commands
 

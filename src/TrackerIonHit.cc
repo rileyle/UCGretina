@@ -58,24 +58,28 @@ void TrackerIonHit::Draw()
 
 void TrackerIonHit::Print()
 {
+  std::ios init(NULL);
+  init.copyfmt(G4cout);
 
   G4cout << std::setw(2)<< std::right << trackID <<" "<<flag<<" "
-	 << std::setw(13)<< particleID<<" "
-	 << std::setprecision(4)<<std::fixed
-	 << KE/GeV<<" "<<std::setprecision(6)
+	 << std::setw(15)<< particleID<<" "
+	 << std::setprecision(4)<<std::setw(8)<<std::fixed
+	 << KE/GeV<<" "<<std::setprecision(6)<<std::setw(8)
 	 << beta<< " "
 	 <<std::setprecision(4)<<std::setw(10)<<std::right
-	 <<theta*1000.<<" "<<std::setw(10)<<std::right
-	 <<phi*1000.<<" "<<std::setw(9)<<std::right	 
-	 <<pos.getX()<<" "<<std::setw(9)<<std::right
-	 <<pos.getY()<<" "<<std::setw(9)<<std::right
-	 <<pos.getZ()<<" "<<std::setw(9)<<std::right
-	 <<time*1000.<<" "<<std::setw(9)<<std::right
-	 <<labtime*1000.<<" "<<std::setw(9)<<std::right
-	 <<globaltime*1000.<<" "<<std::setw(9)<<std::right
-	 <<Edep/MeV<<" "<<length/mm
+	 <<theta*1000.<<" "<<std::setw(12)<<std::right
+	 <<phi*1000.<<" "<<std::setw(10)<<std::right	 
+	 <<pos.getX()<<" "<<std::setw(10)<<std::right
+	 <<pos.getY()<<" "<<std::setw(10)<<std::right
+	 <<pos.getZ()<<" "<<std::setw(12)<<std::right
+	 <<time*1000.<<" "<<std::setw(12)<<std::right
+	 <<labtime*1000.<<" "<<std::setw(12)<<std::right
+	 <<globaltime*1000.<<" "<<std::setw(10)<<std::right
+	 <<Edep/MeV<<" "<<std::setw(10)<<std::right
+	 <<length/mm
 	 << G4endl;
 
+  G4cout.copyfmt( init );
 
 }
 

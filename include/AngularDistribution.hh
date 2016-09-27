@@ -16,14 +16,14 @@ public:
 	double GetCoeff(int);
 	void SetCoeff(int,double);
         void SetCoeffs(double,double,double);
-	void FillPDF();
-	double PDF(double);	
-	double* GetAngDis();
+  	void FillPDF();
+  	double PDF(double);	
+  	double* GetAngDis();
 	double GetRandomAngle();
 	void Report();
 private:
 	double ai[3];
-	double angdis[1440];
+  	double angdis[1440];
 	double angdismax;
 };
 

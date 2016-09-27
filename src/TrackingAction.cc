@@ -36,7 +36,7 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 	aTrack->GetParticleDefinition()->GetParticleName() == "mu-" )
       &&
       ( aTrack->GetParentID() == 0 ||
-	aTrack->GetCreatorProcess()->GetProcessName() == "Decay" ||
+	aTrack->GetCreatorProcess()->GetProcessName() == "RadioactiveDecay" ||
 	aTrack->GetCreatorProcess()->GetProcessName() == "Reaction" ) ){
 
     //    G4cout << "> Event ID = " << eventAction->GetEvent()->GetEventID() << G4endl;
@@ -64,6 +64,10 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
 
   // G4cout << std::fixed << std::setprecision(4) << std::setw(12)
   // 	 << "> PostUserTrackingAction" << G4endl;
+  // G4cout << "> Track ID = " << aTrack->GetTrackID() << G4endl;
+  // G4cout << "> Parent Track ID = " << aTrack->GetParentID() << G4endl;
+  // G4cout << "> Particle Name = "
+  // 	 << aTrack->GetParticleDefinition()->GetParticleName() << G4endl;
   // G4cout << "> KineticEnergy = " << aTrack->GetKineticEnergy() << G4endl;
   // G4cout << "> TotalEnergy = "   << aTrack->GetTotalEnergy() << G4endl;
   // G4cout << "> Pre-step Position = " 
@@ -83,12 +87,13 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
   // NSCL coordinates:     x: down,  y: North, z: with the beam
   //                  (x: ~up in the S800 focal plane detectors)
 
-  if( aTrack->GetParticleDefinition()->GetParticleType() == "nucleus" &&
-      aTrack->GetParentID() > 0 ){
-
-    if( !aTrack->GetDefinition ()-> GetPDGStable() )
-      eventInfo->AddBeta(aTrack->GetStep()->GetPreStepPoint()->GetBeta());
-    
-  }
+  const G4ParticleDefinition* def = aTrack->GetParticleDefinition();
+  
+  // Store beta as a nuclear excited state track has ended
+  // (by de-exciting the nucleus)
+  if( def->GetParticleType() == "nucleus" &&
+      aTrack->GetParentID() > 0 &&
+      aTrack->GetParticleDefinition()->GetParticleName().contains('[') )
+    eventInfo->AddBeta(aTrack->GetStep()->GetPreStepPoint()->GetBeta());
 
 }

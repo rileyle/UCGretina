@@ -132,31 +132,38 @@ void TrackerIonSD::EndOfEvent(G4HCofThisEvent* HCE)
 
      if (print) 
      {	
+       std::ios init(NULL);
+       init.copyfmt(G4cout);
+
        G4cout<<G4endl;
-           G4cout << "-------->Hits Collection: in this event there are " << NbHits
-            << " hits for ion tracking: " << G4endl;
+       G4cout << "-------->Hits Collection: in this event there are "
+	      << NbHits
+	      << " hits for ion tracking: " << G4endl;
 
-      G4cout << std::setw(2) << "ID" <<" "
-	     << std::setw(13)<< "   PID"<<" "
-	     << std::setprecision(4)<<std::fixed
-	     << "KE [GeV]"<<" "<<std::setprecision(6)
-	     << "  beta"<< " "
-	     <<std::setprecision(4)<<std::setw(10)<<std::right
-	     <<"th[mrad]"<<" "<<std::setw(10)<<std::right
-	     <<"phi [mrad]"<<" "<<std::setw(9)<<std::right	 
-	     <<"X [mm]" <<" "<<std::setw(9)<<std::right
-	     <<"Y [mm]"<<" "<<std::setw(9)<<std::right
-	     <<"Z [mm]"<<" "<<std::setw(9)<<std::right
-	     <<"tau [ps]"<<" "<<std::setw(9)<<std::right
-	     <<"t [ps]"<<" "<<std::setw(9)<<std::right
-	     <<"T [ps]"<<" "<<std::setw(9)<<std::right
-	     <<"  Ed [MeV]" <<" Step Length [mm]"
-	     << G4endl;
-
-           for (i=0;i<NbHits;i++) (*ionCollection)[i]->Print();
+       G4cout << std::setw(2) << " " << "ID" <<" "
+	      << std::setw(15)<< "PID"<<" "
+	      << std::setprecision(4)<<std::setw(8)<<std::fixed
+	      << "KE [GeV]"<<" "<<std::setprecision(6)<<std::setw(8)
+	      << "beta"<< " "
+	      <<std::setprecision(4)<<std::setw(10)<<std::right
+	      <<"th[mrad]"<<" "<<std::setw(12)<<std::right
+	      <<"phi [mrad]"<<" "<<std::setw(10)<<std::right	 
+	      <<"X [mm]" <<" "<<std::setw(10)<<std::right
+	      <<"Y [mm]"<<" "<<std::setw(10)<<std::right
+	      <<"Z [mm]"<<" "<<std::setw(12)<<std::right
+	      <<"tau [ps]"<<" "<<std::setw(12)<<std::right
+	      <<"t [ps]"<<" "<<std::setw(12)<<std::right
+	      <<"T [ps]"<<" "<<std::setw(10)<<std::right
+	      <<"Ed [MeV]"<<" " <<std::setw(10)<<std::right
+	      <<"Length [mm]"
+	      << G4endl;
+       
+       for (i=0;i<NbHits;i++) (*ionCollection)[i]->Print();
 	   
+       G4cout.copyfmt( init );
+     
      }
-
+     
     }  
  
  static G4int HCID = -1;

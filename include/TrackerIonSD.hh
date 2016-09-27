@@ -14,8 +14,6 @@
 #include "G4VProcess.hh"
 #include "G4StepStatus.hh"
 #include "G4TrackStatus.hh"
-//#include "Results.hh"
-
 
 class TrackerIonSD : public G4VSensitiveDetector
 {

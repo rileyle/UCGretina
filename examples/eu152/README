@@ -11,25 +11,21 @@ and
 
 commands. The macro file eu152_gammas.mac illustrates this
 approach. These simulations are based on intensities adopted by the
-IAEA for standard calibration sources and should be used for
-efficiency calibrations.
+IAEA for standard calibration sources.
 
 In addition, realistic gamma-ray cascades from stationary sources can
 be simulated using the 
 
     /BeamOut/Source
 
-and
-
-    /BeamOut/LevelSchemeFile
-
-commands. The macro files sm152.mac and gd152.mac and the level scheme
-files sm152.lvl and gd152.lvl illustrate this approach. The level
-scheme files are based on ENSDF adopted beta- and gamma-decay
-branching ratios. The experimental uncertainties in the branching
-ratios combine to yield gamma-ray intensities that do not match the
-IAEA values. The resulting spectra should not be used for efficiency 
-calibrations.
+command. The collection of macro files sm152_<Level Energy>.mac and
+gd152_<Level Energy>.mac macro files illustrate this approach. The
+number of events simulated for each level corresponds to the number of
+decays to that level per 1E6 decays. Level data is read from the files
+z62.a152 and z64.a152 which are versions of those provided with the
+PhotonEvaporation data files, truncated to include levels populated by
+beta decay / EC and with isotropic angular distribution coefficients
+appended.
 
 ================================================================================
 
@@ -41,22 +37,23 @@ o Run the simulations
       $ make
 
     to run the simulations of the 152Eu source described in
-    eu152_gammas.mac, sm152.mac, and gd152.mac. The Makefile automates
-    the following steps:
+    eu152_gammas.mac, sm152_<Level Energy>.mac, and
+    gd152_<Level Energy>.mac. The Makefile automates the following
+    steps:
 
-  - UCGretina writes mode 2 data to eu152_gammas.dat, sm152.dat, and
-    gd152.dat. (The names of the output files are specified in the
-    .mac files.)
+  - UCGretina writes mode 2 data to eu152_gammas.dat,
+    sm152_<Level Energy>.dat, and gd152_<Level Energy>.dat. (The names
+    of the output files are specified in the .mac files.)
 
-  - SimCalculate is used to load the mode 2 data in the .dat files into 
-    calibrated trees in eu152_gammas_sim.root, sm152_sim.root, and
-    gd152_sim.root.
+  - GRUTinizer sorts the mode 2 data in the .dat files into 
+    histograms in eu152_gammas_histos.root,
+    sm152_<Level Energy>_histos.root, and
+    gd152_<Level Energy>_histos.root.
 
-  - Sim_histos is used to sort the calibrated trees into histograms
-    written to eu152_gammas_sim_histos.root and
-    eu152_sim_histos.root. The trees in sm152_sim.root and
-    gd152_sim.root are sorted into a single set of spectra in
-    eu152_sim_histos.root.
+  - gadd (a GRUTinizer utility) combines the
+    sm152_<Level Energy>_histos.root, and
+    gd152_<Level Energy>_histos.root into a full 152Eu spectrum in
+    eu152_histos.root.
 
 o Fit a measured spectrum
 

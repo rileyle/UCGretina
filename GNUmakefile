@@ -45,7 +45,7 @@ CPPFLAGS += -DG4V496
 ############################################
 ## uncomment for geant v. 4.10
 ###########################################
-#CPPFLAGS += -DG4V10
+CPPFLAGS += -DG4V10
 
 G4TARGET := $(name)
 G4EXLIB := true

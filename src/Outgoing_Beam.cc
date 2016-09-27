@@ -1,24 +1,26 @@
 #include "Outgoing_Beam.hh"
-#include "GammaDecayChannel.hh"
 #include "G4DecayTable.hh"
 #include "G4Decay.hh"
+#include "G4RadioactiveDecay.hh"
 #include "G4ProcessManager.hh"
 
-G4Decay Outgoing_Beam::decay;
+//G4RadioactiveDecay* Outgoing_Beam::decay;
+//G4RadioactiveDecaymessenger* Outgoing_Beam::decayMessenger;
 
 Outgoing_Beam::Outgoing_Beam()
 {
   DZ=0;
   DA=0;
   Ex=1.0*MeV;
-  lvlSchemeFileName = "";
+  //  lvlSchemeFileName = ""; //REMOVE
+  lvlDataFileName = "";
   xsectFileName = "";
-  Nlevels = 1;
+  //  Nlevels = 1; //REMOVE
   TarEx=0.*keV;
   TarA = 1;
   TarZ = 1;
   TFrac=0.;
-  tau=0.0*ns;
+  //  tau=0.0*ns; //REMOVE
 
   targetExcitation=false;
   reacted=false;
@@ -29,10 +31,13 @@ Outgoing_Beam::Outgoing_Beam()
   theta_min=0.;
   theta_bin=0.;
   twopi=8.*atan(1.);
-  NQ=1;SQ=0;
-  SetUpChargeStates();
+  //  NQ=1;SQ=0;           // REMOVE
+  //  SetUpChargeStates(); // REMOVE
   beamIn = NULL;
-  DecTab = NULL;
+  //  DecTab = NULL;       // REMOVE
+
+  //  decay = new G4RadioactiveDecay();
+  //  decayMessenger = new G4RadioactiveDecaymessenger(decay);
 }
 
 Outgoing_Beam::~Outgoing_Beam()
@@ -58,11 +63,9 @@ void Outgoing_Beam::setDecayProperties()
   Zin = beamIn->getZ();
   Ain = beamIn->getA();
 
-  // Load the particle table
-  beam     = G4ParticleTable::GetParticleTable()->GetIon(Zin,Ain,0.);
-  ion      = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,Ex);
-  ionGS    = G4ParticleTable::GetParticleTable()->GetIon(Zin+DZ,Ain+DA,0.);
-  ionGS->SetPDGStable(true);
+  // Load the particle table with ground states
+  beam  = G4IonTable::GetIonTable()->GetIon(Zin,Ain,0.);
+  ionGS = G4IonTable::GetIonTable()->GetIon(Zin+DZ,Ain+DA,0.);
 
   if(TarA == 1 && TarZ ==1)
     tarIn = G4ParticleTable::GetParticleTable()->FindParticle("proton");
@@ -75,7 +78,7 @@ void Outgoing_Beam::setDecayProperties()
   else if (TarA == 1 && TarZ ==0)
     tarIn = G4ParticleTable::GetParticleTable()->FindParticle("neutron");
   else
-    tarIn = G4ParticleTable::GetParticleTable()->GetIon(TarZ,    TarA,    0.);
+    tarIn = G4IonTable::GetIonTable()->GetIon(TarZ,    TarA,    0.);
 
   if(DA == 0){
     tarOut   = tarIn;
@@ -96,16 +99,8 @@ void Outgoing_Beam::setDecayProperties()
     tarOut = G4ParticleTable::GetParticleTable()->FindParticle("neutron");
     tarOutGS = tarOut;
   } else {
-    tarOut = G4ParticleTable::GetParticleTable()->GetIon(TarZ-DZ, TarA-DA, Ex);
-    tarOutGS = G4ParticleTable::GetParticleTable()->GetIon(TarZ-DZ, TarA-DA, 0.);
-  }
-  tarOutGS->SetPDGStable(true);
-
-
-  if (ion == NULL) {
-    G4cerr << "Error: no outgoing ion in particle table "
-	   << Zin + DZ << " " << Ain+DA << G4endl;
-    exit(EXIT_FAILURE);
+    tarOut = G4IonTable::GetIonTable()->GetIon(TarZ-DZ, TarA-DA, Ex);
+    tarOutGS = G4IonTable::GetIonTable()->GetIon(TarZ-DZ, TarA-DA, 0.);
   }
   if (ionGS == NULL) {
     G4cerr << "Error: no outgoing ion ground state in particle table "
@@ -149,123 +144,52 @@ void Outgoing_Beam::setDecayProperties()
     m3 = ionGS->GetPDGMass();
     m4 = tarOut->GetPDGMass();
   } else {
-    m3 = ion->GetPDGMass();
+    m3 = ionGS->GetPDGMass();
     if (tarOutGS == NULL)
       m4 = 0.;
     else
       m4 = tarOutGS->GetPDGMass();
   }
 
-  GammaDecayChannel *GamDec = NULL;
-  G4ProcessManager *pm = NULL;
-  G4ParticleDefinition* product;
-  if(targetExcitation)
-    product = tarOut;
-  else
-    product = ion;
-  
-  if (lvlSchemeFileName == ""){
+  // Load the particle table with excited states
+  G4int Z,A;
 
-    levelEnergy[0] = Ex/keV;
-    relPop[0] = 1.0;
-
-    G4cout << "Constructing decay properties for Z = " << product->GetAtomicNumber()
-    	   << " A = " << product->GetAtomicMass() << " with excitation energy " << Ex/keV << " keV" << G4endl;
-    G4cout << "Direct gamma decay to the ground state." << G4endl;
-
-    product->SetPDGStable(false);
-    product->SetPDGLifeTime(tau);
-
-    DecTab = product->GetDecayTable(); 
-    if (DecTab == NULL) {
-      DecTab = new G4DecayTable();
-      product->SetDecayTable(DecTab);
-    }
-    GamDec = new GammaDecayChannel(-1,product,1,Ex,0.,theAngularDistribution);
-    DecTab->Insert(GamDec);
-    //    DecTab->DumpInfo();
-
-    // make sure that the ion has the decay process in its manager
-    pm = product->GetProcessManager();
-    if (pm == NULL) {
-      G4cerr << "Could not find process manager for reaction product." << G4endl;
-      exit(EXIT_FAILURE);
-    }
-    pm->AddProcess(&decay,1,-1,4);
-    // pm->DumpInfo();
-
-  } else { // Set up intermediate states and decay properties
-    G4cout << "Reading level scheme description from " 
-	   << lvlSchemeFileName << G4endl;
-
-    G4int nBranch;
-    G4double meanLife, BR, Exf, a0, a2, a4;
-    G4ParticleDefinition* intermediateIon;
-
-    openLvlSchemeFile();
-
-    Nlevels = 0;
-    while(lvlSchemeFile >> levelEnergy[Nlevels] >> nBranch >> meanLife >> relPop[Nlevels]){
-      G4cout << "Constructing decay properties for Z=" << Zin + DZ
-      	     << " A=" << Ain + DA 
-      	     << " with excitation " << levelEnergy[Nlevels] 
-      	     << " keV, mean lifetime " << meanLife
-      	     << " ps, relative population " << relPop[Nlevels]
-      	     << G4endl;
-      if(Nlevels>0) relPop[Nlevels] += relPop[Nlevels-1];
-      for(G4int j = 0; j < nBranch; j++){
-	lvlSchemeFile >> BR >> Exf >> a0 >> a2 >> a4;
-
-	intermediateIon = 
-	  G4ParticleTable::GetParticleTable()->GetIon(product->GetAtomicNumber(),
-						      product->GetAtomicMass(),
-						      levelEnergy[Nlevels]*keV);
-	if (intermediateIon == NULL) {
-	  G4cerr << "Could not find intermediate ion in particle table."
-		 << product->GetAtomicNumber() << " " << product->GetAtomicMass() << G4endl;
-	  exit(EXIT_FAILURE);
-	}
-	intermediateIon->SetPDGStable(false);
-	intermediateIon->SetPDGLifeTime(meanLife*picosecond);
-
-	DecTab = intermediateIon->GetDecayTable(); 
-	if (DecTab == NULL) {
-	  DecTab = new G4DecayTable();
-	  intermediateIon->SetDecayTable(DecTab);
-	}
-
-	theAngularDistribution.SetCoeffs(a0,a2,a4);
-	theAngularDistribution.Report();
-
-	GamDec = new GammaDecayChannel(-1,intermediateIon,BR,(levelEnergy[Nlevels]-Exf)*keV,Exf*keV,theAngularDistribution);
-	DecTab->Insert(GamDec);
-
-	// make sure that the ion has the decay process in its manager
-	pm = intermediateIon->GetProcessManager();
-	if (pm == NULL) {
-	  G4cerr << "Could not find process manager for reaction product." << G4endl;
-	  exit(EXIT_FAILURE);
-	}
-	pm->AddProcess(&decay,1,-1,4);
-
-      }
-      cout << endl;
-      DecTab->DumpInfo();
-      //      pm->DumpInfo();
-
-      Nlevels++;
-    }
-
-    closeLvlSchemeFile();
-
-    // Normalize relative population parameters
-    for(G4int j = 0; j<Nlevels; j++){
-      relPop[j] /= relPop[Nlevels-1];
-      //      G4cout << "Level energy = " << levelEnergy[j] 
-      //             << " keV, relPop[" << j << "] = " << relPop[j] 
-      //	     << G4endl;
-    }
+  if(targetExcitation){
+    Z = tarOut->GetAtomicNumber();
+    A = tarOut->GetAtomicMass();
+  } else {
+    Z = ionGS->GetAtomicNumber();
+    A = ionGS->GetAtomicMass();
   }
+
+  //REMOVE
+  //  std::ostringstream sfname;
+  //  sfname << "z" << Z << ".a" << A;
+  //  G4String fname =  G4String(sfname.str());  
+
+  if(lvlDataFileName == ""){
+    G4cerr << "Error: level data file name not set." << G4endl;
+    exit(EXIT_FAILURE);
+  }
+  
+  G4NuclearLevelData* levelData = G4NuclearLevelData::GetInstance();
+  levelData->AddPrivateData(Z, A, lvlDataFileName);
+  const G4LevelManager* levelManager = levelData->GetLevelManager(Z, A);
+  G4int Nentries = levelManager->NumberOfTransitions()+1;
+  for(G4int i = 1; i < Nentries; i++){ // Excited states
+    // G4cout << "Level " << i
+    // 	   << " energy = " << levelManager->LevelEnergy(i)
+    // 	   << G4endl;
+    
+    G4ParticleDefinition* excitedState
+      = G4IonTable::GetIonTable()->GetIon(Z,A,levelManager->LevelEnergy(i));
+
+    excitedState->SetPDGStable(false);
+    excitedState->SetPDGLifeTime(levelManager->LifeTime(i));
+  }
+
+  //  G4IonTable::GetIonTable()->DumpTable();
+
 }
 
 //---------------------------------------------------------
@@ -278,8 +202,7 @@ void Outgoing_Beam::ScanInitialConditions(const G4Track & aTrack)
   KEIn=aTrack.GetDynamicParticle()->GetKineticEnergy();
   Ain=aTrack.GetDynamicParticle()->GetDefinition()->GetAtomicMass();
   Zin=aTrack.GetDynamicParticle()->GetDefinition()->GetAtomicNumber();
-  //  m1 = aTrack.GetDynamicParticle()->GetDefinition()->GetPDGMass();
-  tauIn=aTrack.GetProperTime();
+  //  tauIn=aTrack.GetProperTime(); //REMOVE
   ReactionFlag=-1;
   if(aTrack.GetVolume()->GetLogicalVolume()->GetName()=="target_log")
     ReactionFlag=0;
@@ -310,58 +233,27 @@ G4ThreeVector Outgoing_Beam::ReactionPosition()
 G4DynamicParticle* Outgoing_Beam::ReactionProduct()
 {
 
-  G4int lvl;
-  G4double rnd = G4UniformRand();
-  for(lvl=0; lvl < Nlevels; lvl++){
-    //    G4cout << std::fixed << std::setprecision(4) 
-    //	   << "rnd = " << rnd << ", lvl = " << lvl << G4endl;
-    if(rnd < relPop[lvl]) break;
-  }
-  //  G4cout << "Chose lvl = " << lvl << ", E = " << levelEnergy[lvl] << " keV" << G4endl;
-
   G4int Zout, Aout;
+  G4double excitationEnergy = 0.;
   if(targetExcitation){
     Zout = TarZ - DZ;
     Aout = TarA - DA;
+    excitationEnergy = TarEx;
   } else {
     Zout = Zin + DZ;
     Aout = Ain + DA;
+    excitationEnergy = Ex;
   }
 
-  G4ParticleDefinition* product = G4ParticleTable::GetParticleTable()->GetIon(Zout,Aout,levelEnergy[lvl]*keV);
+  G4ParticleDefinition* product
+    = G4IonTable::GetIonTable()->GetIon(Zout, Aout, excitationEnergy);
 
-  G4DynamicParticle* aReactionProduct = new G4DynamicParticle(product,GetOutgoingMomentum());
+  G4DynamicParticle* aReactionProduct
+    = new G4DynamicParticle(product, GetOutgoingMomentum());
 
   return aReactionProduct;
 }
-//---------------------------------------------------------
-//G4DynamicParticle* Outgoing_Beam::ProjectileGS()
-//{
-//  G4DynamicParticle* aReactionProduct =new G4DynamicParticle(ionGS,GetOutgoingMomentum());
 
-  //  aReactionProduct->SetProperTime(tauIn);
-  // G4cout<<" Proper time set to "<<aReactionProduct->GetProperTime()<<G4endl;
-
-//  return aReactionProduct;
-//}
-//---------------------------------------------------------
-// G4DynamicParticle* Outgoing_Beam::TargetExcitation() // No longer needed
-// {
-//   particleTable = G4ParticleTable::GetParticleTable();
-//   G4DynamicParticle* aReactionProduct =new G4DynamicParticle(particleTable->FindParticle("gamma"),TargetAngularDistribution(),TarEx);
-
-//   return aReactionProduct;
-// }
-
-//---------------------------------------------------------
-G4ThreeVector Outgoing_Beam::TargetAngularDistribution() // No longer needed
-{
-    //TB allow a coulex angular distribution for target excitation (coulex on gold)
-    G4ThreeVector direction = G4RandomDirection();
-    direction.setTheta(theTargetAngularDistribution.GetRandomAngle());
-    //G4cout<<direction.getTheta()<<G4endl;
-    return direction;
-}
 //---------------------------------------------------------
 G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
 {
@@ -428,7 +320,7 @@ G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
   //	 << "  ata = " << -asin(ppOut.getY()/ppOut.mag())/mrad
   //	 << "  bta = " << -asin(ppOut.getX()/ppOut.mag())/mrad
   //	 << G4endl;
-
+  
   return ppOut;
 }
 
@@ -492,29 +384,31 @@ void Outgoing_Beam::Report()
   G4cout<<"----> Fraction of target excitations set to "<<TFrac<<G4endl;
   G4cout<<"----> Mass of the incoming beam is " <<beam->GetPDGMass()<<" MeV"<<G4endl;
   G4cout<<"----> Mass of the target is " <<tarIn->GetPDGMass()<<" MeV"<<G4endl;
-  G4cout<<"----> Mass of the outgoing beam-like reaction product is " <<ion->GetPDGMass()<<" MeV"<<G4endl;
+  G4cout<<"----> Mass of the outgoing beam-like reaction product is " <<ionGS->GetPDGMass()<<" MeV"<<G4endl;
   if(tarOut != NULL)
     G4cout<<"----> Mass of the outgoing target-like reaction product is " <<tarOut->GetPDGMass()<<" MeV"<<G4endl;
   G4cout<<"----> Sigma for ata distribution set to "<<sigma_a<<G4endl;
   G4cout<<"----> Sigma for bta distribution set to "<<sigma_b<<G4endl;
 
-  G4cout<<"----> Number of charge states "<<NQ<<G4endl;
-  vector<Charge_State*>::iterator itPos = Q.begin();
-  for(; itPos < Q.end(); itPos++) 
-    {
-      G4cout<<"----> Charge state "     <<(*itPos)->GetCharge()<<G4endl;
-      G4cout<<"   => UnReactedFraction "<<(*itPos)->GetUnReactedFraction()<<G4endl;
-      G4cout<<"   =>   ReactedFraction "<<(*itPos)->GetReactedFraction()<<G4endl;
-      if((*itPos)->GetUseSetKEu())
-	{
-	  G4cout<<"   =>              KE/A "<<(*itPos)->GetSetKEu()/MeV<<" MeV"<<G4endl; 
-	  //	 G4cout<<"   =>                KE "<<(*itPos)->GetSetKE()/MeV<<" MeV"<<G4endl; LR (not initialized if KEu is used)
-	}
-      else
-	G4cout<<"   =>                KE "<<(*itPos)->GetSetKE()/MeV<<" MeV"<<G4endl;
-    }
-  CalcQUR();
-  CalcQR();
+  //REMOVE???
+  // G4cout<<"----> Number of charge states "<<NQ<<G4endl;
+  // vector<Charge_State*>::iterator itPos = Q.begin();
+  // for(; itPos < Q.end(); itPos++) 
+  //   {
+  //     G4cout<<"----> Charge state "     <<(*itPos)->GetCharge()<<G4endl;
+  //     G4cout<<"   => UnReactedFraction "<<(*itPos)->GetUnReactedFraction()<<G4endl;
+  //     G4cout<<"   =>   ReactedFraction "<<(*itPos)->GetReactedFraction()<<G4endl;
+  //     if((*itPos)->GetUseSetKEu())
+  // 	{
+  // 	  G4cout<<"   =>              KE/A "<<(*itPos)->GetSetKEu()/MeV<<" MeV"<<G4endl; 
+  // 	}
+  //     else
+  // 	G4cout<<"   =>                KE "<<(*itPos)->GetSetKE()/MeV<<" MeV"<<G4endl;
+  //   }
+  // CalcQUR();
+  // CalcQR();
+
+  G4IonTable::GetIonTable()->DumpTable();
 }
 
 
@@ -581,6 +475,7 @@ void Outgoing_Beam::setTFrac(G4double ex)
   //G4cout<<"----> Fraction of target excitations set to "<<TFrac<<G4endl;
 
 }
+/* REMOVE
 //-----------------------------------------------------------------
 void Outgoing_Beam::settau(G4double t)
 {
@@ -755,28 +650,19 @@ G4double Outgoing_Beam::GetRsetKE()
   Index=QRI[i];
   return QR[i];
 }
-//----------------------------------------------------------
-void Outgoing_Beam::SetCoeff(int index,double a) {
-  theAngularDistribution.SetCoeff(index,a);
-  return;
-}
-//----------------------------------------------------------
-void Outgoing_Beam::SetTargetCoeff(int index, double a)
-{
-  theTargetAngularDistribution.SetCoeff(index, a);
-  return;
-}
-//----------------------------------------------------------
-void Outgoing_Beam::openLvlSchemeFile()
-{
-  if(!lvlSchemeFile.is_open()) lvlSchemeFile.open(lvlSchemeFileName.c_str());
+*/
+//REMOVE
+// //----------------------------------------------------------
+// void Outgoing_Beam::openLvlSchemeFile()
+// {
+//   if(!lvlSchemeFile.is_open()) lvlSchemeFile.open(lvlSchemeFileName.c_str());
   
-  if (lvlSchemeFile == NULL) G4cout << "lvlSchemeFile ERROR" << G4endl;
-}
-//----------------------------------------------------------
-void Outgoing_Beam::closeLvlSchemeFile()
-{
-  lvlSchemeFile.close();
+//   if (!lvlSchemeFile.is_open()) G4cout << "lvlSchemeFile ERROR" << G4endl;
+// }
+// //----------------------------------------------------------
+// void Outgoing_Beam::closeLvlSchemeFile()
+// {
+//   lvlSchemeFile.close();
 
-  return;
-}
+//   return;
+// }

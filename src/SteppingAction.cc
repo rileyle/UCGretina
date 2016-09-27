@@ -115,7 +115,8 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
       // DTA is dT/T with T = kinetic energy corresponding 
       // to the user-supplied center of the S800 acceptance
       eventInfo->SetDTA( (aStep->GetTrack()->GetKineticEnergy() 
-			  - eventAction->GetS800KE()) / eventAction->GetS800KE() ); 
+			  - eventAction->GetS800KE())
+			  / eventAction->GetS800KE() ); 
 
       // YTA is horizontal position on target, 
       // South is + in NSCL coords = -x in Geant4 coords

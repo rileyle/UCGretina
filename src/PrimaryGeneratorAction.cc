@@ -29,6 +29,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
 
   particleTable = G4ParticleTable::GetParticleTable();
+  ionTable = G4IonTable::GetIonTable();
   BeamOut->SetReactionFlag(-1);
 
   if(source)
@@ -120,7 +121,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   else if(inbeam)
     {
 
-      ion =  particleTable->GetIon(BeamIn->getZ(),BeamIn->getA(),BeamIn->getEx());
+      ion =  ionTable->GetIon(BeamIn->getZ(),BeamIn->getA(),BeamIn->getEx());
       particleGun->SetParticleDefinition(ion);
       
       position=BeamIn->getPosition();
@@ -173,7 +174,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
     }
 
-  // G4cout<<" +++++ Generating an event "<<G4endl;
+  //  G4cout<<" +++++ Generating an event "<<G4endl;
   particleGun->GeneratePrimaryVertex(anEvent);
   // G4cout<<" +++++ Out Generate Primaries "<<G4endl;
 }

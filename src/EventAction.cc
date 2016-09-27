@@ -104,18 +104,18 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 
       // Packing: consolidate interaction points within segments 
       // based on proximity. 
-      G4int trackID[10000];
-      G4int detNum[10000];
-      G4int segNum[10000];
-      G4double measuredEdep[10000];
-      G4double segmentEdep[10000];
-      G4double measuredX[10000];
-      G4double measuredY[10000];
-      G4double measuredZ[10000];
-      G4double X0[10000];
-      G4double Y0[10000];
-      G4double Z0[10000];
-      G4int NCons[10000];
+      G4int trackID[2*MAX_INTPTS];
+      G4int detNum[2*MAX_INTPTS];
+      G4int segNum[2*MAX_INTPTS];
+      G4double measuredEdep[2*MAX_INTPTS];
+      G4double segmentEdep[2*MAX_INTPTS];
+      G4double measuredX[2*MAX_INTPTS];
+      G4double measuredY[2*MAX_INTPTS];
+      G4double measuredZ[2*MAX_INTPTS];
+      G4double X0[2*MAX_INTPTS];
+      G4double Y0[2*MAX_INTPTS];
+      G4double Z0[2*MAX_INTPTS];
+      G4int NCons[2*MAX_INTPTS];
       G4double packingRes2 = packingRes*packingRes;
 
       G4int NMeasured = 0;
@@ -531,10 +531,10 @@ void EventAction::writeDecomp(long long int ts,
 {
   G4int siz;
   GEBDATA gd;
-  CRYS_IPS crys_ips[10000];
+  CRYS_IPS crys_ips[2*MAX_INTPTS];
 
   G4int Ndecomp = 0;
-  G4bool Processed[10000];
+  G4bool Processed[2*MAX_INTPTS];
   for(G4int i = 0; i < NMeasured; i++)
     Processed[i] = false;
 
@@ -713,7 +713,7 @@ void EventAction::writeSim(long long int ts, EventInformation* eventInfo)
 void EventAction::openEvfile()
 {
   if (!evfile.is_open()) evfile.open(outFileName.c_str());
-  if (evfile == NULL){
+  if (!evfile.is_open()){
     G4cout<< "ERROR opening evfile." << G4endl;
     evOut = false;
   } else {
