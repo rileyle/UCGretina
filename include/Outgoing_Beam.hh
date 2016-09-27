@@ -21,7 +21,6 @@ using namespace std;
 
 #include "Randomize.hh"
 #include "Incoming_Beam.hh"
-//#include "Charge_State.hh"
 
 // this is?
 #define  eps 0.00001
@@ -42,16 +41,11 @@ public:
   void setProjectileExcitation(){ targetExcitation = false; }
   void setTargetExcitation(){ targetExcitation = true; }
   G4bool TargetExcitation(){ return targetExcitation; }
-  //REMOVE
-  //  void setLvlSchemeFile(G4String name){ lvlSchemeFileName = name; }
-  //  void openLvlSchemeFile();
-  //  void closeLvlSchemeFile();
   void setLvlDataFile(G4String name){ lvlDataFileName = name; }
   void setTarA(G4int);
   void setTarZ(G4int);
   void setTarEx(G4double);
   void setTFrac(G4double);
-  //  void settau(G4double);
   void ScanInitialConditions(const G4Track &);
   void SetReactionOn(){ reacted=true;};
   void SetReactionOff(){reacted=false;}
@@ -66,9 +60,6 @@ public:
   G4ThreeVector ReactionPosition();
   G4int getTarA(){return TarA;}
   G4int getTarZ(){return TarZ;}
-  //  G4double GetBetaDopp(){return betaDopp;}
-  //  G4double GetGammaDopp(){return 1./sqrt(1.-betaDopp*betaDopp);}
-  //  G4double getTime(){return tau;}
   G4bool   ReactionOn(){return reacted;}
   G4bool   Source(){return source;}
   G4double GetThetaMax(){return theta_max;}
@@ -80,20 +71,6 @@ public:
   G4int    GetReactionFlag(){return ReactionFlag;}
   void     SetReactionFlag(G4int f){ReactionFlag=f;}
   G4int    AboveThreshold(){return ThresholdFlag;}
-  //REMOVE
-  //  void     SetNQ(G4int n){NQ=n;SetUpChargeStates();}
-  //  void     SetUpChargeStates();
-  //  void     SelectQ(G4int q){SQ=q;G4cout<<" Charge state "<<SQ<<" selected for setup"<<G4endl;}
-  //  void     SetQCharge(G4int);
-  //  void     SetQUnReactedFraction(G4double);
-  //  void     SetQReactedFraction(G4double);
-  //  void     SetQKEu(G4double);
-  //  void     SetQKE(G4double);
-  //  void     CalcQR();
-  //  void     CalcQUR();
-  //  G4int    GetIndex(){return Index;}
-  //  G4double GetURsetKE();
-  //  G4double GetRsetKE();
 
 private:
   G4int Ain;
@@ -104,8 +81,6 @@ private:
   G4ThreeVector pIn;
   G4int  ReactionFlag;
   G4int  ThresholdFlag;
-
-  //  G4double      tauIn; //REMOVE
   G4double      KEIn;
 
   G4int DZ;
@@ -121,20 +96,8 @@ private:
   G4double sin2theta3_max;
 
   G4double Ex,TarEx,TFrac;
-  //  G4String lvlSchemeFileName;  //REMOVE
-  //  std::ifstream lvlSchemeFile; //REMOVE
   G4String lvlDataFileName;
   std::ifstream lvlDataFile;
-  //REMOVE
-  //  G4int    Nlevels;
-  //  G4double relPop[1000];
-  //  G4double levelEnergy[1000];
-  //  G4double tau;
-  //  G4double betaDopp;
-  //  G4int    NQ,SQ;
-  //  vector<Charge_State*> Q;
-  //  G4double  QR[1000],QUR[1000];
-  //  G4int     QRI[1000],QURI[1000],Index;
 
   G4ParticleDefinition* beam;
   G4ParticleDefinition* ion;
@@ -143,9 +106,6 @@ private:
   G4ParticleDefinition* tarOut;
   G4ParticleDefinition* tarOutGS;
   
-  //  G4DecayTable *DecTab; //REMOVE
-  
-
   static G4RadioactiveDecay* decay;
   static G4RadioactiveDecaymessenger* decayMessenger;
   G4bool  reacted;
@@ -155,8 +115,8 @@ private:
 
   Incoming_Beam *beamIn;
 
-  G4double sigma_a; //TB
-  G4double sigma_b; //TB
+  G4double sigma_a;
+  G4double sigma_b;
   G4String xsectFileName;
   G4double theta_min;
   G4double theta_max;

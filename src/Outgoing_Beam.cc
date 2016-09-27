@@ -4,23 +4,17 @@
 #include "G4RadioactiveDecay.hh"
 #include "G4ProcessManager.hh"
 
-//G4RadioactiveDecay* Outgoing_Beam::decay;
-//G4RadioactiveDecaymessenger* Outgoing_Beam::decayMessenger;
-
 Outgoing_Beam::Outgoing_Beam()
 {
   DZ=0;
   DA=0;
   Ex=1.0*MeV;
-  //  lvlSchemeFileName = ""; //REMOVE
   lvlDataFileName = "";
   xsectFileName = "";
-  //  Nlevels = 1; //REMOVE
   TarEx=0.*keV;
   TarA = 1;
   TarZ = 1;
   TFrac=0.;
-  //  tau=0.0*ns; //REMOVE
 
   targetExcitation=false;
   reacted=false;
@@ -31,13 +25,7 @@ Outgoing_Beam::Outgoing_Beam()
   theta_min=0.;
   theta_bin=0.;
   twopi=8.*atan(1.);
-  //  NQ=1;SQ=0;           // REMOVE
-  //  SetUpChargeStates(); // REMOVE
   beamIn = NULL;
-  //  DecTab = NULL;       // REMOVE
-
-  //  decay = new G4RadioactiveDecay();
-  //  decayMessenger = new G4RadioactiveDecaymessenger(decay);
 }
 
 Outgoing_Beam::~Outgoing_Beam()
@@ -162,11 +150,6 @@ void Outgoing_Beam::setDecayProperties()
     A = ionGS->GetAtomicMass();
   }
 
-  //REMOVE
-  //  std::ostringstream sfname;
-  //  sfname << "z" << Z << ".a" << A;
-  //  G4String fname =  G4String(sfname.str());  
-
   if(lvlDataFileName == ""){
     G4cerr << "Error: level data file name not set." << G4endl;
     exit(EXIT_FAILURE);
@@ -202,7 +185,6 @@ void Outgoing_Beam::ScanInitialConditions(const G4Track & aTrack)
   KEIn=aTrack.GetDynamicParticle()->GetKineticEnergy();
   Ain=aTrack.GetDynamicParticle()->GetDefinition()->GetAtomicMass();
   Zin=aTrack.GetDynamicParticle()->GetDefinition()->GetAtomicNumber();
-  //  tauIn=aTrack.GetProperTime(); //REMOVE
   ReactionFlag=-1;
   if(aTrack.GetVolume()->GetLogicalVolume()->GetName()=="target_log")
     ReactionFlag=0;
@@ -372,7 +354,6 @@ void Outgoing_Beam::setXsectFile(G4String fileName)
 //---------------------------------------------------------
 void Outgoing_Beam::Report()
 {
-  //  setDecayProperties();
 
   G4cout<<"----> Delta A for the outgoing beam set to  "<<DA<< G4endl;
   G4cout<<"----> Delta Z for the outgoing beam set to  "<<DZ<< G4endl;
@@ -389,24 +370,6 @@ void Outgoing_Beam::Report()
     G4cout<<"----> Mass of the outgoing target-like reaction product is " <<tarOut->GetPDGMass()<<" MeV"<<G4endl;
   G4cout<<"----> Sigma for ata distribution set to "<<sigma_a<<G4endl;
   G4cout<<"----> Sigma for bta distribution set to "<<sigma_b<<G4endl;
-
-  //REMOVE???
-  // G4cout<<"----> Number of charge states "<<NQ<<G4endl;
-  // vector<Charge_State*>::iterator itPos = Q.begin();
-  // for(; itPos < Q.end(); itPos++) 
-  //   {
-  //     G4cout<<"----> Charge state "     <<(*itPos)->GetCharge()<<G4endl;
-  //     G4cout<<"   => UnReactedFraction "<<(*itPos)->GetUnReactedFraction()<<G4endl;
-  //     G4cout<<"   =>   ReactedFraction "<<(*itPos)->GetReactedFraction()<<G4endl;
-  //     if((*itPos)->GetUseSetKEu())
-  // 	{
-  // 	  G4cout<<"   =>              KE/A "<<(*itPos)->GetSetKEu()/MeV<<" MeV"<<G4endl; 
-  // 	}
-  //     else
-  // 	G4cout<<"   =>                KE "<<(*itPos)->GetSetKE()/MeV<<" MeV"<<G4endl;
-  //   }
-  // CalcQUR();
-  // CalcQR();
 
   G4IonTable::GetIonTable()->DumpTable();
 }
@@ -471,198 +434,6 @@ void Outgoing_Beam::setTFrac(G4double ex)
   if(TFrac>1) TFrac=1.;
   if(TFrac<0) TFrac=0.;
 
-  
   //G4cout<<"----> Fraction of target excitations set to "<<TFrac<<G4endl;
 
 }
-/* REMOVE
-//-----------------------------------------------------------------
-void Outgoing_Beam::settau(G4double t)
-{
-
-  tau=t;
-
-  //G4cout<<"----> Lifetime of the excited state for the outgoing beam set to "<<
-  // G4BestUnit(tau,"Time")<<G4endl; 
-}
-//---------------------------------------------------------
-void Outgoing_Beam::SetUpChargeStates()
-{
-
- vector<Charge_State*>::iterator itPos = Q.begin();
-  // clear all elements from the array
-  for(; itPos < Q.end(); itPos++)
-    delete *itPos;    // free the element from memory
-   // finally, clear all elements from the array
-  Q.clear();
-
-  for(G4int i=0;i<NQ;i++) 
-    Q.push_back(new Charge_State);
-
-
-}
-//---------------------------------------------------------
-void Outgoing_Beam::SetQCharge(G4int q)
-{
-
-  if(SQ>=0&&SQ<NQ)
-    {
-      vector<Charge_State*>::iterator itPos = Q.begin();
-
-      for(G4int i=0;i<SQ;i++) itPos++;
-      (*itPos)->SetCharge(q);
-    }
-  else
-    G4cout<<" Number of defined charge states ="<<NQ<<" is too small"<<G4endl;
-}
-
-//---------------------------------------------------------
-void Outgoing_Beam::SetQUnReactedFraction(G4double f)
-{
-
-  if(SQ>=0&&SQ<NQ)
-    {
-      vector<Charge_State*>::iterator itPos = Q.begin();
-
-      for(G4int i=0;i<SQ;i++) itPos++;
-      (*itPos)->SetUnReactedFraction(f);
-      CalcQUR();
-    }
-  else
-    G4cout<<" Number of defined charge states ="<<NQ<<" is too small"<<G4endl;
-}
-//---------------------------------------------------------
-void Outgoing_Beam::SetQReactedFraction(G4double f)
-{
-
-  if(SQ>=0&&SQ<NQ)
-    {
-      vector<Charge_State*>::iterator itPos = Q.begin();
-
-      for(G4int i=0;i<SQ;i++) itPos++;
-      (*itPos)->SetReactedFraction(f);
-      CalcQR();
-    }
-  else
-    G4cout<<" Number of defined charge states ="<<NQ<<" is too small"<<G4endl;
-}
-//---------------------------------------------------------
-void Outgoing_Beam::SetQKEu(G4double e)
-{
-  G4int A;
-
-  A=beamIn->getA()+DA;
-  if(SQ>=0&&SQ<NQ)
-    {
-      vector<Charge_State*>::iterator itPos = Q.begin();
-
-      for(G4int i=0;i<SQ;i++) itPos++;
-      (*itPos)->SetKEu(e,A);
-      CalcQR();
-      CalcQUR();
-    }
-  else
-    G4cout<<" Number of defined charge states ="<<NQ<<" is too small"<<G4endl;
-}
-//---------------------------------------------------------
-void Outgoing_Beam::SetQKE(G4double e)
-{
-
-  if(SQ>=0&&SQ<NQ)
-    {
-      vector<Charge_State*>::iterator itPos = Q.begin();
-
-      for(G4int i=0;i<SQ;i++) itPos++;
-      (*itPos)->SetKE(e);
-      CalcQR();
-      CalcQUR();
-    }
-  else
-    G4cout<<" Number of defined charge states ="<<NQ<<" is too small"<<G4endl;
-}
-//---------------------------------------------------------
-void Outgoing_Beam::CalcQR()
-{
-  G4double sum;
-  vector<Charge_State*>::iterator itPos = Q.begin();
-
-  sum=0.;
-  for(; itPos < Q.end(); itPos++)
-    sum+=(*itPos)->GetReactedFraction();
-  //  G4cout<<" Sum = "<<sum<<G4endl;
-  itPos = Q.begin();
-  G4int ind=0,i,max,n=0;
-  for(; itPos < Q.end(); itPos++)
-    { 
-  
-      max=(G4int)(1000.*(*itPos)->GetReactedFraction()/sum);
-      //      G4cout<<" Sum = "<<sum<<" Max = "<<max<<" n "<<n<<G4endl;
-      for(i=0;i<max;i++) 
-	{
-	  QR[ind]=(*itPos)->GetSetKE();
-	  QRI[ind]=n;
-	  ind++;
-	}
-      n++;
-    }
-
-}
-//---------------------------------------------------------
-void Outgoing_Beam::CalcQUR()
-{
-  G4double sum;
-  vector<Charge_State*>::iterator itPos = Q.begin();
-
-  sum=0.;
-  for(; itPos < Q.end(); itPos++)
-    sum+=(*itPos)->GetUnReactedFraction();
-
-  itPos = Q.begin();
-  G4int ind=0,i,max,n=0;
-  for(; itPos < Q.end(); itPos++)
-    { 
-      max=(G4int)(1000.*(*itPos)->GetUnReactedFraction()/sum);
-      //      G4cout<<" Sum = "<<sum<<" Max = "<<max<<" n "<<n<<" ind "<<ind<<G4endl;
-      for(i=0;i<max;i++) 
-	{
-	  QUR[ind]=(*itPos)->GetSetKE();
-	  QURI[ind]=n;
-	  ind++;
-	}
-      n++;
-    }
-}
-//---------------------------------------------------------
-G4double Outgoing_Beam::GetURsetKE()
-{
-  G4int i;
-
-  i=(G4int)(1000.*G4UniformRand());
-  Index=QURI[i];
-  return QUR[i];
-}
-//---------------------------------------------------------
-G4double Outgoing_Beam::GetRsetKE()
-{
-  G4int i;
-
-  i=(G4int)(1000.*G4UniformRand());
-  Index=QRI[i];
-  return QR[i];
-}
-*/
-//REMOVE
-// //----------------------------------------------------------
-// void Outgoing_Beam::openLvlSchemeFile()
-// {
-//   if(!lvlSchemeFile.is_open()) lvlSchemeFile.open(lvlSchemeFileName.c_str());
-  
-//   if (!lvlSchemeFile.is_open()) G4cout << "lvlSchemeFile ERROR" << G4endl;
-// }
-// //----------------------------------------------------------
-// void Outgoing_Beam::closeLvlSchemeFile()
-// {
-//   lvlSchemeFile.close();
-
-//   return;
-// }

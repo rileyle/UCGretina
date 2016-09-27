@@ -25,8 +25,7 @@ class Outgoing_Beam_Messenger: public G4UImessenger
   private:
     Outgoing_Beam* BeamOut;    
     G4UIdirectory*             BeamOutDir;
-  //    G4UIdirectory*             QDir; // REMOVE
-    G4UIcmdWithAnInteger*      DACmd;
+     G4UIcmdWithAnInteger*     DACmd;
     G4UIcmdWithAnInteger*      DZCmd;
     G4UIcmdWithADoubleAndUnit* ExCmd;
     G4UIcmdWithoutParameter*   SrcCmd;
@@ -35,20 +34,12 @@ class Outgoing_Beam_Messenger: public G4UImessenger
     G4UIcmdWithAnInteger*      TZCmd;
     G4UIcmdWithADoubleAndUnit* TExCmd;
     G4UIcmdWithADouble*        TExFCmd;
-  //    G4UIcmdWithADoubleAndUnit* tauCmd; // REMOVE
     G4UIcmdWithoutParameter*   RepCmd;
     G4UIcmdWithADoubleAndUnit* ThMinCmd;
     G4UIcmdWithADoubleAndUnit* ThMTCmd;
     G4UIcmdWithADoubleAndUnit* DistSigACmd;
     G4UIcmdWithADoubleAndUnit* DistSigBCmd;
     G4UIcmdWithAString*        XsectCmd;
-  //    G4UIcmdWithAnInteger*      NQCmd;    
-  //    G4UIcmdWithAnInteger*      SQCmd;  
-  //    G4UIcmdWithAnInteger*      SCCmd;  
-  //    G4UIcmdWithADouble*        QUFCmd;  
-  //    G4UIcmdWithADouble*        QRFCmd;  
-  //    G4UIcmdWithADoubleAndUnit* QKECmd;
-  //    G4UIcmdWithADoubleAndUnit* QKEuCmd;
     G4UIcmdWithoutParameter*   UpdateCmd;
 };
 
