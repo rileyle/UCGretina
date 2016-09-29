@@ -133,16 +133,17 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       KE=BeamIn->getKE(ion);
       particleGun->SetParticleEnergy(KE);
 
-      if(fracOn)
-	{
-	  if(G4UniformRand()<frac) 
-	    BeamOut->SetReactionOff();
-	  else   
-	    BeamOut->SetReactionOn();
-	}
+      //REMOVE
+      // if(fracOn)
+      // 	{
+      // 	  if(G4UniformRand()<frac) 
+      // 	    BeamOut->SetReactionOff();
+      // 	  else   
+      // 	    BeamOut->SetReactionOn();
+      // 	}
 
-      if(BeamOut->ReactionOn())
-      	{
+      //      if(BeamOut->ReactionOn())
+      // {
 
 	  G4double TT;
 	  G4double TC;
@@ -170,7 +171,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
 	  myDetector->setTargetReactionDepth(depth);
 
-	}
+	  //	} //REMOVE
 
     }
 

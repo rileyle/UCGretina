@@ -1,0 +1,47 @@
+================================================================================
+
+Several gamma-ray calibration sources are implemented in UCGretina
+which can be accessed with the 
+
+    /Experiment/RunSource
+
+and 
+
+    /Experiment/Source/Set
+
+commands. The macro file co60_gammas.mac illustrates this
+approach. These simulations are based on intensities adopted by the
+IAEA for standard calibration sources.
+
+In addition, realistic gamma-ray cascades from stationary sources can
+be simulated using the 
+
+    /BeamOut/Source
+
+command. The macro file co60.mac illustrates this approach.
+Descriptions of transitions de-exciting states of the daughter nucleus
+(60Ni) are read from the level data file z28.a60.ad.lvldata, which is
+a modified version of that provided with the PhotonEvaporationX.X data
+files, truncated to include levels populated by beta decay / EC and
+with isotropic angular distribution coefficients appended.
+
+================================================================================
+o Running the simulations
+
+  - In this directory, type
+
+      $ make
+
+    to run the simulations of the 60Co source described in
+    co60_gammas.mac, co60.mac.
+
+  - UCGretina writes mode 2 data to co60_gammas.dat and
+    co60.dat. (The names of the output files are specified in the
+    .mac files.)
+
+  - GRUTinizer sorts the mode 2 data in the .dat files into 
+    histograms in co60_gammas_histos.root, co60_histos.root.
+    (The GRUTinizer histogram library
+    ./util/GRUTinizer/MakeHistosSourcesSim.cxx is provided.) 
+
+================================================================================

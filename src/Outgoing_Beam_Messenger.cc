@@ -47,10 +47,11 @@ Outgoing_Beam_Messenger::Outgoing_Beam_Messenger(Outgoing_Beam* BO)
   TZCmd->SetParameterName("choice",false);
   TZCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  TExFCmd = new G4UIcmdWithADouble("/BeamOut/TargetExcitationFraction",this);
-  TExFCmd->SetGuidance("Set fraction of target excitation as compared to the projectile excitation.");
-  TExFCmd->SetParameterName("choice",false);
-  TExFCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  //REMOVE
+  // TExFCmd = new G4UIcmdWithADouble("/BeamOut/TargetExcitationFraction",this);
+  // TExFCmd->SetGuidance("Set fraction of target excitation as compared to the projectile excitation.");
+  // TExFCmd->SetParameterName("choice",false);
+  // TExFCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   RepCmd = new G4UIcmdWithoutParameter("/BeamOut/Report",this);
   RepCmd->SetGuidance("Report parameters for the outgoing beam.");
@@ -96,7 +97,7 @@ Outgoing_Beam_Messenger::~Outgoing_Beam_Messenger()
   delete TACmd;
   delete TZCmd;
   delete TExCmd;
-  delete TExFCmd;
+  //  delete TExFCmd; //REMOVE
   delete RepCmd;
   delete DZCmd;
   delete DACmd;
@@ -134,8 +135,9 @@ void Outgoing_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamOut->setTarA(TACmd->GetNewIntValue(newValue));}
   if( command == TZCmd )
     { BeamOut->setTarZ(TACmd->GetNewIntValue(newValue));}
-  if( command == TExFCmd )
-    { BeamOut->setTFrac(TExFCmd->GetNewDoubleValue(newValue));}
+  //REMOVE
+  // if( command == TExFCmd )
+  //   { BeamOut->setTFrac(TExFCmd->GetNewDoubleValue(newValue));}
   if( command == RepCmd )
     { BeamOut->Report();}
   if( command == ThMinCmd )

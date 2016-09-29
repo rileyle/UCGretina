@@ -41,7 +41,6 @@ G4bool TrackerIonSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
  const G4int    trackID = aStep->GetTrack()->GetTrackID(); 
  const G4String name =  aParticle->GetDefinition()->GetParticleName();
  const G4double len=aStep->GetStepLength();
- // G4cout<<G4endl;
 
   if(type=="nucleus")
    {     

@@ -6,9 +6,9 @@
 
 // These are declared in global scope so that they are accessible to the 
 // fit function fitf().
-TH1F *sim;       
-TH1F *spectrum;
-TH1F *backGround;
+GH1D *sim;       
+GH1D *spectrum;
+GH1D *backGround;
 
 // Fit function
 Double_t fitf(Double_t *v,Double_t *par) {
@@ -28,32 +28,43 @@ Double_t fitf(Double_t *v,Double_t *par) {
 
 }
 
-void fitSpectrum() {
-  fitSpectrum("egam");
+void eu152Fit() {
+  eu152Fit("eu152_gammas_histos.root", 4);
 }
 
-void fitSpectrum(TString histoName) {
+void eu152Fit(TString simFileName) {
+  eu152Fit(simFileName, 4);
+}
+
+void eu152Fit(TString simFileName, Int_t rebin) {
 
   // Load measured spectra =====================================================
   cout << "\nLoading measured spectra ...\n" << endl;
 
   TString specFileName = "data/run020_cal_histos.root";
   TFile *spF = new TFile(specFileName);
-  spF->GetObject(histoName,spectrum);
-
+  TH1F* spec;
+  spF->GetObject("egam", spec);
+  spectrum = (GH1D*)spec->Clone();
+  spectrum->Rebin(rebin);
+  
   TString bgFileName   = "data/run007_cal_histos.root";
   TFile *bgF = new TFile(bgFileName);
-  bgF->GetObject(histoName,backGround);
-
+  TH1F* back;
+  bgF->GetObject("egam", back);
+  backGround = (GH1D*)back->Clone();
+  backGround->Rebin(rebin);
+  
   // Load Geant4 simulations ===================================================
   cout << "\n... loading simulated spectra ...\n" << endl;
 
   const Int_t nSim = 1;       // Number of simulated gamma-rays
   
-  TString simFileName = "eu152_sim_histos.root";
+  //  TString simFileName = "eu152_gammas_histos.root";
   TFile *sF = new TFile(simFileName);
-  sF->GetObject(histoName,sim);
-
+  sF->GetObject("energy/energy_gaus", sim);
+  sim->Rebin(rebin);
+  
   // Check binning.
   cout << "\n   Measured spectrum has " << spectrum->GetBinWidth(1) 
        << " keV/channel" << endl;
@@ -66,39 +77,52 @@ void fitSpectrum(TString histoName) {
   cout << "\n... fitting ...\n" << endl;
 
   const Int_t nPar = nSim+3;  // Number of fit parameters
-  Float_t bgMinE  = 1540.;
-  Float_t bgMaxE = 2500.;
+  Float_t bgMinE  = 1800.;
+  Float_t bgMaxE = 3000.;
 
   Float_t fitMinE = 10.;
-  Float_t fitMaxE = 4000.;
+  Float_t fitMaxE = 3000.;
 
   // Initialize fit parameter array
-  Double_t par[1000];
+  Double_t par[nPar];
   par[0]  = 0.1;      // Measured random background
-  par[1]  = 2.0;             // Simulation
-  par[2]  = 50.;           // Threshold parameter 1
-  par[3]  =  5.;           // Threshold parameter 2
+  par[1]  = 10.0;     // Simulation
+  par[2]  = 85.;      // Threshold parameter 1
+  par[3]  =  5.;      // Threshold parameter 2
 
-  TF1 *f1 = new TF1("f1",fitf,bgMinE,bgMaxE,nPar);
-  f1->SetLineColor(4); // 4 = Blue
-  f1->SetNpx(1000);    // Number of points used to draw the function
+  TF1 *f1 = new TF1("f1", fitf, bgMinE, bgMaxE, nPar);
+  f1->SetLineColor(kBlue);
+  f1->SetNpx(10000);        // Number of points used to draw the function
 
   f1->SetParameters(par);
-  //  f1->FixParameter(0, 0.109163); // Run 081 (Based on 1540-4000 keV fit)
-  f1->FixParameter(2,0.0);
-  f1->FixParameter(3,0.001);
 
-  spectrum->GetXaxis()->SetRangeUser(0.,4000.);
-  TH1F *diff = (TH1F*)spectrum->Clone("diff");
+  // Fit the room background component.
+  f1->FixParameter(1, 10.);
+  f1->FixParameter(2, 85.);
+  f1->FixParameter(3, 5.);
 
-  // Set the background.
-  spectrum->Fit("f1","LRME");
+  spectrum->GetXaxis()->SetRangeUser(0.,3000.);
+  GH1D *diff = (GH1D*)spectrum->Clone("diff");
+  GH1D * sqrtup = (GH1D*)spectrum->Clone("Error+");
+  GH1D * sqrtdn = (GH1D*)spectrum->Clone("Error-");
+
+  ROOT::Math::MinimizerOptions::SetDefaultMinimizer("Minuit2", "Migrad");
+  ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls( 1000000 );
+  ROOT::Math::MinimizerOptions::SetDefaultMaxIterations( 100000 );
+
+  spectrum->Fit("f1","LR");
   
-  f1->FixParameter(0,f1->GetParameter(0));
+  f1->FixParameter(0, f1->GetParameter(0));
 
   // Fit the full spectrum.
   f1->SetRange(fitMinE, fitMaxE);
-  spectrum->Fit("f1","LRME");
+
+  f1->ReleaseParameter(1);
+  f1->ReleaseParameter(2);
+  f1->ReleaseParameter(3);
+  spectrum->Fit("f1","LR");
+
+  // Discrepancy ===============================================================
   
   // Create the difference spectrum
   for(int i=0;i<diff->GetNbinsX();i++) {
@@ -106,14 +130,23 @@ void fitSpectrum(TString histoName) {
     Float_t E = diff->GetBinCenter(i);
 
     if(E>fitMinE && E<fitMaxE) {
-      diff->SetBinContent(i, diff->GetBinContent(i) - f1->Eval(E));
+      diff->SetBinContent(i, f1->Eval(E) - diff->GetBinContent(i));
+      sqrtup->SetBinContent(i,  sqrt(spectrum->GetBinContent(i)
+				     +f1->Eval(E)));
+      sqrtdn->SetBinContent(i, -sqrt(spectrum->GetBinContent(i)
+				     +f1->Eval(E)));
+
     } else {
       diff->SetBinContent(i, 0.);
+      sqrtup->SetBinContent(i, 0.);
+      sqrtdn->SetBinContent(i, 0.);
     }
 
   }
 
-  TCanvas *Spectra = new TCanvas("Spectra", "Spectra", 600, 600);
+  // Display ===================================================================
+  
+  TCanvas *Spectra = new TCanvas("Spectra", "Spectra", 800, 800);
   Spectra->SetCrosshair();      //Include a crosshair cursor...
   Spectra->ToggleEventStatus(); //...and show its coordinates
   Spectra->Divide(1,2);
@@ -121,13 +154,30 @@ void fitSpectrum(TString histoName) {
   Spectra->cd(1);
   Spectra_1->SetLogy();
 
-  spectrum->SetLineColor(1);
+  spectrum->SetStats(kFALSE);
+  spectrum->SetLineColor(kBlack);
+  spectrum->GetXaxis()->SetTitle("Energy (keV)");
+  spectrum->GetYaxis()->SetTitle(Form("Counts/(%d keV)", rebin));
   spectrum->Draw();
 
   Spectra->cd(2);
-  diff->SetLineColor(1);
-  diff->GetYaxis()->SetRangeUser(-2000.,2000.);
+
+  diff->SetTitle("Discrepancy");
+  diff->SetStats(kFALSE);
+  diff->GetXaxis()->SetTitle("Energy (keV)");
+  diff->GetYaxis()->SetTitle(Form("Counts/(%d keV)", rebin));
+  diff->SetFillColor(kBlue);
+  diff->SetLineColor(kBlue);
+  diff->GetYaxis()->SetRangeUser(-5000.,5000.);
   diff->Draw();
+
+  sqrtup->SetFillColor(kGray);
+  sqrtup->SetLineColor(kGray);
+  sqrtup->Draw("SAME");
+  sqrtdn->SetFillColor(kGray);
+  sqrtdn->SetLineColor(kGray);
+  sqrtdn->Draw("SAME");
+  diff->Draw("SAME");
 
   cout << "Total difference = " << diff->Integral() << endl;
 

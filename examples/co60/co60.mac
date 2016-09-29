@@ -6,32 +6,43 @@
 /Target/Sled
 /BeamTube/Construct
 /Gretina/update
-# Set reaction parameters ======================================================
-/Experiment/Reaction/On
-/Target/Material G4_Galactic
-/Target/Thickness 0.1 um 
-/BeamIn/A 152
-/BeamIn/Z 62
-/BeamIn/KEu 0. keV
-/BeamIn/Focus/Z 0. mm
-/BeamIn/Focus/X 0. mm
-/BeamIn/Focus/Y 0. mm
+
+# Set source/decay parameters ==================================================
+
+# Turn off the Reaction process (G4RadioactiveDecay handles the beta decay).
+/process/inactivate Reaction
+
+# Stationary 60Co source
+/BeamOut/Source
+/BeamIn/A 60
+/BeamIn/Z 27
+/BeamIn/KEu 0. keV      
+
+# Source position and dimensions
+/BeamIn/Focus/Z  0. mm
+/BeamIn/Focus/X  0. mm
+/BeamIn/Focus/Y  0. mm
 /BeamIn/Focus/DX 0. mm
 /BeamIn/Focus/DY 0. mm
+
+# Load excited states of the daughter (60Ni) into the particle table.
 /BeamOut/DA 0
-/BeamOut/DZ 0
-/BeamOut/ProjectileExcitation 121.7818 keV
-/BeamOut/Source
+/BeamOut/DZ +1
+/BeamOut/LevelDataFile z28.a60.ad.lvldata
+
 /BeamOut/Update
+
 # Print simulation parameters to stdout ========================================
 /Target/Report
 /ExpHall/Report
+
 # Tracking parameters ==========================================================
 #/GammaPrint/Track_Set
 #/IonPrint/Track_Set
+
 # Output parameters ============================================================
-/Mode2/PackingRes 6.0 mm
+/Mode2/PackingRes 0.0 mm
 /Mode2/crmatFile crmat.LINUX
 /Mode2/GretinaCoords
-/Mode2/Filename sm152_122.dat
-/run/beamOn 16000
+/Mode2/Filename co60.dat
+/run/beamOn 1000000

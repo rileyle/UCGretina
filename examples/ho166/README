@@ -1,30 +1,31 @@
 ================================================================================
 
-This example illustrates the use of the /BeamOut/Source command with
-the /BeamOut/LevelSchemeFile command to simulate a stationary
-166Ho source. Gamma cascades are simulated, so this approach produces events
-with realistic multiplicity for gamma-gamma conicidence gating.
+The macro file ho166.mac simulates a 166Ho source using the  
 
-The level scheme of the 166Er decay product is specified in the level
-scheme file er166.lvl.  The relative populations of the levels and the
-gamma branching ratios are taken from ENSDF.
+    /BeamOut/Source
+
+command. Descriptions of transitions de-exciting states of the
+daughter nucleus (166Er) are read from the level data file
+z68.a166.ad.lvldata, which is a modified version of that provided with
+the PhotonEvaporationX.X data files, truncated to include levels
+populated by beta decay / EC and with isotropic angular distribution
+coefficients appended.
 
 ================================================================================
+o Running the simulations
 
-o In this directory, type
+  - In this directory, type
 
-    $ make
+      $ make
 
-  to run the simulation of the 166Ho source measurement described in
-  ho166.mac. The Makefile automates the following steps:
+    to run the simulation of the 166Ho source described in
+    ho166.mac.
 
-o UCGretina writes mode 2 data to ho166.dat. (The name of the output
-  file is specified in ho166.mac.)
+  - UCGretina writes mode 2 data to ho166.dat. (The name of the output
+    file is specified in the .mac file.)
 
-o SimCalculate is used to load the mode 2 data in ho166.dat into a
-  calibrated tree in ho166_sim.root
-
-o Sim_histos is used to sort the calibrated tree into histograms
-  written to ho166_sim_histos.root
+  - GRUTinizer sorts the mode 2 data in the .dat file into 
+    histograms in ho166_histos.root. (The GRUTinizer histogram library
+    ./util/GRUTinizer/MakeHistosSourcesSim.cxx is provided.) 
 
 ================================================================================

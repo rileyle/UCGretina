@@ -27,6 +27,8 @@ class EventAction_Messenger: public G4UImessenger
     G4UIcmdWithAString*        OutFileCmd;
     G4UIcmdWithoutParameter*   OutDetCmd;
     G4UIcmdWithADoubleAndUnit* PosResCmd;
+    G4UIcmdWithADoubleAndUnit* ThreshECmd;
+    G4UIcmdWithADoubleAndUnit* ThreshDECmd;
     G4UIdirectory*             Mode2Dir;
     G4UIcmdWithAString*        Mode2FileCmd;
     G4UIcmdWithAString*        crmatCmd;

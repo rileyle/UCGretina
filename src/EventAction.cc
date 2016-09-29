@@ -27,6 +27,8 @@ EventAction::EventAction()
   eventsPerSecond = 0;
   everyNevents = 1000;
   posRes = 0.;
+  threshE = 0.;
+  threshDE = 0.001*keV;
 }
 
 

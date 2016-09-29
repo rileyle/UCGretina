@@ -13,8 +13,14 @@ EventAction_Messenger::EventAction_Messenger(EventAction* EA):theEventAction(EA)
   OutDetCmd = new G4UIcmdWithoutParameter("/Output/DetectorsOnly",this);
   OutDetCmd->SetGuidance("Only print detected gamma-ray information.");
 
-  PosResCmd = new G4UIcmdWithADoubleAndUnit("/Output/PositionResolution", this);
+  PosResCmd = new G4UIcmdWithADoubleAndUnit("/Gretina/detector/PositionResolution", this);
   PosResCmd->SetGuidance("Set position resolution (default = 0).");
+
+  ThreshECmd = new G4UIcmdWithADoubleAndUnit("/Gretina/detector/ThresholdEnergy", this);
+  ThreshECmd->SetGuidance("Set crystal low-energy threshold (default = 0).");
+
+  ThreshDECmd = new G4UIcmdWithADoubleAndUnit("/Gretina/detector/ThresholdDE", this);
+  ThreshDECmd->SetGuidance("Set crystal low energy threshold width paramter (default = 0.001 keV).");
   
   Mode2Dir = new G4UIdirectory("/Mode2/");
   Mode2Dir->SetGuidance("Parameters for simulating Mode2 data.");
@@ -52,6 +58,8 @@ EventAction_Messenger::~EventAction_Messenger()
   delete OutFileCmd;
   delete OutDetCmd;
   delete PosResCmd;
+  delete ThreshECmd;
+  delete ThreshDECmd;
   delete Mode2Dir;
   delete Mode2FileCmd;
   delete crmatCmd;
@@ -74,6 +82,10 @@ void EventAction_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
     {theEventAction->SetOutDetsOnly();}
   if( command == PosResCmd )
     {theEventAction->SetPosRes(PosResCmd->GetNewDoubleValue(newValue));}
+  if( command == ThreshECmd )
+    {theEventAction->SetThreshE(ThreshECmd->GetNewDoubleValue(newValue));}
+  if( command == ThreshDECmd )
+    {theEventAction->SetThreshDE(ThreshDECmd->GetNewDoubleValue(newValue));}
   if( command == Mode2FileCmd )
     {theEventAction->SetMode2File(newValue);}
   if( command == crmatCmd )

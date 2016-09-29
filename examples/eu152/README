@@ -18,44 +18,34 @@ be simulated using the
 
     /BeamOut/Source
 
-command. The collection of macro files sm152_<Level Energy>.mac and
-gd152_<Level Energy>.mac macro files illustrate this approach. The
-number of events simulated for each level corresponds to the number of
-decays to that level per 1E6 decays. Level data is read from the files
-z62.a152 and z64.a152 which are versions of those provided with the
-PhotonEvaporation data files, truncated to include levels populated by
-beta decay / EC and with isotropic angular distribution coefficients
-appended.
+command. The macro file eu152.mac illustrates this approach.
+Descriptions of transitions de-exciting states of the daughter nuclei
+(152Sm and 152Gd) are read from the level data files
+z62.a152.ad.lvldata and z64.a152.ad.lvldata, which are modified
+versions of those provided with the PhotonEvaporationX.X data files,
+truncated to include levels populated by beta decay / EC and with
+isotropic angular distribution coefficients appended.
 
 ================================================================================
-
-================================================================================
-o Run the simulations
+o Running the simulations
 
   - In this directory, type
 
       $ make
 
     to run the simulations of the 152Eu source described in
-    eu152_gammas.mac, sm152_<Level Energy>.mac, and
-    gd152_<Level Energy>.mac. The Makefile automates the following
-    steps:
+    eu152_gammas.mac, eu152.mac.
 
-  - UCGretina writes mode 2 data to eu152_gammas.dat,
-    sm152_<Level Energy>.dat, and gd152_<Level Energy>.dat. (The names
-    of the output files are specified in the .mac files.)
+  - UCGretina writes mode 2 data to eu152_gammas.dat and
+    eu152.dat. (The names of the output files are specified in the
+    .mac files.)
 
   - GRUTinizer sorts the mode 2 data in the .dat files into 
     histograms in eu152_gammas_histos.root,
-    sm152_<Level Energy>_histos.root, and
-    gd152_<Level Energy>_histos.root.
+    eu152_histos.root. (The GRUTinizer histogram library
+    ./util/GRUTinizer/MakeHistosSourcesSim.cxx is provided.) 
 
-  - gadd (a GRUTinizer utility) combines the
-    sm152_<Level Energy>_histos.root, and
-    gd152_<Level Energy>_histos.root into a full 152Eu spectrum in
-    eu152_histos.root.
-
-o Fit a measured spectrum
+o Fitting a measured spectrum
 
   - The root files ./data/run022_cal_histos.root and 
     ./data/run007_cal_histos.root are measured 152Eu and room
@@ -67,12 +57,11 @@ o Fit a measured spectrum
     spectra. (The background scaling is set with a fit above 1540
     keV.)
 
-      $ root
-      $ .L eu152Fit.C
-      $ fitSpectrum()
+      $ grutinizer
+      GRizer [0] .x eu152Fit.C ("eu152_gammas_histos.root")
 
     The simulated spectrum is the response to 1E6 gamma rays, and fit
-    parameter 1 is the scaling factor. The measured spectrum
+    parameter p1 is the scaling factor. The measured spectrum
     corresponds to 
 
       Run020: free running, 595.6 live seconds, 9/17/2012
@@ -88,24 +77,19 @@ o Fit a measured spectrum
 
   - The output:
 
- FCN=577795 FROM MINOS     STATUS=UNCHANGED       0 CALLS          64 TOTAL
-                     EDM=2.67343e-11    STRATEGY= 1      ERROR MATRIX ACCURATE 
-  EXT PARAMETER                                   STEP         FIRST   
-  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
-   1  p0           5.03242e-01     fixed    
-   2  p1           4.93627e+01   1.59446e-02   1.59446e-02  -3.24280e-04
-   3  p2           0.00000e+00     fixed    
-   4  p3           1.00000e-03     fixed    
-                               ERR DEF= 0.5
-Total difference = 40010.3
+****************************************
+Minimizer is Minuit2 / Migrad
+MinFCN                    =       591878
+Chi2                      =    1.141e+06
+NDf                       =          745
+Edm                       =   1.4663e-08
+NCalls                    =          131
+p0                        =     0.456734                      	 (fixed)
+p1                        =      51.8667   +/-   0.0169514   
+p2                        =      84.2491   +/-   0.0297208   
+p3                        =      9.21024   +/-   0.0379807   
+Total difference = -90047.1
 
-  - The fixed parameters p2 and p3 are threshold parameters. Freeing
-    these finds the best-fit threshold parameters for the entire
-    array. However, it is preferable to determine threshold parameters
-    crystal-by-crystal and fold in simulated crystal thresholds at the 
-    SimCalculate stage as is done here (thresholds in run020_run007.thresh).
-
-    (This only affects lab-frame energies below about 200 keV --- not
-    always worth pursuing.)
+  - The fixed parameters p2 and p3 are low-energy threshold parameters.
 
 ================================================================================

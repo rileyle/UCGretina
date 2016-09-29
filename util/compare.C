@@ -49,9 +49,9 @@ void compare(TString file1, TString name1, TString file2, TString name2,
        << diff->Integral()/spectrum1->Integral()*100.
        << " %" << endl;
   
-  cout << "Difference > 60 keV = " << diff->Integral(60, 2000) << endl;
+  cout << "Difference > 100 keV = " << diff->Integral(100, 2000) << endl;
   cout << "                   "
-       << diff->Integral(60,2000)/spectrum1->Integral()*100.
+       << diff->Integral(100,2000)/spectrum1->Integral()*100.
        << " %" << endl;
 
   cout << "Difference > 1415 keV = " << diff->Integral(1415, 2000) << endl;

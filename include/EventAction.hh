@@ -42,7 +42,8 @@ class EventAction : public G4UserEventAction
     void closeMode2file();
     void writeGEBHeader(GEBDATA*);
     void writeS800(long long int, G4double, G4double, G4double, G4double);
-  void writeDecomp(long long int, G4int, G4int*, G4int*, G4int*, G4double*, G4double*, G4double*, G4double*, G4double*);
+    void writeDecomp(long long int, G4int, G4int*, G4int*, G4int*, G4double*,
+                     G4double*, G4double*, G4double*, G4double*);
     void writeSim(long long int, EventInformation*);
     void openCrmatFile();
     void closeCrmatFile();
@@ -64,6 +65,8 @@ class EventAction : public G4UserEventAction
     G4int GetEveryNEvents(){return everyNevents;}
 
     void SetPosRes(G4double res){posRes = res;}
+    void SetThreshE(G4double e){threshE = e;}
+    void SetThreshDE(G4double de){threshDE = de;}
   
   private:
     G4int ionCollectionID;
@@ -88,6 +91,8 @@ class EventAction : public G4UserEventAction
     G4bool fisInBeam;
     G4int NTotalEvents;
     G4double posRes;
+    G4double threshE;
+    G4double threshDE;
   
     G4int timerCount;
     G4int everyNevents;

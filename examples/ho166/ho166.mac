@@ -6,32 +6,42 @@
 /Target/Sled
 /BeamTube/Construct
 /Gretina/update
-# Set reaction parameters ======================================================
-/Experiment/Reaction/On
-/Target/Material G4_Galactic
-/Target/Thickness 0.1 um 
+
+# Set source/decay parameters ==================================================
+
+# Turn off the Reaction process (G4RadioactiveDecay handles beta decay).
+/process/inactivate Reaction
+
+# Stationary 166Ho source
+/BeamOut/Source
 /BeamIn/A 166
 /BeamIn/Z 67
-/BeamIn/KEu 0. keV
-/BeamIn/Focus/Z 0. mm
-/BeamIn/Focus/X 0. mm
-/BeamIn/Focus/Y 0. mm
+/BeamIn/KEu 0. keV      
+
+# Source position and dimensions
+/BeamIn/Focus/Z  0. mm
+/BeamIn/Focus/X  0. mm
+/BeamIn/Focus/Y  0. mm
 /BeamIn/Focus/DX 0. mm
 /BeamIn/Focus/DY 0. mm
+
+# Load excited states of the daughter (166Er) into the particle table.
 /BeamOut/DA 0
-/BeamOut/DZ 1
-/BeamOut/LevelSchemeFile er166.lvl
-/BeamOut/Source
-/BeamOut/tau 0 ps
+/BeamOut/DZ +1
+/BeamOut/LevelDataFile z68.a166.ad.lvldata
+
 /BeamOut/Update
+
 # Print simulation parameters to stdout ========================================
 /Target/Report
 /ExpHall/Report
+
 # Tracking parameters ==========================================================
 #/GammaPrint/Track_Set
 #/IonPrint/Track_Set
+
 # Output parameters ============================================================
-/Mode2/PackingRes 6.0 mm
+/Mode2/PackingRes 0.0 mm
 /Mode2/crmatFile crmat.LINUX
 /Mode2/GretinaCoords
 /Mode2/Filename ho166.dat

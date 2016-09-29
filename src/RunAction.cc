@@ -29,16 +29,19 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   else
     evaction->SetEveryNEvents(1);
 
-  if(BeamOut->ReactionOn()) {
-    G4cout<<" Simulating " << run->GetNumberOfEventToBeProcessed()
-	  << " scattered ions "<<G4endl;
+
+  G4cout << " Simulating " << run->GetNumberOfEventToBeProcessed();
+  if(BeamOut->Source()){
+    G4cout << " stationary source nuclei" << G4endl;
+  } else if(BeamOut->InFlight()) {
+    G4cout << " beam ions" << G4endl;
     evaction->SetInBeam(true);
   } else {
-    G4cout<<" Simulating "  << run->GetNumberOfEventToBeProcessed()
-	  << " source events "<<G4endl;
-    evaction->SetInBeam(false);
+    G4cout << " gamma-ray source events "<<G4endl;
   }
-  if(evaction->EvOut())
+
+
+if(evaction->EvOut())
     G4cout << " Writing ASCII output to " 
 	   << evaction->GetOutFileName() << G4endl;
   if(evaction->Mode2Out())

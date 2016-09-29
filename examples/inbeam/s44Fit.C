@@ -118,7 +118,7 @@ void s44Fit(Int_t rebin) {
     Double_t E = diff->GetBinCenter(i);
 
     if(E>fitMinE && E<fitMaxE) {
-      diff->SetBinContent(i, diff->GetBinContent(i) - f1->Eval(E));
+      diff->SetBinContent(i, f1->Eval(E) - diff->GetBinContent(i));
       sqrtup->SetBinContent(i,  sqrt(spectrum->GetBinContent(i)
 				     +f1->Eval(E)));
       sqrtdn->SetBinContent(i, -sqrt(spectrum->GetBinContent(i)
@@ -134,7 +134,7 @@ void s44Fit(Int_t rebin) {
 
   // Display ===================================================================
   
-  TCanvas *Spectra = new TCanvas("Spectra", "Spectra", 600, 600);
+  TCanvas *Spectra = new TCanvas("Spectra", "Spectra", 800, 800);
   Spectra->SetCrosshair();      //Include a crosshair cursor...
   Spectra->ToggleEventStatus(); //...and show its coordinates
   Spectra->Divide(1,2);
@@ -142,16 +142,22 @@ void s44Fit(Int_t rebin) {
   Spectra->cd(1);
   Spectra_1->SetLogy();
 
+  spectrum->SetStats(kFALSE);
   spectrum->SetLineColor(kBlack);
+  spectrum->GetXaxis()->SetTitle("Energy (keV)");
+  spectrum->GetYaxis()->SetTitle(Form("Counts/(%d keV)", rebin));
   spectrum->Draw();
 
   Spectra->cd(2);
 
   diff->SetTitle("Discrepancy");
+  diff->SetStats(kFALSE);
+  diff->GetXaxis()->SetTitle("Energy (keV)");
+  diff->GetYaxis()->SetTitle(Form("Counts/(%d keV)", rebin));
   diff->SetFillColor(kBlue);
   diff->SetLineColor(kBlue);
-
   diff->Draw();
+
   sqrtup->SetFillColor(kGray);
   sqrtup->SetLineColor(kGray);
   sqrtup->Draw("SAME");

@@ -35,39 +35,40 @@ public:
   void Update(){ beamIn->Report(); setDecayProperties(); Report(); }
   void defaultIncomingIon(Incoming_Beam *);
   void setDecayProperties(void);
-  void setDA(G4int);
-  void setDZ(G4int);
-  void setEx(G4double);
+  void setDA(G4int da){ DA.push_back(da); }
+  void setDZ(G4int dz){ DZ.push_back(dz); }
+  void setEx(G4double ex){ Ex = ex; }
   void setProjectileExcitation(){ targetExcitation = false; }
   void setTargetExcitation(){ targetExcitation = true; }
   G4bool TargetExcitation(){ return targetExcitation; }
-  void setLvlDataFile(G4String name){ lvlDataFileName = name; }
-  void setTarA(G4int);
-  void setTarZ(G4int);
-  void setTarEx(G4double);
-  void setTFrac(G4double);
+  void setLvlDataFile(G4String name){ lvlDataFileNames.push_back(name); }
+  void setTarA(G4int a){ TarA = a; }
+  void setTarZ(G4int z){ TarZ = z; }
+  void setTarEx(G4double ex){ TarEx=ex; }
   void ScanInitialConditions(const G4Track &);
-  void SetReactionOn(){ reacted=true;};
-  void SetReactionOff(){reacted=false;}
+  //  void SetReactionOn(){ reacted=true;}; //REMOVE
+  //  void SetReactionOff(){reacted=false;} //REMOVE
   void SetSource(){source=true;}
+  void SetInFlight(){inflight=true;}
   void SetThetaMin(G4double t){theta_min=t;}
   void SetThetaMax(G4double t){theta_max=t;}
-  void SetThetaSigmaA(G4double sig){sigma_a=sig;} //LR // TB
-  void SetThetaSigmaB(G4double sig){sigma_b=sig;} //LR // TB
+  void SetThetaSigmaA(G4double sig){sigma_a=sig;}
+  void SetThetaSigmaB(G4double sig){sigma_b=sig;}
 
   G4ParticleTable* particleTable; 
   G4DynamicParticle* ReactionProduct();
   G4ThreeVector ReactionPosition();
-  G4int getTarA(){return TarA;}
-  G4int getTarZ(){return TarZ;}
-  G4bool   ReactionOn(){return reacted;}
+  G4int    getTarA(){return TarA;}
+  G4int    getTarZ(){return TarZ;}
+  //  G4bool   ReactionOn(){return reacted;} //REMOVE
   G4bool   Source(){return source;}
+  G4bool   InFlight(){return inflight;}
   G4double GetThetaMax(){return theta_max;}
   G4double GetThetaMin(){return theta_min;}
-  G4double GetThetaSigmaA(){return sigma_a;} //TB
-  G4double GetThetaSigmaB(){return sigma_b;} //TB
-  void setXsectFile(G4String);
-  G4double getTFrac(){return TFrac;};
+  G4double GetThetaSigmaA(){return sigma_a;}
+  G4double GetThetaSigmaB(){return sigma_b;}
+  void     setXsectFile(G4String);
+  //  G4double getTFrac(){return TFrac;}; //REMOVE
   G4int    GetReactionFlag(){return ReactionFlag;}
   void     SetReactionFlag(G4int f){ReactionFlag=f;}
   G4int    AboveThreshold(){return ThresholdFlag;}
@@ -83,8 +84,8 @@ private:
   G4int  ThresholdFlag;
   G4double      KEIn;
 
-  G4int DZ;
-  G4int DA;
+  std::vector<G4int> DZ;
+  std::vector<G4int> DA;
   G4int TarA;
   G4int TarZ;
   G4double m1;
@@ -95,21 +96,20 @@ private:
   G4double p1;
   G4double sin2theta3_max;
 
-  G4double Ex,TarEx,TFrac;
-  G4String lvlDataFileName;
-  std::ifstream lvlDataFile;
+  G4double Ex,TarEx; //,TFrac; //REMOVE
+  std::vector<G4String> lvlDataFileNames;
+  //  std::ifstream lvlDataFile; //REMOVE
 
   G4ParticleDefinition* beam;
-  G4ParticleDefinition* ion;
-  G4ParticleDefinition* ionGS;
+  //  G4ParticleDefinition* ion; //REMOVE
   G4ParticleDefinition* tarIn;
-  G4ParticleDefinition* tarOut;
-  G4ParticleDefinition* tarOutGS;
+  //  G4ParticleDefinition* tarOut; //REMOVE
+  std::vector<G4ParticleDefinition*> ionGS;
+  std::vector<G4ParticleDefinition*> tarOutGS;
   
-  static G4RadioactiveDecay* decay;
-  static G4RadioactiveDecaymessenger* decayMessenger;
-  G4bool  reacted;
-  G4bool  source;
+  //  G4bool  reacted; //REMOVE
+  G4bool inflight;
+  G4bool source;
 
   G4bool targetExcitation;
 

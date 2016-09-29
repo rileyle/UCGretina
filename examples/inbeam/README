@@ -15,19 +15,19 @@ Example fit: 9Be(44S,44S') at 100 MeV/u with fictional inelastic cross sections
 
 ****************************************
 Minimizer is Minuit2 / Migrad
-MinFCN                    =      175.154
-Chi2                      =      277.843
+MinFCN                    =      194.646
+Chi2                      =      361.747
 NDf                       =          354
-Edm                       =  1.37424e-07
-NCalls                    =          550
-p0                        =      5.69621   +/-   0.0890612    	 (limited)
-p1                        =  -0.00870095   +/-   0.000482024  	 (limited)
-p2                        =       1.8726   +/-   0.256931     	 (limited)
-p3                        =  -0.00092636   +/-   0.000125381  	 (limited)
+Edm                       =  1.31597e-07
+NCalls                    =          469
+p0                        =      5.70541   +/-   0.096793     	 (limited)
+p1                        =    -0.008947   +/-   0.000552529  	 (limited)
+p2                        =      2.17438   +/-   0.234623     	 (limited)
+p3                        =  -0.00107732   +/-   0.000117586  	 (limited)
 p4                        =            0                      	 (fixed)
-p5                        =   0.00189812   +/-   0.000680773 
-p6                        =  0.000969745   +/-   0.000228275 
-p7                        =   0.00528793   +/-   0.000430473 
+p5                        =   0.00174721   +/-   0.000646258 
+p6                        =   0.00112492   +/-   0.000218024 
+p7                        =   0.00494196   +/-   0.000413673 
 
   Parameters p0-p3 specify two exponentials to fit the prompt
   background. Parameter p4 scales the measured background (not present
@@ -39,12 +39,12 @@ p7                        =   0.00528793   +/-   0.000430473
   the number of times the corresponding excited states were populated in
   the experiment to produce measured spectrum.
 
-      2+ state at 1329 keV:  1900 +/-680  (2000 exact)
-      2+ state at 2150 keV:   970 +/-230  (1000 exact)
-      4+ state at 2457 keV:  5290 +/-430  (5000 exact)
+      2+ state at 1329 keV:  1700 +/-650  (2000 exact)
+      2+ state at 2150 keV:  1120 +/-220  (1000 exact)
+      4+ state at 2457 keV:  4900 +/-410  (5000 exact)
 
   (The exact scaling factors for the peaks are known, because this is
-  simulated data generated in the ./makeData subdirectory.)
+   simulated data generated in the ./makeData subdirectory.)
 
 ================================================================================
 To set up your own fit ...

@@ -43,7 +43,7 @@ Executables are automatically installed in
 
 Several examples are in the examples subdirectory, including
 illustrations of fitting simulations to measured source and in-beam
-spectra. In the examples, the GrROOT package is used for sorting the
+spectra. In the examples, the GRUTinizer package is used for sorting the
 mode 2 output from UCGretina.
 
 ## Selected Macro File Commands ##
@@ -129,7 +129,7 @@ Mandatory command after all /BeamOut/ and /BeamIn/ commands:
 
     /BeamOut/Update
 
-Optional commands related to the incoming beam:
+Mandatory commands related to the incoming beam:
 
     /BeamIn/A <A> /BeamIn/Z <Z>
 
@@ -138,6 +138,8 @@ Optional commands related to the incoming beam:
     /BeamIn/KEu <double> <unit>
 
 > Kinetic energy per nucleon of the incoming beam
+
+Optional commands related to the incoming beam:
 
     /BeamIn/Dpp <double>
 
@@ -162,17 +164,23 @@ Optional commands related to the incoming beam:
 > specifies the momentum acceptance of the incoming beam, so the
 > momentum acceptance parameter should be set to zero: `/BeamIn/Dpp 0`.)
 
-    /BeamIn/Focus/X <double> <unit> /BeamIn/Focus/Y <double> <unit>
+    /BeamIn/Focus/X <double> <unit>
+
+    /BeamIn/Focus/Y <double> <unit>
 
 > Offsets of the emission point of the incoming beam. (Z defaults to
 > -50 cm. If you change this, make sure it is upstream of the target!)
 
-    /BeamIn/Focus/DX <double> <unit> /BeamIn/Focus/DY <double> <unit>
+    /BeamIn/Focus/DX <double> <unit>
+
+    /BeamIn/Focus/DY <double> <unit>
 
 > Horizontal and vertical widths of the beam spot at the emission
 > point (not on target)
 
-    /BeamIn/Focus/Ata0 <double> <unit> /BeamIn/Focus/Bta0 <double> <unit>
+    /BeamIn/Focus/Ata0 <double> <unit>
+
+    /BeamIn/Focus/Bta0 <double> <unit>
 
 > Direction of the incoming beam (dispersive and nondispersive angles,
 > respectively)
@@ -184,7 +192,7 @@ Optional commands related to the incoming beam:
 > Angular divergences of the incoming beam in the dispersive and
 > nondispersive directions, respectively.
 
-Commands related to the outgoing reaction product:
+Mandatory commands related to the outgoing beam:
 
     /BeamOut/DA <int> 
 
@@ -203,15 +211,31 @@ Commands related to the outgoing reaction product:
     /BeamOut/ProjectileExcitation <double> <unit>
 
 > Excitation energy of the beam-like reaction product. (The
-> target-like reaction product is not excited.) If a level scheme file
-> is used, the energy parameter is ignored. 
+> target-like reaction product is not excited.) This energy must
+> correspond to a state described in the level data file described
+> below. 
 
     /BeamOut/TargetExcitation <double> <unit>
 
 > Excitation energy of the target-like reaction product. (The
-> beam-like reaction product is not excited.) The energy parameter is
-> superseded by a level scheme file if a `/BeamOut/LevelSchemeFile`
-> command is present.
+> beam-like reaction product is not excited.) This energy must
+> correspond to a state described in the level data file described
+> below. 
+
+    /BeamOut/LevelDataFile <filename>
+
+> The level data file describes the discrete transitions of the
+> outgoing (beam-like or target-like) reaction product. Each line
+> describes a single transition, including the energy,
+> angular momentum, and lifetime of the level de-excited, and the
+> energy, angular momentum and parity change, internal conversion
+> coefficients, and gamma-ray angular distribution coefficients of the
+> transition. The file format is based on that of the
+> PhotonEvaporationX.X data files (described in detail in the file
+> $G4LEVELGAMMADAT/README-LevelGammaData) with three gamma-ray angular
+> distribution coefficients appended to each line.
+
+Optional commands related to the outgoing reaction product:
 
     /BeamOut/XsectFile <filename>
 
