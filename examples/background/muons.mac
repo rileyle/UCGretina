@@ -6,14 +6,17 @@
 /Target/Sled
 /BeamTube/Construct
 /Gretina/update
+
 # Source parameters ============================================================
 /Experiment/RunSource
 /Experiment/Source/Set muon
+
 # Tracking parameters ==========================================================
 #/GammaPrint/Track_Set
 #/IonPrint/Track_Set
+
 # Output parameters ============================================================
-/Mode2/PackingRes 6.0 mm
+/Mode2/PackingRes 0.0 mm
 /Mode2/crmatFile crmat.LINUX
 /Mode2/GretinaCoords
 /Mode2/Filename muons.dat

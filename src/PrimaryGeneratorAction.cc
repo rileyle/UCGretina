@@ -133,45 +133,31 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       KE=BeamIn->getKE(ion);
       particleGun->SetParticleEnergy(KE);
 
-      //REMOVE
-      // if(fracOn)
-      // 	{
-      // 	  if(G4UniformRand()<frac) 
-      // 	    BeamOut->SetReactionOff();
-      // 	  else   
-      // 	    BeamOut->SetReactionOn();
-      // 	}
-
-      //      if(BeamOut->ReactionOn())
-      // {
-
-	  G4double TT;
-	  G4double TC;
-	  G4double depth;
+      G4double TT;
+      G4double TC;
+      G4double depth;
     
-	  //Reactions in the target
+      //Reactions in the target
 
-	  // This works in general ...
-	  TT = myDetector->GetTarget()->DistanceToIn(position, direction);
-	  TT = myDetector->GetTarget()->DistanceToOut(position+TT*direction, 
-						      direction);
-          TT *= direction.getZ();
+      // This works in general ...
+      TT = myDetector->GetTarget()->DistanceToIn(position, direction);
+      TT = myDetector->GetTarget()->DistanceToOut(position+TT*direction, 
+						  direction);
+      TT *= direction.getZ();
 
-	  // ... but this may be faster, and approximately correct for 
-	  // a flat target.
-	  //	  TT= myDetector->GetTargetThickness();
+      // ... but this may be faster, and approximately correct for 
+      // a flat target.
+      //	  TT= myDetector->GetTargetThickness();
 
-	  TC=myDetector->GetTargetPos()->getZ();
-	  depth=TC+TT*(G4UniformRand()-0.5);
+      TC=myDetector->GetTargetPos()->getZ();
+      depth=TC+TT*(G4UniformRand()-0.5);
 
- 	  //    G4cout<< "- Target Thickness is  "<<TT/mm<<" mm"<<G4endl;
- 	  //    G4cout<< "- Target Center is at  "<<TC/mm<<" mm"<<G4endl;
- 	  //    G4cout<< "- Reaction depth   at  "<<depth/mm<<" mm"<<G4endl;
- 	  //    G4cout<< "- Direction is  "<<direction<<G4endl;
+      //    G4cout<< "- Target Thickness is  "<<TT/mm<<" mm"<<G4endl;
+      //    G4cout<< "- Target Center is at  "<<TC/mm<<" mm"<<G4endl;
+      //    G4cout<< "- Reaction depth   at  "<<depth/mm<<" mm"<<G4endl;
+      //    G4cout<< "- Direction is  "<<direction<<G4endl;
 
-	  myDetector->setTargetReactionDepth(depth);
-
-	  //	} //REMOVE
+      myDetector->setTargetReactionDepth(depth);
 
     }
 

@@ -42,10 +42,6 @@ private:
   G4UIcmdWithoutParameter*     SrcDFCmd;
   G4UIcmdWithoutParameter*     SrcDBCmd;
   G4UIcmdWithoutParameter*     SrcRepCmd;
-  //REMOVE
-  //  G4UIcmdWithoutParameter*     ROnCmd;
-  //  G4UIcmdWithoutParameter*     ROfCmd;
-  //  G4UIcmdWithADouble*          SFrCmd;
 
 };
 

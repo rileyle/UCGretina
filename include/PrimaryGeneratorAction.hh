@@ -53,9 +53,6 @@ public:
   void SetSourceBG();
   void SetSourceBGWhite();
   void SetSourceMuon();
-  //  void ReactionOn(){BeamOut->SetReactionOn();fracOn=false;}   //REMOVE
-  //  void ReactionOff(){BeamOut->SetReactionOff();fracOn=false;} //REMOVE
-  //  void SetFraction(G4double f){fracOn=true;frac=f;} //REMOVE
   void SetSourceEnergy(G4double);
   void SetWhiteSourceLowE(G4double energy){sourceWhiteLoE = energy;}
   void SetWhiteSourceHighE(G4double energy){sourceWhiteHiE = energy;}

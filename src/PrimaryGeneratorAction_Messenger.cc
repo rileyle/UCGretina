@@ -79,18 +79,6 @@ PrimaryGeneratorAction_Messenger::PrimaryGeneratorAction_Messenger(PrimaryGenera
   SrcRepCmd = new G4UIcmdWithoutParameter("/Experiment/Source/Report",this);
   SrcRepCmd->SetGuidance("Report source parameters");
 
-  //REMOVE
-  //  ROfCmd = new G4UIcmdWithoutParameter("/Experiment/Reaction/Off",this);
-  //  ROfCmd->SetGuidance("Simulate only unreacted ions.");
-
-  //  ROnCmd = new G4UIcmdWithoutParameter("/Experiment/Reaction/On",this);
-  //  ROnCmd->SetGuidance("Simulate only Coulomb scattered ions.");
-
-  //  SFrCmd = new G4UIcmdWithADouble("/Experiment/Reaction/UnscatteredFraction",this);
-  //  SFrCmd->SetGuidance("Set fraction of Coulomb unscattered ions in the beam ");
-  //  SFrCmd->SetParameterName("fraction",false);
-  //  SFrCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-  
 }
 
 
@@ -116,10 +104,6 @@ PrimaryGeneratorAction_Messenger::~PrimaryGeneratorAction_Messenger()
   delete SrcCollAngCmd;
   delete SrcCollDirCmd;
   delete SrcRepCmd;
-  //REMOVE
-  //  delete ROnCmd;
-  //  delete ROfCmd;
-  //  delete SFrCmd;
 }
 
 
@@ -172,16 +156,6 @@ void PrimaryGeneratorAction_Messenger::SetNewValue(G4UIcommand* command,G4String
 
   if( command == SrcRepCmd )
     {PGA ->SourceReport();}
-
-  //REMOVE
-  //  if( command == ROnCmd )
-  //    {PGA ->ReactionOn();}
-
-  //  if( command == ROfCmd )
-  //    {PGA ->ReactionOff();}
-
-  // if( command == SFrCmd )
-  //    {PGA ->SetFraction(SFrCmd->GetNewDoubleValue(newValue));}
 
 }
 

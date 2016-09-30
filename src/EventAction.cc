@@ -106,18 +106,18 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 
       // Packing: consolidate interaction points within segments 
       // based on proximity. 
-      G4int trackID[2*MAX_INTPTS];
-      G4int detNum[2*MAX_INTPTS];
-      G4int segNum[2*MAX_INTPTS];
-      G4double measuredEdep[2*MAX_INTPTS];
-      G4double segmentEdep[2*MAX_INTPTS];
-      G4double measuredX[2*MAX_INTPTS];
-      G4double measuredY[2*MAX_INTPTS];
-      G4double measuredZ[2*MAX_INTPTS];
-      G4double X0[2*MAX_INTPTS];
-      G4double Y0[2*MAX_INTPTS];
-      G4double Z0[2*MAX_INTPTS];
-      G4int NCons[2*MAX_INTPTS];
+      G4int trackID[100*MAX_INTPTS];
+      G4int detNum[100*MAX_INTPTS];
+      G4int segNum[100*MAX_INTPTS];
+      G4double measuredEdep[100*MAX_INTPTS];
+      G4double segmentEdep[100*MAX_INTPTS];
+      G4double measuredX[100*MAX_INTPTS];
+      G4double measuredY[100*MAX_INTPTS];
+      G4double measuredZ[100*MAX_INTPTS];
+      G4double X0[100*MAX_INTPTS];
+      G4double Y0[100*MAX_INTPTS];
+      G4double Z0[100*MAX_INTPTS];
+      G4int NCons[100*MAX_INTPTS];
       G4double packingRes2 = packingRes*packingRes;
 
       G4int NMeasured = 0;
@@ -263,6 +263,12 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 		 << " of event " << event_id 
 		 << G4endl;
 
+	if(NMeasured >= 100*MAX_INTPTS){
+	  G4cout << "Error: too many decomposed hits. Increase hit processing array dimension."
+		 << G4endl;
+	  exit(EXIT_FAILURE);
+	}
+	
       }
 
       // Packing: Consolidate the "measured" gamma-ray interaction points
@@ -390,7 +396,7 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	  measuredZ[i] += CLHEP::RandGauss::shoot(0, posRes);
 	}
       }
-      
+
       // Write decomposed gamma event(s) to the output file
       writeDecomp(timestamp, 
 		  NMeasured, 
@@ -533,10 +539,10 @@ void EventAction::writeDecomp(long long int ts,
 {
   G4int siz;
   GEBDATA gd;
-  CRYS_IPS crys_ips[2*MAX_INTPTS];
+  CRYS_IPS crys_ips[100*MAX_INTPTS];
 
   G4int Ndecomp = 0;
-  G4bool Processed[2*MAX_INTPTS];
+  G4bool Processed[100*MAX_INTPTS];
   for(G4int i = 0; i < NMeasured; i++)
     Processed[i] = false;
 
@@ -584,13 +590,16 @@ void EventAction::writeDecomp(long long int ts,
 	   Processed[j] == false &&
 	   detNum[j]+4 == crys_ips[Ndecomp].crystal_id){
 	  crys_ips[Ndecomp].tot_e += e[j];
-	  crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].x = x[j];
-	  crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].y = y[j];
-	  crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].z = z[j];
-	  crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].e = e[j];
-	  crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].seg = segNum[j];
-	  crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].seg_ener = se[j];
-	  crys_ips[Ndecomp].num++;
+	  // Only MAX_INTPTS interaction points can be stored in a crys_ips.
+	  if( crys_ips[Ndecomp].num < MAX_INTPTS ){
+	    crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].x = x[j];
+	    crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].y = y[j];
+	    crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].z = z[j];
+	    crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].e = e[j];
+	    crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].seg = segNum[j];
+	    crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].seg_ener = se[j];
+	  }
+	  crys_ips[Ndecomp].num++; // Check for overflow below, and warn.
 	  Processed[j] = true;
 	}
       }
@@ -604,12 +613,16 @@ void EventAction::writeDecomp(long long int ts,
     gd.timestamp = ts;
     gd.length = sizeof(CRYS_IPS);
 
-    if(Ndecomp > MAX_INTPTS)
-      G4cout << "Warning: " << Ndecomp << " interaction points."
-	     << "         only " << MAX_INTPTS << " can be written."
-	     << G4endl;
-
     for(G4int i = 0; i < Ndecomp; i++){
+
+      if(crys_ips[i].num > MAX_INTPTS){
+	G4cout << "Warning: " << crys_ips[i].num << " interaction points."
+	       << "         only " << MAX_INTPTS << " can be written."
+	       << G4endl;
+	crys_ips[i].num = MAX_INTPTS;
+
+      }
+
       //Write GEB header for decomp event
       writeGEBHeader(&gd);
 

@@ -12,7 +12,6 @@ Outgoing_Beam::Outgoing_Beam()
   TarA = 1;
   TarZ = 1;
   targetExcitation=false;
-  //  reacted=false; // REMOVE
   source=false;
   inflight=false;
   sigma_a=0.;
@@ -148,16 +147,6 @@ void Outgoing_Beam::setDecayProperties()
 
   if(beamIn->getKE(beam) > 0.)
     SetInFlight();
-
-  //  if(source){
-  //    G4ProcessManager *pm;
-  //    if(targetExcitation){
-  //      pm = tarIn->GetProcessManager();
-  //    } else {
-  //      pm = beam->GetProcessManager();
-  //    }
-  //  }
-  //  pm->RemoveProcess (G4VProcess *aProcess);
   
   //  ionTable()->DumpTable();
 }
