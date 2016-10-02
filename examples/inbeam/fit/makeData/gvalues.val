@@ -1,0 +1,15 @@
+GRETINA_X_OFFSET {
+  Value: 0.0
+}
+
+GRETINA_Y_OFFSET {
+  Value: 0.0
+}
+
+GRETINA_Z_OFFSET {
+  Value: 0.0
+}
+
+BETA {
+  Value: 0.4169
+}

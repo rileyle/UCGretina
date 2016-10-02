@@ -198,6 +198,24 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		      hit.GetCoreEnergy()*gRandom->Gaus(1,1./1000.));
 
     for(int i=0; i<nBetas; i++){
+
+      // Symmetrized gamma-gamma
+      Double_t e1 = hit.GetDoppler_2(betas[i])*gRandom->Gaus(1,1./1000.);
+      for(int y=x+1; y<gretina->Size(); y++){
+
+	TGretinaHit hit2 = gretina->GetGretinaHit(y);
+	Double_t e2 = hit2.GetDoppler_2(betas[i])*gRandom->Gaus(1,1./1000.);
+      
+	obj.FillHistogram("energy",
+			  Form("gamma_gamma_dop_%.0f_gaus", betas[i]*10000),
+			  energyNChannels/16, energyLlim, energyUlim/2, e1,
+			  energyNChannels/16, energyLlim, energyUlim/2, e2);
+	obj.FillHistogram("energy",
+			  Form("gamma_gamma_dop_%.0f_gaus", betas[i]*10000),
+			  energyNChannels/8, energyLlim, energyUlim, e2,
+			  energyNChannels/8, energyLlim, energyUlim, e1);
+      }
+    
       obj.FillHistogram("energy",
 			Form("dop_%.0f", betas[i]*10000),
 			energyNChannels, energyLlim, energyUlim,
