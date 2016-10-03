@@ -43,8 +43,11 @@ Executables are automatically installed in
 
 Several examples are in the examples subdirectory, including
 illustrations of fitting simulations to measured source and in-beam
-spectra. In the examples, the GRUTinizer package is used for sorting the
-mode 2 output from UCGretina.
+spectra. Makefiles are provided in the examples for sorting simulated
+mode 2 output with the
+[GRUTinizer](https://github.com/pcbend/GRUTinizer) and
+[GrROOT](http://nucl.phys.s.u-tokyo.ac.jp/wimmer/software.php)
+packages.
 
 ## Selected Macro File Commands ##
 
