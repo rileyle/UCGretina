@@ -2,16 +2,14 @@
 
 ## Compile and install ##
 
-Install version 4.10.02.p02 of the Geant4 libraries from
-http://geant4.web.cern.ch/geant4/support/download.shtml. You will need
-the data files for low energy electromagnetic processes. 
+Install version [4.10.02.p02 of the Geant4 libraries](http://geant4.web.cern.ch/geant4/support/download.shtml). 
+You will need the data files for low energy electromagnetic processes,
+photon evaporation, and radioactive decay.
 
 Simulating the LBL scanning table requires the external
 [CADMesh](https://github.com/christopherpoole/cadmesh) package. Paths
 to the CADMesh `include` and `lib` directories must be set in the
-GNUMakefile. _However, as of Geant4.10.02.p02, instantiating the 
-G4TessellatedSolid objects results in malloc errors. UCGretina v3 is
-current solution._
+GNUMakefile.
 
 Set up your environment (consider adding this to your `.bashrc`):
 

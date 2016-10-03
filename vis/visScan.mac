@@ -1,6 +1,7 @@
 /ExpHall/X_length 2. m
 /ExpHall/Y_length 2. m
 /ExpHall/Z_length 2. m
+
 # Detector parameters ==========================================================
 /Gretina/detector/enableCapsules
 /ScanningTable/CADModelPath ../../cadModels
@@ -9,13 +10,27 @@
 /ScanningTable/IncludeCloverCart
 /ScanningTable/IncludeSlitMount
 /ScanningTable/IncludeShields
+/ScanningTable/IncludeCollimator
+/ScanningTable/IncludeCollimatorInsert
+/ScanningTable/SetCollimatorRadius 0.5 mm
+/ScanningTable/IncludeCollimatorMount
+/ScanningTable/SetXShift    0 mm
+/ScanningTable/SetYShift    -64.9 mm    # z, actually
+/ScanningTable/SetZShift   -4.64 mm    # y, actually
+/ScanningTable/SetCloverZ -24.34 mm    # y, actually
 /Gretina/update
+
 # Source parameters ============================================================
 /Experiment/RunSource
 /Experiment/Source/Set cs137
 /Experiment/Source/setX 0. mm
 /Experiment/Source/setY 200. mm
-/Experiment/Source/setZ -37.05 mm
+/Experiment/Source/setZ -64.9 mm
+/Experiment/Source/setR 0.1 mm
+# Comment these out to simulate events into the collimator/sleeve
+/Experiment/Source/CollimationDirection 0 1 0
+/Experiment/Source/CollimationAngle 0.37595 deg
+
 # Print simulation parameters to stdout ========================================
 /ExpHall/Report
 
