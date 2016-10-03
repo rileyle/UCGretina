@@ -1,0 +1,26 @@
+all: s44_1329_histos.root \
+     s44_2150_histos.root \
+     s44_2457_histos.root \
+     s44_spectrum.root
+	echo "Geant4 simulations done."
+
+# Pattern rules for running Geant4 simulations and sorting the output
+# into Root histograms
+%.dat : %.mac
+	UCGretina $*.mac | tee $*.log
+
+%_sim.root : %.dat
+	SimCalculate -i $*.dat -o $*_sim.root -s s44.set | tee $*_sim.log
+
+%_histos.root : %_sim.root
+	Sim_histos -i $*_sim.root -o $*_histos.root | tee $*_histos.log
+
+s44_spectrum.root: makeSpec_GrR.C \
+                   s44_1329_histos.root \
+                   s44_2150_histos.root \
+                   s44_2457_histos.root
+	root -l -b -q 'makeSpec_GrR.C'
+	cp s44_spectrum.root ..
+
+clean:
+	rm *.log *.dat *.root

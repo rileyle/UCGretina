@@ -1,5 +1,9 @@
 ================================================================================
-Example fit: 9Be(44S,44S') at 100 MeV/u with fictional inelastic cross sections
+Example fit: 1H(44S,44S') at 100 MeV/u populating the states at
+             1329 keV, 2150 keV, and 2457 keV with with fictional
+	     inelastic cross sections 
+================================================================================
+- Run the simulations, using GRUTinizer to sort:
 
 - Run the simulations:
 
@@ -83,7 +87,8 @@ To set up your own fit ...
       those you use in your gamma-ray simulation. Use the average of
       the simulated beta spectrum --- the specrum called "sim/beta" in
       the GRUTinizer histogram file provided
-      (./util/GRUTinizer/MakeHistosInbeam.cxx).
+      (./util/GRUTinizer/MakeHistosInbeam.cxx) and "hbeta" in the
+      GrROOT histogram file provided (./util/GrROOT/SimHistograms.cc).
 
       In the current example 1H(44S, 44S') at 100 MeV/A, we find 0.4068.
 
@@ -94,14 +99,12 @@ To set up your own fit ...
       corresponding to the center of the S800 acceptance is set in
       each macro file with the /Mode2/S800KE command. For experimental
       data, this should be set based on the actual S800 setting. For
-      purely simulated data, this parameter can be adjusted to center
-      the simulated DTA spectrum at 0%. The DTA spectrum is named
-      "s800/dta" in the GRUTinizer histogram file provided
-      (./util/GRUTinizer/MakeHistosInbeam.cxx).
-
-- Run the simulations:
-
-  $ make
+      purely simulated data, the average kinetic energy of the
+      outgoing reaction product post-target can be used. The DTA
+      spectrum is named "s800/dta" in the GRUTinizer histogram library
+      provided (./util/GRUTinizer/MakeHistosInbeam.cxx) and "dta" in
+      the GrROOT histogram file provided
+      (./util/GrROOT/SimHistograms.cc). 
 
 - Make a modified version of s44Fit.C: 
 

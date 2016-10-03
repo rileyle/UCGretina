@@ -1,17 +1,29 @@
 ================================================================================
-Example fit: 9Be(44S,44S') at 100 MeV/u with fictional inelastic cross sections
+Example fit: 9Be(44S,44S') at 100 MeV/u populating the states at
+             1329 keV, 2150 keV, and 2457 keV with with fictional
+	     inelastic cross sections 
+================================================================================
+- Run the simulations, using GRUTinizer to sort:
 
-- Run the simulations:
+    $ make
 
-  $ make
+  or using GrROOT to sort:
 
-- Run the fit script:
+    $ make -f Makefile.GrROOT
 
-  $ grutinizer
+- Run the fit script, with spectra sorted with GRUITinizer:
 
-  GRizer [0] .x s44Fit.C
+    $ grutinizer
 
-- Here's the fit output:
+    GRizer [0] .x s44Fit.C
+
+  or with spectra sorted with GrROOT:
+
+    $ root -l
+
+    root [0] .x s44Fit_GrR.C
+
+- Sample fit output:
 
 ****************************************
 Minimizer is Minuit2 / Migrad
@@ -83,7 +95,8 @@ To set up your own fit ...
       those you use in your gamma-ray simulation. Use the average of
       the simulated beta spectrum --- the specrum called "sim/beta" in
       the GRUTinizer histogram file provided
-      (./util/GRUTinizer/MakeHistosInbeam.cxx).
+      (./util/GRUTinizer/MakeHistosInbeam.cxx) and "hbeta" in the
+      GrROOT histogram file provided (./util/GrROOT/SimHistograms.cc).
 
       In the current example 9Be(44S, 44S') at 100 MeV/A, 0.4169.
 
@@ -96,12 +109,10 @@ To set up your own fit ...
       data, this should be set based on the actual S800 setting. For
       purely simulated data, the average kinetic energy of the
       outgoing reaction product post-target can be used. The DTA
-      spectrum is named "s800/dta" in the GRUTinizer histogram file
-      provided (./util/GRUTinizer/MakeHistosInbeam.cxx).
-
-- Run the simulations:
-
-  $ make
+      spectrum is named "s800/dta" in the GRUTinizer histogram library
+      provided (./util/GRUTinizer/MakeHistosInbeam.cxx) and "dta" in
+      the GrROOT histogram file provided
+      (./util/GrROOT/SimHistograms.cc). 
 
 - Make a modified version of s44Fit.C: 
 

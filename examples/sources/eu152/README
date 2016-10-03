@@ -34,13 +34,16 @@ o Running the simulations
       $ make
 
     to run the simulations of the 152Eu source described in
-    eu152_gammas.mac, eu152.mac.
+    eu152_gammas.mac, eu152.mac and sort with GRUITinizer. To sort with 
+    GrROOT,
+
+      $ make -f Makefile.GrROOT
 
   - UCGretina writes mode 2 data to eu152_gammas.dat and
     eu152.dat. (The names of the output files are specified in the
     .mac files.)
 
-  - GRUTinizer sorts the mode 2 data in the .dat files into 
+  - GRUTinizer or GrROOT sorts the mode 2 data in the .dat files into
     histograms in eu152_gammas_histos.root,
     eu152_histos.root. (The GRUTinizer histogram library
     ./util/GRUTinizer/MakeHistosSourcesSim.cxx is provided.) 

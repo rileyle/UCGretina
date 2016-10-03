@@ -32,12 +32,15 @@ o Running the simulations
       $ make
 
     to run the simulation of the 166Ho source described in
-    ho166.mac.
+    ho166.mac and sort with GRUITinizer. To sort with
+    GrROOT,
+
+      $ make -f Makefile.GrROOT
 
   - UCGretina writes mode 2 data to ho166.dat. (The name of the output
     file is specified in the .mac file.)
 
-  - GRUTinizer sorts the mode 2 data in the .dat file into 
+  - GRUTinizer or GrROOT sorts the mode 2 data in the .dat file into 
     histograms in ho166_histos.root. (The GRUTinizer histogram library
     ./util/GRUTinizer/MakeHistosSourcesSim.cxx is provided.) 
 
