@@ -8,9 +8,8 @@ all:  eu152_gammas_histos.root \
 	UCGretina $*.mac | tee $*.log
 
 %_histos.root : %.dat
-	grutinizer -qH $*.dat -o $*.root --hist-output $*_histos.root
+	grutinizer -qH $*.dat -o /dev/null --hist-output $*_histos.root
 	rm $*.dat
-	rm $*.root
 
 clean:
 	rm *.log *.dat *.root

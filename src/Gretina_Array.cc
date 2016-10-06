@@ -307,7 +307,7 @@ void Gretina_Array:: ReadSolidFile()
       nPgons++;
       break;
     }
-    if(opgon != i1) {
+    if(opgon != i1) { // first-pass initializaton for each solid
       nPgons++;
       opgon = i1;
       pgons.push_back( CpolyhPoints() );
