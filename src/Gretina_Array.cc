@@ -1074,9 +1074,9 @@ void Gretina_Array::ConstructGeCrystals()
         sprintf(sName, "geCapsPolyPcone%2.2d", nGe);
         pPg->pCaps = new G4IntersectionSolid(G4String(sName), pPg->pPoly, pPg->pCoax, G4Transform3D( rm, G4ThreeVector() ) );
 
-	G4cout << " Cubic Volume (" << sName << ") = "
-	       << pPg->pCaps->GetCubicVolume()/cm3
-	       << " cm3" << G4endl;
+	// G4cout << " Total Ge Volume (" << sName << ") = "
+	//        << pPg->pCaps->GetCubicVolume()/cm3
+	//        << " cm3" << G4endl;
 
         if( usePassive ) {
           if( pPg->passThick1 > 0. ) {
@@ -1187,8 +1187,20 @@ void Gretina_Array::ConstructGeCrystals()
     //    pPg->pDetL->SetSensitiveDetector( theDetector->GeSD() );    //LR
     pPg->pDetL->SetSensitiveDetector( theDetector->GetGammaSD() );    //LR
     ngen++;
+
+    G4cout << "\n  Total Ge Volume (" << pPg->pCaps->GetName() << ") = "
+	   << pPg->pCaps->GetCubicVolume()/cm3
+	   << " cm3" << G4endl;
+    G4cout << "    Back dead layer volume(" << pPg->pCaps1->GetName() << ") = "
+	   << pPg->pCaps1->GetCubicVolume()/cm3
+	   << " cm3" << G4endl;
+    G4cout << "    Coaxial dead layer volume(" << pPg->pCoax2->GetName() << ") = "
+	   << pPg->pCoax2->GetCubicVolume()/cm3
+	   << " cm3\n" << G4endl;
   }
+  
   G4cout << "Number of generated crystals is " << ngen << G4endl;
+
 }
 
 void Gretina_Array::ConstructTheCapsules()
@@ -1729,10 +1741,12 @@ void Gretina_Array::ConstructSegments()
     if( ppgerm->isPlanar ) continue;
     
     indexS = tSegments[iPg];
-    G4cout << " Crystal type " << iPg << ": ";
+    G4cout << " Crystal type " << iPg << ": " << G4endl;
+    G4cout << "   Segment volumes:" << G4endl;
     for( slice=0; slice<ppgerm->nslice; slice++ ) {
       for( sector=0; sector<ppgerm->npoints/2; sector++, indexS++) { 
         nGe = 100 * iPg + 10 * slice + sector;     // --> PPPSs (P=CrystalShape, S =Slice, s=sector) 
+	G4double segVol = 0.;
         // the four parts composing the segment
         for(int ss = 0; ss < 4; ss++) {
           switch (ss) {
@@ -1764,12 +1778,17 @@ void Gretina_Array::ConstructSegments()
             new G4PVPlacement( 0, G4ThreeVector(), ppseg->pDetL, G4String(sName2), ppgerm->pDetL, false, 0);
             ppgerm->pDetL->SetVisAttributes( altVA );
           }
+	  segVol += ppseg->pPoly->GetCubicVolume(); 
           nSeg++;
           iSeg[iPg]++;
         }
+	G4cout << "     " << nGe << " = "
+	       << segVol/cm3
+	       << " cm3" << G4endl;
+
       }
     }
-    G4cout << iSeg[iPg] << " segments" << G4endl;
+    G4cout << " " << iSeg[iPg] << " segments" << G4endl;
   }
   G4cout << " --> Total number of generated sub-segments (4 sub-segments per segment) is " << nSeg << " [ ";
   for(iPg = 0; iPg < nPgons; iPg++)
