@@ -121,6 +121,8 @@ void Gretina_Array::InitData()
   
   stepFactor         = 1;
   stepHasChanged     = false;
+
+  printVolumes       = false;
   
   myMessenger        = new Gretina_Array_Messenger(this);
 
@@ -1074,10 +1076,6 @@ void Gretina_Array::ConstructGeCrystals()
         sprintf(sName, "geCapsPolyPcone%2.2d", nGe);
         pPg->pCaps = new G4IntersectionSolid(G4String(sName), pPg->pPoly, pPg->pCoax, G4Transform3D( rm, G4ThreeVector() ) );
 
-	// G4cout << " Total Ge Volume (" << sName << ") = "
-	//        << pPg->pCaps->GetCubicVolume()/cm3
-	//        << " cm3" << G4endl;
-
         if( usePassive ) {
           if( pPg->passThick1 > 0. ) {
             zSliceGe = new G4double[2];
@@ -1188,13 +1186,13 @@ void Gretina_Array::ConstructGeCrystals()
     pPg->pDetL->SetSensitiveDetector( theDetector->GetGammaSD() );    //LR
     ngen++;
 
-    G4cout << "\n  Total Ge Volume (" << pPg->pCaps->GetName() << ") = "
+    G4cout << "\n  Total Ge volume (" << pPg->pCaps->GetName() << ")     = "
 	   << pPg->pCaps->GetCubicVolume()/cm3
 	   << " cm3" << G4endl;
-    G4cout << "    Back dead layer volume(" << pPg->pCaps1->GetName() << ") = "
+    G4cout << "    Back dead layer volume (" << pPg->pCaps1->GetName() << ")     = "
 	   << pPg->pCaps1->GetCubicVolume()/cm3
 	   << " cm3" << G4endl;
-    G4cout << "    Coaxial dead layer volume(" << pPg->pCoax2->GetName() << ") = "
+    G4cout << "    Coaxial dead layer volume (" << pPg->pCoax2->GetName() << ") = "
 	   << pPg->pCoax2->GetCubicVolume()/cm3
 	   << " cm3\n" << G4endl;
   }
@@ -1741,12 +1739,21 @@ void Gretina_Array::ConstructSegments()
     if( ppgerm->isPlanar ) continue;
     
     indexS = tSegments[iPg];
-    G4cout << " Crystal type " << iPg << ": " << G4endl;
-    G4cout << "   Segment volumes:" << G4endl;
+
+    if(printVolumes){
+      G4cout << " Crystal type " << iPg << ": " << G4endl;
+      G4cout << "   Segment volumes:" << G4endl;
+      G4cout << "                     Total      Coax Passive  Back Passive" << G4endl;
+      G4cout << "   Segment           [cm3]         [cm3]         [cm3]" << G4endl;
+    }
+    G4double segVol, backPassiveVol, coaxPassiveVol;
+
     for( slice=0; slice<ppgerm->nslice; slice++ ) {
       for( sector=0; sector<ppgerm->npoints/2; sector++, indexS++) { 
         nGe = 100 * iPg + 10 * slice + sector;     // --> PPPSs (P=CrystalShape, S =Slice, s=sector) 
-	G4double segVol = 0.;
+	segVol = 0.;
+	backPassiveVol = 0.;
+	coaxPassiveVol = 0.;
         // the four parts composing the segment
         for(int ss = 0; ss < 4; ss++) {
           switch (ss) {
@@ -1772,20 +1779,45 @@ void Gretina_Array::ConstructSegments()
             break;
           }
           ppseg->pPoly  = new CConvexPolyhedron( G4String(sName1), ppseg->vertex, ppseg->nfaces, ppseg->ifaces);
-          ppseg->pDetL  = new G4LogicalVolume( ppseg->pPoly, matCryst, G4String(sName2), 0, 0, 0 ); 
+	  //          ppseg->pDetL  = new G4LogicalVolume( ppseg->pPoly, matCryst, G4String(sName2), 0, 0, 0 );
+	  // LR: segment volumes were too large (sum > crystal volume). Intersect with crystal.
+	  G4RotationMatrix rm;
+	  rm.set(0,0,0);
+	  ppseg->pCaps  = new G4IntersectionSolid( G4String(sName1), ppseg->pPoly, ppgerm->pCaps, G4Transform3D( rm, G4ThreeVector() ) );
+
+	  // We make these to calculate the dead volume in the segment.
+	  sprintf(sName1, "SegmPassB_%5.5d", nGe ); 
+	  ppseg->pCaps1 = new G4IntersectionSolid( G4String(sName1), ppseg->pPoly, ppgerm->pCaps1, G4Transform3D( rm, G4ThreeVector() ) );
+	  sprintf(sName1, "SegmPassC_%5.5d", nGe ); 
+	  ppseg->pCaps2 = new G4IntersectionSolid( G4String(sName1), ppseg->pPoly, ppgerm->pCoax2, G4Transform3D( rm, G4ThreeVector() ) );
+	  
+	  ppseg->pDetL  = new G4LogicalVolume( ppseg->pCaps, matCryst, G4String(sName2), 0, 0, 0 ); 
           ppseg->pDetL->SetVisAttributes( segVA[(indexS)%4] );      // in this way they get also the same color
           if( drawReadOut ) {
             new G4PVPlacement( 0, G4ThreeVector(), ppseg->pDetL, G4String(sName2), ppgerm->pDetL, false, 0);
             ppgerm->pDetL->SetVisAttributes( altVA );
           }
-	  segVol += ppseg->pPoly->GetCubicVolume(); 
+	  // These take a while, so only compute them if we're printing them.
+	  if(printVolumes){ 
+	    segVol         += ppseg->pCaps->GetCubicVolume();
+	    backPassiveVol += ppseg->pCaps1->GetCubicVolume();
+	    coaxPassiveVol += ppseg->pCaps2->GetCubicVolume();
+	  }
           nSeg++;
           iSeg[iPg]++;
         }
-	G4cout << "     " << nGe << " = "
-	       << segVol/cm3
-	       << " cm3" << G4endl;
-
+	if(printVolumes){
+	  G4cout << "   "
+		 << std::setw(8)
+		 << nGe 
+		 << std::fixed << std::setprecision(2) << std::setw(14)
+		 << segVol/cm3
+		 << std::fixed << std::setprecision(2) << std::setw(14)
+		 << coaxPassiveVol/cm3
+		 << std::fixed << std::setprecision(2) << std::setw(14)
+		 << backPassiveVol/cm3
+		 << G4endl;
+	}
       }
     }
     G4cout << " " << iSeg[iPg] << " segments" << G4endl;
@@ -1794,7 +1826,6 @@ void Gretina_Array::ConstructSegments()
   for(iPg = 0; iPg < nPgons; iPg++)
     G4cout << iSeg[iPg] << " ";
   G4cout << "]" << G4endl;
-
   
   G4cout << G4endl << "Checking consistency of segments ..." << G4endl;
   G4int nproblems = 0;
@@ -3460,6 +3491,13 @@ Gretina_Array_Messenger::Gretina_Array_Messenger(Gretina_Array* pTarget)
   SetStepCmd->SetGuidance("Required parameters: 1 integer (step will be divided by the input value).");
   SetStepCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  commandName = directoryName + "printVolumes";
+  aLine = commandName.c_str();
+  printVolCmd = new G4UIcmdWithoutParameter(aLine, this);
+  printVolCmd->SetGuidance("Print segment total and passive volumes");
+  printVolCmd->SetGuidance("Required parameters: none.");
+  printVolCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
 }
 
 Gretina_Array_Messenger::~Gretina_Array_Messenger()
@@ -3486,6 +3524,7 @@ Gretina_Array_Messenger::~Gretina_Array_Messenger()
   delete DrawReadOutCmd;
   delete DontDrawReadOutCmd;
   delete SetStepCmd;
+  delete printVolCmd;
 }
 
 void Gretina_Array_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
@@ -3579,4 +3618,10 @@ void Gretina_Array_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
   if( command == SetStepCmd ) {
     myTarget->SetStep( SetStepCmd->GetNewIntValue(newValue) );
   }
+
+  if( command == printVolCmd ) {
+    myTarget->SetPrintVolumes( true );
+  }
+
+
 }

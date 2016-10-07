@@ -186,8 +186,9 @@ class Gretina_Array
     G4bool                      makeCapsule;    //> true: encapsulation will be generated
     G4bool                      useCylinder;    //> true: the intersection with the cylinder will be considered
     G4bool                      cryostatStatus; //> true: include cryostats behind clusters //LR
-    G4bool    readOut;                          //> true: a segmentation have been defined  
-
+    G4bool                      readOut;        //> true: a segmentation have been defined  
+    G4bool                      printVolumes;   //> true: report crystal, segment, and passive volumes
+  
   //////////////////////////////
   ///////// Methods  ///////////
   //////////////////////////////
@@ -311,8 +312,9 @@ class Gretina_Array
     void SetUsePassive          ( G4bool );
     void SetDrawReadOut         ( G4bool );
     void SetWriteSegments       ( G4bool );
-    
-  public:       
+    void SetPrintVolumes        ( G4bool flag){ printVolumes = flag; }
+
+public:       
     void SetStep                ( G4int  ); 
      
   public:
@@ -379,8 +381,9 @@ class Gretina_Array_Messenger: public G4UImessenger
     G4UIcmdWithABool*          EnableCapsulesCmd;
     G4UIcmdWithABool*          DisableCapsulesCmd;            
     G4UIcmdWithAnInteger*      SetStepCmd;
-    
-  public:
+    G4UIcmdWithoutParameter*   printVolCmd;
+
+public:
     void SetNewValue(G4UIcommand*, G4String);
 };
 

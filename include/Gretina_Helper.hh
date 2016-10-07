@@ -136,6 +136,7 @@ class CpolyhPoints
    
   public:  
     G4Polycone          *pCoax2;     //> cylinder (passive area at the coaxial hole) 
+    G4IntersectionSolid *pCaps2;     //> intersection with polyhedron		    
     G4LogicalVolume     *pDetL2;     //> its logical				    
     G4VPhysicalVolume   *pDetP2;     //> passivated area (coax)			    
     
