@@ -742,6 +742,17 @@ void PrimaryGeneratorAction::SetSourceBG()
   // Gordon R. Gilmore,
   // Practical Gamma-Ray Spectrometry, 2nd Edition, Wiley
   // Published Online: 21 APR 2008
+  
+  e=46.54*keV;sourceBranchingSum+=4.25;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=63.28*keV;sourceBranchingSum+=4.8;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=74.82*keV;sourceBranchingSum+=27.7;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=77.11*keV;sourceBranchingSum+=46.2;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+  e=92.58*keV;sourceBranchingSum+=5.58;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
   e=185.72*keV;sourceBranchingSum+=57.2;
   TheSource.push_back(new SourceData(e,sourceBranchingSum));
   e=238.63*keV;sourceBranchingSum+=43.6;

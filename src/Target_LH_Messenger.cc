@@ -36,6 +36,11 @@ Target_Messenger::Target_Messenger(Target* Tar)
   SDTarCmd->SetParameterName("choice",false);
   SDTarCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  PosZCmd = new G4UIcmdWithADoubleAndUnit("/Target/SetPosition_Z",this);
+  PosZCmd->SetGuidance("Select the position of the target along the beam axis (Z direction.");
+  PosZCmd->SetParameterName("choice",false);
+  PosZCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   NSCmd = new G4UIcmdWithAnInteger("/Target/NStep",this);
   NSCmd->SetGuidance("Select the number of steps in the target");
   NSCmd->SetParameterName("choice",false);
@@ -72,6 +77,7 @@ Target_Messenger::~Target_Messenger()
   delete ACmd;
   delete MatCmd;
   delete SDTarCmd;
+  delete PosZCmd;
   delete NSCmd;
   delete sFCmd;
   delete sledCmd;
@@ -95,6 +101,8 @@ void Target_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
    { aTarget->setMaterial(newValue);} 
   if( command == SDTarCmd )
     { aTarget->SetDensity(SDTarCmd->GetNewDoubleValue(newValue)); }
+  if( command == PosZCmd )
+    { aTarget->SetPositionZ(PosZCmd->GetNewDoubleValue(newValue));}
   if( command == NSCmd )
     { aTarget->setNStep(NSCmd->GetNewIntValue(newValue)); }
   if( command == sFCmd )
