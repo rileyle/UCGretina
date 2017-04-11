@@ -51,7 +51,9 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
     // 	   << "   energy = " << aTrack->GetKineticEnergy();
 
     eventInfo->AddEmittedGamma(aTrack->GetKineticEnergy(), 
-			       &pos, &dir);
+			       &pos, &dir,
+			       aTrack->GetParentID());
+
   }
 
 }
@@ -73,7 +75,7 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
   // G4cout << "> MomentumDirection = " 
   // 	 << aTrack->GetMomentumDirection() << G4endl;
   // G4cout << "> Beta = " 
-  // 	 << aTrack->GetStep()->GetPreStepPoint()->GetBeta() << G4endl;
+  // 	 << aTrack->GetStep()->GetPostStepPoint()->GetBeta() << G4endl;
   // G4cout << ">==========================================" << G4endl;
 
   // S800 data
@@ -87,7 +89,8 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
       aTrack->GetParentID() > 0 ){
 
     if( !aTrack->GetDefinition ()-> GetPDGStable() )
-      eventInfo->AddBeta(aTrack->GetStep()->GetPreStepPoint()->GetBeta());
+      eventInfo->AddBeta(aTrack->GetStep()->GetPostStepPoint()->GetBeta(),
+			 aTrack->GetTrackID());
     
   }
 
