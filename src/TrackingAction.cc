@@ -51,7 +51,9 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
     // 	   << "   energy = " << aTrack->GetKineticEnergy();
 
     eventInfo->AddEmittedGamma(aTrack->GetKineticEnergy(), 
-			       &pos, &dir);
+			       &pos, &dir,
+			       aTrack->GetParentID());
+
   }
 
 }
@@ -64,10 +66,6 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
 
   // G4cout << std::fixed << std::setprecision(4) << std::setw(12)
   // 	 << "> PostUserTrackingAction" << G4endl;
-  // G4cout << "> Track ID = " << aTrack->GetTrackID() << G4endl;
-  // G4cout << "> Parent Track ID = " << aTrack->GetParentID() << G4endl;
-  // G4cout << "> Particle Name = "
-  // 	 << aTrack->GetParticleDefinition()->GetParticleName() << G4endl;
   // G4cout << "> KineticEnergy = " << aTrack->GetKineticEnergy() << G4endl;
   // G4cout << "> TotalEnergy = "   << aTrack->GetTotalEnergy() << G4endl;
   // G4cout << "> Pre-step Position = " 
@@ -77,7 +75,7 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
   // G4cout << "> MomentumDirection = " 
   // 	 << aTrack->GetMomentumDirection() << G4endl;
   // G4cout << "> Beta = " 
-  // 	 << aTrack->GetStep()->GetPreStepPoint()->GetBeta() << G4endl;
+  // 	 << aTrack->GetStep()->GetPostStepPoint()->GetBeta() << G4endl;
   // G4cout << ">==========================================" << G4endl;
 
   // S800 data
@@ -94,6 +92,7 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
   if( def->GetParticleType() == "nucleus" &&
       aTrack->GetParentID() > 0 &&
       aTrack->GetParticleDefinition()->GetParticleName().contains('[') )
-    eventInfo->AddBeta(aTrack->GetStep()->GetPreStepPoint()->GetBeta());
+    eventInfo->AddBeta(aTrack->GetStep()->GetPostStepPoint()->GetBeta(),
+			 aTrack->GetTrackID());
 
 }

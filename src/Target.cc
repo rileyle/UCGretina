@@ -168,6 +168,11 @@ void Target::SetPosition(G4double x, G4double y, G4double z)
   x=Target_phys->GetTranslation().getX();
   y=Target_phys->GetTranslation().getY();
   z=Target_phys->GetTranslation().getZ();
+
+  Pos->setX(x);
+  Pos->setY(y);
+  Pos->setZ(z);
+
   G4cout <<"----> Target position is set to "
 	 << G4BestUnit(x,"Length") << ", "
     	 << G4BestUnit(y,"Length") << ", "

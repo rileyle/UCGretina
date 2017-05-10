@@ -15,8 +15,8 @@ public:
 
   inline virtual void Print()const{;}
 
-  void AddEmittedGamma(G4double, G4ThreeVector*, G4ThreeVector*);
-  void AddBeta(G4double);
+  void AddEmittedGamma(G4double, G4ThreeVector*, G4ThreeVector*, G4int);
+  void AddBeta(G4double, G4int);
   void SetFullEnergy(G4int f){ fFullEnergy = f; }
   void SetATA(G4double a){fata = a;}
   void SetBTA(G4double b){fbta = b;}
@@ -48,6 +48,7 @@ private:
   G4double fEmittedGammaTheta[MAX_SIM_GAMMAS];
   G4int    fNEmittedGammas;
   G4double fBeta[MAX_SIM_GAMMAS];
+  G4int    fBetaTrackID[MAX_SIM_GAMMAS];
   G4int    fNBetas;
   G4int    fFullEnergy;
   G4double fata;
