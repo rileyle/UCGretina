@@ -228,7 +228,7 @@ Mandatory commands related to the outgoing beam:
 > The level data file describes the discrete transitions of the
 > outgoing (beam-like or target-like) reaction product. Each line
 > describes a single transition, including the energy,
-> angular momentum, and lifetime of the level de-excited, and the
+> angular momentum, and half-life of the level de-excited, and the
 > energy, angular momentum and parity change, internal conversion
 > coefficients, and gamma-ray angular distribution coefficients of the
 > transition. The file format is based on that of the
