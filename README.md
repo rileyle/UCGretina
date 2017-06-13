@@ -235,6 +235,11 @@ Mandatory commands related to the outgoing beam:
 > PhotonEvaporationX.X data files (described in detail in the file
 > $G4LEVELGAMMADAT/README-LevelGammaData) with three gamma-ray angular
 > distribution coefficients appended to each line.
+> 
+> _Note: If the mass number of the outgoing nucleus lies outside of
+> the A range specified in NuclearLevelData.cc by the AMIN[] and
+> AMAX[] arrays, you will need to increase the range to include it so
+> that your level data can be loaded._
 
 Optional commands related to the outgoing reaction product:
 
