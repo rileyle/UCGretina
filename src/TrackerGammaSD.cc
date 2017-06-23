@@ -146,6 +146,8 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   newHit->SetPosCrys    (posSol);
   newHit->SetTrackOrigin(aStep->GetTrack()->GetVertexPosition());
 
+  newHit->SetGlobalTime(aStep->GetTrack()->GetGlobalTime());
+  
   gammaCollection->insert( newHit );
   newHit->Draw();
   //  getc(stdin);

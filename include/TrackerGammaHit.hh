@@ -36,10 +36,11 @@ class TrackerGammaHit : public G4VHit
       void SetCreatorProcess (G4String proc) { creatorProcess = proc; };
       void SetDetNumb(G4int num) {detNumb=num;};
       void SetSegNumb(G4int num) {segNumb=num;};
-      void SetEdep     (G4double de)      { edep = de; };
-      void SetPos      (G4ThreeVector xyz){ pos = xyz; };
-      void SetPosCrys  (G4ThreeVector xyz){ posCrys = xyz; };
-      void SetTrackOrigin(G4ThreeVector xyz){ trackOrigin = xyz; };
+      void SetEdep     (G4double de)       { edep = de; };
+      void SetPos      (G4ThreeVector xyz) { pos = xyz; };
+      void SetPosCrys  (G4ThreeVector xyz) { posCrys = xyz; };
+      void SetTrackOrigin(G4ThreeVector xyz) { trackOrigin = xyz; };
+      void SetGlobalTime(G4double t) { globalTime = t; };
       
       G4int GetTrackID()             { return trackID; };
       G4String GetParticleID()       { return particleID; };
@@ -52,8 +53,9 @@ class TrackerGammaHit : public G4VHit
       G4ThreeVector GetPos()         { return pos; };
       G4ThreeVector GetPosCrys()     { return posCrys; };
       G4ThreeVector GetTrackOrigin() { return trackOrigin; };
-      
-  private:
+      G4double      GetGlobalTime() { return globalTime; };
+
+private:
   
       G4int         trackID;
       G4String      particleID;
@@ -66,6 +68,8 @@ class TrackerGammaHit : public G4VHit
       G4ThreeVector pos;
       G4ThreeVector posCrys;
       G4ThreeVector trackOrigin;
+      G4double      globalTime;
+
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
