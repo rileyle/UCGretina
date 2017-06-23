@@ -36,8 +36,14 @@ void Incoming_Beam::Report()
   G4cout<<"----> A of the incoming beam set to  "<<A<< G4endl;
   G4cout<<"----> Kin. En. of the incoming beam set to "<<
   G4BestUnit(KE,"Energy")<<G4endl;
-  G4cout<<"----> Kin. En. per nucleon of the incoming beam set to "<<
-  G4BestUnit(KEu,"Energy")<<G4endl;
+  if(dtaFileName != ""){
+    G4cout<<"----> Relative KE distribution of the incoming beam read from "
+	  << dtaFileName << G4endl;
+    G4cout<<"----> KE per nucleon corresponding to zero relative KE set to "
+	  << G4BestUnit(KEu,"Energy")<<G4endl;
+  } else
+    G4cout<<"----> KE per nucleon of the incoming beam set to "<<
+      G4BestUnit(KEu,"Energy")<<G4endl;
   G4cout<<"----> momentum acceptance for the incoming beam set to  "<<Dpp<< G4endl;
   G4cout<<"----> focal point X position for the incoming beam set to  "<<G4BestUnit(fcX,"Length")<< G4endl;
   G4cout<<"----> focal point DX size for the incoming beam set to  "<<G4BestUnit(fcDX,"Length")<< G4endl;
@@ -149,7 +155,11 @@ void Incoming_Beam::setDTAFile(G4String fileName)
   dtaFileName = fileName;
   std::ifstream dtaFile;
   dtaFile.open(dtaFileName);
-
+  if (!dtaFile.is_open()) {
+    G4cout << "Unable to open " << dtaFileName << G4endl;
+    exit(EXIT_FAILURE);
+  }
+ 
   dtaFile >> dtaMin >> dtaMax >> dtaBin;
   dtaFile.getline(line,1000);  // Advance to next line.
 
