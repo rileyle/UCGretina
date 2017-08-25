@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
+#include "Randomize.hh"
 
 class AngularDistribution {
 public:
