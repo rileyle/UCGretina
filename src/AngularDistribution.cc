@@ -66,24 +66,24 @@ double AngularDistribution::PDF(double x) {
 }
 /***************************************************************/
 double AngularDistribution::GetRandomAngle() {
-	// FILE* fp = fopen("internal_test.dat","w");
-	// printf("in random angle\n");
-	// 	int i=0;
-	// for(i=0;i<1440;i++)	fprintf(fp,"%i\t%f\n",i,angdis[i]);
-	// fclose(fp);
+	//FILE* fp = fopen("internal_test.dat","w");
+	//printf("in random angle\n");
+	//	int i=0;
+	//for(i=0;i<1440;i++)	fprintf(fp,"%i\t%f\n",i,angdis[i]);
+	//fclose(fp);
 	double r1   = 0;
 	double rw   = 0;
 	int    rbin = 0;
 	double r2   = 0;
 	do {
-		r1          = rand();
-		rw          = rand();
+                r1          = G4UniformRand(); //rand();
+		rw          = G4UniformRand(); //rand();
 		r1          = (double)r1/RAND_MAX*1440;
 		rbin        = (int)r1;
 		rw          = (double)rw/RAND_MAX*angdismax;
 		//printf("%i\t%f\n",rbin,rw);
 	} while(angdis[rbin]<rw);
-	r2 = rand();
+	r2 = G4UniformRand(); //rand();
 	r2 = (double)r2/RAND_MAX;
 	return (rbin+r2)*3.14159/1440; 
 }
