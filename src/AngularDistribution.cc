@@ -76,15 +76,12 @@ double AngularDistribution::GetRandomAngle() {
 	int    rbin = 0;
 	double r2   = 0;
 	do {
-                r1          = G4UniformRand(); //rand();
-		rw          = G4UniformRand(); //rand();
-		r1          = (double)r1/RAND_MAX*1440;
-		rbin        = (int)r1;
-		rw          = (double)rw/RAND_MAX*angdismax;
-		//printf("%i\t%f\n",rbin,rw);
+	  r1          = G4UniformRand()*1440.;
+	  rw          = G4UniformRand()*angdismax;
+	  rbin        = (int)r1;
+	  //		printf("%i\t%f\n",rbin,rw);
 	} while(angdis[rbin]<rw);
-	r2 = G4UniformRand(); //rand();
-	r2 = (double)r2/RAND_MAX;
+	r2 = G4UniformRand();
 	return (rbin+r2)*3.14159/1440; 
 }
 /***************************************************************/
