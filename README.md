@@ -233,7 +233,7 @@ Mandatory commands related to the outgoing beam:
 > coefficients, and gamma-ray angular distribution coefficients of the
 > transition. The file format is based on that of the
 > PhotonEvaporationX.X data files (described in detail in the file
-> $G4LEVELGAMMADAT/README-LevelGammaData) with three gamma-ray angular
+> $G4LEVELGAMMADATA/README-LevelGammaData) with three gamma-ray angular
 > distribution coefficients appended to each line.
 > 
 > _Note: If the mass number of the outgoing nucleus lies outside of
