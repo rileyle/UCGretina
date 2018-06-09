@@ -17,6 +17,7 @@ void EventInformation::AddEmittedGamma(G4double e,
 
   //G4cout << "   fNEmittedGammas = " << fNEmittedGammas << G4endl;
 
+  // In-beam 
   for(G4int i = 0; i < fNBetas; i++){
     // G4cout << "i have fBetaTrackID[" <<i<<"] = "<<fBetaTrackID[i]
     // 	   << ", and Emitted Gamma parent ID = " << parentID << G4endl;
@@ -33,6 +34,18 @@ void EventInformation::AddEmittedGamma(G4double e,
       break;
     }
   }
+
+  // Source/Background
+  if(fNBetas == 0){
+      fEmittedGammaEnergies[fNEmittedGammas] = e/keV;
+      fEmittedGammaPosX[fNEmittedGammas]     = pos->getX()/mm;
+      fEmittedGammaPosY[fNEmittedGammas]     = pos->getY()/mm;
+      fEmittedGammaPosZ[fNEmittedGammas]     = pos->getZ()/mm;
+      fEmittedGammaPhi[fNEmittedGammas]      = dir->getPhi()/rad;
+      fEmittedGammaTheta[fNEmittedGammas]    = dir->getTheta()/rad;
+      fNEmittedGammas++;
+  }
+    
 }
 
 void EventInformation::AddBeta(G4double b, G4int TID){
