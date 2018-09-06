@@ -25,11 +25,7 @@ Double_t fitf(Double_t *v,Double_t *par) {
 
 }
 
-void s44Fit() {
-  s44Fit(16);
-}
-
-void s44Fit(Int_t rebin) {
+void s44Fit(Int_t rebin){
 
   // Load measured spectra =====================================================
   cout << "\nLoading measured spectrum ...\n" << endl;
@@ -82,9 +78,9 @@ void s44Fit(Int_t rebin) {
   par[2]  = 1.;              // Exponential 2
   par[3]  = -1E-03;
   par[4]  = 0;                // Measured random background
-  par[5]  = 0.0001;           // 1329 keV
-  par[6]  = 0.0001;           // 2150 keV
-  par[7]  = 0.0001;           // 2457 keV
+  par[5]  = 0.001;           // 1329 keV
+  par[6]  = 0.001;           // 2150 keV
+  par[7]  = 0.001;           // 2457 keV
 
   TF1 *f1 = new TF1("f1",fitf,fitMinE,fitMaxE,nPar);
   f1->SetLineColor(kBlue);
@@ -140,7 +136,7 @@ void s44Fit(Int_t rebin) {
   Spectra->Divide(1,2);
 
   Spectra->cd(1);
-  Spectra_1->SetLogy();
+  gPad->SetLogy();
 
   spectrum->SetStats(kFALSE);
   spectrum->SetLineColor(kBlack);
@@ -174,4 +170,8 @@ void s44Fit(Int_t rebin) {
   cout << "   2457 keV: " << f1->GetParameter(7)*1e6 << " +/- "
        << f1->GetParError(7)*1e6 << endl;
 
+}
+
+void s44Fit() {
+  s44Fit(16);
 }
