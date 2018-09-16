@@ -9,6 +9,15 @@
 
 # Set source/decay parameters ==================================================
 
+# Source position and dimensions
+/BeamIn/Focus/Z  0. mm
+/BeamIn/Focus/X  0. mm
+/BeamIn/Focus/Y  0. mm
+/BeamIn/Focus/DX 0. mm
+/BeamIn/Focus/DY 0. mm
+
+/Target/sourceFrame eu152_Z2707
+
 # Turn off the Reaction process (G4RadioactiveDecay handles the beta decay).
 /process/inactivate Reaction
 
@@ -18,14 +27,7 @@
 /BeamIn/Z 63
 /BeamIn/KEu 0. keV      
 
-# Source position and dimensions
-/BeamIn/Focus/Z  0. mm
-/BeamIn/Focus/X  0. mm
-/BeamIn/Focus/Y  0. mm
-/BeamIn/Focus/DX 0. mm
-/BeamIn/Focus/DY 0. mm
-
-# Load excited states of both daughters (152Sm, 152Gd) into the particle table.
+# Load level schemes of the daughters (152Sm, 152Gd).
 /BeamOut/DA 0
 /BeamOut/DZ -1
 /BeamOut/LevelDataFile z62.a152.ad.lvldata

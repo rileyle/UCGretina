@@ -62,7 +62,7 @@ void eu152Fit(TString simFileName, Int_t rebin) {
   
   //  TString simFileName = "eu152_gammas_histos.root";
   TFile *sF = new TFile(simFileName);
-  sF->GetObject("energy/energy_gaus", sim);
+  sF->GetObject("energy/energy", sim);
   sim->Rebin(rebin);
   
   // Check binning.

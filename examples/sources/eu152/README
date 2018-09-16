@@ -53,7 +53,7 @@ o Fitting a measured spectrum
   - The root files ./data/run022_cal_histos.root and 
     ./data/run007_cal_histos.root are measured 152Eu and room
     background spectra measured with the standard NSCL configuration
-    of Gretina in September 2012.
+    of Gretina in September 2012 (7 quads).
 
   - The root script eu152Fit.C fits the measured spectrum with a
     linear combination of the room background and simulated
