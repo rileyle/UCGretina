@@ -43,7 +43,7 @@
 #include "Outgoing_Beam.hh"
 
 class DetectorConstruction;
-//class PhysicsListMessenger;
+class PhysicsListMessenger;
 class G4VPhysicsConstructor;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -20,10 +20,8 @@ be simulated using the
 
 command. The macro file co60.mac illustrates this approach.
 Descriptions of transitions de-exciting states of the daughter nucleus
-(60Ni) are read from the level data file z28.a60.ad.lvldata, which is
-a modified version of that provided with the PhotonEvaporationX.X data
-files, truncated to include levels populated by beta decay / EC and
-with isotropic angular distribution coefficients appended.
+(60Ni) are read from the level data file z28.a60.lvldata, which is
+provided with the PhotonEvaporationX.X data files.
 
 ================================================================================
 o Running the simulations

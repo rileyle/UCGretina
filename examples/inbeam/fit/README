@@ -47,7 +47,7 @@ p7                        =   0.00494196   +/-   0.000413673
 
   Parameters p5-p7 scale the simulations of in-beam excitations of the
   first two 2+ states and the 4+ state of 44S.  Multiply the
-  scaling factor by the number of events simulated (1E6 here) to get
+  scaling factor by the number of events simulated (1E5 here) to get
   the number of times the corresponding excited states were populated in
   the experiment to produce measured spectrum.
 

@@ -25,10 +25,6 @@ Double_t fitf(Double_t *v,Double_t *par) {
 
 }
 
-void s44Fit_GrR() {
-  s44Fit_GrR(8);
-}
-
 void s44Fit_GrR(Int_t rebin) {
 
   // Load measured spectra =====================================================
@@ -140,7 +136,7 @@ void s44Fit_GrR(Int_t rebin) {
   Spectra->Divide(1,2);
 
   Spectra->cd(1);
-  Spectra_1->SetLogy();
+  gPad->SetLogy();
 
   spectrum->SetStats(kFALSE);
   spectrum->SetLineColor(kBlack);
@@ -167,11 +163,15 @@ void s44Fit_GrR(Int_t rebin) {
   diff->Draw("SAME");
 
   cout << "\nPopulation of excited states of 44S:" << endl;
-  cout << "   1329 keV: " << f1->GetParameter(5)*1e6 << " +/- "
-       << f1->GetParError(5)*1e6 << endl;
-  cout << "   2150 keV: " << f1->GetParameter(6)*1e6 << " +/- "
-       << f1->GetParError(6)*1e6 << endl;
-  cout << "   2457 keV: " << f1->GetParameter(7)*1e6 << " +/- "
-       << f1->GetParError(7)*1e6 << endl;
+  cout << "   1329 keV: " << f1->GetParameter(5)*1e5 << " +/- "
+       << f1->GetParError(5)*1e5 << endl;
+  cout << "   2150 keV: " << f1->GetParameter(6)*1e5 << " +/- "
+       << f1->GetParError(6)*1e5 << endl;
+  cout << "   2457 keV: " << f1->GetParameter(7)*1e5 << " +/- "
+       << f1->GetParError(7)*1e5 << endl;
 
+}
+
+void s44Fit_GrR() {
+  s44Fit_GrR(8);
 }

@@ -28,7 +28,7 @@
 # Load excited states of the daughter (60Ni) into the particle table.
 /BeamOut/DA 0
 /BeamOut/DZ +1
-/BeamOut/LevelDataFile z28.a60.ad.lvldata
+/BeamOut/LevelDataFile z28.a60.lvldata
 
 /BeamOut/Update
 
@@ -45,4 +45,4 @@
 /Mode2/crmatFile crmat.LINUX
 /Mode2/GretinaCoords
 /Mode2/Filename co60.dat
-/run/beamOn 1000000
+/run/beamOn 100000

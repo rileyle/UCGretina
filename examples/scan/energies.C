@@ -1,6 +1,3 @@
-void energies(TString fileName){
-  energies(fileName, 31);
-}
 
 void energies(TString fileName, Int_t mod){
 
@@ -40,4 +37,8 @@ void energies(TString fileName, Int_t mod){
   e3->GetXaxis()->SetRangeUser(0,800);
   e3->Draw();
 
+}
+
+void energies(TString fileName){
+  energies(fileName, 31);
 }

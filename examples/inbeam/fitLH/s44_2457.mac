@@ -20,7 +20,7 @@
 /BeamOut/TargetZ 1
 /BeamOut/DA 0
 /BeamOut/DZ 0
-/BeamOut/LevelDataFile z16.a44.ad.lvldata
+/BeamOut/LevelDataFile z16.a44.lvldata
 /BeamOut/ProjectileExcitation 2457 keV
 /BeamOut/AngDistSigmaA 0.006 rad
 /BeamOut/AngDistSigmaB 0.006 rad
@@ -41,4 +41,4 @@
 /Mode2/S800KE 3.353 GeV
 #/Mode2/Print
 /Mode2/Filename s44_2457.dat
-/run/beamOn 1000000
+/run/beamOn 100000

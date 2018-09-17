@@ -26,7 +26,7 @@
 /// \file electromagnetic/TestEm1/src/PhysicsList.cc
 /// \brief Implementation of the PhysicsList class
 // 
-// $Id: PhysicsList.cc 93735 2015-10-30 11:00:28Z gcosmo $
+// $Id: PhysicsList.cc 100290 2016-10-17 08:47:55Z gcosmo $
 //
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -40,7 +40,6 @@
 #include "G4EmStandardPhysics_option1.hh"
 #include "G4EmStandardPhysics_option2.hh"
 #include "G4EmStandardPhysics_option3.hh"
-//#include "EmStandardPhysics_option4_mod.hh"
 #include "G4EmStandardPhysics_option4.hh"
 #include "G4EmStandardPhysicsSS.hh"
 #include "G4EmStandardPhysicsGS.hh"
@@ -68,15 +67,13 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PhysicsList::PhysicsList(DetectorConstruction* det) 
-: G4VModularPhysicsList(), fEmPhysicsList(0), fDet(0)//, fMessenger(0)
+  : G4VModularPhysicsList(), fDet(det)
 {
-  fDet = det;
   //  fMessenger = new PhysicsListMessenger(this);
   SetVerboseLevel(1);
 
   // EM physics
   //  fEmName = G4String("emstandard_opt4_mod");
-  //  fEmPhysicsList = new EmStandardPhysics_option4_mod();  
   fEmName = G4String("emstandard_opt4");
   fEmPhysicsList = new G4EmStandardPhysics_option4();  
   
@@ -121,8 +118,6 @@ void PhysicsList::ConstructParticle()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "G4EmProcessOptions.hh"
-
 void PhysicsList::ConstructProcess()
 {
   // Transportation
@@ -132,12 +127,6 @@ void PhysicsList::ConstructProcess()
   // Electromagnetic physics list
   //
   fEmPhysicsList->ConstructProcess();
-  
-  // Em options
-  //
-  G4EmProcessOptions emOptions;
-  emOptions.SetBuildCSDARange(true);
-  emOptions.SetDEDXBinningForCSDARange(10*10);
     
 
   // Beam Reaction
@@ -166,10 +155,10 @@ void PhysicsList::AddPhysicsList(const G4String& name)
   
   if (name == fEmName) return;
 
-  // if (name == "local") {
-  //   fEmName = name;
-  //   delete fEmPhysicsList;
-  //   fEmPhysicsList = new PhysListEmStandard(name);
+  //if (name == "local") {
+  //  fEmName = name;
+  //  delete fEmPhysicsList;
+  //  fEmPhysicsList = new PhysListEmStandard(name);
     
   // } else 
 
@@ -198,10 +187,10 @@ void PhysicsList::AddPhysicsList(const G4String& name)
     delete fEmPhysicsList;
     fEmPhysicsList = new G4EmStandardPhysics_option4();
         
-  // } else if (name == "emstandardSS") {
-  //   fEmName = name;
-  //   delete fEmPhysicsList;
-  //   fEmPhysicsList = new G4EmStandardPhysicsSS();
+  } else if (name == "emstandardSS") {
+    fEmName = name;
+    delete fEmPhysicsList;
+    fEmPhysicsList = new G4EmStandardPhysicsSS();
     
   } else if (name == "emstandardGS") {
     fEmName = name;
@@ -248,9 +237,10 @@ void PhysicsList::AddReaction()
     
   Reaction* react = new Reaction(BeamOut);
 
-  theParticleIterator->reset();
-  while( (*theParticleIterator)() ){
-    G4ParticleDefinition* particle = theParticleIterator->value();
+  auto particleIterator=GetParticleIterator();
+  particleIterator->reset();
+  while( (*particleIterator)() ){
+    G4ParticleDefinition* particle = particleIterator->value();
     G4String particleName = particle->GetParticleName();
     if ( particleName == "GenericIon" ) 
       ph->RegisterProcess(react, particle);    
@@ -271,9 +261,10 @@ void PhysicsList::AddDecay()
   //
   G4Decay* fDecayProcess = new G4Decay();
 
-  theParticleIterator->reset();
-  while( (*theParticleIterator)() ){
-    G4ParticleDefinition* particle = theParticleIterator->value();
+  auto particleIterator=GetParticleIterator();
+  particleIterator->reset();
+  while( (*particleIterator)() ){
+    G4ParticleDefinition* particle = particleIterator->value();
     if (fDecayProcess->IsApplicable(*particle)) 
       ph->RegisterProcess(fDecayProcess, particle);    
   }
@@ -284,15 +275,20 @@ void PhysicsList::AddDecay()
 #include "G4PhysicsListHelper.hh"
 #include "G4RadioactiveDecay.hh"
 #include "G4GenericIon.hh"
+#include "G4NuclideTable.hh"
 
 void PhysicsList::AddRadioactiveDecay()
 {  
   G4RadioactiveDecay* radioactiveDecay = new G4RadioactiveDecay();
-  radioactiveDecay->SetHLThreshold(-1.*s);
+  
   radioactiveDecay->SetARM(true);                //Atomic Rearangement
   
   G4PhysicsListHelper* ph = G4PhysicsListHelper::GetPhysicsListHelper();  
   ph->RegisterProcess(radioactiveDecay, G4GenericIon::GenericIon());
+  
+  // mandatory for G4NuclideTable
+  //
+  G4NuclideTable::GetInstance()->SetThresholdOfHalfLife(0.1*picosecond);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -305,9 +301,10 @@ void PhysicsList::AddRadioactiveDecay()
 //   // Step limitation seen as a process
 //   StepMax* stepMaxProcess = new StepMax();
 
-//   theParticleIterator->reset();
-//   while ((*theParticleIterator)()){
-//       G4ParticleDefinition* particle = theParticleIterator->value();
+//   auto particleIterator=GetParticleIterator();
+//   particleIterator->reset();
+//   while ((*particleIterator)()){
+//       G4ParticleDefinition* particle = particleIterator->value();
 //       G4ProcessManager* pmanager = particle->GetProcessManager();
 
 //       if (stepMaxProcess->IsApplicable(*particle))
@@ -340,5 +337,4 @@ void PhysicsList::GetRange(G4double val)
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 

@@ -8,10 +8,8 @@ command.
 
 Descriptions of transitions de-exciting states of the
 daughter nucleus (166Er) are read from the level data file
-z68.a166.ad.lvldata, which is a modified version of that provided with
-the PhotonEvaporationX.X data files, truncated to include levels
-populated by beta decay / EC and with isotropic angular distribution
-coefficients appended.
+z68.a166.ad.lvldata, which is provided with the PhotonEvaporationX.X
+data files.
 
 The activity of a 166Ho source arises from the beta- decay of a very
 long-lived 5.696 keV isomer instead of the ground state. To avoid the

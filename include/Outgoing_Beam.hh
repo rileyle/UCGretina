@@ -16,8 +16,11 @@ using namespace std;
 #include "G4Decay.hh"
 #include "G4RadioactiveDecay.hh"
 #include "G4RadioactiveDecaymessenger.hh"
-#include "NuclearLevelData.hh"
-#include "LevelManager.hh"
+//#include "NuclearLevelData.hh"
+//#include "LevelManager.hh"
+#include "G4NuclearLevelData.hh"
+#include "G4LevelManager.hh"
+#include "G4IonTable.hh"
 
 #include "Randomize.hh"
 #include "Incoming_Beam.hh"

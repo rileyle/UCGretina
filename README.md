@@ -1,8 +1,8 @@
-# UCGretina v4.0 #
+# UCGretina v4.1 #
 
 ## Compile and install ##
 
-Install version [4.10.02.p02 of the Geant4 libraries](http://geant4.web.cern.ch/geant4/support/download.shtml). 
+Install version [4.10.04.p01 of the Geant4 libraries](http://geant4.web.cern.ch/geant4/support/download.shtml). 
 You will need the data files for low energy electromagnetic processes,
 photon evaporation, and radioactive decay.
 
@@ -13,7 +13,8 @@ GNUMakefile.
 
 Set up your environment (consider adding this to your `.bashrc`):
 
-    $ source <G4INSTALL>/share/Geant4-10.2.2/geant4make/geant4make.sh
+    $ source <Path to Geant4>/bin/geant4.sh
+    $ source <Path to Geant4>/share/Geant4-10.4.1/geant4make/geant4make.sh
 
 Compile:
 

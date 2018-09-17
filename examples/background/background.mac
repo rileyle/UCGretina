@@ -23,5 +23,5 @@
 /Mode2/crmatFile crmat.LINUX
 /Mode2/GretinaCoords
 /Mode2/Filename background.dat
-/run/beamOn 10000000
+/run/beamOn 1000000
 
