@@ -21,10 +21,8 @@ be simulated using the
 command. The macro file eu152.mac illustrates this approach.
 Descriptions of transitions de-exciting states of the daughter nuclei
 (152Sm and 152Gd) are read from the level data files
-z62.a152.ad.lvldata and z64.a152.ad.lvldata, which are modified
-versions of those provided with the PhotonEvaporationX.X data files,
-truncated to include levels populated by beta decay / EC and with
-isotropic angular distribution coefficients appended.
+z62.a152.lvldata and z64.a152.lvldata, which are provided with the
+PhotonEvaporationX.X data files.
 
 ================================================================================
 o Running the simulations
@@ -82,17 +80,42 @@ o Fitting a measured spectrum
 
 ****************************************
 Minimizer is Minuit2 / Migrad
-MinFCN                    =       591878
-Chi2                      =    1.141e+06
+MinFCN                    =       201899
+Chi2                      =       410043
 NDf                       =          745
-Edm                       =   1.4663e-08
-NCalls                    =          131
+Edm                       =   1.0773e-07
+NCalls                    =          123
 p0                        =     0.456734                      	 (fixed)
-p1                        =      51.8667   +/-   0.0169514   
-p2                        =      84.2491   +/-   0.0297208   
-p3                        =      9.21024   +/-   0.0379807   
-Total difference = -90047.1
+p1                        =      50.7624   +/-   0.0165417   
+p2                        =      84.2892   +/-   0.0301792   
+p3                        =      9.29685   +/-   0.0384524   
+Total difference = -53693.8
 
   - The fixed parameters p2 and p3 are low-energy threshold parameters.
+
+
+  - Fitting with the radioactive decay simulation
+
+      $ grutinizer
+      GRizer [0] .x eu152Fit.C ("eu152_histos.root")
+
+****************************************
+Minimizer is Minuit2 / Migrad
+MinFCN                    =       164522
+Chi2                      =       348048
+NDf                       =          745
+Edm                       =  1.03674e-06
+NCalls                    =          116
+p0                        =     0.456734                      	 (fixed)
+p1                        =      32.0079   +/-   0.0103914   
+p2                        =      84.0185   +/-   0.0291215   
+p3                        =      8.84233   +/-   0.0337336   
+Total difference = -24221.9
+
+
+    should yield a scaling factor of
+
+    (53841(750) Bq)*(595.6 seconds)
+                        =  3.21(4)E7 gamma rays emitted
 
 ================================================================================

@@ -2,7 +2,7 @@
 
 ## Compile and install ##
 
-Install version [4.10.04.p01 of the Geant4 libraries](http://geant4.web.cern.ch/geant4/support/download.shtml). 
+Install version [4.10.04.p02 of the Geant4 libraries](http://geant4.web.cern.ch/geant4/support/download.shtml). 
 You will need the data files for low energy electromagnetic processes,
 photon evaporation, and radioactive decay.
 
@@ -14,11 +14,17 @@ GNUMakefile.
 Set up your environment (consider adding this to your `.bashrc`):
 
     $ source <Path to Geant4>/bin/geant4.sh
-    $ source <Path to Geant4>/share/Geant4-10.4.1/geant4make/geant4make.sh
+    $ source <Path to Geant4>/share/Geant4-10.4.2/geant4make/geant4make.sh
 
 Compile:
 
     $ make
+
+To enable gamma-ray angular distributions:
+
+    $ make AD=1
+
+(produces the binary UCGretina_AD)
 
 To use the LBL scanning table:
 
@@ -127,7 +133,7 @@ Mandatory command after setting any GRETINA parameters:
 
 ### In-beam Simulations ###
 
-Mandatory command after all /BeamOut/ and /BeamIn/ commands:
+Mandatory command after all `/BeamOut/` and `/BeamIn/` commands:
 
     /BeamOut/Update
 
@@ -147,7 +153,7 @@ Optional commands related to the incoming beam:
 
 > Momentum acceptance (dp/p) for the incoming beam. (Set this to 0 if
 > you are providing the dta spectrum of the incoming beam using the
-> /BeamIn/dtaFile command.)
+> `/BeamIn/dtaFile` command.)
 
     /BeamIn/dtaFile <filename>
 
@@ -226,16 +232,11 @@ Mandatory commands related to the outgoing beam:
 
     /BeamOut/LevelDataFile <filename>
 
-> The level data file describes the discrete transitions of the
-> outgoing (beam-like or target-like) reaction product. Each line
-> describes a single transition, including the energy,
-> angular momentum, and half-life of the level de-excited, and the
-> energy, angular momentum and parity change, internal conversion
-> coefficients, and gamma-ray angular distribution coefficients of the
-> transition. The file format is based on that of the
+> The level data file describes the discrete levels and transitions 
+> of the outgoing (beam-like or target-like) reaction product. 
+> The file format is based on that of the
 > PhotonEvaporationX.X data files (described in detail in the file
-> $G4LEVELGAMMADATA/README-LevelGammaData) with three gamma-ray angular
-> distribution coefficients appended to each line.
+> $G4LEVELGAMMADATA/README-LevelGammaData). 
 > 
 > _Note: If the mass number of the outgoing nucleus lies outside of
 > the A range specified in NuclearLevelData.cc by the AMIN[] and
@@ -299,24 +300,26 @@ Mandatory commands
 
     /Experiment/Source/Set <type>
 
-> Currently implemented types: eu152, cs137, co56, co60,
-> photopeaks, eu152_peaks, co56_peaks, au, white, simple
+> Currently implemented types: `eu152`, `cs137`, `co56`, `co60`, 
+> `ra226`, `am241`, `photopeaks`, `eu152_peaks`, `co56_peaks`, 
+> `ra226`, `au`, `white`, `simple`
 
 > The simple source type emits gamma rays of a single energy (set with
-> the /Experiment/Source/setEnergy command) 
+> the `/Experiment/Source/setEnergy` command) 
 
 > The white source type emits gamma rays in a uniform energy
 > distribution between 100 keV and 10 MeV. These limits can be set
 > with the `/Experiment/Source/setWhiteLowE` and
 > `/Experiment/Source/setWhiteHighE` commands.
 
-> eu152_peaks, co56_peaks, and photopeaks sources produce selected
-> gamma-rays from 152Eu, 56Co, and both, respectively. The gamma rays
-> are emitted in equal quantities to facilitiate determining photopeak
-> efficiencies by fitting the photopeaks directly.
+> `eu152_peaks`, `co56_peaks`, and `photopeaks` sources produce 
+> selected gamma-rays from <SUP>152</SUP>Eu, <SUP>56</SUP>Co, and both, 
+> respectively. The gamma rays are emitted in equal quantities to 
+> facilitiate determining photopeak efficiencies by fitting the photopeaks 
+> directly.
 
-> _Note: The eu152, co56, co60 source types reproduce empirical
-> relative intensities. However, the total number of gamma rays
+> _Note: The `eu152`, `co56`, `co60`, and `ra226` source types reproduce 
+> empirical relative intensities. However, the total number of gamma rays
 > simulated does not correspond to the number of decays of the source,
 > because these simulated sources emit a single gamma-ray per event,
 > while some gamma rays from these sources are emitted in cascades._
@@ -360,7 +363,7 @@ Optional commands
 
 > Optionally include the source frame (`/Target/Construct` command required).
 
-> Currently implemented frames: eu152_Z2707, cs137_E2879, and co56_2012
+> Currently implemented frames: `eu152_Z2707`, `cs137_E2879`, and `co56_2012`
 
 ### Background Simulations (see also ./examples/background) ###
 
@@ -390,9 +393,22 @@ from which background gamma-rays are emitted.
 > Set the inner and outer radii of the background sphere 
 > (default: 3.0 m, 3.4 m). 
 
-### LBL Scanning Table ###
+### Gamma-Ray Angular Distributions (see also ./examples/inbeam/angdist) ###
 
-(UCGretina_Scan only)
+(`UCGretina_AD` only)
+
+The level data file format described under /BeamOut/LevelDataFile` 
+above is modified to include coefficients a0, a2, a4 of the 
+gamma-ray angular distribution
+
+> W(theta) = a_0 + a_2 P_2[cos(theta)] + a_4 P_4[cos(theta)]
+
+(theta relative to the beam axis) appended to the end of each of 
+the lines describing transitions.
+
+### LBL Scanning Table (see also ./examples/scan) ###
+
+(`UCGretina_Scan` only)
 
 _The geometries specified in `./GretinaGeometry/Scan0`, 
 `./GretinaGeometry/Scan1`, `./GretinaGeometry/Scan2`, and 
@@ -444,23 +460,29 @@ Optional commands for the scanning table:
 
     /ScanningTable/SetYShift <double> <unit>
 
-> Set the horizontal shifts of the source relative to the central axis of the GRETINA module. (These positions correspond to those reported by the stepper motor controller.)
+> Set the horizontal shifts of the source relative to the central axis
+> of the GRETINA module. (These positions correspond to those reported
+> by the stepper motor controller.)
 
     /ScanningTable/SetZShift <double> <unit>
 
-> Set the vertical shift of the slit assembly. (This position corresponds to that reported by the stepper motor controller.)
+> Set the vertical shift of the slit assembly. (This position
+> corresponds to that reported by the stepper motor controller.) 
 
     /ScanningTable/SetCloverZ <double> <unit>
 
-> Set the vertical shift of the Clover detector assembly. (This position corresponds to the vertical position of the Clover assembly relative to its lowest position, determined by the brackets on the scanning table frame.)
+> Set the vertical shift of the Clover detector assembly. (This
+> position corresponds to the vertical position of the Clover assembly
+> relative to its lowest position, determined by the brackets on the
+> scanning table frame.)
 
     /ScanningTable/SetCollimatorRadius <double> <unit>
 
 > Set the inner radius of the collimator insert.
 
-### Liquid Hydrogen Target ###
+### Liquid Hydrogen Target (see also ./examples/inbeam/fitLH) ###
 
-(UCGretina_LH only)
+(`UCGretina_LH` only)
 
 Optional commands for setting LH target parameters (must precede
 /Target/Construct):
@@ -497,7 +519,7 @@ Optional commands for setting LH target parameters (must precede
 > is provided to enable source simulations with an empty cell with
 > window frames installed.)
 
-Mandatory command for building the LH target (UCGretina_LH):
+Mandatory command for building the LH target (`UCGretina_LH`):
 
     /Target/Construct
 
