@@ -18,7 +18,12 @@ ifdef SCANNING
   CPPFLAGS  += -I/usr/local/CADMesh/include
   EXTRALIBS += -L/usr/local/CADMesh/lib -lcadmesh -lassimp -ltet
 else
+ifdef AD
+  name := UCGretina_AD
+  CPPFLAGS += -DAD
+else
   name := UCGretina
+endif
 endif
 endif
 

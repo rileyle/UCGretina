@@ -135,9 +135,9 @@ void Outgoing_Beam::setDecayProperties()
     const G4LevelManager* levelManager = levelData->GetLevelManager(Z, A);
     G4int Nentries = levelManager->NumberOfTransitions()+1;
     for(G4int i = 1; i < Nentries; i++){ // Excited states
-      // G4cout << "Level " << i
-      // 	   << " energy = " << levelManager->LevelEnergy(i)
-      // 	   << G4endl;
+      //      G4cout << "Level " << i
+      //	     << " energy = " << levelManager->LevelEnergy(i)
+      //	     << G4endl;
       G4ParticleDefinition* excitedState
 	= ionTable->GetIon(Z,A,levelManager->LevelEnergy(i));
       excitedState->SetPDGStable(false);

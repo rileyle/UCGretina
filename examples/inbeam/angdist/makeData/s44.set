@@ -1,0 +1,38 @@
+VerboseLevel:		0
+LastEvent:		0
+
+#Event Building
+EventTimeDiff:	300
+
+Angle.a:		0.0  #in mrad
+Angle.b:		0.0   #in mrad
+
+Target.X:		0
+Target.Y:		0
+Target.Z:		0
+Target.Beta:		0.4169
+  
+Gretina.Matrix.File:	$(GRROOT_DIR)/settings/crmat.LINUX
+
+Gretina.Cal.File:	$(GRROOT_DIR)/settings/nofile.dat
+
+#Type of addback to be used. 0 is cluster, 1 is neighbor, 2 is calorimeter, 3 is neighbors-no-search
+AddBackType:	0
+OverflowThreshold:	6000 #in keV
+StoreAllIPoints:	1
+
+Gretina.Recalibrate.File:	$(GRROOT_DIR)/settings/nofile.dat
+
+Sim.Resolution.File:    s44.res
+Sim.Threshold.File:     s44.thresh
+
+#Which hole contains each detector
+Detector.0:	15
+Detector.1:	6
+Detector.2:	16
+Detector.3:	8
+Detector.4:	9
+Detector.5:	7
+Detector.6:	17
+Detector.7:     14
+Detector.8:     19
