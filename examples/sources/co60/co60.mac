@@ -45,4 +45,5 @@
 /Mode2/crmatFile crmat.LINUX
 /Mode2/GretinaCoords
 /Mode2/Filename co60.dat
+
 /run/beamOn 100000

@@ -1,5 +1,4 @@
-all:  co60_gammas_histos.root \
-      co60_histos.root
+all:  co60_histos.root
 	echo "Geant4 simulations done."
 
 # Pattern rules for running Geant4 simulations and sorting the output

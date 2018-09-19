@@ -1,20 +1,7 @@
 ================================================================================
 
-Several gamma-ray calibration sources are implemented in UCGretina
-which can be accessed with the 
-
-    /Experiment/RunSource
-
-and 
-
-    /Experiment/Source/Set
-
-commands. The macro file co60_gammas.mac illustrates this
-approach. These simulations are based on intensities adopted by the
-IAEA for standard calibration sources.
-
-In addition, realistic gamma-ray cascades from stationary sources can
-be simulated using the 
+Realistic gamma-ray cascades from stationary sources can be simulated
+using the 
 
     /BeamOut/Source
 
@@ -23,8 +10,21 @@ Descriptions of transitions de-exciting states of the daughter nucleus
 (60Ni) are read from the level data file z28.a60.lvldata, which is
 provided with the PhotonEvaporationX.X data files.
 
+In order to simulate angular correlations, the functionality must be
+activated in >geant4.10.3. Set the fCorrelatedGamma flag to true in
+<PATH TO
+GEANT4.10>/source/processes/hadronic/models/de_excitation/management/src/G4DeexPrecoParameters.cc,
+recompile and reinstall geant4, and recompile UCGretina.
+
+The GRUTinizer histogram library
+./util/GRUTinizer/MakeHistos60CoSim.cxx is provided. The
+sim/emitted_delta spectrum shows the cos(theta) histogram, where theta
+is the angle between the 1332 and 1173 keV gamma rays. If angular
+correlations have been successfully activated, this specrum will not
+be flat.
+
 ================================================================================
-o Running the simulations
+o Running the simulation
 
   - In this directory, type
 
@@ -36,13 +36,10 @@ o Running the simulations
 
       $ make -f Makefile.GrROOT
 
-  - UCGretina writes mode 2 data to co60_gammas.dat and
-    co60.dat. (The names of the output files are specified in the
-    .mac files.)
+  - UCGretina writes mode 2 data to co60.dat. (The names of the output
+    files are specified in the .mac files.)
 
   - GRUTinizer or GrROOT sorts the mode 2 data in the .dat files into 
-    histograms in co60_gammas_histos.root, co60_histos.root.
-    (The GRUTinizer histogram library
-    ./util/GRUTinizer/MakeHistosSourcesSim.cxx is provided.) 
+    histograms in co60_histos.root. 
 
 ================================================================================

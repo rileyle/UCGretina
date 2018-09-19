@@ -72,20 +72,34 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();
-  
+
+  Int_t    energyNChannels = 8192;
+  Double_t energyLlim = 0.;
+  Double_t energyUlim = 8192.;
+
   if(gretSim){
-    if(gretSim->Size() > 0){
+    for(int x=0; x<gretSim->Size(); x++){
+      TGretSimHit hit = gretSim->GetGretinaSimHit(x);
+      obj.FillHistogram("sim","emitted_energy",
+			energyNChannels, energyLlim, energyUlim,
+			hit.GetEn());
+      obj.FillHistogram("sim","emitted_theta",
+			180, 0., 180.,
+			hit.GetTheta()*TMath::RadToDeg());
+      obj.FillHistogram("sim","emitted_phi",
+			360, 0., 360.,
+			hit.GetPhi()*TMath::RadToDeg());
+      obj.FillHistogram("sim","emitted_z",
+			1000,-50., 50.,
+			hit.GetZ());
       obj.FillHistogram("sim","beta",
-			500, 0, 0.5,
-			gretSim->GetGretinaSimHit(0).GetBeta());
-      obj.FillHistogram("sim","z",
-			1000,-5,5.,
-			gretSim->GetGretinaSimHit(0).GetZ());
+     			500, 0, 0.5,
+     			hit.GetBeta());
       obj.FillHistogram("sim","beta_z",
-			1000,-5,5.,
-			gretSim->GetGretinaSimHit(0).GetZ(),
-			300, 0.2, 0.5,
-			gretSim->GetGretinaSimHit(0).GetBeta());
+     			1000,-5,5.,
+     			hit.GetZ(),
+     			300, 0.2, 0.5,
+     			hit.GetBeta());
     }
   }
   
@@ -104,7 +118,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
      
      // std::cout << std::flush;
 
-     Double_t dta = s800Sim->GetS800SimHit(0).GetDTA()*100.;
+     Double_t dta = s800Sim->GetS800SimHit(0).GetDTA();
 
      // std::cout << "                      ATA = "
      //  	      << s800Sim->GetS800SimHit(0).GetATA() << std::endl;
@@ -115,14 +129,27 @@ void MakeHistograms(TRuntimeObjects& obj) {
      // std::cout << "                      DTA = "
      //  	      << dta << std::endl;
     
-     // Rough dta acceptance cut
-     if(dta < -6. || dta > 6.)
-       return;
-  
+
      obj.FillHistogram("s800","dta",
-		       4096, -6, 6,
+		       200, -0.10, 0.10,
 		       dta);
 
+     // Rough dta acceptance cut
+     if(dta < -0.06 || dta > 0.06)
+       return;
+  
+     obj.FillHistogram("s800","dta_cut",
+		       200, -0.10, 0.10,
+		       dta);
+
+     obj.FillHistogram("s800","ata",
+		       200, -100, 100,
+		       s800Sim->GetS800SimHit(0).GetATA());
+
+     obj.FillHistogram("s800","bta",
+		       200, -100, 100,
+		       s800Sim->GetS800SimHit(0).GetBTA());
+     
      Double_t xsin, ysin, scatter;
 
      xsin =  sin(s800Sim->GetS800SimHit(0).GetATA()/1000.);
@@ -154,11 +181,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   // (optionally define extra beta values in gvalues file)
   const Int_t    nBetas = 1;
   Double_t betas[nBetas] = {beta};
-  
-  Int_t    energyNChannels = 8192;
-  Double_t energyLlim = 0.;
-  Double_t energyUlim = 8192.;
-  
+    
   Double_t calorimeterEnergy = 0.;
   Double_t calorimeterEnergy_gaus = 0.;
   std::vector<TGretinaHit> hits;

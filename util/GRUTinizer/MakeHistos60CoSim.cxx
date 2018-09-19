@@ -86,6 +86,12 @@ void MakeHistograms(TRuntimeObjects& obj) {
   Double_t energyUlim = 4000.;
 
   if(gretSim){
+    Double_t x1 = -1;
+    Double_t y1 = -1;
+    Double_t z1 = -1;
+    Double_t x2 = -1;
+    Double_t y2 = -1;
+    Double_t z2 = -1;
     for(int x=0; x<gretSim->Size(); x++){
       TGretSimHit hit = gretSim->GetGretinaSimHit(x);
       obj.FillHistogram("sim","emitted_energy",
@@ -100,7 +106,22 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogram("sim","emitted_z",
 			1000,-50., 50.,
 			hit.GetZ());
+      if(hit.GetEn() > 1331 && hit.GetEn() < 1334){
+	x1 = sin(hit.GetTheta())*cos(hit.GetPhi());
+	y1 = sin(hit.GetTheta())*sin(hit.GetPhi());
+	z1 = cos(hit.GetTheta());
+      }
+      if(hit.GetEn() > 1171 && hit.GetEn() < 1175){
+	x2 = sin(hit.GetTheta())*cos(hit.GetPhi());
+	y2 = sin(hit.GetTheta())*sin(hit.GetPhi());
+	z2 = cos(hit.GetTheta());
+      }
     }
+    Double_t cosTheta
+      = (x1*x2+y1*y2+z1*z2)/(x1*x1+y1*y1+z1*z1)/(x2*x2+y2*y2+z2*z2);
+    obj.FillHistogram("sim","emitted_delta",
+		      180, -1, 1.,
+		      cosTheta);
   }
 
   if(!gretina)
@@ -108,6 +129,50 @@ void MakeHistograms(TRuntimeObjects& obj) {
   
   Double_t calorimeterEnergy = 0.;
   std::vector<TGretinaHit> hits;
+
+  // Gamma-gated crystal spectrum
+  Double_t eGateLlim = 1327.5;
+  Double_t eGateUlim = 1337.5;
+  int iGate = -1;
+  for(int i=0; i<gretina->Size(); i++){
+    TGretinaHit hit = gretina->GetGretinaHit(i);
+    if( hit.GetCoreEnergy() > eGateLlim &&
+        hit.GetCoreEnergy() < eGateUlim )
+      iGate = i;
+  }
+  if(iGate>=0){
+    for(int i=0; i<gretina->Size(); i++){
+      TGretinaHit hit = gretina->GetGretinaHit(i);
+      if(i != iGate){
+	Double_t mE = measuredE(hit.GetCoreEnergy());
+	obj.FillHistogram("energy",
+			  Form("energy_%.0f",
+			       (eGateLlim+eGateUlim)/2.0),
+			  energyNChannels, energyLlim, energyUlim, mE);
+	obj.FillHistogram("energy",
+			  Form("fold_vs_energy_%.0f",
+			       (eGateLlim+eGateUlim)/2.0),
+			  energyNChannels/8, energyLlim, energyUlim, mE,
+			  20, 0, 20, hit.NumberOfInteractions());
+
+	// Count segment fold
+	int segment_fold = hit.NumberOfInteractions();
+	for(int y=0; y < hit.NumberOfInteractions(); y++)
+	  for(int z = y+1; z < hit.NumberOfInteractions(); z++)
+	    if(hit.GetSegmentId(y) == hit.GetSegmentId(z)){
+	      segment_fold--;
+	      break;
+	    }
+
+	obj.FillHistogram("energy",
+			  Form("segfold_vs_energy_%.0f",
+			       (eGateLlim+eGateUlim)/2.0),
+			  energyNChannels/8, energyLlim, energyUlim, mE,
+			  20, 0, 20, segment_fold);
+	
+      }
+    }
+  }
 
   // Addback preprocessing
   for(int x=0; x<gretina->Size(); x++){
@@ -270,6 +335,12 @@ void MakeHistograms(TRuntimeObjects& obj) {
     }
   }
   
+  // For energy-gated addback spectra
+  std::vector<Double_t> ABenergy;
+  std::vector<TString> ABtype;
+  Int_t    Naddback = 0;
+  iGate = -1;
+  
   while(hits.size() > 0){
     TGretinaHit currentHit = hits.back();
     hits.pop_back();
@@ -348,6 +419,48 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		      20, 0, 20, neighbors,
 		      10, 0, 10, cluster.size());
 
+    // For energy-gated addback spectra
+    if(addbackEnergy > eGateLlim &&
+       addbackEnergy < eGateUlim)
+      iGate = Naddback;
+
+    ABenergy.push_back(addbackEnergy);
+    ABtype.push_back(addbackType);
+    Naddback++;
+
+  }
+
+  // Fill energy-gated addback spectra
+  if(iGate >= 0){
+    for(int i = 0; i<Naddback; i++){
+      if(i != iGate){
+	obj.FillHistogram("addback",
+			  ABtype[i]+Form("_%.0f",
+					   (eGateLlim+eGateUlim)/2.0),
+			  energyNChannels, energyLlim, energyUlim,
+			  ABenergy[i]);
+
+	if(ABtype[i] == "addback_n0"
+	   || ABtype[i] == "addback_n1"){
+	  obj.FillHistogram("addback",
+			    Form("addback_n0n1_%.0f",
+				 (eGateLlim+eGateUlim)/2.0),
+			    energyNChannels, energyLlim, energyUlim,
+			    ABenergy[i]);
+	}
+    
+	if(ABtype[i] == "addback_n0"
+	   || ABtype[i] == "addback_n1"
+	   || ABtype[i] == "addback_n2"){
+	  obj.FillHistogram("addback",
+			    Form("addback_n0n1n2_%.0f",
+				 (eGateLlim+eGateUlim)/2.0),
+			    energyNChannels, energyLlim, energyUlim,
+			    ABenergy[i]);
+	}
+	
+      }
+    }
   }
   
   TList *list = &(obj.GetObjects());
