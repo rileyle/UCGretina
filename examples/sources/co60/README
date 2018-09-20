@@ -23,6 +23,11 @@ is the angle between the 1332 and 1173 keV gamma rays. If angular
 correlations have been successfully activated, this specrum will not
 be flat.
 
+The position/delta is the cos(theta) spectrum of 1332-1172 keV
+coincidence events observed by GRETINA. The ./angCorr.C script
+produces an angular distribution plot by dividing the position/delta
+spectrum by that from a simulation with no angular correlation.
+
 ================================================================================
 o Running the simulation
 
