@@ -685,10 +685,7 @@ void EventAction::writeSim(long long int ts, EventInformation* eventInfo)
       g4sim_egs.gammas[i].z     = eventInfo->GetEmittedGammaPosZ(i);
       g4sim_egs.gammas[i].phi   = eventInfo->GetEmittedGammaPhi(i);
       g4sim_egs.gammas[i].theta = eventInfo->GetEmittedGammaTheta(i);
-      if(fisInBeam)
-	g4sim_egs.gammas[i].beta  = eventInfo->GetBeta(i);
-      else
-	g4sim_egs.gammas[i].beta  = 0;
+      g4sim_egs.gammas[i].beta  = eventInfo->GetBeta(i);
     }
 
     //Write GEB header for G4SIM event
@@ -723,11 +720,8 @@ void EventAction::writeSim(long long int ts, EventInformation* eventInfo)
 	     << eventInfo->GetEmittedGammaPhi(i)
 	     << std::setw(12) 
 	     << eventInfo->GetEmittedGammaTheta(i)
-	     << std::setw(12);
-      if(fisInBeam)
-	evfile << eventInfo->GetBeta(i) << G4endl;
-      else
-	evfile << 0 << G4endl;
+	     << std::setw(12)
+	     << eventInfo->GetBeta(i) << G4endl;
     }
   }
  
