@@ -113,9 +113,11 @@ p3                        =      8.84233   +/-   0.0337336
 Total difference = -24221.9
 
 
-    should yield a scaling factor of
+    Here, each event corresponds to one decay. 
 
     (53841(750) Bq)*(595.6 seconds)
                         =  3.21(4)E7 gamma rays emitted
+
+    with should yield a scaling factor (p1) of 32.1(4).
 
 ================================================================================

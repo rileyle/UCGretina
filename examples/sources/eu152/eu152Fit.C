@@ -28,14 +28,6 @@ Double_t fitf(Double_t *v,Double_t *par) {
 
 }
 
-void eu152Fit() {
-  eu152Fit("eu152_gammas_histos.root", 4);
-}
-
-void eu152Fit(TString simFileName) {
-  eu152Fit(simFileName, 4);
-}
-
 void eu152Fit(TString simFileName, Int_t rebin) {
 
   // Load measured spectra =====================================================
@@ -152,7 +144,7 @@ void eu152Fit(TString simFileName, Int_t rebin) {
   Spectra->Divide(1,2);
 
   Spectra->cd(1);
-  Spectra_1->SetLogy();
+  gPad->SetLogy();
 
   spectrum->SetStats(kFALSE);
   spectrum->SetLineColor(kBlack);
@@ -182,3 +174,12 @@ void eu152Fit(TString simFileName, Int_t rebin) {
   cout << "Total difference = " << diff->Integral() << endl;
 
 }
+
+void eu152Fit(TString simFileName) {
+  eu152Fit(simFileName, 4);
+}
+
+void eu152Fit() {
+  eu152Fit("eu152_gammas_histos.root", 4);
+}
+

@@ -406,6 +406,10 @@ gamma-ray angular distribution
 (theta relative to the beam axis) appended to the end of each of 
 the lines describing transitions.
 
+_Important Note: the built-in gamma-ray angular correlations are 
+bypassed entirely in this version of the code. The directions of 
+Gamma rays emitted in cascades are completely uncorrelated._
+
 ### LBL Scanning Table (see also ./examples/scan) ###
 
 (`UCGretina_Scan` only)

@@ -410,6 +410,7 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 
   // Write emitted gamma information from this event to 
   // the output file.
+
   writeSim(timestamp, eventInfo);
 
   if(event_id%everyNevents == 0 && event_id > 0) {
@@ -684,7 +685,10 @@ void EventAction::writeSim(long long int ts, EventInformation* eventInfo)
       g4sim_egs.gammas[i].z     = eventInfo->GetEmittedGammaPosZ(i);
       g4sim_egs.gammas[i].phi   = eventInfo->GetEmittedGammaPhi(i);
       g4sim_egs.gammas[i].theta = eventInfo->GetEmittedGammaTheta(i);
-      g4sim_egs.gammas[i].beta  = eventInfo->GetBeta(i);
+      if(fisInBeam)
+	g4sim_egs.gammas[i].beta  = eventInfo->GetBeta(i);
+      else
+	g4sim_egs.gammas[i].beta  = 0;
     }
 
     //Write GEB header for G4SIM event
@@ -704,7 +708,7 @@ void EventAction::writeSim(long long int ts, EventInformation* eventInfo)
     evfile << "E" << std::setw(4) << eventInfo->GetNEmittedGammas()  
 	   << std::setw(4) << eventInfo->GetFullEnergy()  
 	   << std::setw(12) << ts/10000 << G4endl;
-    for(G4int i = 0; i < eventInfo->GetNEmittedGammas(); i++)
+    for(G4int i = 0; i < eventInfo->GetNEmittedGammas(); i++){
       evfile << "     "
 	     << std::fixed << std::setprecision(4) 
 	     << std::right << std::setw(12) 
@@ -719,8 +723,12 @@ void EventAction::writeSim(long long int ts, EventInformation* eventInfo)
 	     << eventInfo->GetEmittedGammaPhi(i)
 	     << std::setw(12) 
 	     << eventInfo->GetEmittedGammaTheta(i)
-	     << std::setw(12) 
-	     << eventInfo->GetBeta(i) << G4endl;
+	     << std::setw(12);
+      if(fisInBeam)
+	evfile << eventInfo->GetBeta(i) << G4endl;
+      else
+	evfile << 0 << G4endl;
+    }
   }
  
 }
