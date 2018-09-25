@@ -1,0 +1,21 @@
+# Detector parameters ==========================================================
+/Gretina/detector/enableCapsules
+/Gretina/detector/enableCryostats
+/Gretina/Shell full
+/Target/Construct
+/Target/Sled
+/BeamTube/Construct
+/Gretina/update
+
+# Source parameters ============================================================
+/Experiment/RunSource
+/Experiment/Source/Set simple
+/Experiment/Source/setEnergy 1 MeV
+
+# Output parameters ============================================================
+/Mode2/crmatFile crmat.LINUX
+/Mode2/GretinaCoords
+/Output/Filename simple.out
+/run/beamOn 100
+
+
