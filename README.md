@@ -58,6 +58,28 @@ packages.
 
 ### Geometry ###
 
+Five text files present in the working directory in which `UCGretina`
+is run determine the geometry of the crystals (`asolid`), including
+coaxial and back dead layers, the segmentation of crystals for readout
+(`aslice`), the assembly of crystals into quads (`acluster`), the
+aluminum vacuum jacket surrounding the crystals in each quad
+(`awalls`), and the placement of modules into the array
+(`aeuler`). The detector construction code is a modified version of
+the `AgataDetectorArray` class in the AGATA simulation code. The file
+`./GretinaGeometry/geometry_description_agata` describes the geometry
+file formats.
+
+Geometry files for several array configurations are provided in the
+`./GretinaGeometry` directory. The bash script `change_geometry.sh` is
+provided to create soft links in the current working directory to the
+geometry files with the path and root name supplied as a command line
+argument. For example,
+
+    $ ./change_geometry.sh <PATH TO GretinaGeometry>/GretinaNSCL/G120C4
+
+creates links to the 7-quad configuration used in the 
+GRETINA commissioning at the NSCL.
+
 Optional commands for setting target parameters:
 
     /Target/Material <material name>
@@ -257,7 +279,7 @@ Optional commands related to the outgoing reaction product:
 >       <Channel 3 differential cross section [arbitrary units]>
 >       ...
 
-> If this file is presnet, the 2-body reaction will draw from this
+> If this file is present, the 2-body reaction will draw from this
 > distribution to determine the scattering-angle for each event. The
 > minimum and maximum scattering angles read from this file supersede
 > values set with the `/BeamOut/ThetaMin` and `/BeamOut/ThetaMax`
@@ -614,7 +636,7 @@ Energies are expressed in keV, and positions are expressed in mm.
 > file. There are small deviations in crystal placement from the
 > design positions. Therefore, using the standard crmat file
 > introduces offsets in the crystal-frame hit patterns. Using the
-> internal transormations does not.
+> internal transformations does not.
 
     /Mode2/GretinaCoords
 
@@ -665,11 +687,11 @@ Run the macro file `vis/vis.mac` an interactive session:
     Idle> exit
 
 This generates a VRML 2 file named `g4_XX.wrl` which can be viewed
-with a VRML viewer (like mayavi2). Macro files are included for
-visualizing GRETA, the LBL scanning table, and the liquid-hydrogen
-target setups. These scripts must be run in a directory with soft
-links (aclust, euler, aslice, asolid, awalls) to the appropriate
-GRETINA geometry files. 
+with a VRML viewer (like view3dscene, FreeWRL, or mayavi2). Macro
+files are included for visualizing GRETA, the LBL scanning table, and
+the liquid-hydrogen target setups. These scripts must be run in a
+directory with soft links (`aclust`, `euler`, `aslice`, `asolid`,
+`awalls`) to the appropriate GRETINA geometry files.
 
 The macro file `./vis/trajectories.mac` illustrates how to add particle
 trajectories to visulatizations.
