@@ -22,7 +22,7 @@ command. The macro file eu152.mac illustrates this approach.
 Descriptions of transitions de-exciting states of the daughter nuclei
 (152Sm and 152Gd) are read from the level data files
 z62.a152.lvldata and z64.a152.lvldata, which are provided with the
-PhotonEvaporationX.X data files.
+PhotonEvaporation5.2 (or later) data files.
 
 ================================================================================
 o Running the simulations
@@ -68,7 +68,7 @@ o Fitting a measured spectrum
       Run020: free running, 595.6 live seconds, 9/17/2012
       Source activity:
       (313100(4400) Bq on 5/1/1978)*(0.5)^(34.3819 years/13.537 years) 
-                        = 53841(754) Bq
+                        = 53841(757) Bq
 
         (53841(750) Bq)*(595.6 seconds)*(1.537 gamma rays/decay) 
                         =  4.93(7)E7 gamma rays emitted
@@ -115,8 +115,8 @@ Total difference = -24221.9
 
     Here, each event corresponds to one decay. 
 
-    (53841(750) Bq)*(595.6 seconds)
-                        =  3.21(4)E7 gamma rays emitted
+    (53841(757) Bq)*(595.6 seconds)
+                        =  3.21(5)E7 decays
 
     with should yield a scaling factor (p1) of 32.1(4).
 
