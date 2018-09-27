@@ -332,7 +332,9 @@ Mandatory commands
 > The white source type emits gamma rays in a uniform energy
 > distribution between 100 keV and 10 MeV. These limits can be set
 > with the `/Experiment/Source/setWhiteLowE` and
-> `/Experiment/Source/setWhiteHighE` commands.
+> `/Experiment/Source/setWhiteHighE` commands. The multiplicity
+> of the white source is set with the
+> `/Experiment/Source/setMultiplicity` command.
 
 > `eu152_peaks`, `co56_peaks`, and `photopeaks` sources produce 
 > selected gamma-rays from <SUP>152</SUP>Eu, <SUP>56</SUP>Co, and both, 
@@ -379,7 +381,12 @@ Optional commands
 
     /Experiment/Source/setWhiteHighE <double> <unit>
 
-> Set the limits of the energy distribution of the "white" source type
+> Set the limits of the energy distribution of the "white" and
+> "bgwhite" source types.
+
+    /Experiment/Source/setMultiplicity <int>
+
+> Sets the multiplicity of the "white" and "bgwhite" source types.
 
     /Target/sourceFrame <frame type>
 
