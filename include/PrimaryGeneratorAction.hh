@@ -56,6 +56,7 @@ public:
   void SetSourceEnergy(G4double);
   void SetWhiteSourceLowE(G4double energy){sourceWhiteLoE = energy;}
   void SetWhiteSourceHighE(G4double energy){sourceWhiteHiE = energy;}
+  void SetWhiteSourceMult(G4int mult){sourceMultiplicity = mult;}
   void SetSourceCollAngle(G4double ang){collimationAngle = ang; isCollimated = true;}
   void SetSourceCollDirection(G4ThreeVector dir){collimationDirection = dir; isCollimated = true;}
   G4double GetSourceEnergy();
@@ -86,6 +87,7 @@ private:
   G4double sourceBranchingSum;
   G4double sourceWhiteLoE;
   G4double sourceWhiteHiE;
+  G4int sourceMultiplicity;
   G4double bgSphereRmin;
   G4double bgSphereRmax;
   G4double collimationAngle;

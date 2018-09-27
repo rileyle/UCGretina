@@ -31,14 +31,19 @@ PrimaryGeneratorAction_Messenger::PrimaryGeneratorAction_Messenger(PrimaryGenera
   SrcECmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   SrcWLECmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/setWhiteLowE",this);
-  SrcWLECmd->SetGuidance("Set lower gamma-ray energy limit for the white source");
+  SrcWLECmd->SetGuidance("Set lower gamma-ray energy limit for the white/bgwhite source");
   SrcWLECmd->SetParameterName("White Source Lower Energy Limit",false);
   SrcWLECmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   SrcWHECmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/setWhiteHighE",this);
-  SrcWHECmd->SetGuidance("Set upper gamma-ray energy limit for the white source");
+  SrcWHECmd->SetGuidance("Set upper gamma-ray energy limit for the white/bgwhite source");
   SrcWHECmd->SetParameterName("White Source Upper Energy Limit",false);
   SrcWHECmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  SrcMultCmd = new G4UIcmdWithAnInteger("/Experiment/Source/setMultiplicity",this);
+  SrcMultCmd->SetGuidance("Set multiplicity for the white/bgwhite source");
+  SrcMultCmd->SetParameterName("White Source Multiplicity",false);
+  SrcMultCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   SrcXCmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/setX",this);
   SrcXCmd->SetGuidance("Set X position for the source");
@@ -95,6 +100,7 @@ PrimaryGeneratorAction_Messenger::~PrimaryGeneratorAction_Messenger()
   delete SrcECmd;
   delete SrcWLECmd;
   delete SrcWHECmd;
+  delete SrcMultCmd;
   delete SrcXCmd;
   delete SrcYCmd;
   delete SrcZCmd;
@@ -129,6 +135,9 @@ void PrimaryGeneratorAction_Messenger::SetNewValue(G4UIcommand* command,G4String
 
   if( command == SrcWHECmd )
     {PGA ->SetWhiteSourceHighE(SrcECmd->GetNewDoubleValue(newValue));}
+
+  if( command == SrcMultCmd )
+    {PGA ->SetWhiteSourceMult(SrcMultCmd->GetNewIntValue(newValue));}
 
   if( command == SrcXCmd )
     {PGA ->SetSourceX(SrcXCmd->GetNewDoubleValue(newValue));}
