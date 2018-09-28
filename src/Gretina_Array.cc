@@ -1203,11 +1203,11 @@ void Gretina_Array::ConstructGeCrystals()
 
 void Gretina_Array::ConstructTheCapsules()
 {
-  //  G4int    nPg, nSid, nGe;
-  G4int    nPg, nGe;
-  //  G4bool   movePlane;
-  //  G4double dist1 = 0.;
-  //  G4double dist2 = 0.;
+  G4int    nPg, nSid, nGe;
+  //  G4int    nPg, nGe;
+  G4bool   movePlane;
+  G4double dist1 = 0.;
+  G4double dist2 = 0.;
   char     sName[128];
   
   CpolyhPoints* pPg = NULL;
@@ -1238,16 +1238,16 @@ void Gretina_Array::ConstructTheCapsules()
     nGe = pPg->whichGe;
     
     if( pPg->isPlanar ) {  // planar: no capsule, guardring
-   //   dist1 = pPg->guardThick;
-   //   dist2 = dist1;
+      //      dist1 = pPg->guardThick;
+      //      dist2 = dist1;
       
       if( makeCapsule ) {
 	pPv = &capsO[nPg];  
 	sprintf(sName, "plaPoly%2.2d", nGe);
 	pPv->pPoly  = new CConvexPolyhedron(G4String(sName), pPg->vertex);
         //      for( nSid=0; nSid<pPg->pPoly->GetnPlanes()-2; nSid++ )
-	//	for( nSid=2; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
-	//	  movePlane = pPv->pPoly->MovePlane( nSid, pPg->guardThick[nSid%4] );
+	for( nSid=2; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
+	  movePlane = pPv->pPoly->MovePlane( nSid, pPg->guardThick[nSid%4] );
 	pPv->whichGe = nGe;
 	sprintf(sName, "plaPolyL%2.2d", nGe);
 	pPv->pDetL = new G4LogicalVolume( pPv->pPoly, matCryst, G4String(sName), 0, 0, 0 ); 
@@ -1259,8 +1259,8 @@ void Gretina_Array::ConstructTheCapsules()
 	sprintf(sName, "plbPoly%2.2d", nGe);
 	pPc->pPoly  = new CConvexPolyhedron(G4String(sName), pPg->vertex);
         //	for( nSid=0; nSid<pPg->pPoly->GetnPlanes()-2; nSid++ )
-	//	for( nSid=2; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
-	//	  movePlane = pPc->pPoly->MovePlane( nSid, pPg->guardThick[nSid%4] );
+	for( nSid=2; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
+	  movePlane = pPc->pPoly->MovePlane( nSid, pPg->guardThick[nSid%4] );
 	pPc->whichGe = nGe;
 	sprintf(sName, "plbPolyL%2.2d", nGe);
 	pPc->pDetL = new G4LogicalVolume( pPc->pPoly, matCryst, G4String(sName), 0, 0, 0 );
@@ -1276,8 +1276,8 @@ void Gretina_Array::ConstructTheCapsules()
 	sprintf(sName, "plaPoly%2.2d", nGe);
 	pPv->pPoly  = new CConvexPolyhedron(G4String(sName), pPg->vertex);
         //      for( nSid=0; nSid<pPg->pPoly->GetnPlanes()-2; nSid++ )
-	//	for( nSid=2; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
-	//	  movePlane = pPv->pPoly->MovePlane( nSid, pPg->guardThick[nSid%4] );
+	for( nSid=2; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
+	  movePlane = pPv->pPoly->MovePlane( nSid, pPg->guardThick[nSid%4] );
 	pPv->whichGe = nGe;
 	sprintf(sName, "plaPolyL%2.2d", nGe);
 	pPv->pDetL = new G4LogicalVolume( pPv->pPoly, matCryst, G4String(sName), 0, 0, 0 ); 
@@ -1344,15 +1344,15 @@ void Gretina_Array::ConstructTheCapsules()
       }
     }
     else {
-      //      dist1 = pPg->capSpace;
-      //      dist2 = dist1 + pPg->capThick;
+      dist1 = pPg->capSpace;
+      dist2 = dist1 + pPg->capThick;
       if( makeCapsule ) {
 
 	pPv = &capsI[nPg];  
 	sprintf(sName, "vaPoly%2.2d", nGe);
 	pPv->pPoly  = new CConvexPolyhedron(G4String(sName), pPg->vertex);
-	//	for( nSid=0; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
-	//	  movePlane = pPv->pPoly->MovePlane( nSid, dist1 );
+	for( nSid=0; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
+	  movePlane = pPv->pPoly->MovePlane( nSid, dist1 );
 	pPv->whichGe = nGe;
 	sprintf(sName, "geVacPolyL%2.2d", nGe);
 	pPv->pDetL = new G4LogicalVolume( pPv->pPoly, matHole, G4String(sName), 0, 0, 0 ); 
@@ -1365,8 +1365,8 @@ void Gretina_Array::ConstructTheCapsules()
 	pPc = &capsO[nPg];  
 	sprintf(sName, "caPoly%2.2d", nGe);
 	pPc->pPoly  = new CConvexPolyhedron(G4String(sName), pPg->vertex);
-	//	for( nSid=0; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
-	//	  movePlane = pPc->pPoly->MovePlane( nSid, dist2 );
+	for( nSid=0; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
+	  movePlane = pPc->pPoly->MovePlane( nSid, dist2 );
 	pPc->whichGe = nGe;
 	sprintf(sName, "geCapPolyL%2.2d", nGe);
 	pPc->pDetL = new G4LogicalVolume( pPc->pPoly, matWalls, G4String(sName), 0, 0, 0 );
@@ -1382,8 +1382,8 @@ void Gretina_Array::ConstructTheCapsules()
 	pPv = &capsO[nPg];  
 	sprintf(sName, "cryPoly%2.2d", nGe);
 	pPv->pPoly  = new CConvexPolyhedron(G4String(sName), pPg->vertex);
-	//	for( nSid=0; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
-	//	  movePlane = pPv->pPoly->MovePlane( nSid, dist1 );
+	for( nSid=0; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
+	  movePlane = pPv->pPoly->MovePlane( nSid, dist1 );
 	pPv->whichGe = nGe;
 	sprintf(sName, "cryPolyL%2.2d", nGe);
 	pPv->pDetL = new G4LogicalVolume( pPv->pPoly, matHole, G4String(sName), 0, 0, 0 ); 
