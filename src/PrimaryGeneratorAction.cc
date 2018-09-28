@@ -15,6 +15,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction *detector, I
   frac=0;
   sourceWhiteLoE = 100.*keV;
   sourceWhiteHiE = 10000.*keV;
+  sourceMultiplicity = 1;
   isCollimated         = false;
   collimationDirection = G4ThreeVector(0., 0., 1.);
   collimationAngle     = 0.;
@@ -163,6 +164,14 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
   //  G4cout<<" +++++ Generating an event "<<G4endl;
   particleGun->GeneratePrimaryVertex(anEvent);
+
+  if(sourceMultiplicity > 1 &&
+     (sourceType == "white" || sourceType == "bgwhite")){
+    for(G4int i = 1; i<sourceMultiplicity; i++){
+      particleGun->SetParticleEnergy(GetSourceEnergy());
+      particleGun->GeneratePrimaryVertex(anEvent);
+    }
+  }
   // G4cout<<" +++++ Out Generate Primaries "<<G4endl;
 }
 //---------------------------------------------------------------------
