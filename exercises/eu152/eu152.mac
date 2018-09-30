@@ -8,21 +8,13 @@
 /Gretina/update
 
 # Set source/decay parameters ==================================================
-
-# Source position and dimensions
-/BeamIn/Focus/Z  0. mm
-/BeamIn/Focus/X  0. mm
-/BeamIn/Focus/Y  0. mm
-/BeamIn/Focus/DX 0. mm
-/BeamIn/Focus/DY 0. mm
-
 /Target/sourceFrame eu152_Z2707
 
-# Turn off the Reaction process (G4RadioactiveDecay handles the beta decay).
-/process/inactivate Reaction
+/process/inactivate Reaction  # (G4RadioactiveDecay handles the beta decay).
+/BeamOut/Source               # We’re not really shooting a beam at a target
 
 # Stationary 152Eu source
-/BeamOut/Source
+/BeamIn/Focus/Z  0. mm        # (Misleading: emission point, not focus)
 /BeamIn/A 152
 /BeamIn/Z 63
 /BeamIn/KEu 0. keV      
