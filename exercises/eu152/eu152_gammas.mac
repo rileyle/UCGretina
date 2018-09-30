@@ -12,12 +12,7 @@
 /Experiment/Source/Set eu152
 /Target/sourceFrame eu152_Z2707
 
-# Tracking parameters ==========================================================
-#/GammaPrint/Track_Set
-#/IonPrint/Track_Set
-
 # Output parameters ============================================================
-/Mode2/PackingRes 0.0 mm
 /Mode2/crmatFile crmat.LINUX
 /Mode2/GretinaCoords
 /Mode2/Filename eu152_gammas.dat
