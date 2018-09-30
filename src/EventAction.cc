@@ -83,7 +83,9 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	     << G4endl;
     G4cout << eventInfo->GetNEmittedGammas() << " emitted gamma(s)" << G4endl;
     for(G4int i = 0; i< eventInfo->GetNEmittedGammas(); i++)
-      G4cout << "energy = " << eventInfo->GetEmittedGammaEnergy(i)
+      G4cout << std::fixed << std::setprecision(4) 
+	     << std::setw(12) << std::right
+	     << "energy = " << eventInfo->GetEmittedGammaEnergy(i)
 	     << " pos = " << eventInfo->GetEmittedGammaPosX(i)
 	     << ", " << eventInfo->GetEmittedGammaPosY(i)
 	     << ", " << eventInfo->GetEmittedGammaPosZ(i)

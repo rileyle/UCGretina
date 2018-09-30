@@ -93,21 +93,28 @@ G4VPhysicalVolume* Target::Construct()
 //-----------------------------------------------------------------------------
 void Target::ConstructBeamTube(){
 
+  G4double Phi0 = 0.*deg;
+  G4double dPhi = 360.*deg;
+  if(Cutaway){
+    Phi0 = -90.*deg;
+    dPhi = 180.*deg;
+  }
+
   // Beam line segment
 
   G4Tubs* BeamTube0 = new G4Tubs("BeamTube0", BeamTubeRmin, BeamTubeRmax, 
-				BeamTubeDz, 0.*deg, 360.*deg); 
+				BeamTubeDz, Phi0, dPhi); 
   G4Tubs* BeamTee0 = new G4Tubs("BeamTee0", BeamTeeRmin, BeamTeeRmax, 
-				BeamTeeDz, 0.*deg, 360.*deg); 
+				BeamTeeDz, Phi0, dPhi); 
 
   G4Tubs* BeamTubeCutout = new G4Tubs("BeamTubeCutout", 0., BeamTeeRmax, 
-				      BeamTeeDz, 0.*deg, 360.*deg); 
+				      BeamTeeDz, Phi0, dPhi); 
 
   G4RotationMatrix BeamTeeRot = NoRot;
   BeamTeeRot.rotateX(90.0*deg);
 
   G4Tubs* BeamTeeCutout = new G4Tubs("BeamTeeCutout", 0., BeamTubeRmin, 
-				     BeamTubeDz, 0.*deg, 360.*deg); 
+				     BeamTubeDz, Phi0, dPhi); 
 
   G4SubtractionSolid* BeamTube 
     = new G4SubtractionSolid("BeamTube", BeamTube0, BeamTubeCutout,
