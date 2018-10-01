@@ -138,6 +138,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj.FillHistogram("energy", "energy",
 		      energyNChannels, energyLlim, energyUlim, mE);
 
+    if(gretSim && gretSim->Size()>0)
+      if(gretSim->GetGretinaSimHit(0).IsFEP())
+        obj.FillHistogram("energy", "photopeak",
+	  		  energyNChannels, energyLlim, energyUlim, mE);
+    
     obj.FillHistogram("energy", "fold_vs_energy",
 		      energyNChannels/8, energyLlim, energyUlim, mE,
 		      20, 0, 20, hit.NumberOfInteractions());
