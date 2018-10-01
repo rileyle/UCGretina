@@ -3,7 +3,6 @@ DEVNOTES
 *.out
 *.log
 *.root
-*.root
 *.rad
 *.spe
 *.wrl
