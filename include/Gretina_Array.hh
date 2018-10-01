@@ -335,7 +335,7 @@ public:
     
   public:
     inline G4bool                GetDrawReadOut     () { return drawReadOut; };
-
+    inline G4bool                GetReadOut         () { return readOut; };
 };
 
 #include "G4UImessenger.hh"
