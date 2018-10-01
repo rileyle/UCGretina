@@ -98,36 +98,39 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
 
   // Segment number
   G4int segCode = 0;
+  G4RunManager* runManager = G4RunManager::GetRunManager();
+  DetectorConstruction* theDetector 
+    = (DetectorConstruction*)runManager->GetUserDetectorConstruction();
+
+  if(theDetector->GetGretina()->GetReadOut()){
 #ifdef SCANNING
-  if( detNum < 124 ){ // GRETINA
+    if( detNum < 124 ){ // GRETINA
 #endif
-    G4RunManager* runManager = G4RunManager::GetRunManager();
-    DetectorConstruction* theDetector 
-      = (DetectorConstruction*)runManager->GetUserDetectorConstruction();
+      segCode = 
+	theDetector->GetGretina()->GetSegmentNumber( detCode, posSol );
 
-    segCode = 
-      theDetector->GetGretina()->GetSegmentNumber( detCode, posSol );
-
-    // Modify sector number to match GRETINA data stream
-    G4int slice  = segCode/10;
-    G4int sector = segCode%10;
-    // Type B crystal (offset -1)
-    if(sector>0) 
-      sector--;
-    else
-      sector=5;
-    // Type A crystal (offset -2)
-    if(detNum % 2){
+      // Modify sector number to match GRETINA data stream
+      G4int slice  = segCode/10;
+      G4int sector = segCode%10;
+      // Type B crystal (offset -1)
       if(sector>0) 
 	sector--;
       else
 	sector=5;
-    }
-    segCode = sector + 6 * slice;
+      // Type A crystal (offset -2)
+      if(detNum % 2){
+	if(sector>0) 
+	  sector--;
+	else
+	  sector=5;
+      }
+      segCode = sector + 6 * slice;
 #ifdef SCANNING
-  }
+    }
 #endif
-
+  } else {
+    segCode = -1;
+  }
   TrackerGammaHit* newHit = new TrackerGammaHit();
 
   newHit->SetTrackID  (aStep->GetTrack()->GetTrackID());
