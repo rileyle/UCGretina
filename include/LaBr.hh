@@ -16,6 +16,8 @@
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
 
+#include "TrackerGammaSD.hh"
+
 class LaBr 
 {
   public:
@@ -26,6 +28,9 @@ class LaBr
   ~LaBr();
   
   G4VPhysicalVolume *Construct();
+
+  void MakeSensitive(TrackerGammaSD*);
+
   void setR(G4double);
   void setLength(G4double);
   void setMaterial(G4String);

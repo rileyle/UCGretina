@@ -188,6 +188,7 @@ void DetectorConstruction::Placement()
   }
   if( laBrStatus ){
     the_LaBr->Construct();
+    the_LaBr->MakeSensitive(TrackerGamma);
   }
 #endif
 

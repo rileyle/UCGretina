@@ -52,14 +52,22 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   G4StepPoint* preStepPoint = aStep->GetPreStepPoint();
   G4TouchableHandle theTouchable = preStepPoint->GetTouchableHandle();
 
-  G4int detCode = theTouchable->GetReplicaNumber(0);
-  if(detCode == 0)
-    detCode = theTouchable->GetReplicaNumber(depth);
-  G4int detNum = detCode%1000;
-
   G4String name = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
 
-  //    G4cout << name << ", " << detCode << ", " << detNum << G4endl;
+  G4int detCode = -1;
+  G4int detNum = -1;
+  if(name == "LaBr"){
+    detCode = 0;
+    detNum  = 132;
+  }
+  else { // GRETINA or Clover
+    detCode = theTouchable->GetReplicaNumber(0);
+    if(detCode == 0)
+      detCode = theTouchable->GetReplicaNumber(depth);
+    detNum = detCode%1000;
+  }
+
+  //  G4cout << name << ", " << detCode << ", " << detNum << G4endl;
 
   // Track everything (the primary gamma, all secondary electrons, 
   // and all secondary gammas).
@@ -74,16 +82,16 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();
 
   G4VPhysicalVolume* topVolume;
-#ifdef SCANNING
+  //#ifdef SCANNING
   if( detNum < 124 ) // GRETINA
-#endif
+  //#endif
     topVolume = theTouchable->GetVolume(depth);
-#ifdef SCANNING
-  else if( detNum > 123 ) // Clover
+  //#ifdef SCANNING
+  else if( detNum > 123 ) // Clover or LaBr
     topVolume = theTouchable->GetVolume(0);
   else
     topVolume = NULL;
-#endif
+  //#endif
 
   G4ThreeVector frameTrans = topVolume->GetFrameTranslation();
 
@@ -103,9 +111,9 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
     = (DetectorConstruction*)runManager->GetUserDetectorConstruction();
 
   if(theDetector->GetGretina()->GetReadOut()){
-#ifdef SCANNING
+    //#ifdef SCANNING
     if( detNum < 124 ){ // GRETINA
-#endif
+    //#endif
       segCode = 
 	theDetector->GetGretina()->GetSegmentNumber( detCode, posSol );
 
@@ -125,9 +133,9 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
 	  sector=5;
       }
       segCode = sector + 6 * slice;
-#ifdef SCANNING
+    //#ifdef SCANNING
     }
-#endif
+    //#endif
   } else {
     segCode = -1;
   }

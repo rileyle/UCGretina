@@ -63,6 +63,11 @@ G4VPhysicalVolume* LaBr::Construct()
   return LaBr_phys;
 }
 //-----------------------------------------------------------------------------
+void LaBr::MakeSensitive(TrackerGammaSD* TrackerGamma)
+{
+  LaBr_log->SetSensitiveDetector(TrackerGamma);
+}
+//---------------------------------------------------------------------
 void LaBr::setR(G4double R)
 {
   LaBr_R=R;
