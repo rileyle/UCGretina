@@ -171,7 +171,8 @@ void TrackerGammaSD::EndOfEvent(G4HCofThisEvent* HCE)
 	    
 	    G4cout << "\n--------> event " << runManager->GetCurrentEvent()->GetEventID() << ", "
 		   << NbHits << " hits for gamma tracking: " << G4endl;
-
+	    G4cout << "                        parent    creator" << G4endl;
+	    G4cout << "trackID PID     process track     process     det seg     Edep      X         Y         Z         Xo        Yo        Zo" << G4endl;
 	    for (i=0;i<NbHits;i++) (*gammaCollection)[i]->Print();
 
 	  }
