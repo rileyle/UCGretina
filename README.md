@@ -222,6 +222,12 @@ Optional commands related to the incoming beam:
 > Angular divergences of the incoming beam in the dispersive and
 > nondispersive directions, respectively.
 
+    /BeamIn/Excitation <double> <unit>
+
+> Excitation energy of the incoming beam. This generally only makes
+> sense in simulations of the the gamma decay of stationary excited
+> nuclei, for which the `/BeamOut/Source` command is present. 
+
 Mandatory commands related to the outgoing beam:
 
     /BeamOut/DA <int> 

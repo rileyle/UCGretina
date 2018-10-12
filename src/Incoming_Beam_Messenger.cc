@@ -21,6 +21,11 @@ Incoming_Beam_Messenger::Incoming_Beam_Messenger(Incoming_Beam* BI)
   ZCmd->SetParameterName("choice",false);
   ZCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  ExCmd = new G4UIcmdWithADoubleAndUnit("/BeamIn/Excitation",this);
+  ExCmd->SetGuidance("Set excitation energy for the incoming beam.");
+  ExCmd->SetParameterName("choice",false);
+  ExCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   KECmd = new G4UIcmdWithADoubleAndUnit("/BeamIn/KE",this);
   KECmd->SetGuidance("Set kinetic energy for the incoming beam.");
   KECmd->SetParameterName("choice",false);
@@ -112,6 +117,7 @@ Incoming_Beam_Messenger::~Incoming_Beam_Messenger()
   delete RepCmd;
   delete ZCmd;
   delete ACmd;
+  delete ExCmd;
   delete Ata0Cmd;
   delete Bta0Cmd;
 }
@@ -124,6 +130,8 @@ void Incoming_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamIn->setA(ACmd->GetNewIntValue(newValue));}
   if( command == ZCmd )
     { BeamIn->setZ(ZCmd->GetNewIntValue(newValue));}
+  if( command == ExCmd )
+    { BeamIn->setEx(ExCmd->GetNewDoubleValue(newValue));}
   if( command == KECmd )
     { BeamIn->setKE(KECmd->GetNewDoubleValue(newValue));}
   if( command == KEuCmd )
@@ -144,7 +152,7 @@ void Incoming_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamIn->setfcZ(fcZCmd->GetNewDoubleValue(newValue));}
   if( command == maxACmd )
     { BeamIn->setmaxAta(maxACmd->GetNewDoubleValue(newValue));}
- if( command == maxBCmd )
+  if( command == maxBCmd )
     { BeamIn->setmaxBta(maxBCmd->GetNewDoubleValue(newValue));}
   if( command == Ata0Cmd )
     { BeamIn->setAta0(Ata0Cmd->GetNewDoubleValue(newValue));}

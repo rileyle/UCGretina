@@ -26,6 +26,7 @@ class Incoming_Beam_Messenger: public G4UImessenger
     G4UIdirectory*             fcDir;
     G4UIcmdWithAnInteger*      ACmd;
     G4UIcmdWithAnInteger*      ZCmd;
+    G4UIcmdWithADoubleAndUnit* ExCmd;
     G4UIcmdWithADoubleAndUnit* KECmd;
     G4UIcmdWithADoubleAndUnit* KEuCmd;
     G4UIcmdWithAString*        dtaCmd;
