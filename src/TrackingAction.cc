@@ -48,7 +48,9 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
     // 	   << std::setw(12) << std::right
     // 	   << "   pos = " << pos
     // 	   << "   dir = " << dir
-    // 	   << "   energy = " << aTrack->GetKineticEnergy();
+    // 	   << "   energy = " << aTrack->GetKineticEnergy()
+    // 	   << "   parent = " << aTrack->GetParentID()
+    // 	   << G4endl;
 
     eventInfo->AddEmittedGamma(aTrack->GetKineticEnergy(), 
 			       &pos, &dir,
@@ -86,13 +88,41 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
   //                  (x: ~up in the S800 focal plane detectors)
 
   const G4ParticleDefinition* def = aTrack->GetParticleDefinition();
+
+  // G4cout << ">==========================================" << G4endl;
+  // G4cout << "> Particle Type = " << def->GetParticleType() << G4endl;
+  // G4cout << "> Track ID      = " << aTrack->GetTrackID() << G4endl;
+  // G4cout << "> Parent ID     = " << aTrack->GetParentID() << G4endl;
+  // G4cout << "> Particle Name = "
+  // 	 << aTrack->GetParticleDefinition()->GetParticleName() << G4endl;
+  // G4cout << ">==========================================" << G4endl;
+  
+  // G4cout << "> TotalEnergy = "   << aTrack->GetTotalEnergy() << G4endl;
+  // G4cout << "> Pre-step Position = " 
+  // 	 << aTrack->GetStep()->GetPreStepPoint()->GetPosition() << G4endl;
+  // G4cout << "> Post-step Position = " 
+  // 	 << aTrack->GetStep()->GetPostStepPoint()->GetPosition() << G4endl;
+  // G4cout << "> MomentumDirection = " 
+  // 	 << aTrack->GetMomentumDirection() << G4endl;
+  // G4cout << "> Beta = " 
+  // 	 << aTrack->GetStep()->GetPostStepPoint()->GetBeta() << G4endl;
+  // G4cout << ">==========================================" << G4endl;
+
   
   // Store beta as a nuclear excited state track has ended
   // (by de-exciting the nucleus)
+
   if( def->GetParticleType() == "nucleus" &&
-      aTrack->GetParentID() > 0 &&
       aTrack->GetParticleDefinition()->GetParticleName().contains('[') )
     eventInfo->AddBeta(aTrack->GetStep()->GetPostStepPoint()->GetBeta(),
-			 aTrack->GetTrackID());
+		       aTrack->GetTrackID());
+
+  
+  // if( def->GetParticleType() == "nucleus" &&
+  //     aTrack->GetParentID() > 0 &&
+  //     aTrack->GetParticleDefinition()->GetParticleName().contains('[') )
+  //   eventInfo->AddBeta(aTrack->GetStep()->GetPostStepPoint()->GetBeta(),
+  // 		       aTrack->GetTrackID());
+
 
 }
