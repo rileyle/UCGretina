@@ -1,9 +1,8 @@
 #include "LaBr.hh"
 
-LaBr::LaBr(G4LogicalVolume* experimentalHall_log,Materials* mat)
+LaBr::LaBr(Materials* mat)
 {
   materials=mat;
-  expHall_log=experimentalHall_log;
 
   LaBr_R  = 0.75*2.54*cm;
   LaBr_Dz = 0.75*2.54*cm;
@@ -25,9 +24,10 @@ LaBr::LaBr(G4LogicalVolume* experimentalHall_log,Materials* mat)
 LaBr::~LaBr()
 {;}
 //-----------------------------------------------------------------------------
-G4VPhysicalVolume* LaBr::Construct()
+G4VPhysicalVolume* LaBr::Construct(G4LogicalVolume* experimentalHall_log)
 {
 
+  expHall_log=experimentalHall_log;
 
   LaBr_Crys = new G4Tubs("LaBr", 0., LaBr_R, LaBr_Dz, 0., 360.*deg);
   

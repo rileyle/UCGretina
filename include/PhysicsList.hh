@@ -45,6 +45,7 @@
 class DetectorConstruction;
 class PhysicsListMessenger;
 class G4VPhysicsConstructor;
+class PhysicsList_Messenger;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -67,6 +68,8 @@ class PhysicsList: public G4VModularPhysicsList
     void AddStepMax();
 
     void GetRange(G4double);
+
+  void SetGammaAngularCorrelations(bool);
       
   private:    
     G4VPhysicsConstructor* fEmPhysicsList;
@@ -75,6 +78,8 @@ class PhysicsList: public G4VModularPhysicsList
     DetectorConstruction* fDet;
 
     Outgoing_Beam* BeamOut;
+
+  PhysicsList_Messenger* theMessenger;
 
   //    PhysicsListMessenger* fMessenger;         
 };

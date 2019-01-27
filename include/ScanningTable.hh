@@ -30,10 +30,10 @@ class ScanningTable
 
   G4LogicalVolume *expHall_log;
 
-  ScanningTable(G4LogicalVolume*,Materials*);
+  ScanningTable(Materials*);
   ~ScanningTable();
   
-  void Construct();
+  void Construct(G4LogicalVolume*);
   void SetCADPath(G4String pth) { CADModelPath = pth; }
   void SetIncludeCloverCart() { includeCloverCart = true; }
   void SetIncludeCartFrame() { includeCartFrame = true; }

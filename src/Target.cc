@@ -1,10 +1,11 @@
 #ifndef LHTARGET
 #include "Target.hh"
 
-Target::Target(G4LogicalVolume* experimentalHall_log,Materials* mat)
+Target::Target(Materials* mat)
 {
   materials=mat;
-  expHall_log=experimentalHall_log;
+
+  buildSled=false;
 
   Target_side_x=50*mm;
   Target_side_y=50*mm;
@@ -25,9 +26,9 @@ Target::~Target()
 { delete target_limits;}
 
 //-----------------------------------------------------------------------------
-G4VPhysicalVolume* Target::Construct()
+G4VPhysicalVolume* Target::Construct(G4LogicalVolume* experimentalHall_log)
 {
-
+  expHall_log=experimentalHall_log;
   aTarget = new G4Box("target",Target_side_x/2.,Target_side_y/2.,Target_thickness/2.);
 
   Target_log = new G4LogicalVolume(aTarget,TargetMaterial,"Target_log",0,0,0);
@@ -47,6 +48,8 @@ G4VPhysicalVolume* Target::Construct()
   }
 
   Target_log->SetVisAttributes(Vis_6);
+
+  if(buildSled) BuildSled();
 
   return Target_phys;
 }
@@ -262,7 +265,7 @@ void Target::setSourceFrame(G4String sF)
   G4cout<<"----> Including source frame: "<<sourceFrame<< G4endl;                 
 }
 //-------------------------------------------------------------------
-void Target::setSled()
+void Target::BuildSled()
 {
 
   sledMaterial = materials->FindMaterial("G10");

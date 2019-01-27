@@ -27,10 +27,10 @@ class WU_Chamber
 
   G4LogicalVolume *expHall_log;
 
-  WU_Chamber(G4LogicalVolume*,Materials*);
+  WU_Chamber(Materials*);
   ~WU_Chamber();
   
-  G4VPhysicalVolume *Construct();
+  G4VPhysicalVolume *Construct(G4LogicalVolume*);
   void Report();
   
     private:

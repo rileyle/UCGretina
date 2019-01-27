@@ -32,7 +32,7 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "PhysicsList.hh"
-//#include "PhysicsListMessenger.hh"
+#include "PhysicsList_Messenger.hh"
  
 //#include "PhysListEmStandard.hh"
 
@@ -69,7 +69,7 @@
 PhysicsList::PhysicsList(DetectorConstruction* det) 
   : G4VModularPhysicsList(), fDet(det)
 {
-  //  fMessenger = new PhysicsListMessenger(this);
+  theMessenger = new PhysicsList_Messenger(this);
   SetVerboseLevel(1);
 
   // EM physics
@@ -90,7 +90,7 @@ PhysicsList::PhysicsList(DetectorConstruction* det)
 
 PhysicsList::~PhysicsList()
 {
-  //  delete fMessenger;
+  delete theMessenger;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -244,7 +244,7 @@ void PhysicsList::AddReaction()
     G4String particleName = particle->GetParticleName();
     if ( particleName == "GenericIon" ) 
       ph->RegisterProcess(react, particle);    
-      ph->RegisterProcess(new G4StepLimiter, particle);
+    ph->RegisterProcess(new G4StepLimiter, particle);
   }
 }
 
@@ -285,10 +285,11 @@ void PhysicsList::AddRadioactiveDecay()
   
   G4PhysicsListHelper* ph = G4PhysicsListHelper::GetPhysicsListHelper();  
   ph->RegisterProcess(radioactiveDecay, G4GenericIon::GenericIon());
-  
+
   // mandatory for G4NuclideTable
   //
   G4NuclideTable::GetInstance()->SetThresholdOfHalfLife(0.1*picosecond);
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -334,6 +335,11 @@ void PhysicsList::GetRange(G4double val)
   G4cout << "particle : " << part->GetParticleName()  << G4endl;
   G4cout << "energy   : " << G4BestUnit(val,"Energy") << G4endl;
   G4cout << "range    : " << G4BestUnit(cut,"Length") << G4endl;
+}
+
+void PhysicsList::SetGammaAngularCorrelations(bool val){
+  G4NuclearLevelData::GetInstance()->GetParameters()->SetCorrelatedGamma(val);
+  G4cout<<"Set correlated gamma "<<val<<G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

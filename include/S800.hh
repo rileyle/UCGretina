@@ -24,10 +24,10 @@ class S800
 
   G4LogicalVolume *expHall_log;
 
-  S800(G4LogicalVolume*,Materials*);
+  S800(Materials*);
   ~S800();
   
-  G4VPhysicalVolume *Construct();
+  G4VPhysicalVolume *Construct(G4LogicalVolume*);
   void setR(G4double);
   void setLength(G4double);
   void setMaterial(G4String);

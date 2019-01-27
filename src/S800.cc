@@ -1,9 +1,8 @@
 #include "S800.hh"
 
-S800::S800(G4LogicalVolume* experimentalHall_log,Materials* mat)
+S800::S800(Materials* mat)
 {
   materials=mat;
-  expHall_log=experimentalHall_log;
 
   S800_R      = 280.*mm; // Est.
   S800_Dz     = 100.*mm; // Est.
@@ -28,8 +27,10 @@ S800::S800(G4LogicalVolume* experimentalHall_log,Materials* mat)
 S800::~S800()
 {;}
 //-----------------------------------------------------------------------------
-G4VPhysicalVolume* S800::Construct()
+G4VPhysicalVolume* S800::Construct(G4LogicalVolume* experimentalHall_log)
 {
+
+  expHall_log=experimentalHall_log;
 
   S800_Quad = new G4Tubs("S800", 3.*2.54*cm, S800_R, S800_Dz, 0., 360.*deg);
   

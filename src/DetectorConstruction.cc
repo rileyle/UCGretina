@@ -23,6 +23,61 @@ DetectorConstruction::DetectorConstruction()
   gretinaStatus = true;
 
   myMessenger = new DetectorConstruction_Messenger(this);
+
+  //  DefineMaterials();
+  materials = new Materials();
+
+  TrackerIon = new TrackerIonSD("IonTracker");
+  TrackerIonSDMessenger = new TrackerIonSD_Messenger(TrackerIon);
+
+  TrackerGamma = new TrackerGammaSD("GammaTracker");
+  TrackerGammaSDMessenger = new TrackerGammaSD_Messenger(TrackerGamma);
+
+  ExperimentalHall = new Experimental_Hall(materials);
+  ExperimentalHallMessenger = new Experimental_Hall_Messenger(ExperimentalHall);
+  
+  // Background sphere
+  BackgroundSphere = new Background_Sphere(materials);
+  BackgroundSphereMessenger = new Background_Sphere_Messenger(BackgroundSphere);
+
+#ifndef LHTARGET
+#ifndef SCANNING
+  // Beam Tube
+
+  BeamTube = new Beam_Tube(materials);
+  BeamTubeMessenger = new Beam_Tube_Messenger(BeamTube);
+
+  // Greta Chamber
+
+  GretaChamber = new Greta_Chamber(materials);
+  GretaChamberMessenger = new Greta_Chamber_Messenger(GretaChamber);
+
+  // WU Chamber
+  WUChamber = new WU_Chamber(materials);
+
+#else
+  // Scanning Table
+  scanningTable = new ScanningTable(materials);
+  ScanningTableMessenger = new ScanningTable_Messenger(scanningTable);
+#endif
+#endif
+
+#ifndef SCANNING  
+  // S800 Quadrupole
+  the_S800 = new S800(materials);
+  the_LaBr = new LaBr(materials);
+#endif
+  
+  // Target
+
+  aTarget = new Target(materials);
+  TargetMessenger = new Target_Messenger(aTarget);
+
+  // GRETINA
+
+  the_Gretina_Array = new Gretina_Array();
+  the_Gretina_Array_Messenger = new Gretina_Array_Messenger(the_Gretina_Array);
+
 }
 
 DetectorConstruction::~DetectorConstruction()
@@ -44,75 +99,26 @@ DetectorConstruction::~DetectorConstruction()
 G4VPhysicalVolume* DetectorConstruction::Construct()
 {
 
-  //  DefineMaterials();
-  materials = new Materials();
-
   // Tracker for ions in the target
 
   G4SDManager* SDman = G4SDManager::GetSDMpointer();
-  TrackerIon = new TrackerIonSD("IonTracker");
-  TrackerIonSDMessenger = new TrackerIonSD_Messenger(TrackerIon);
   SDman->AddNewDetector( TrackerIon );
 
   // Tracker for gammas in GRETINA
 
-  TrackerGamma = new TrackerGammaSD("GammaTracker");
-  TrackerGammaSDMessenger = new TrackerGammaSD_Messenger(TrackerGamma);
   SDman->AddNewDetector( TrackerGamma );
 
   // Experimental Hall
 
-  Experimental_Hall* ExperimentalHall = new Experimental_Hall(materials);
   ExpHall_phys = ExperimentalHall->Construct();
   ExpHall_log  = ExperimentalHall->GetLogVolume();
-  ExperimentalHallMessenger = new Experimental_Hall_Messenger(ExperimentalHall);
 
   G4RunManager* runManager = G4RunManager::GetRunManager();
   runManager->DefineWorldVolume( ExpHall_phys );
 
-  // Background sphere
+  BackgroundSphere->Construct(ExpHall_log);
 
-  BackgroundSphere = new Background_Sphere(ExpHall_log,materials);
-  BackgroundSphereMessenger = new Background_Sphere_Messenger(BackgroundSphere);
-  BackgroundSphere->Construct();
-
-#ifndef LHTARGET
-#ifndef SCANNING
-  // Beam Tube
-
-  BeamTube = new Beam_Tube(ExpHall_log,materials);
-  BeamTubeMessenger = new Beam_Tube_Messenger(BeamTube);
-
-  // Greta Chamber
-
-  GretaChamber = new Greta_Chamber(ExpHall_log,materials);
-  GretaChamberMessenger = new Greta_Chamber_Messenger(GretaChamber);
-
-  // WU Chamber
-  WUChamber = new WU_Chamber(ExpHall_log,materials);
-
-#else
-  // Scanning Table
-  scanningTable = new ScanningTable(ExpHall_log,materials);
-  ScanningTableMessenger = new ScanningTable_Messenger(scanningTable);
-#endif
-#endif
-
-#ifndef SCANNING  
-  // S800 Quadrupole
-  the_S800 = new S800(ExpHall_log,materials);
-  the_LaBr = new LaBr(ExpHall_log,materials);
-#endif
-  
-  // Target
-
-  aTarget = new Target(ExpHall_log,materials);
-  TargetMessenger = new Target_Messenger(aTarget);
-
-  // GRETINA
-
-  the_Gretina_Array = new Gretina_Array();
-  the_Gretina_Array_Messenger = new Gretina_Array_Messenger(the_Gretina_Array);
+  Placement();
 
   return ExpHall_phys;
 }
@@ -129,22 +135,22 @@ void DetectorConstruction::Placement()
 #ifndef SCANNING
   // Beam Tube
   if( beamTubeStatus ){
-    BeamTube->Construct();
+    BeamTube->Construct(ExpHall_log);
   }
 
   // Greta Chamber
   if( gretaChamberStatus ){
-    GretaChamber->Construct();
+    GretaChamber->Construct(ExpHall_log);
   }
 
   // WU Chamber
   if( WUChamberStatus ){
-    WUChamber->Construct();
+    WUChamber->Construct(ExpHall_log);
   }
 
 #else
   // Scanning Table
-  scanningTable->Construct();
+  scanningTable->Construct(ExpHall_log);
   if( cloverStatus == "left"  || cloverStatus == "both" ){
     G4cout << "Constructing left clover detector." << G4endl;
     leftClover = new Clover_Detector(ExpHall_log, materials, "left");
@@ -164,7 +170,7 @@ void DetectorConstruction::Placement()
 
   // Target
   if( targetStatus ){
-    aTarget->Construct();
+    aTarget->Construct(ExpHall_log);
     aTarget->GetTargetLog()->SetSensitiveDetector(TrackerIon);
   }
 
@@ -184,10 +190,10 @@ void DetectorConstruction::Placement()
     Shell->Placement(shellStatus);
   }
   if( s800Status ){
-    the_S800->Construct();
+    the_S800->Construct(ExpHall_log);
   }
   if( laBrStatus ){
-    the_LaBr->Construct();
+    the_LaBr->Construct(ExpHall_log);
   }
 #endif
 

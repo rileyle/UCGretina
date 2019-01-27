@@ -22,10 +22,10 @@ class Background_Sphere
 
   G4LogicalVolume *expHall_log;
 
-  Background_Sphere(G4LogicalVolume*,Materials*);
+  Background_Sphere(Materials*);
   ~Background_Sphere();
   
-  G4VPhysicalVolume *Construct();
+  G4VPhysicalVolume *Construct(G4LogicalVolume*);
   void setRmin(G4double);
   void setRmax(G4double);
   void setMaterial(G4String);

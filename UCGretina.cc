@@ -100,10 +100,10 @@ int main(int argc,char** argv)
     }
 
   // Initialize G4 kernel
-  cout << "*** Initializing runManager" << endl;
-  //  runManager->SetVerboseLevel(2);
-  runManager->Initialize();
-  cout << "*** Initialized runManager" << endl;
+  // cout << "*** Initializing runManager" << endl;
+  // //  runManager->SetVerboseLevel(2);
+  // runManager->Initialize();
+  // cout << "*** Initialized runManager" << endl;
 
   // get the pointer to the UI manager and set verbosities
   G4UImanager* UI = G4UImanager::GetUIpointer();
