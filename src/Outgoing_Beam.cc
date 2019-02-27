@@ -208,8 +208,8 @@ G4DynamicParticle* Outgoing_Beam::ReactionProduct()
   G4ParticleDefinition* product
     = G4IonTable::GetIonTable()->GetIon(Zout, Aout, excitationEnergy);
 
-  //  G4cout << "  " << product->GetParticleName() << G4endl;
-  //  G4cout << "  ex = " << excitationEnergy << G4endl;
+  //G4cout << "  " << product->GetParticleName() << G4endl;
+  //G4cout << "  ex = " << excitationEnergy << G4endl;
   
   G4DynamicParticle* aReactionProduct
     = new G4DynamicParticle(product, GetOutgoingMomentum());

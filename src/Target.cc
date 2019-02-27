@@ -114,7 +114,7 @@ void Target::setMaterial(G4String materialName)
   }
 
   Target_log->SetVisAttributes(Vis_6);
-         
+
 }
 //-------------------------------------------------------------------
 void Target::setTargetReactionDepth(G4double depth)

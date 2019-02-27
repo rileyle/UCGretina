@@ -117,7 +117,7 @@ void Outgoing_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     BeamOut->setProjectileExcitation();
   }
   if( command == TExCmd ){ 
-    BeamOut->setEx(TExCmd->GetNewDoubleValue(newValue));
+    BeamOut->setTarEx(TExCmd->GetNewDoubleValue(newValue));
     BeamOut->setTargetExcitation();
   }
   if( command == SrcCmd )
