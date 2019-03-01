@@ -90,7 +90,7 @@ G4VParticleChange* Reaction::PostStepDoIt(
     // 	   << G4endl;
 
   }
-   
+
   return &aParticleChange;
 }
 
@@ -126,7 +126,7 @@ G4double Reaction::PostStepGetPhysicalInteractionLength(
     // Target excitations:
     // Stop and kill the decay product once it reaches its ground state.
     if( target_reaction &&
-	!aTrack.GetDynamicParticle()->GetParticleDefinition()->GetParticleName().contains('[') ){
+	!aTrack.GetDynamicParticle()->GetParticleDefinition()->GetParticleName().contains('[') && BeamOut->GetReactionFlag()==1){
       ground_state = true;
       target_reaction = false;  //Reset for next decay
       return 0;
