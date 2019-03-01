@@ -46,7 +46,7 @@ class Reaction : public G4VProcess
      virtual G4double AtRestGetPhysicalInteractionLength(
                              const G4Track& ,
 			     G4ForceCondition* 
-			    ){ return -1.0; };
+			    ){ return DBL_MAX; };
 			    
      //  no operation in  AtRestDoIt      
      virtual G4VParticleChange* AtRestDoIt(
