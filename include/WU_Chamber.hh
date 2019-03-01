@@ -73,9 +73,7 @@ class WU_Chamber
 
   //default position
   G4RotationMatrix NoRot;
-  G4RotationMatrix Rot;
   G4RotationMatrix CylRot;
-  G4RotationMatrix BoxRot;
   G4ThreeVector *Pos0;
 
   //the tube

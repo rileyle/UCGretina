@@ -658,7 +658,7 @@ void Gretina_Array:: ReadClustFile()
   FILE      *fp;
   char      line[256];
   G4int     lline, i1, i2, i3, nsolids, oclust;
-  float  ps, th, ph;
+  float  pps, th, ph;
   float  x, y, z;
   
   nClAng    =  0;
@@ -694,8 +694,8 @@ void Gretina_Array:: ReadClustFile()
     lline = strlen(line);
     if(lline < 2) continue;
     if(line[0] == '#') continue;
-//    if(sscanf(line,"%d %d %d %lf %lf %lf %lf %lf %lf", &i1, &i2, &i3, &ps, &th, &ph, &x, &y, &z) != 9) {
-    if(sscanf(line,"%d %d %d %f %f %f %f %f %f", &i1, &i2, &i3, &ps, &th, &ph, &x, &y, &z) != 9) {
+//    if(sscanf(line,"%d %d %d %lf %lf %lf %lf %lf %lf", &i1, &i2, &i3, &pps, &th, &ph, &x, &y, &z) != 9) {
+    if(sscanf(line,"%d %d %d %f %f %f %f %f %f", &i1, &i2, &i3, &pps, &th, &ph, &x, &y, &z) != 9) {
       nClAng++;
       break;
     }
@@ -715,12 +715,12 @@ void Gretina_Array:: ReadClustFile()
     pEa->whichGe = i2;
     pEa->numPhys = i3;
     
-    pEa->ps = ((G4double)ps) * deg;
+    pEa->ps = ((G4double)pps) * deg;
     pEa->th = ((G4double)th) * deg;
     pEa->ph = ((G4double)ph) * deg;
     
     pEa->rotMat.set(0,0,0);
-    pEa->rotMat.rotateZ(((G4double)ps) * deg);
+    pEa->rotMat.rotateZ(((G4double)pps) * deg);
     pEa->rotMat.rotateY(((G4double)th) * deg);
     pEa->rotMat.rotateZ(((G4double)ph) * deg);
     
@@ -770,7 +770,7 @@ void Gretina_Array:: ReadEulerFile()
   FILE      *fp;
   char      line[256];
   G4int     lline, i1, i2;
-  float     ps, th, ph, x, y, z;
+  float     pps, th, ph, x, y, z;
   
   if( (fp = fopen(eulerFile, "r")) == NULL) {
     G4cout << "\nError opening data file " << eulerFile << G4endl;
@@ -789,8 +789,8 @@ void Gretina_Array:: ReadEulerFile()
     lline = strlen(line);
     if(lline < 2) continue;
     if(line[0] == '#') continue;
-//    if(sscanf(line,"%d %d %lf %lf %lf %lf %lf %lf", &i1, &i2, &ps, &th, &ph, &x, &y, &z) != 8)
-    if(sscanf(line,"%d %d %f %f %f %f %f %f", &i1, &i2, &ps, &th, &ph, &x, &y, &z) != 8)
+//    if(sscanf(line,"%d %d %lf %lf %lf %lf %lf %lf", &i1, &i2, &pps, &th, &ph, &x, &y, &z) != 8)
+    if(sscanf(line,"%d %d %f %f %f %f %f %f", &i1, &i2, &pps, &th, &ph, &x, &y, &z) != 8)
       break;
     euler.push_back( CeulerAngles() );
     pEa = &euler[nEuler];
@@ -800,11 +800,11 @@ void Gretina_Array:: ReadEulerFile()
     pEa->whichGe = i2;
 
     pEa->rotMat.set( 0, 0, 0 );
-    pEa->rotMat.rotateZ(((G4double)ps)*deg);
+    pEa->rotMat.rotateZ(((G4double)pps)*deg);
     pEa->rotMat.rotateY(((G4double)th)*deg);
     pEa->rotMat.rotateZ(((G4double)ph)*deg);
     
-    pEa->ps      = ((G4double)ps)*deg;
+    pEa->ps      = ((G4double)pps)*deg;
     pEa->th      = ((G4double)th)*deg;
     pEa->ph      = ((G4double)ph)*deg;
     
@@ -825,7 +825,7 @@ void Gretina_Array:: ReadSliceFile()
   FILE      *fp;
   char      line[256];
   //  G4int     ns, npts, sameSlice, nSlices; // REMOVE?
-  G4int     ns, sameSlice, nSlices;
+  G4int     sn, sameSlice, nSlices;
   float     zz1, ZZ1;
   G4double  zz, ZZ;
   CpolyhPoints *pPg;
@@ -887,13 +887,13 @@ void Gretina_Array:: ReadSliceFile()
       // fills the arrays
       for(nPg = 0; nPg < nPgons; nPg++) {
         pPg = &pgons[nPg];
-        G4double zz = pPg->zFace1;
+        G4double zzF = pPg->zFace1;
         G4double dz = (pPg->zFace2 - pPg->zFace1)/nSlices;
         pPg->zSliceI.clear();
         pPg->zSliceO.clear();
         for(G4int kk=0; kk<nSlices; kk++) {
-          pPg->zSliceI.push_back( zz + kk * dz );
-          pPg->zSliceO.push_back( zz + kk * dz );
+          pPg->zSliceI.push_back( zzF + kk * dz );
+          pPg->zSliceO.push_back( zzF + kk * dz );
         }
         pPg->zSliceI.push_back( pPg->zFace2 );
         pPg->zSliceO.push_back( pPg->zFace2 );
@@ -914,23 +914,23 @@ void Gretina_Array:: ReadSliceFile()
   while( fgets(line, 255, fp) ) {
     if(line[0] == '#') continue;
 //    if( sscanf(line,"%d %lf %lf", &ns, &zz, &ZZ) == 2 )
-    if( sscanf(line,"%d %f %f", &ns, &zz1, &ZZ1) == 2 )
+    if( sscanf(line,"%d %f %f", &sn, &zz1, &ZZ1) == 2 )
       ZZ1 = zz1;
     zz = (G4double)zz1;
     ZZ = (G4double)ZZ1;
-    if(ns < 0 || ns > maxPgons) { // needed to avoid problems in case the minimum index in pgons is not zero
-      G4cout << " Warning! Solid " << ns << " out of range: ignoring  slice  " << zz  << " -- " << ZZ << G4endl;
+    if(sn < 0 || sn > maxPgons) { // needed to avoid problems in case the minimum index in pgons is not zero
+      G4cout << " Warning! Solid " << sn << " out of range: ignoring  slice  " << zz  << " -- " << ZZ << G4endl;
       continue;
     }
     for(nPg = 0; nPg < nPgons; nPg++) {
       pPg = &pgons[nPg];
-      if(pPg->whichGe != ns) continue; // looks for the right solid
+      if(pPg->whichGe != sn) continue; // looks for the right solid
       G4double z2 = pPg->zSliceI[pPg->nslice-1];
       G4double Z2 = pPg->zSliceO[pPg->nslice-1];
       z2 += zz * mm;
       Z2 += ZZ * mm;
       if(z2 > pPg->zFace2 || Z2 > pPg->zFace2) {
-        G4cout << " Warning! Slice " << zz << " -- " << ZZ << " of solid " << ns << " exceeds length of solid "
+        G4cout << " Warning! Slice " << zz << " -- " << ZZ << " of solid " << sn << " exceeds length of solid "
                << "( " << z2 << " -- " << Z2 << "   > " << pPg->zFace2 - pPg->zFace1 << " )" << G4endl;
         continue;
       }
@@ -1514,7 +1514,7 @@ void Gretina_Array::ConstructTheClusters()
     }
 #else
     rm.set(0, 0, 0);
-    G4double ps = 0.;
+    G4double pps = 0.;
     G4double th = 0.;
     G4double ph = 0.;
     rotatedPos = G4ThreeVector();
@@ -1535,7 +1535,7 @@ void Gretina_Array::ConstructTheClusters()
       }  
 
       printf( "  Wall  %4d      %9.2f %9.2f %9.2f %9.2f %9.2f %9.2f\n", pPg->whichWall,
-       ps/deg, th/deg, ph/deg, rotatedPos.x()/cm, rotatedPos.y()/cm, rotatedPos.z()/cm );
+       pps/deg, th/deg, ph/deg, rotatedPos.x()/cm, rotatedPos.y()/cm, rotatedPos.z()/cm );
     }
 #endif    
   }
@@ -2955,17 +2955,17 @@ G4int Gretina_Array::GetCoaxSegmentNumber( G4int nGe, G4ThreeVector position )
 
 void Gretina_Array::CalculateVolumeAndCenter(G4int iPg, G4int start, G4int nsegs, G4double step)
 {
-  G4int ns, ss, npts, nn;
+  G4int sn, ss, npts, nn;
   G4double xMin, yMin, zMin;
   G4double xMax, yMax, zMax;
   std::vector<CpolyhPoints *> ppsegs;  // collect here the pointers the four sub-segments
   ppsegs.resize(4);
-  for(ns = 0; ns < nsegs; ns++) {
+  for(sn = 0; sn < nsegs; sn++) {
     // gather the composing segments
-    ppsegs[0] = &pgSegLl[start + ns];
-    ppsegs[1] = &pgSegLu[start + ns];
-    ppsegs[2] = &pgSegRl[start + ns];
-    ppsegs[3] = &pgSegRu[start + ns];
+    ppsegs[0] = &pgSegLl[start + sn];
+    ppsegs[1] = &pgSegLu[start + sn];
+    ppsegs[2] = &pgSegRl[start + sn];
+    ppsegs[3] = &pgSegRu[start + sn];
 
     // define a bounding box enclosing all the sub-segments
     // (an own one is more convenient here than a G4BoundingBox object)
@@ -2994,8 +2994,7 @@ void Gretina_Array::CalculateVolumeAndCenter(G4int iPg, G4int start, G4int nsegs
     zMax = ceil(zMax);
     
     G4double rr2, rc2 = 0., Rc2 = 0., zch = 0.; 
-    G4bool useCylinder = this->useCylinder && pgons[iPg].cylinderMakesSense;
-    if(useCylinder) {
+    if(useCylinder && pgons[iPg].cylinderMakesSense) {
       rc2 = pow(pgons[iPg].tubr, 2.);
       Rc2 = pow(pgons[iPg].tubR, 2.);
       zch = pgons[iPg].zFace1 + pgons[iPg].thick;
@@ -3054,9 +3053,9 @@ void Gretina_Array::CalculateVolumeAndCenter(G4int iPg, G4int start, G4int nsegs
     theCenter = theCenter/nseen;
     theVolume = nseen*pow(dd1,3.);
     printf( " Crystal# %2d  Segment# %3d : %6d shot %6d seen --> Volume = %6.3f cm3   Center = (%7.3f %7.3f %7.3f) cm\n",
-              iPg, ns, ntot, nseen, theVolume/cm3, theCenter.x()/cm, theCenter.y()/cm, theCenter.z()/cm);
-    segVolume[start + ns] = theVolume;
-    segCenter[start + ns] = theCenter;
+              iPg, sn, ntot, nseen, theVolume/cm3, theCenter.x()/cm, theCenter.y()/cm, theCenter.z()/cm);
+    segVolume[start + sn] = theVolume;
+    segCenter[start + sn] = theCenter;
   }
   ppsegs.clear();
 }
