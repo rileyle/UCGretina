@@ -1,5 +1,3 @@
-#ifdef AD
-
 //
 // ********************************************************************
 // * License and Disclaimer                                           *
@@ -25,7 +23,6 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: G4PhotonEvaporation.hh 106723 2017-10-20 09:50:34Z gcosmo $
 //
 // -------------------------------------------------------------------
 //
@@ -53,12 +50,10 @@
 
 #include "globals.hh"
 #include "G4VEvaporationChannel.hh"
-#include "NuclearLevelData.hh"
-#include "LevelManager.hh"
+#include "G4NuclearLevelData.hh"
+#include "G4LevelManager.hh"
 #include "G4Fragment.hh"
 #include "G4Threading.hh"
-
-#include "AngularDistribution.hh"
 
 const G4int MAXDEPOINT = 10;
 const G4int MAXGRDATA  = 300;
@@ -143,7 +138,6 @@ private:
   G4double fStep;
   G4double fMaxLifeTime;
 
-  G4double LevelDensity;
   G4double Tolerance;
 
   G4bool   fICM;
@@ -178,7 +172,5 @@ inline G4int G4PhotonEvaporation::GetVacantShellNumber() const
 { 
   return vShellNumber;
 }
-
-#endif
 
 #endif

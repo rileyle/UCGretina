@@ -1,5 +1,3 @@
-#ifdef AD
-
 //
 // ********************************************************************
 // * License and Disclaimer                                           *
@@ -25,7 +23,6 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: G4PhotonEvaporation.cc 106723 2017-10-20 09:50:34Z gcosmo $
 //
 // -------------------------------------------------------------------
 //
@@ -52,7 +49,7 @@
 #include "G4Gamma.hh"
 #include "G4LorentzVector.hh"
 #include "G4FragmentVector.hh"
-#include "GammaTransition.hh"
+#include "G4GammaTransition.hh"
 #include "G4Pow.hh"
 #include <CLHEP/Units/SystemOfUnits.h>
 #include <CLHEP/Units/PhysicalConstants.h>
@@ -74,7 +71,6 @@ G4PhotonEvaporation::G4PhotonEvaporation(G4GammaTransition* p)
   //G4cout << "### New G4PhotonEvaporation() " << this << G4endl;   
   fNuclearLevelData = G4NuclearLevelData::GetInstance(); 
   fNucPStore = G4NuclearPolarizationStore::GetInstance();
-  LevelDensity = 0.125/CLHEP::MeV;
   Tolerance = 20*CLHEP::eV;
 
   if(!fTransition) { fTransition = new G4GammaTransition(); }
@@ -100,7 +96,6 @@ void G4PhotonEvaporation::Initialise()
     G4cout << "### G4PhotonEvaporation is initialized " << this << G4endl;   
   }
   G4DeexPrecoParameters* param = fNuclearLevelData->GetParameters();
-  LevelDensity = param->GetLevelDensity();
   Tolerance = param->GetMinExcitation();
   fMaxLifeTime = param->GetMaxLifeTime();
   fCorrelatedGamma = param->CorrelatedGamma();
@@ -146,6 +141,12 @@ G4PhotonEvaporation::EmittedFragment(G4Fragment* nucleus)
 					    nucleus->GetA_asInt(),
 					    nucleus->GetExcitationEnergy());
     nucleus->SetNuclearPolarization(fPolarization);
+    // printf("Excitation energy: %lf\n",fPolarization->GetExcitationEnergy());
+    // for(size_t i=0;i<fPolarization->GetPolarization().size();i++){
+    //   for(size_t j=0;j<fPolarization->GetPolarization()[i].size();j++){
+    // 	printf("Polarization[%lu][%lu]: (%lf,%lf)\n",i,j,fPolarization->GetPolarization()[i][j].real(),fPolarization->GetPolarization()[i][j].imag());
+    //   }
+    // }
   }
   if(fVerbose > 1) { 
     G4cout << "G4PhotonEvaporation::EmittedFragment: " 
@@ -282,7 +283,8 @@ G4PhotonEvaporation::GetEmissionProbability(G4Fragment* nucleus)
   G4double wres = (G4double)GRWidth[A];
   G4double eres2= eres*eres;
   G4double wres2= wres*wres;
-  G4double xsqr = std::sqrt(A*LevelDensity*fExcEnergy);
+  G4double levelDensity = fNuclearLevelData->GetLevelDensity(Z,A,fExcEnergy);
+  G4double xsqr = std::sqrt(levelDensity*fExcEnergy);
 
   G4double egam    = fExcEnergy;
   G4double gammaE2 = egam*egam;
@@ -297,7 +299,7 @@ G4PhotonEvaporation::GetEmissionProbability(G4Fragment* nucleus)
     gammaE2 = egam*egam;
     gammaR2 = gammaE2*wres2;
     egdp2   = gammaE2 - eres2;
-    p1 = G4Exp(2.0*(std::sqrt(A*LevelDensity*std::abs(fExcEnergy - egam)) - xsqr))
+    p1 = G4Exp(2.0*(std::sqrt(levelDensity*std::abs(fExcEnergy - egam)) - xsqr))
       *gammaR2*gammaE2/(egdp2*egdp2 + gammaR2);
     fProbability += (p1 + p0);
     fCummProbability[i] = fProbability;
@@ -344,7 +346,6 @@ G4PhotonEvaporation::GenerateGamma(G4Fragment* nucleus)
   G4double time = nucleus->GetCreationTime();
 
   G4double efinal = 0.0;
-  AngularDistribution* angDist = NULL;
   G4double ratio  = 0.0;
   vShellNumber    = -1;
   G4int  JP1      = 0;
@@ -440,6 +441,8 @@ G4PhotonEvaporation::GenerateGamma(G4Fragment* nucleus)
     if(fVerbose > 1) {
       G4cout << "Discrete emission from level Index= " << fIndex 
 	     << " Elevel= " << fLevelManager->LevelEnergy(fIndex)
+             << " Ltime= " << fLevelManager->LifeTime(fIndex)
+             << " LtimeMax= " << fMaxLifeTime
 	     << "  RDM= " << fRDM << "  ICM= " << fICM << G4endl;
     }
     if(0 == fIndex || !level) { return result; }
@@ -474,8 +477,6 @@ G4PhotonEvaporation::GenerateGamma(G4Fragment* nucleus)
     fIndex = level->FinalExcitationIndex(idx);
     JP2    = fLevelManager->SpinTwo(fIndex); 
 
-    angDist = level->AngDist(idx);
-    
     // final energy and time
     efinal = fLevelManager->LevelEnergy(fIndex);
     if(fSampleTime && ltime > 0.0) { 
@@ -486,7 +487,7 @@ G4PhotonEvaporation::GenerateGamma(G4Fragment* nucleus)
   // protection for floating levels
   if(std::abs(efinal - eexc) <= Tolerance) { return result; }
 
-  result = fTransition->SampleTransition(nucleus, efinal, angDist, ratio, JP1,
+  result = fTransition->SampleTransition(nucleus, efinal, ratio, JP1,
 					 JP2, multiP, vShellNumber, 
 					 isDiscrete, isGamma);
   if(result) { result->SetCreationTime(time); }
@@ -530,4 +531,3 @@ void G4PhotonEvaporation::RDMForced(G4bool val)
   fRDM = val;
 }
   
-#endif

@@ -1,4 +1,5 @@
 #include "Reaction.hh"
+#include "Reaction_Messenger.hh"
 
 Reaction::Reaction(Outgoing_Beam* BO, const G4String& aName)
   : G4VProcess(aName), BeamOut(BO)
@@ -13,11 +14,15 @@ Reaction::Reaction(Outgoing_Beam* BO, const G4String& aName)
   decayed_at_rest = false;
   target_reaction = false;
   ground_state    = false;
+
+  //A cheap way to get a messenger
+  theMessenger = new Reaction_Messenger(this);
 }
 
 Reaction::~Reaction() 
-{                                     
-}                                     
+{
+  delete theMessenger;
+}
 
 // In-flight reaction
 // G4VParticleChange* Reaction::PostStepDoIt(
@@ -25,9 +30,9 @@ Reaction::~Reaction()
 // 			     const G4Step& aStep
 // 			    )
 G4VParticleChange* Reaction::PostStepDoIt(
-			     const G4Track& aTrack,
-			     const G4Step&           // (unused parameter)
-			    )
+					  const G4Track& aTrack,
+					  const G4Step&           // (unused parameter)
+					  )
 {
 
   // G4cout << "I'm in PostStepDoIt." << G4endl;
@@ -67,14 +72,60 @@ G4VParticleChange* Reaction::PostStepDoIt(
 
 	aParticleChange.ProposeTrackStatus(fStopAndKill);
 
+	G4DynamicParticle *theProduct = NULL;
 	if(BeamOut->AboveThreshold()){
 	  aParticleChange.SetNumberOfSecondaries(1);
-	  aParticleChange.AddSecondary(BeamOut->ReactionProduct(),
+	  theProduct = BeamOut->ReactionProduct();
+	  aParticleChange.AddSecondary(theProduct,
 				       BeamOut->ReactionPosition(),
 				       true);
 	}
 
 	BeamOut->SetReactionFlag(1);
+
+	if(theProduct){
+	  //This is a bit heavy, but lets me get the excitation energy
+	  G4int Z = theProduct->GetParticleDefinition()->GetAtomicNumber();
+	  G4int A = theProduct->GetParticleDefinition()->GetAtomicMass();
+	  G4Fragment frag(A,Z,theProduct->Get4Momentum());
+	  G4double Ex = frag.GetExcitationEnergy();
+	  //Based on my reading of the source code, this should never return an
+	  //invalid pointer...
+	  const G4LevelManager *lman = G4NuclearLevelData::GetInstance()->GetLevelManager(Z,A);
+	  size_t index = 0;
+	  index = lman->NearestLevelIndex(Ex,index);
+	  G4int twoJ = lman->SpinTwo(index);
+	  //printf("(Z=%d,A=%d): E=%lf\n",frag.GetZ_asInt(),frag.GetA_asInt(),frag.GetExcitationEnergy());
+	  // std::unordered_map<int,double> P;
+	  // P[-4]=0.;
+	  // P[-2]=0.5;
+	  // P[0]=0;
+	  // P[2]=0.5;
+	  // P[4]=0.;
+	  std::vector<std::vector<G4complex>> polV;
+	  polV.resize(twoJ+1);
+	  for(size_t k=0;k<polV.size();k++){
+	    for(size_t kappa=0;kappa<2*k+1;kappa++){
+	      if(kappa==0){
+		G4double PkKappa = 0.;
+		for(int twoM=-twoJ;twoM<=twoJ;twoM+=2)
+		  PkKappa+=G4Clebsch::ClebschGordanCoeff(twoJ,twoM,twoJ,-twoM,2*k)/G4Clebsch::ClebschGordanCoeff(twoJ,twoM,twoJ,-twoM,0)/sqrt(2*k+1)*substates[twoM];;
+		polV[k].push_back(G4complex(PkKappa,0.0));
+		// if(i==0)
+		//   polV[i].push_back(G4complex(1.0,0.0));
+		// if(i==2)
+		//   polV[i].push_back(G4complex(-0.534523,0.0));
+		// if(i==4)
+		//   polV[i].push_back(G4complex(0.5345,0.0));
+	      }
+	      else
+		polV[k].push_back(G4complex(0.0,0.0));
+	    }
+	  }
+	  auto nucPstore = G4NuclearPolarizationStore::GetInstance();
+	  auto pol = nucPstore->FindOrBuild(frag.GetZ_asInt(),frag.GetA_asInt(),frag.GetExcitationEnergy());
+	  pol->SetPolarization(polV);
+	}
 
       }
 
@@ -92,6 +143,10 @@ G4VParticleChange* Reaction::PostStepDoIt(
   }
 
   return &aParticleChange;
+}
+
+void Reaction::SetPopulation(G4int twoM, G4double frac){
+  substates[twoM]=frac;
 }
 
 // Trigger the in-flight reaction at the depth in the target determined
