@@ -104,13 +104,13 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
 
       G4ThreeVector pDir = aStep->GetTrack()->GetMomentumDirection();
 
-      // ATA is the dispersive angle, 
+      // ATA is the dispersive angle (radians), 
       // down is + in NSCL coords= -y in Geant4 coords
-      eventInfo->SetATA( asin(-pDir.getY()/pDir.mag())/mrad );
+      eventInfo->SetATA( asin(-pDir.getY()/pDir.mag()) );
 
-      // BTA is the non-dispersive angle, 
+      // BTA is the non-dispersive angle (radians), 
       // South is + in NSL coords = -x in Geant4 coords
-      eventInfo->SetBTA( asin(-pDir.getX()/pDir.mag())/mrad );
+      eventInfo->SetBTA( asin(-pDir.getX()/pDir.mag()) );
 
       // DTA is dT/T with T = kinetic energy corresponding 
       // to the user-supplied center of the S800 acceptance
@@ -118,9 +118,9 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
 			  - eventAction->GetS800KE())
 			  / eventAction->GetS800KE() ); 
 
-      // YTA is horizontal position on target, 
+      // YTA is horizontal position on target (meters), 
       // South is + in NSCL coords = -x in Geant4 coords
-      eventInfo->SetYTA( -aStep->GetTrack()->GetStep()->GetPreStepPoint()->GetPosition().getX()/mm );
+      eventInfo->SetYTA( -aStep->GetTrack()->GetStep()->GetPreStepPoint()->GetPosition().getX()/meter );
 
     }
     // Kill a reaction product once it hits the chamber or beamline
