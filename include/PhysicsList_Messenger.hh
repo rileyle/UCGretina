@@ -4,6 +4,7 @@
 #include "G4UImessenger.hh"
 #include "G4UIdirectory.hh"
 #include "G4UIcmdWithABool.hh"
+#include "G4UIcmdWithAString.hh"
 
 class PhysicsList;
 
@@ -21,6 +22,8 @@ private:
   G4UIdirectory* physDir;
 
   G4UIcmdWithABool* CorrCmd;
+  G4UIcmdWithABool* PolCmd;
+  G4UIcmdWithAString* AddCmd;
 };
 
 #endif//PHYSICSLIST_MESSENGER_H

@@ -51,35 +51,37 @@ class PhysicsList_Messenger;
 
 class PhysicsList: public G4VModularPhysicsList
 {
-  public:
-    PhysicsList(DetectorConstruction*);
-   ~PhysicsList();
+public:
+  PhysicsList(DetectorConstruction*);
+  ~PhysicsList();
 
-    virtual void ConstructParticle();
-    virtual void ConstructProcess();
+  virtual void ConstructParticle();
+  virtual void ConstructProcess();
 
-    void SetOutgoingBeam(Outgoing_Beam *BO) {BeamOut = BO;}
-    void AddReaction();
+  void SetOutgoingBeam(Outgoing_Beam *BO) {BeamOut = BO;}
+  void AddReaction();
 
-    void AddPhysicsList(const G4String& name);
+  void AddPhysicsList(const G4String& name);
     
-    void AddDecay();
-    void AddRadioactiveDecay();
-    void AddStepMax();
+  void AddDecay();
+  void AddRadioactiveDecay();
+  void AddStepMax();
 
-    void GetRange(G4double);
+  void GetRange(G4double);
 
   void SetGammaAngularCorrelations(bool);
+  void SetUsePolarizedPhysics(bool);
       
-  private:    
-    G4VPhysicsConstructor* fEmPhysicsList;
-    G4String               fEmName;
+private:    
+  G4VPhysicsConstructor* fEmPhysicsList;
+  G4String               fEmName;
     
-    DetectorConstruction* fDet;
+  DetectorConstruction* fDet;
 
-    Outgoing_Beam* BeamOut;
+  Outgoing_Beam* BeamOut;
 
   PhysicsList_Messenger* theMessenger;
+  bool usePolar;
 
   //    PhysicsListMessenger* fMessenger;         
 };
