@@ -95,31 +95,18 @@ G4VParticleChange* Reaction::PostStepDoIt(
 	  size_t index = 0;
 	  index = lman->NearestLevelIndex(Ex,index);
 	  G4int twoJ = lman->SpinTwo(index);
-	  //printf("(Z=%d,A=%d): E=%lf\n",frag.GetZ_asInt(),frag.GetA_asInt(),frag.GetExcitationEnergy());
-	  // std::unordered_map<int,double> P;
-	  // P[-4]=0.;
-	  // P[-2]=0.5;
-	  // P[0]=0;
-	  // P[2]=0.5;
-	  // P[4]=0.;
 	  std::vector<std::vector<G4complex>> polV;
 	  polV.resize(twoJ+1);
+	  G4double cosTheta = aTrack.GetMomentumDirection().cosTheta();
 	  for(size_t k=0;k<polV.size();k++){
-	    for(size_t kappa=0;kappa<2*k+1;kappa++){
-	      if(kappa==0){
-		G4double PkKappa = 0.;
-		for(int twoM=-twoJ;twoM<=twoJ;twoM+=2)
-		  PkKappa+=G4Clebsch::ClebschGordanCoeff(twoJ,twoM,twoJ,-twoM,2*k)/G4Clebsch::ClebschGordanCoeff(twoJ,twoM,twoJ,-twoM,0)/sqrt(2*k+1)*substates[twoM];;
-		polV[k].push_back(G4complex(PkKappa,0.0));
-		// if(i==0)
-		//   polV[i].push_back(G4complex(1.0,0.0));
-		// if(i==2)
-		//   polV[i].push_back(G4complex(-0.534523,0.0));
-		// if(i==4)
-		//   polV[i].push_back(G4complex(0.5345,0.0));
-	      }
-	      else
-		polV[k].push_back(G4complex(0.0,0.0));
+	    G4double PkKappa;
+	    G4double Pk0_z = 0.;//First calculate along z-axis
+	    for(int twoM=-twoJ;twoM<=twoJ;twoM+=2)
+	      Pk0_z+=G4Clebsch::ClebschGordanCoeff(twoJ,twoM,twoJ,-twoM,2*k)/G4Clebsch::ClebschGordanCoeff(twoJ,twoM,twoJ,-twoM,0)/sqrt(2*k+1)*substates[twoM];
+	    //Now rotate into particle frame
+	    for(size_t kappa=0;kappa<k+1;kappa++){
+	      PkKappa = Pk0_z*G4Clebsch::WignerLittleD(2*k,2*kappa,0,cosTheta);
+	      polV[k].push_back(G4complex(PkKappa,0.0));
 	    }
 	  }
 	  auto nucPstore = G4NuclearPolarizationStore::GetInstance();
