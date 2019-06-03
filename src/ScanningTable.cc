@@ -451,20 +451,21 @@ void ScanningTable::Construct()
 	}
       }
     }
-    std::vector<G4TwoVector> polygon2;
-    polygon2.push_back( G4TwoVector(0*mm,          0*mm) );
-    polygon2.push_back( G4TwoVector(151.576*mm,    0*mm) );
-    polygon2.push_back( G4TwoVector(151.576*mm, -457.2*mm) );
-    polygon2.push_back( G4TwoVector(133.35*mm,  -457.2*mm) );
-    polygon2.push_back( G4TwoVector(0*mm,        -19.05*mm) );
 
-    std::vector<G4ExtrudedSolid::ZSection> zsections2;
-    zsections2.push_back( G4ExtrudedSolid::ZSection(0.,       0., 1.) );
-    zsections2.push_back( G4ExtrudedSolid::ZSection(19.05*mm, 0., 1.) );
-	
+    std::vector<G4TwoVector> polygon2(5);
+    polygon2[0] = G4TwoVector(0*mm,          0*mm);
+    polygon2[1] = G4TwoVector(151.576*mm,    0*mm);
+    polygon2[2] = G4TwoVector(151.576*mm, -457.2*mm);
+    polygon2[3] = G4TwoVector(133.35*mm,  -457.2*mm);
+    polygon2[4] = G4TwoVector(0*mm,        -19.05*mm);
+
     ZSlitAssemblyTriangle = new G4ExtrudedSolid("ZSlitAssemblyTriangle", 
 						polygon2,
-						zsections2);
+						19.05,
+						G4TwoVector(0*mm, 0*mm),
+						1.0,
+						G4TwoVector(0*mm, 0*mm),
+						1.0);
 
     ZSlitAssemblyTriangle_log 
       = new G4LogicalVolume(ZSlitAssemblyTriangle,
