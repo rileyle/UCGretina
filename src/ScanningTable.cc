@@ -20,11 +20,15 @@ ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,
   includeShield           = false;
   includeCuTarget         = false;
 
-  xShift  = 0.0*mm;
-  yShift  = 0.0*mm;
-  zShift  = 0.0*mm;
+  controllerX  = 0.0*mm;                   // geant4 -x
+  controllerY  = 0.0*mm;                   // geant4  z
+  controllerZ  = 0.0*mm;                   // geant4  y
+  controllerOffsetX = 0.0*mm;              // geant4 -x
+  //  controllerOffsetY = -44.45*mm + 16.5*mm; // geant4  z
+  controllerOffsetY = -44.45*mm;           // geant4  z
+  
   cloverZ = 0.0*mm;
-  //  cloverOffset = 343.88*mm; // Shield y position
+  //  cloverOffset = 343.88*mm; / Shield y position
   cloverOffset = 336.10*mm; // Mounts without shields
 
   collimatorRadius = 1.0*mm;
@@ -295,7 +299,7 @@ void ScanningTable::Construct()
       CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
 				  (char*)"STL");
       mesh->SetScale(mm);
-      mesh->SetOffset(G4ThreeVector(0., zShift, 0.));
+      mesh->SetOffset(G4ThreeVector(0., controllerZ, 0.));
      
       G4VSolid *Slits = mesh->TessellatedMesh();
       ZSlit_log = new G4LogicalVolume(Slits, ZSlitMaterial[i], 
@@ -423,7 +427,7 @@ void ScanningTable::Construct()
 	if((i != 0) && (   i < 5  || i == 5  || i == 7 || i == 8 
 			|| i == 9 || i == 10 || i > 11)){
 	  mesh->SetScale(mm);
-	  mesh->SetOffset(G4ThreeVector(0., zShift, 0.));
+	  mesh->SetOffset(G4ThreeVector(0., controllerZ, 0.));
 	} else { // and parts that don't
 	  mesh->SetScale(mm);
 	  mesh->SetOffset(G4ThreeVector(0., 0., 0.));
@@ -475,12 +479,12 @@ void ScanningTable::Construct()
     ZSlitAssemblyTriangle_log->SetVisAttributes(VisSlit2);
 
     ZSlitAssemblyTriangle1Shift.setX(171.2*mm);
-    ZSlitAssemblyTriangle1Shift.setY(397.38*mm + zShift);
+    ZSlitAssemblyTriangle1Shift.setY(397.38*mm + controllerZ);
     ZSlitAssemblyTriangle1Shift.setZ( -7.304*mm);
     ZSlitAssemblyTriangle1Pos = ZSlitAssemblyTriangle1Shift;
 
     ZSlitAssemblyTriangle2Shift.setX(-152.15*mm);
-    ZSlitAssemblyTriangle2Shift.setY( 397.38*mm + zShift);
+    ZSlitAssemblyTriangle2Shift.setY( 397.38*mm + controllerZ);
     ZSlitAssemblyTriangle2Shift.setZ(  -7.304*mm);
     ZSlitAssemblyTriangle2Pos = ZSlitAssemblyTriangle2Shift;
   
@@ -511,7 +515,7 @@ void ScanningTable::Construct()
     // better than G4PolyCones.
 
     G4cout << "   ... collimator (x, y = " 
-	   << xShift << ", " << yShift << " mm) ... " << G4endl;
+	   << controllerX << ", " << controllerY << " mm) ... " << G4endl;
 
     G4Tubs* CollimatorBase = new G4Tubs("CollimatorBase_vol",
 					0., 2.0*25.4*mm,
@@ -524,9 +528,9 @@ void ScanningTable::Construct()
 					     0, 0, 0);
 
     G4ThreeVector *collBasePos 
-      = new G4ThreeVector(Pos0->getX() + xShift, 
+      = new G4ThreeVector(Pos0->getX() - controllerX - controllerOffsetX, 
 			  Pos0->getY() + 165.2095*mm, 
-			  Pos0->getZ() - 44.45*mm + yShift);
+			  Pos0->getZ() + controllerY + controllerOffsetY);
     G4RotationMatrix collRot = G4RotationMatrix::IDENTITY;
     collRot.rotateX(90.*deg);
     CollimatorBase_phys = new G4PVPlacement(G4Transform3D(collRot, 
@@ -547,9 +551,9 @@ void ScanningTable::Construct()
 					     0, 0, 0);
 
     G4ThreeVector *collMid1Pos 
-      = new G4ThreeVector(Pos0->getX() + xShift, 
+      = new G4ThreeVector(Pos0->getX() - controllerX - controllerOffsetX, 
 			  Pos0->getY() + 196.9595*mm, 
-			  Pos0->getZ() - 44.45*mm + yShift);
+			  Pos0->getZ() + controllerY + controllerOffsetY);
     CollimatorMid1_phys = new G4PVPlacement(G4Transform3D(collRot, 
     							  *collMid1Pos),
     					    CollimatorMid1_log,
@@ -568,9 +572,9 @@ void ScanningTable::Construct()
 					     0, 0, 0);
 
     G4ThreeVector *collMid2Pos 
-      = new G4ThreeVector(Pos0->getX() + xShift, 
+      = new G4ThreeVector(Pos0->getX() - controllerX - controllerOffsetX, 
 			  Pos0->getY() + 202.372*mm, 
-			  Pos0->getZ() - 44.45*mm + yShift);
+			  Pos0->getZ() + controllerY + controllerOffsetY);
     CollimatorMid2_phys = new G4PVPlacement(G4Transform3D(collRot, 
     							  *collMid2Pos),
     					    CollimatorMid2_log,
@@ -589,9 +593,9 @@ void ScanningTable::Construct()
 					     0, 0, 0);
 
     G4ThreeVector *collMid3Pos 
-      = new G4ThreeVector(Pos0->getX() + xShift, 
+      = new G4ThreeVector(Pos0->getX() - controllerX - controllerOffsetX, 
 			  Pos0->getY() + 207.1115*mm, 
-			  Pos0->getZ() - 44.45*mm + yShift);
+			  Pos0->getZ() + controllerY + controllerOffsetY);
     CollimatorMid3_phys = new G4PVPlacement(G4Transform3D(collRot, 
     							  *collMid3Pos),
     					    CollimatorMid3_log,
@@ -610,9 +614,9 @@ void ScanningTable::Construct()
 					     0, 0, 0);
 
     G4ThreeVector *collBodyPos 
-      = new G4ThreeVector(Pos0->getX() + xShift, 
+      = new G4ThreeVector(Pos0->getX() - controllerX - controllerOffsetX, 
 			  Pos0->getY() + 249.301*mm, 
-			  Pos0->getZ() - 44.45*mm + yShift);
+			  Pos0->getZ() + controllerY + controllerOffsetY);
     CollimatorBody_phys = new G4PVPlacement(G4Transform3D(collRot, 
     							  *collBodyPos),
     					    CollimatorBody_log,
@@ -634,9 +638,9 @@ void ScanningTable::Construct()
 					   "CollimatorInsert_log", 
 					   0, 0, 0);
       G4ThreeVector *collIPos 
-	= new G4ThreeVector(Pos0->getX() + xShift, 
+	= new G4ThreeVector(Pos0->getX() - controllerX - controllerOffsetX, 
 			    Pos0->getY() + 249.301*mm, 
-			    Pos0->getZ() - 44.45*mm + yShift);
+			    Pos0->getZ() + controllerY + controllerOffsetY);
       collRot = G4RotationMatrix::IDENTITY;
       collRot.rotateX(90.*deg);
       Collimator_phys = new G4PVPlacement(G4Transform3D(collRot, *collIPos),
@@ -720,9 +724,12 @@ void ScanningTable::Construct()
 				    (char*)"STL");
 	mesh->SetScale(mm);
 	if(i < 4)
-	  mesh->SetOffset(G4ThreeVector(xShift, 0., 37.05*mm + yShift));
+	  mesh->SetOffset(G4ThreeVector(-controllerX - controllerOffsetX,
+					0.,
+					81.5*mm + controllerY + controllerOffsetY));
 	else if(i < 15)
-	  mesh->SetOffset(G4ThreeVector(0., 0., 37.05*mm + yShift));
+	  mesh->SetOffset(G4ThreeVector(0., 0.,
+					81.5*mm + controllerY+ controllerOffsetY));
 	else if (i > 14)
 	  mesh->SetOffset(G4ThreeVector(0., 0., 0.));
 
@@ -744,7 +751,7 @@ void ScanningTable::Construct()
   if (includeCloverCart) {
 
     G4cout << "   ... Clover cart (z = " 
-	   << zShift
+	   << controllerZ
 	   << " mm) ... " << G4endl;
 
     // This is the mount for the BGO anti-compton shields.
@@ -774,7 +781,8 @@ void ScanningTable::Construct()
     // 	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
     // 				    (char*)"STL");
     // 	mesh->SetScale(mm);
-    // 	mesh->SetOffset(G4ThreeVector(xShift, 0., yShift));
+    // 	mesh->SetOffset(G4ThreeVector(-controllerX - controllerOffsetX,
+    //                                 0., controllerY + controllerOffsetY));
 	
     // 	G4VSolid *CloverAssembly = mesh->TessellatedMesh();
 	
@@ -952,9 +960,9 @@ void ScanningTable::Construct()
 
     CuTarget_log->SetVisAttributes(VisSlit2);
 
-    CuTargetShift.setX(Pos0->getX() + xShift);
+    CuTargetShift.setX(Pos0->getX() - controllerX - controllerOffsetX);
     CuTargetShift.setY(Pos0->getY() + 249.301*mm + 148.2625*mm);
-    CuTargetShift.setZ(Pos0->getZ() -  44.45*mm + yShift);
+    CuTargetShift.setZ(Pos0->getZ() + controllerY + controllerOffsetY);
     CuTargetPos = CuTargetShift;
 
     CuTarget_phys = new G4PVPlacement(G4Transform3D(NoRot, 
@@ -978,7 +986,7 @@ void ScanningTable::Construct()
     CADMesh *meshCloverRightShield = new CADMesh((char*)CADFileName.data(), 
 						 (char*)"STL");
     meshCloverRightShield->SetScale(mm);
-    meshCloverRightShield->SetOffset(G4ThreeVector(0., zShift, 0.));
+    meshCloverRightShield->SetOffset(G4ThreeVector(0., controllerZ, 0.));
 
     G4VSolid *CloverRightShield = meshCloverRightShield->TessellatedMesh();
     CloverRightShield_log = new G4LogicalVolume(CloverRightShield, 
@@ -1011,7 +1019,7 @@ void ScanningTable::Construct()
     CADMesh *meshCloverLeftShield = new CADMesh((char*)CADFileName.data(), 
 						(char*)"STL");
     meshCloverLeftShield->SetScale(mm);
-    meshCloverLeftShield->SetOffset(G4ThreeVector(0., zShift, 0.));
+    meshCloverLeftShield->SetOffset(G4ThreeVector(0., controllerZ, 0.));
 
     G4VSolid *CloverLeftShield = meshCloverLeftShield->TessellatedMesh();
     CloverLeftShield_log = new G4LogicalVolume(CloverLeftShield, 

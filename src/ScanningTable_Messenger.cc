@@ -34,20 +34,21 @@ ScanningTable_Messenger::ScanningTable_Messenger(ScanningTable* ST)
   CuTargetCmd = new G4UIcmdWithoutParameter("/ScanningTable/IncludeCuTarget", this);
   CuTargetCmd->SetGuidance("Include the Cu Target.");
 
-  XShiftCmd = new G4UIcmdWithADoubleAndUnit("/ScanningTable/SetXShift", this);
-  XShiftCmd->SetGuidance("Set the horizontal (X) shift of the source from nominal.");
-  XShiftCmd->SetParameterName("choice", false);
-  XShiftCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  ControllerXCmd = new G4UIcmdWithADoubleAndUnit("/ScanningTable/SetControllerX",
+					    this);
+  ControllerXCmd->SetGuidance("Set the X position of the scanning table controller.");
+  ControllerXCmd->SetParameterName("choice", false);
+  ControllerXCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  YShiftCmd = new G4UIcmdWithADoubleAndUnit("/ScanningTable/SetYShift", this);
-  YShiftCmd->SetGuidance("Set the horizontal (Y) shift of the source from nominal.");
-  YShiftCmd->SetParameterName("choice", false);
-  YShiftCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  ControllerYCmd = new G4UIcmdWithADoubleAndUnit("/ScanningTable/SetControllerY", this);
+  ControllerYCmd->SetGuidance("Set the Y position of the scanning table controller.");
+  ControllerYCmd->SetParameterName("choice", false);
+  ControllerYCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
   
-  ZShiftCmd = new G4UIcmdWithADoubleAndUnit("/ScanningTable/SetZShift", this);
-  ZShiftCmd->SetGuidance("Set the vertical shift of the slits from nominal.");
-  ZShiftCmd->SetParameterName("choice", false);
-  ZShiftCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  ControllerZCmd = new G4UIcmdWithADoubleAndUnit("/ScanningTable/SetControllerZ", this);
+  ControllerZCmd->SetGuidance("Set the vertical position of the scanning table slits.");
+  ControllerZCmd->SetParameterName("choice", false);
+  ControllerZCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   CloverZCmd = new G4UIcmdWithADoubleAndUnit("/ScanningTable/SetCloverZ", this);
   CloverZCmd->SetGuidance("Set the vertical position of the Clover(s).");
@@ -77,9 +78,9 @@ ScanningTable_Messenger::~ScanningTable_Messenger()
   delete CollimatorMountCmd;
   delete ShieldCmd;
   delete CuTargetCmd;
-  delete XShiftCmd;
-  delete YShiftCmd;
-  delete ZShiftCmd;
+  delete ControllerXCmd;
+  delete ControllerYCmd;
+  delete ControllerZCmd;
   delete CloverZCmd;
   delete CollRCmd;
   delete SlitWCmd;
@@ -105,12 +106,12 @@ void ScanningTable_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { scanningTable->SetIncludeShield(); }
   if ( command == CuTargetCmd )
     { scanningTable->SetIncludeCuTarget(); }
-  if ( command == XShiftCmd )
-    { scanningTable->SetXShift(XShiftCmd->GetNewDoubleValue(newValue)); }
-  if ( command == YShiftCmd )
-    { scanningTable->SetYShift(YShiftCmd->GetNewDoubleValue(newValue)); }
-  if ( command == ZShiftCmd )
-    { scanningTable->SetZShift(ZShiftCmd->GetNewDoubleValue(newValue)); }
+  if ( command == ControllerXCmd )
+    { scanningTable->SetControllerX(ControllerXCmd->GetNewDoubleValue(newValue)); }
+  if ( command == ControllerYCmd )
+    { scanningTable->SetControllerY(ControllerYCmd->GetNewDoubleValue(newValue)); }
+  if ( command == ControllerZCmd )
+    { scanningTable->SetControllerZ(ControllerZCmd->GetNewDoubleValue(newValue)); }
   if ( command == CloverZCmd )
     { scanningTable->SetCloverZ(CloverZCmd->GetNewDoubleValue(newValue)); }
   if ( command == CollRCmd )

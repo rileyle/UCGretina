@@ -32,9 +32,9 @@ private:
   G4UIcmdWithoutParameter* CollimatorMountCmd;
   G4UIcmdWithoutParameter* CuTargetCmd;
   G4UIcmdWithoutParameter* ShieldCmd;
-  G4UIcmdWithADoubleAndUnit* XShiftCmd;
-  G4UIcmdWithADoubleAndUnit* YShiftCmd;
-  G4UIcmdWithADoubleAndUnit* ZShiftCmd;
+  G4UIcmdWithADoubleAndUnit* ControllerXCmd;
+  G4UIcmdWithADoubleAndUnit* ControllerYCmd;
+  G4UIcmdWithADoubleAndUnit* ControllerZCmd;
   G4UIcmdWithADoubleAndUnit* CloverZCmd;
   G4UIcmdWithADoubleAndUnit* CollRCmd;
   G4UIcmdWithADoubleAndUnit* SlitWCmd;
