@@ -5,32 +5,34 @@ Notes
 
 - The scanning table positions a collimated source under the
   crystal nearest the slit assembly (crystal 124 in this example),
-  which produces a vertical pencil beam.
+  which produces a vertical pencil beam. (Geometry files that place a quad
+  in the scanning table with crystals 124-127 in the front position are
+  located in ./GretinaGeometry/Scan0 - ./GretinaGeometry/Scan3.)
 
 - In the output, crystals 124-127 are the GRETINA module, crystals
-  129-132 are the ?? clover detector and crystals 133-136 are the ??
+  129-132 are the left clover detector and crystals 133-136 are the right
   clover detector (facing the table). 
 
 - (Unfortunately) there are three relevant coordinate systems:
 
       Geant4/UCGretina: X horizontal (left facing the table)
                         Y vertical   (up)
-                        Z horizontal (from clovers to back of the table)
+                        Z horizontal (from the slits to back of the table)
 
-      Table controller: X horizontal (from clovers to back of the table)
-                        Y horizontal (right facing the table)
+      Table controller: X horizontal (right facing the table)
+                        Y horizontal (from the slits to back of the table)
                         Z vertical   (up)
 
-      GRETINA crystal:  X tilted     (~16 deg above G4/UCG Y, controller Y)
-                        Y horizontal (left facing the table)
-                        Z tilted     (crystal axis; ~16 deg from G4/UCG Z)
+      GRETINA crystal:  X tilted     (~16 deg above G4/UCG Z, controller Y)
+                        Y horizontal (left, G4/UCG X, -controller X)
+                        Z tilted     (crystal axis; ~16 deg from G4/UCG Y)
 
 - The positioning of the collimator and source are specified
   in the Geant4/UCGretina coordinate system with the
 
-      /ScanningTable/SetXShift
-      /ScanningTable/SetYShift
-      /ScanningTable/SetYShift
+      /ScanningTable/SetControllerX
+      /ScanningTable/SetControllerY
+      /ScanningTable/SetControllerZ
 
   and
 
