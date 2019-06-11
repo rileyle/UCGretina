@@ -1,4 +1,5 @@
 #include "DetectorConstruction.hh"
+#include "PrimaryGeneratorAction.hh"
 
 DetectorConstruction::DetectorConstruction()
 {
@@ -159,6 +160,13 @@ void DetectorConstruction::Placement()
     rightClover->Construct();
     rightClover->MakeSensitive(TrackerGamma);
   }
+  
+  // Position the source horizontally using scanning-table controller position
+  G4RunManager* runManager = G4RunManager::GetRunManager();
+  PrimaryGeneratorAction* generatorAction
+    = (PrimaryGeneratorAction*)runManager->GetUserPrimaryGeneratorAction();
+  generatorAction->SetSourceX(-scanningTable->GetControllerX());
+  generatorAction->SetSourceZ( scanningTable->GetControllerY());
 #endif
 #endif
 

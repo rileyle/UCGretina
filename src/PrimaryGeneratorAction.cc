@@ -5,6 +5,9 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction *detector, I
   SetInBeam();
   sourcePosition.setX(0);
   sourcePosition.setY(0);
+#ifdef SCANNING
+  sourcePosition.setY(200.*mm);
+#endif
   sourcePosition.setZ(0);
   sourceRadius = 0;
   SetSourceEu152();

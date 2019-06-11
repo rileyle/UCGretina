@@ -501,12 +501,11 @@ Optional commands for the scanning table:
 
 > Set the horizontal positions of the source collimator relative to
 > the central axis of the GRETINA module. (These positions correspond
-> to those reported by the stepper motor controller.) The horizontal
-> position of the source must also be set using the
-> `/Experiment/Source/setX`, `/Experiment/Source/setZ`, and
-> `/Experiment/Source/setZ` commands to place the source within the
-> collomator. (The controller x axis points opposite the geant4 x
-> axis, and the controller y axis points along the geant4 z axis.)
+> to those reported by the stepper motor controller. The controller
+> x axis points opposite the geant4 x axis, and the controller y axis
+> points along the geant4 z axis.) The horizontal position of the
+> source should not be set using the usual source positioning commands
+> (`/Experiment/Source/setX` and `/Experiment/Source/setZ`). 
 
     /ScanningTable/SetControllerZ <double> <unit>
 

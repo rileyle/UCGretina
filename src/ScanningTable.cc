@@ -62,8 +62,12 @@ void ScanningTable::Construct()
 
   //--- First the physical cart: 8020 frame, base, top and back panel ---------
 
-  G4cout << "Constructing the LBL scanning table." << G4endl;
+  G4cout << "Constructing the LBNL scanning table." << G4endl;
 
+  G4cout << "   Controller at x = " << controllerX/mm << " mm, "
+         << controllerY/mm << " mm, "
+	 << controllerZ/mm << " mm" << G4endl;
+  
   G4cout << "   Loading STL files from directory:\n   " << CADModelPath 
 	 << "\n   and building Tessellated solids ... " << G4endl;
 

@@ -23,9 +23,6 @@
 # Source parameters ============================================================
 /Experiment/RunSource
 /Experiment/Source/Set cs137
-/Experiment/Source/setX     -10.0 mm        # -ControllerX
-/Experiment/Source/setY     200.0 mm        #  (vertical)
-/Experiment/Source/setZ     -64.9 mm        #  ControllerY
 /Experiment/Source/setR 0.1 mm
 # Comment these out to simulate gamma rays emitted into the collimator walls
 /Experiment/Source/CollimationDirection 0 1 0

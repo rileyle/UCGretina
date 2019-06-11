@@ -28,19 +28,23 @@ Notes
                         Z tilted     (crystal axis; ~16 deg from G4/UCG Y)
 
 - The positioning of the collimator and source are specified
-  in the Geant4/UCGretina coordinate system with the
+  in the scanning-table controller coordinates with the
 
       /ScanningTable/SetControllerX
       /ScanningTable/SetControllerY
+
+  commands.
+
+  The vertical position of the slit mask is specified in
+  scanning-table controller coordiates with the
+
       /ScanningTable/SetControllerZ
 
-  and
+  command.
 
-      /Experiment/Source/setX 
-      /Experiment/Source/setY 
-      /Experiment/Source/setZ 
-
-  commands. 
+  The usual source positioning commands (`/Experiment/Source/setX`, 
+  `/Experiment/Source/setY`, `/Experiment/Source/setZ`) should not
+  be used.
 
 - The
 

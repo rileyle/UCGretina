@@ -46,6 +46,9 @@ class ScanningTable
   void SetControllerX(G4double value) { controllerX = value; }
   void SetControllerY(G4double value) { controllerY = value; }
   void SetControllerZ(G4double value) { controllerZ = value; }
+  G4double GetControllerX() { return controllerX; }
+  G4double GetControllerY() { return controllerY; }
+  G4double GetControllerZ() { return controllerZ; }
   void SetCollR(G4double value)  { collimatorRadius = value; }
   void SetSlitWidth(G4double value)  { slitWidth = value; }
   void SetCloverZ(G4double value){ cloverZ = value; }
