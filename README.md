@@ -495,18 +495,24 @@ Optional commands for the scanning table:
 
 > Construct the BGO anti-Compton shields.
 
-    /ScanningTable/SetXShift <double> <unit>
+    /ScanningTable/SetControllerX <double> <unit>
 
-    /ScanningTable/SetYShift <double> <unit>
+    /ScanningTable/SetControllerY <double> <unit>
 
-> Set the horizontal shifts of the source relative to the central axis
-> of the GRETINA module. (These positions correspond to those reported
-> by the stepper motor controller.)
+> Set the horizontal positions of the source collimator relative to
+> the central axis of the GRETINA module. (These positions correspond
+> to those reported by the stepper motor controller.) The horizontal
+> position of the source must also be set using the
+> `/Experiment/Source/setX`, `/Experiment/Source/setZ`, and
+> `/Experiment/Source/setZ` commands to place the source within the
+> collomator. (The controller x axis points opposite the geant4 x
+> axis, and the controller y axis points along the geant4 z axis.)
 
-    /ScanningTable/SetZShift <double> <unit>
+    /ScanningTable/SetControllerZ <double> <unit>
 
-> Set the vertical shift of the slit assembly. (This position
-> corresponds to that reported by the stepper motor controller.) 
+> Set the vertical position of the slit assembly. (This position
+> corresponds to that reported by the stepper motor controller. The
+> controller z axis corresponds to the geant4 y axis.) 
 
     /ScanningTable/SetCloverZ <double> <unit>
 
