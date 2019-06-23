@@ -7,10 +7,16 @@
 # (untested on other systems)
 CPPFLAGS := -D_FILE_OFFSET_BITS=64
 
-# Use -D to define LHTARGET macro for the C preprocesssor
+# Use -D to define LHTARGET, AD, SCANNING macros for the C preprocesssor
 ifdef LHTARGET
+ifdef AD
+  name := UCGretina_LH_AD
+  CPPFLAGS += -DLHTARGET
+  CPPFLAGS += -DAD
+else
   name := UCGretina_LH
   CPPFLAGS += -DLHTARGET
+endif
 else
 ifdef SCANNING
   name := UCGretina_Scan

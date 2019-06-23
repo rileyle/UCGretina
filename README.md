@@ -36,7 +36,8 @@ To use the liquid hydrogen target:
 
     $ make LHTARGET=1
 
-(produces the binary UCGretina_LH)
+(produces the binary UCGretina_LH, can be compiled with AD=1 as well
+to produce the binary UCGretina_LH_AD)
 
 Executables are automatically installed in
 
@@ -452,7 +453,7 @@ Gamma rays emitted in cascades are completely uncorrelated._
 _The geometries specified in `./GretinaGeometry/Scan0`, 
 `./GretinaGeometry/Scan1`, `./GretinaGeometry/Scan2`, and 
 `./GretinaGeometry/Scan3` orient the GRETINA module such that the 
-corresponding crystal is centered on the slits._
+corresponding crystal is centered on the slits.
 
 Mandatory command for building the scanning table:
 
