@@ -454,8 +454,23 @@ void Gretina_Array:: ReadSolidFile()
     pPg->minR = sqrt(minR2) + 2.*tolerance; // safety margin!
     
     // check: to avoid tolerance problems, increase the cylinder length
-    if( fabs((pPg->zFace2-pPg->zFace1) - pPg->tubL) < tolerance )
-      pPg->tubL += 2.*tolerance;
+
+    // LR: (Commenting this out.)
+    //     The polyhedra in the solid file are 90 mm long in z. Making tubL
+    //     larger here to avoid colocated planes in the
+    //     G4IntersectionSolids of the crystal and back dead layer is
+    //     a problem, because the back dead layer is also placed using
+    //     tubL. Instead, we'll use the tolerance in defining the
+    //     crystal and back dead layer. 
+
+    //if( fabs((pPg->zFace2-pPg->zFace1) - pPg->tubL) < tolerance ){
+    //  printf( "pPg->zFace2 = %12.6f, pPg->zFace1 = %12.6f, pPg->tubL =%12.6f",
+    //          pPg->zFace2, pPg->zFace1, pPg->tubL ); //LR
+    //  G4cout << " Warning! Increasing crystal length by "
+    //         << 2.*tolerance/mm << " mm in solid "                      //LR
+    //	     << pPg->whichGe << G4endl;                                   //LR
+    //  pPg->tubL += 2.*tolerance;
+    //}
     
     // check the validity of the cylinder
     if( pPg->cylinderMakesSense && (pPg->tubR < 0.) ) {
@@ -970,6 +985,7 @@ void Gretina_Array::ConstructGeCrystals()
   rm.set(0,0,0);
 
   G4int ngen, nPg, nGe, nPh = 0, nPt;
+  G4double tolerance = 0.5*mm;
 
   // data to construct the cylinders and the passive parts
   // they are generated in their final position to avoid problems in placement
@@ -1054,10 +1070,10 @@ void Gretina_Array::ConstructGeCrystals()
       }
       else {
         zSliceGe = new G4double[4];
-        zSliceGe[0] = pPg->zCenter-pPg->tubL/2.;
+        zSliceGe[0] = pPg->zCenter-pPg->tubL/2.-tolerance;  // LR: To avoid colocated planes in the G4IntersectionSolid
         zSliceGe[1] = zFace1 + pPg->thick;
         zSliceGe[2] = zFace1 + pPg->thick;
-        zSliceGe[3] = pPg->zCenter+pPg->tubL/2.;
+        zSliceGe[3] = pPg->zCenter+pPg->tubL/2.+tolerance;  // LR: "
 
         InnRadGe = new G4double[4];
         InnRadGe[0] = 0.;
@@ -1106,10 +1122,10 @@ void Gretina_Array::ConstructGeCrystals()
           if( pPg->passThick2 > 0. ) {
             // passive area at the coaxial hole (placed later as daughter of the original crystal)
             zSliceGe = new G4double[4];
-            zSliceGe[0] = pPg->zFace1 + pPg->thick - pPg->passThick2;
+            zSliceGe[0] = pPg->zFace1 + pPg->thick - pPg->passThick2; // passThick2 in front of the central contact
             zSliceGe[1] = pPg->zFace1 + pPg->thick;
             zSliceGe[2] = pPg->zFace1 + pPg->thick;
-            zSliceGe[3] = pPg->zCenter+pPg->tubL/2.-pPg->passThick1;
+            zSliceGe[3] = pPg->zCenter+pPg->tubL/2.-pPg->passThick1;  // ... up to the bottom of the back dead layer
 
             InnRadGe = new G4double[4];
             InnRadGe[0] = 0.;
