@@ -172,15 +172,23 @@ void TrackerGammaSD::EndOfEvent(G4HCofThisEvent* HCE)
    G4int i;
    G4int NbHits = gammaCollection->entries();
 
-        if (NbHits>0&&print) 
+   //   G4double total = 0;                            // TMP
+   //   for (i=0;i<NbHits;i++)                         // TMP
+   //     total+= (*gammaCollection)[i]->GetEdep();    // TMP
+
+       // if (NbHits>0&&total>1./MeV) // TMP
+       if (NbHits>0&&print)
+
 	  { 
+
+	    // printf("\nTotal energy deposited = %9.3f MeV", total/MeV); // TMP
 
 	    G4RunManager* runManager = G4RunManager::GetRunManager();
 	    
 	    G4cout << "\n--------> event " << runManager->GetCurrentEvent()->GetEventID() << ", "
 		   << NbHits << " hits for gamma tracking: " << G4endl;
-	    G4cout << "                        parent    creator" << G4endl;
-	    G4cout << "trackID PID     process track     process     det seg     Edep      X         Y         Z         Xo        Yo        Zo" << G4endl;
+	    G4cout << "                            parent    creator" << G4endl;
+	    G4cout << "trackID   PID     process   track     process     det seg     Edep      X         Y         Z         Xo        Yo        Zo" << G4endl;
 	    for (i=0;i<NbHits;i++) (*gammaCollection)[i]->Print();
 
 	  }

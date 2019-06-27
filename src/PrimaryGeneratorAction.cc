@@ -46,6 +46,10 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	  else
 	    particleGun->SetParticleDefinition(particleTable->FindParticle("mu-"));
 	}
+      else if(sourceType == "neutron")
+	{
+	  particleGun->SetParticleDefinition(particleTable->FindParticle("neutron"));
+	}
       else
 	{
 	  particleGun->SetParticleDefinition(particleTable->FindParticle("gamma"));
@@ -248,6 +252,8 @@ void PrimaryGeneratorAction::SetSourceType(G4String name) //LR
     SetSourceBGWhite();
   } else if (name == "muon") {
     SetSourceMuon();
+  } else if (name == "neutron") {
+    SetSourceNeutron();
   } else if (name == "simple") {
     SetSourceSimple();
   }
@@ -811,6 +817,27 @@ void PrimaryGeneratorAction::SetSourceMuon()
 
 }
 //-------------------------------------------------------------------------
+void PrimaryGeneratorAction::SetSourceNeutron()
+{
+  sourceType = "neutron";
+  background = false;
+
+  G4double e;
+  sourceBranchingSum=0.;
+
+  // start from the beginning of the array
+  vector<SourceData*>::iterator itPos = TheSource.begin();
+  // clear all elements from the array
+  for(; itPos < TheSource.end(); itPos++)
+    delete *itPos;    // free the element from memory
+   // finally, clear all elements from the array
+  TheSource.clear();
+
+  e=1000.0*keV;sourceBranchingSum+=100.;
+  TheSource.push_back(new SourceData(e,sourceBranchingSum));
+
+}
+//-------------------------------------------------------------------------
 G4double PrimaryGeneratorAction::GetSourceEnergy()
 {
  
@@ -837,7 +864,7 @@ G4double PrimaryGeneratorAction::GetSourceEnergy()
 //-------------------------------------------------------------------------
 void PrimaryGeneratorAction::SetSourceEnergy(G4double energy)
 {
-  if(sourceType == "simple"){
+  if(sourceType == "simple" || sourceType == "neutron"){
      vector<SourceData*>::iterator itPos = TheSource.begin();
      (*itPos)->e = energy;
      G4cout << "Setting source energy to " << energy << " MeV" << G4endl;

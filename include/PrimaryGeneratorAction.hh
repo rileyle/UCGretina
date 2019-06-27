@@ -53,6 +53,7 @@ public:
   void SetSourceBG();
   void SetSourceBGWhite();
   void SetSourceMuon();
+  void SetSourceNeutron();
   void SetSourceEnergy(G4double);
   void SetWhiteSourceLowE(G4double energy){sourceWhiteLoE = energy;}
   void SetWhiteSourceHighE(G4double energy){sourceWhiteHiE = energy;}

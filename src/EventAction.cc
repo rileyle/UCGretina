@@ -641,6 +641,35 @@ void EventAction::writeDecomp(long long int ts,
 
   }
 
+  // TMP
+  // G4double total = 0;
+  // for(G4int i = 0; i < Ndecomp; i++)
+  //   for(G4int j = 0; j < crys_ips[i].num; j++)
+  //     total += crys_ips[i].ips[j].e;
+  // if(total>1000.){
+
+  //   G4cout << "Total energy deposited = " << std::setw(12)
+  // 	   << total << G4endl;
+    
+  //   G4cout << "D" << std::setw(4) << Ndecomp 
+  // 	   << std::setw(12) << ts/10000 << G4endl;
+  //   for(G4int i = 0; i < Ndecomp; i++){
+  //     G4cout << "C" << std::setw(4) << crys_ips[i].crystal_id
+  // 	     << std::setw(4) << crys_ips[i].num << G4endl;
+  //     for(G4int j = 0; j < crys_ips[i].num; j++){
+  // 	G4cout << std::setw(5) 
+  // 	       << crys_ips[i].ips[j].seg 
+  // 	       << std::fixed << std::setprecision(4) 
+  // 	       << std::right << std::setw(12) 
+  // 	       << crys_ips[i].ips[j].e << std::setw(12) 
+  // 	       << crys_ips[i].ips[j].x << std::setw(12) 
+  // 	       << crys_ips[i].ips[j].y << std::setw(12) 
+  // 	       << crys_ips[i].ips[j].z
+  // 	       << G4endl;
+  //     }
+  //   }
+  // }
+  
   if(evOut){
     evfile << "D" << std::setw(4) << Ndecomp 
     	   << std::setw(12) << ts/10000 << G4endl;
