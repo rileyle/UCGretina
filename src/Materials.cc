@@ -82,11 +82,16 @@
 
   // Germanium defined via its isotopes
   G4Element* elGe = new G4Element("Germanium", "Ge", 5);
-  elGe->AddIsotope(Ge70, 0.2123);
-  elGe->AddIsotope(Ge72, 0.2766);
-  elGe->AddIsotope(Ge73, 0.0773);
-  elGe->AddIsotope(Ge74, 0.3594);
-  elGe->AddIsotope(Ge76, 0.0744);
+  elGe->AddIsotope(Ge70, 0.2057);
+  elGe->AddIsotope(Ge72, 0.2745);
+  elGe->AddIsotope(Ge73, 0.0775);
+  elGe->AddIsotope(Ge74, 0.3650);
+  elGe->AddIsotope(Ge76, 0.0773);
+  // elGe->AddIsotope(Ge70, 0.2123);
+  // elGe->AddIsotope(Ge72, 0.2766);
+  // elGe->AddIsotope(Ge73, 0.0773);
+  // elGe->AddIsotope(Ge74, 0.3594);
+  // elGe->AddIsotope(Ge76, 0.0744);
   myElements.push_back(elGe);
   
   // Materials
