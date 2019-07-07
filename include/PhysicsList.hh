@@ -46,6 +46,11 @@ class DetectorConstruction;
 class PhysicsListMessenger;
 class G4VPhysicsConstructor;
 
+#ifdef NEUTRONS
+// From LBE for neutrons
+class G4StoppingPhysics;        // This builder encapsulate stopping processes
+#endif
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 class PhysicsList: public G4VModularPhysicsList
@@ -56,6 +61,11 @@ class PhysicsList: public G4VModularPhysicsList
 
     virtual void ConstructParticle();
     virtual void ConstructProcess();
+
+#ifdef NEUTRONS
+    // From LBE for neutrons
+    virtual void ConstructHad();
+#endif
 
     void SetOutgoingBeam(Outgoing_Beam *BO) {BeamOut = BO;}
     void AddReaction();
@@ -75,6 +85,11 @@ class PhysicsList: public G4VModularPhysicsList
     DetectorConstruction* fDet;
 
     Outgoing_Beam* BeamOut;
+
+#ifdef NEUTRONS
+    // From LBE for neutrons
+    G4StoppingPhysics* stoppingPhysics;
+#endif
 
   //    PhysicsListMessenger* fMessenger;         
 };

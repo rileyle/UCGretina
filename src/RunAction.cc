@@ -37,7 +37,7 @@ void RunAction::BeginOfRunAction(const G4Run* run)
     G4cout << " beam ions" << G4endl;
     evaction->SetInBeam(true);
   } else {
-    G4cout << " gamma-ray source events "<<G4endl;
+    G4cout << " source events "<<G4endl;
   }
 
 

@@ -65,6 +65,26 @@ PrimaryGeneratorAction_Messenger::PrimaryGeneratorAction_Messenger(PrimaryGenera
   SrcRCmd->SetParameterName("Source radius",false);
   SrcRCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  SrcDXCmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/setDX",this);
+  SrcDXCmd->SetGuidance("Set the width of the source in the  nondispersive direction");
+  SrcDXCmd->SetParameterName("Source width",false);
+  SrcDXCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  SrcDYCmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/setDY",this);
+  SrcDYCmd->SetGuidance("Set the height of the source in the dispersive direction");
+  SrcDYCmd->SetParameterName("Source height",false);
+  SrcDYCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  SrcSigXCmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/setSigmaX",this);
+  SrcSigXCmd->SetGuidance("Set the width of the Gaussian source distribution in the nondispersive direction");
+  SrcSigXCmd->SetParameterName("Source Gaussian width",false);
+  SrcSigXCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  SrcSigYCmd = new G4UIcmdWithADoubleAndUnit("/Experiment/Source/setSigmaY",this);
+  SrcSigYCmd->SetGuidance("Set the height of the Gaussian source distribution in the dispersive direction");
+  SrcSigYCmd->SetParameterName("Source Gaussian height",false);
+  SrcSigYCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   SrcTFCmd = new G4UIcmdWithoutParameter("/Experiment/Source/OnTargetFace",this);
   SrcTFCmd->SetGuidance("Set source position on target face");
   
@@ -80,6 +100,11 @@ PrimaryGeneratorAction_Messenger::PrimaryGeneratorAction_Messenger(PrimaryGenera
   SrcCollDirCmd->SetGuidance("Set direction of collimation for the source");
   SrcCollDirCmd->SetParameterName("X","Y","Z",false,false);
   SrcCollDirCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  SrcThetaFileCmd = new G4UIcmdWithAString("/Experiment/Source/ThetaFile",this);
+  SrcThetaFileCmd->SetGuidance("Set the name of the file specifying the theta distribution of the emitted particles.");
+  SrcThetaFileCmd->SetParameterName("choice",false);
+  SrcThetaFileCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   SrcRepCmd = new G4UIcmdWithoutParameter("/Experiment/Source/Report",this);
   SrcRepCmd->SetGuidance("Report source parameters");
@@ -105,10 +130,15 @@ PrimaryGeneratorAction_Messenger::~PrimaryGeneratorAction_Messenger()
   delete SrcYCmd;
   delete SrcZCmd;
   delete SrcRCmd;
+  delete SrcDXCmd;
+  delete SrcDYCmd;
+  delete SrcSigXCmd;
+  delete SrcSigYCmd;
   delete SrcTFCmd;
   delete SrcTBCmd;
   delete SrcCollAngCmd;
   delete SrcCollDirCmd;
+  delete SrcThetaFileCmd;
   delete SrcRepCmd;
 }
 
@@ -151,6 +181,18 @@ void PrimaryGeneratorAction_Messenger::SetNewValue(G4UIcommand* command,G4String
   if( command == SrcRCmd )
     {PGA ->SetSourceR(SrcRCmd->GetNewDoubleValue(newValue));}
 
+  if( command == SrcDXCmd )
+    {PGA ->SetSourceDX(SrcDXCmd->GetNewDoubleValue(newValue));}
+
+  if( command == SrcDYCmd )
+    {PGA ->SetSourceDY(SrcDYCmd->GetNewDoubleValue(newValue));}
+
+  if( command == SrcSigXCmd )
+    {PGA ->SetSourceSigmaX(SrcSigXCmd->GetNewDoubleValue(newValue));}
+
+  if( command == SrcSigYCmd )
+    {PGA ->SetSourceSigmaY(SrcSigYCmd->GetNewDoubleValue(newValue));}
+
   if( command == SrcTFCmd )
     {PGA ->SetSourceOnTargetFace();}
 
@@ -163,6 +205,9 @@ void PrimaryGeneratorAction_Messenger::SetNewValue(G4UIcommand* command,G4String
   if( command == SrcCollDirCmd )
     {PGA ->SetSourceCollDirection(SrcCollDirCmd->GetNew3VectorValue(newValue));}
 
+  if( command == SrcThetaFileCmd )
+    {PGA -> SetSourceThetaFile(newValue);}
+  
   if( command == SrcRepCmd )
     {PGA ->SourceReport();}
 

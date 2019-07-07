@@ -2,7 +2,7 @@
 
 ## Compile and install ##
 
-Install version [4.10.04.p02 of the Geant4 libraries](http://geant4.web.cern.ch/geant4/support/download.shtml). 
+Install version [4.10.04.p03 of the Geant4 libraries](http://geant4.web.cern.ch/geant4/support/download.shtml). 
 You will need the data files for low energy electromagnetic processes,
 photon evaporation, and radioactive decay.
 
@@ -38,6 +38,14 @@ To use the liquid hydrogen target:
 
 (produces the binary UCGretina_LH, can be compiled with AD=1 as well
 to produce the binary UCGretina_LH_AD)
+
+To activate neutron-related processes in the physics list (required for
+the `neutron` source type:
+
+    $ make NEUTRONS=1
+	
+(does not affect the executable name, can be used with any of the
+above flags)
 
 Executables are automatically installed in
 
@@ -84,21 +92,21 @@ GRETINA commissioning at the NSCL.
 Optional commands for setting target parameters:
 
     /Target/Material <material name>
-
+    
     /Target/X_length <double> <unit>
-
+    
     /Target/Y_length <double> <unit>
-
+    
     /Target/SetPosition_X <double> <unit>
-
+    
     /Target/SetPosition_Y <double> <unit>
-
+    
     /Target/SetPosition_Z <double> <unit>
-
+    
     /Target/Thickness <double> <unit>
-
+    
     /Target/ScaleDensity <double>
-
+    
     /Target/Sled
 
 Mandatory command for building a target/source frame:
@@ -108,9 +116,9 @@ Mandatory command for building a target/source frame:
 Optional commands for setting beam-tube geometry:
 
     /BeamTube/R_min <double> <unit>
-
+    
     /BeamTube/R_max <double> <unit>
-
+    
     /BeamTube/Length <double> <unit>
 
 Mandatory command for building the beam tube:
@@ -131,15 +139,15 @@ and 1.5 mm wall thickness):
 Optional commands for setting GRETA chamber geometry:
 
     /GretaChamber/R_min <double> <unit>
-
+    
     /GretaChamber/R_max <double> <unit>
 
 Optional commands for including GRETINA-related dead material:
 
     /Gretina/detector/enableCapsules
-
+    
     /Gretina/detector/enableCryostats
-
+    
     /Gretina/Shell < full || north || south || Greta || GretaLH || Greta_North || Greta_South || GretaLH_North || GretaLH_South >
 
 Optional command to omit the GRETINA detectors:
@@ -184,9 +192,9 @@ Optional commands related to the incoming beam:
 > file with format: 
 
 >       <Minimum DTA [%]> <Maximum DTA [%]> <DTA bin width [%]> 
->       <Channel 1 counts> 
->       <Channel 2 counts>
->       <Channel 3 counts>
+>       <Bin 1 counts> 
+>       <Bin 2 counts>
+>       <Bin 3 counts>
 >       ...
 
 > If this command is present, the incoming beam energy is set by
@@ -196,28 +204,28 @@ Optional commands related to the incoming beam:
 > momentum acceptance parameter should be set to zero: `/BeamIn/Dpp 0`.)
 
     /BeamIn/Focus/X <double> <unit>
-
+    
     /BeamIn/Focus/Y <double> <unit>
 
 > Offsets of the emission point of the incoming beam. (Z defaults to
 > -50 cm. If you change this, make sure it is upstream of the target!)
 
     /BeamIn/Focus/DX <double> <unit>
-
+    
     /BeamIn/Focus/DY <double> <unit>
 
 > Horizontal and vertical widths of the beam spot at the emission
 > point (not on target)
 
     /BeamIn/Focus/Ata0 <double> <unit>
-
+    
     /BeamIn/Focus/Bta0 <double> <unit>
 
 > Direction of the incoming beam (dispersive and nondispersive angles,
 > respectively)
 
     /BeamIn/Focus/maxAta <double> <unit> 
-
+    
     /BeamIn/Focus/maxBta <double> <unit>
 
 > Angular divergences of the incoming beam in the dispersive and
@@ -232,7 +240,7 @@ Optional commands related to the incoming beam:
 Mandatory commands related to the outgoing beam:
 
     /BeamOut/DA <int> 
-
+    
     /BeamOut/DZ <int>
 
 > Changes in mass number and atomic number of the reaction. The
@@ -240,7 +248,7 @@ Mandatory commands related to the outgoing beam:
 > Z+DZ)
 
     /BeamOut/TargetA <int>
-
+    
     /BeamOut/TargetZ <int>
 
 > Mass number and charge number of the target nucleus.
@@ -293,7 +301,7 @@ Optional commands related to the outgoing reaction product:
 > commands.
 
     /BeamOut/AngDistSigmaA <double> <unit>
-
+    
     /BeamOut/AngDistSigmaB <double> <unit>
 
 > Angular spreads of the lab-frame scattering angle distribution of
@@ -304,7 +312,7 @@ Optional commands related to the outgoing reaction product:
 > with the `/BeamOut/XsectFile` command.
 
     /BeamOut/ThetaMin <double> <unit>
-
+    
     /BeamOut/ThetaMax <double> <unit>
 
 > Limits of the scattering angle distribution used in the 2-body
@@ -326,19 +334,18 @@ Optional commands related to the outgoing reaction product:
 Mandatory commands
 
     /Experiment/RunSource
-
+    
     /Experiment/Source/Set <type>
 
 > Currently implemented types: `eu152`, `cs137`, `co56`, `co60`, 
 > `ra226`, `am241`, `photopeaks`, `eu152_peaks`, `co56_peaks`, 
-> `ra226`, `au`, `white`, `simple`
+> `ra226`, `au`, `white`, `simple`, `neutron`
 
 > The simple source type emits gamma rays of a single energy (set with
 > the `/Experiment/Source/setEnergy` command) 
 
 > The white source type emits gamma rays in a uniform energy
-> distribution between 100 keV and 10 MeV. These limits can be set
-> with the `/Experiment/Source/setWhiteLowE` and
+> distribution set with the `/Experiment/Source/setWhiteLowE` and
 > `/Experiment/Source/setWhiteHighE` commands. The multiplicity
 > of the white source is set with the
 > `/Experiment/Source/setMultiplicity` command.
@@ -355,45 +362,82 @@ Mandatory commands
 > because these simulated sources emit a single gamma-ray per event,
 > while some gamma rays from these sources are emitted in cascades._
 
+> The `neutron` source type emits neutrons instead of gamma rays,
+> functioning in all other ways like the `simple` gamma-ray source.
+
 Optional commands
 
     /Experiment/Source/setEnergy <double> <unit>
 
-> Set the energy of the "simple" source type
+> Energy of the `simple` and `neutron` source types
 
     /Experiment/Source/setX <double> <unit>
     /Experiment/Source/setY <double> <unit>
     /Experiment/Source/setZ <double> <unit>
 
-> Set the position of the source.
+> Position of the source.
 
     /Experiment/Source/setR <double> <unit>
 
-> Set the radius of the source disk. 
+> Radius of the source disk. 
+
+    /Experiment/Source/setDX <double> <unit>
+	/Experiment/Source/setDY <double> <unit>
+
+> Horizontal (nondispersive) and vertical (dispersive) widths of a 
+> rectangular source. These override the `/Experiment/Source/setR` 
+> command.
+
+    /Experiment/Source/setSigmaX <double> <unit>
+	/Experiment/Source/setSigmaY <double> <unit>
+
+> Horizontal (nondispersive) and vertical (dispersive) sigma 
+> parameter of a Gaussian distribution of emission points. These 
+> override the `/Experiment/Source/setR` command. 
+
+> Note: The setDX, setDY and setSigmaX, setSigmaY can be mixed (to
+> give a flat dispersive and Gaussian nondispersive distribution of
+> emission points, e.g.).
 
     /Experiment/Source/CollimationAngle <double> <unit>
 
-> Set the angular spread of the collimated beam (about the collimation
+> Angular spread of the collimated beam (about the collimation
   direction).
 
     /Experiment/Source/CollimationDirection <double> <double> <double>
 
-> Set the X, Y, and Z components of a vector specifying the direction
-> of the collimated beam. 
+> X, Y, and Z components of a vector specifying the direction of the
+> collimated beam. 
 
-> (The above position, radius, and collimation commands have no effect
-> with the "white", "background", "bgwhite", and "muon" source types.)
+   /Experiment/Source/ThetaFile <filename>
+
+> File name for the theta distribution of the emitted particles. This 
+> is a text file with format: 
+
+>       <Minimum theta [rad]> <Maximum theta [rad]> <theta bin width [rad]> 
+>       <Bin 1 counts> 
+>       <Bin 2 counts>
+>       <Bin 3 counts>
+>       ...
+
+> If this command is present, the direction of each emitted particle is
+> set by drawing randomly from the given theta distribution.
+
+> (The above commands setting the position, radius, collimation, and 
+> theta distribution have no effect with the "white", "background", 
+> "bgwhite", and "muon" source types.)
 
     /Experiment/Source/setWhiteLowE  <double> <unit>
-
+    
     /Experiment/Source/setWhiteHighE <double> <unit>
 
-> Set the limits of the energy distribution of the "white" and
-> "bgwhite" source types.
+> Energy range of a flat distribution for the `white` and `bgwhite`
+> source types (also work with `simple` and `neutron` source types,
+> superseding setEnergy)
 
     /Experiment/Source/setMultiplicity <int>
 
-> Sets the multiplicity of the "white" and "bgwhite" source types.
+> Multiplicity of the "white" and "bgwhite" source types
 
     /Target/sourceFrame <frame type>
 
@@ -406,7 +450,7 @@ Optional commands
 Mandatory commands for running background simulations
 
     /Experiment/RunSource
-
+    
     /Experiment/Source/Set < background || bgwhite || muon >
 
 > The `background` source type emits several gamma rays
@@ -423,7 +467,7 @@ from which background gamma-rays are emitted.
 > Set material for the background sphere (default: `G4_Galactic`).
 
     /BackgroundSphere/R_min <double> <unit>
-
+    
     /BackgroundSphere/R_max <double> <unit>
 
 > Set the inner and outer radii of the background sphere 
@@ -497,7 +541,7 @@ Optional commands for the scanning table:
 > Construct the BGO anti-Compton shields.
 
     /ScanningTable/SetControllerX <double> <unit>
-
+    
     /ScanningTable/SetControllerY <double> <unit>
 
 > Set the horizontal positions of the source collimator relative to
@@ -701,7 +745,7 @@ Energies are expressed in keV, and positions are expressed in mm.
 Run the macro file `vis/vis.mac` an interactive session:
 
     $ UCGretina
-
+    
     Idle> /control/execute vis/vis.mac
     Idle> exit
 

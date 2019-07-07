@@ -288,7 +288,7 @@ void Gretina_Array:: ReadSolidFile()
   
   if( (fp = fopen(solidFile, "r")) == NULL) {
     G4cout << "\nError opening data file " << solidFile << G4endl;
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
 
   G4cout << "\nReading description of crystals from file " << solidFile << " ..." << G4endl;
@@ -681,7 +681,7 @@ void Gretina_Array:: ReadClustFile()
   
   if( (fp = fopen(clustFile, "r")) == NULL) {
     G4cout << "\nError opening data file " << clustFile << G4endl;
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
   
   G4RotationMatrix rm;
@@ -789,7 +789,7 @@ void Gretina_Array:: ReadEulerFile()
   
   if( (fp = fopen(eulerFile, "r")) == NULL) {
     G4cout << "\nError opening data file " << eulerFile << G4endl;
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
 
   euler.clear();

@@ -640,7 +640,7 @@ void EventAction::writeDecomp(long long int ts,
     }
 
   }
-
+  
   if(evOut){
     evfile << "D" << std::setw(4) << Ndecomp 
     	   << std::setw(12) << ts/10000 << G4endl;
@@ -788,7 +788,7 @@ void EventAction::openCrmatFile()
   crmatFile = open(crmatFileName.c_str(), O_RDONLY, 0);
   if(crmatFile < 0){
     G4cout << "ERROR opening crmatFile" << G4endl;
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   return;
 }
@@ -816,7 +816,7 @@ void EventAction::SetCrmatFile(G4String name) {
 
   if(size < 0){
     G4cout << "ERROR reading crmat file." << G4endl;
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   G4cout << "Read " << size << " bytes into crmat" << G4endl;

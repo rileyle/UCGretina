@@ -79,8 +79,8 @@ void TrackerGammaHit::Print()
 {
 
   G4cout << std::setw(3)  << std::right << trackID 
-	 << std::setw(10) << particleID
-	 << std::setw(10) << process
+	 << std::setw(12) << particleID
+	 << std::setw(12) << process
 	 << std::setw(3) << parentTrackID
 	 << std::setw(20) << creatorProcess
 	 << std::setw(3)  << detNumb
