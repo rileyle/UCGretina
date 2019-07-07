@@ -172,16 +172,9 @@ void TrackerGammaSD::EndOfEvent(G4HCofThisEvent* HCE)
    G4int i;
    G4int NbHits = gammaCollection->entries();
 
-   //   G4double total = 0;                            // TMP
-   //   for (i=0;i<NbHits;i++)                         // TMP
-   //     total+= (*gammaCollection)[i]->GetEdep();    // TMP
-
-       // if (NbHits>0&&total>1./MeV) // TMP
        if (NbHits>0&&print)
 
 	  { 
-
-	    // printf("\nTotal energy deposited = %9.3f MeV", total/MeV); // TMP
 
 	    G4RunManager* runManager = G4RunManager::GetRunManager();
 	    

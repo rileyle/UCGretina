@@ -39,6 +39,14 @@ To use the liquid hydrogen target:
 (produces the binary UCGretina_LH, can be compiled with AD=1 as well
 to produce the binary UCGretina_LH_AD)
 
+To activate neutron-related processes in the physics list (required for
+the `neutron` source type:
+
+    $ make NEUTRONS=1
+	
+(does not affect the executable name, can be used with any of the
+above flags)
+
 Executables are automatically installed in
 
     $G4WORKDIR/bin/$G4SYSTEM
@@ -423,9 +431,9 @@ Optional commands
     
     /Experiment/Source/setWhiteHighE <double> <unit>
 
-> Energy range of a flat distribution for the "white" and "bgwhite" source 
-> types (also work with "simple" and "neutron" sources, superseding 
-> setEnergy)
+> Energy range of a flat distribution for the `white` and `bgwhite`
+> source types (also work with `simple` and `neutron` source types,
+> superseding setEnergy)
 
     /Experiment/Source/setMultiplicity <int>
 

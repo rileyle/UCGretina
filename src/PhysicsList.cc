@@ -64,10 +64,12 @@
 #include "G4IonConstructor.hh"
 #include "G4ShortLivedConstructor.hh"
 
-// LR: From LBE for neutrons
+#ifdef NEUTRONS
+// From LBE for neutrons
 // Builder for all stopping processes
 #include "G4StoppingPhysics.hh"
 #include "G4MaxTimeCuts.hh"
+#endif
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -89,9 +91,10 @@ PhysicsList::PhysicsList(DetectorConstruction* det)
 
   BeamOut = NULL;
 
-
-  // LR: from LBE for neutrons
+#ifdef NEUTRONS
+  // From LBE for neutrons
   stoppingPhysics = new G4StoppingPhysics;
+#endif
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -132,7 +135,8 @@ void PhysicsList::ConstructProcess()
   //
   AddTransportation();
 
-  // LR: From LBE for neutrons
+#ifdef NEUTRONS  
+  // From LBE for neutrons
   auto myParticleIterator=G4ParticleTable::GetParticleTable()->GetIterator();
   myParticleIterator->reset();
   while( (*(myParticleIterator))() ){
@@ -146,8 +150,9 @@ void PhysicsList::ConstructProcess()
     //    pmanager->AddDiscreteProcess(new G4MinEkineCuts()); // LR: need this?
   }	
 
-  // LR: From LBE for neutrons
+  // From LBE for neutrons
   ConstructHad();
+#endif
   
   // Electromagnetic physics list
   //
@@ -363,6 +368,7 @@ void PhysicsList::GetRange(G4double val)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+#ifdef NEUTRONS
 // LR: From LBE for neutrons
 
 // Hadronic processes ////////////////////////////////////////////////////////
@@ -726,3 +732,4 @@ void PhysicsList::ConstructHad()
   // Add stopping processes with builder
   stoppingPhysics->ConstructProcess();
 }
+#endif

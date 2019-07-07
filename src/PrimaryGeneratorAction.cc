@@ -871,6 +871,12 @@ void PrimaryGeneratorAction::SetSourceNeutron()
   sourceType = "neutron";
   background = false;
 
+#ifndef NEUTRONS
+  G4cout << "Error: To use the neutron source type, compile with NEUTRONS=1."
+	 << G4endl;
+  exit(EXIT_FAILURE);
+#endif
+  
   G4double e;
   sourceBranchingSum=0.;
 
