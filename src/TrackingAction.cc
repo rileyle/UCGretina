@@ -32,6 +32,7 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 
   // Emitted gamma
   if( ( aTrack->GetParticleDefinition()->GetParticleName() == "gamma" ||
+	aTrack->GetParticleDefinition()->GetParticleName() == "neutron" ||
 	aTrack->GetParticleDefinition()->GetParticleName() == "mu+" ||
 	aTrack->GetParticleDefinition()->GetParticleName() == "mu-" )
       &&

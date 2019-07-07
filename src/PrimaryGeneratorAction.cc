@@ -10,18 +10,27 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction *detector, I
 #endif
   sourcePosition.setZ(0);
   sourceRadius = 0;
+  sourceDX = -1;
+  sourceDY = -1;
+  sourceSigmaX = -1;
+  sourceSigmaY = -1;
   SetSourceEu152();
   sourceType = "eu152";
   n_particle = 1;
   particleGun = new G4ParticleGun(n_particle);
   fracOn=false;
   frac=0;
-  sourceWhiteLoE = 100.*keV;
-  sourceWhiteHiE = 10000.*keV;
+  sourceWhiteLoE = -1;
+  sourceWhiteHiE = -1;
   sourceMultiplicity = 1;
   isCollimated         = false;
   collimationDirection = G4ThreeVector(0., 0., 1.);
   collimationAngle     = 0.;
+  thetaFileName = "";
+  theta_max=180.*deg;
+  theta_min=0.;
+  theta_bin=0.;
+
 }
 
 PrimaryGeneratorAction::~PrimaryGeneratorAction()
@@ -85,19 +94,30 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	}
       else
 	{
-	  // Pick a point on the source disk.
+	  // Find the emission point.
 	  G4ThreeVector sourceOffset = G4ThreeVector(0.,0.,0.);
-	  if(sourceRadius > 0){
-	    G4double xOffset, yOffset;
+	  G4double xOffset = 0;
+	  G4double yOffset = 0;
+	  if(sourceDX > 0 || sourceDY > 0 ||
+	     sourceSigmaX > 0 || sourceSigmaY > 0 ){
+	    if(sourceDX > 0)
+	      xOffset = (0.5-G4UniformRand())*sourceDX;
+	    else if(sourceSigmaX > 0)
+	      xOffset = CLHEP::RandGauss::shoot(0, sourceSigmaX);
+	    if(sourceDY > 0)
+	      yOffset = (0.5-G4UniformRand())*sourceDY;
+	    else if(sourceSigmaY > 0)
+	      yOffset = CLHEP::RandGauss::shoot(0, sourceSigmaY);
+	  } else if(sourceRadius > 0){
 	    G4double rOffset, phiOffset;
 	    phiOffset = G4UniformRand()*8.*atan(1.);
 	    rOffset   = G4UniformRand()+G4UniformRand();
 	    if(rOffset >= 1) rOffset =- (rOffset - 2.);
 	    xOffset = rOffset*cos(phiOffset)*sourceRadius;
 	    yOffset = rOffset*sin(phiOffset)*sourceRadius;
-	    sourceOffset.setX(xOffset);
-	    sourceOffset.setY(yOffset);
 	  }
+	  sourceOffset.setX(xOffset);
+	  sourceOffset.setY(yOffset);
 
 	  if(isCollimated){
 	    G4double cosThetaMax = cos(collimationAngle);
@@ -118,7 +138,21 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	      sourceOffset.rotateZ(collimationDirection.phi());
 	    }
 	  } else {
-	    particleGun->SetParticleMomentumDirection(G4RandomDirection());
+	    if(thetaFileName == ""){
+	      particleGun->SetParticleMomentumDirection(G4RandomDirection());
+	    } else {
+	      CLHEP::RandGeneral randTheta(thetaDist, Ntheta);
+	      G4double theta
+		= theta_min + randTheta.fire()*(theta_max - theta_min);
+	      G4double phi = G4UniformRand()*twopi;
+	      
+	      G4ThreeVector sourceDir
+		= G4ThreeVector(std::sin(theta)*std::cos(phi),
+				std::sin(theta)*std::sin(phi), 
+				std::cos(theta)).unit();
+
+	      particleGun->SetParticleMomentumDirection(sourceDir);
+	    }
 	  }
 	  particleGun->SetParticlePosition(sourcePosition+sourceOffset);
 	}
@@ -212,6 +246,21 @@ void PrimaryGeneratorAction::SourceReport()
       G4cout<<"----> Source position in X is set to "<<G4BestUnit(sourcePosition.getX(),"Length")<<G4endl;
       G4cout<<"----> Source position in Y is set to "<<G4BestUnit(sourcePosition.getY(),"Length")<<G4endl;
       G4cout<<"----> Source position in Z is set to "<<G4BestUnit(sourcePosition.getZ(),"Length")<<G4endl;
+
+      if(sourceDX > 0 || sourceDY > 0 ||
+	 sourceSigmaX > 0 || sourceSigmaY > 0 ){
+	if(sourceDX > 0)
+	  G4cout<<"----> Source width (nondispersive) is set to "<<G4BestUnit(sourceDX,"Length")<<G4endl;
+	if(sourceDY > 0)
+	  G4cout<<"----> Source height (dispersive) is set to "<<G4BestUnit(sourceDX,"Length")<<G4endl;
+	if(sourceSigmaX > 0)
+	  G4cout<<"----> Source Gaussian width (nondispersive) is set to "<<G4BestUnit(sourceSigmaX,"Length")<<G4endl;
+	if(sourceSigmaY > 0)
+	  G4cout<<"----> Source Gaussian height (dispersive) is set to "<<G4BestUnit(sourceSigmaY,"Length")<<G4endl;
+
+      } else {
+	G4cout<<"----> Source disk radius is set to "<<G4BestUnit(sourceRadius,"Length")<<G4endl;
+      }
     }
   else
     G4cout<<"----> In-beam run selected for simulations"<<G4endl;
@@ -842,7 +891,11 @@ G4double PrimaryGeneratorAction::GetSourceEnergy()
 {
  
   G4double rand;
-  if(sourceType != "white" && sourceType != "bgwhite"){
+  if(sourceWhiteLoE >= 0 && sourceWhiteHiE > sourceWhiteLoE){
+
+    return sourceWhiteLoE + G4UniformRand()*(sourceWhiteHiE - sourceWhiteLoE);
+
+  } else {
 
     rand=G4UniformRand()*sourceBranchingSum;
 
@@ -850,10 +903,6 @@ G4double PrimaryGeneratorAction::GetSourceEnergy()
 
     for(; itPos < TheSource.end(); itPos++)
       if(rand<(*itPos)->b) return (*itPos)->e;
-
-  } else {
-    
-    return sourceWhiteLoE + G4UniformRand()*(sourceWhiteHiE - sourceWhiteLoE);
 
   }
 
@@ -869,7 +918,31 @@ void PrimaryGeneratorAction::SetSourceEnergy(G4double energy)
      (*itPos)->e = energy;
      G4cout << "Setting source energy to " << energy << " MeV" << G4endl;
   } else {
-    G4cout << "Warning: /Experiment/Source/setEnergy has no effect unless the source type is set to \"simple\"" << G4endl;
+    G4cout << "Warning: /Experiment/Source/setEnergy has no effect unless the source type is set to \"simple\" or  \"neutron\"" << G4endl;
   }
+}
+//-------------------------------------------------------------------------
+void PrimaryGeneratorAction::SetSourceThetaFile(G4String fileName)
+{
+ 
+  char line[1000];
+
+  thetaFileName = fileName;
+  std::ifstream thetaFile;
+  thetaFile.open(thetaFileName);
+
+  thetaFile >> theta_min >> theta_max >> theta_bin;
+  thetaFile.getline(line,1000);  // Advance to next line.
+
+  G4double x;
+  Ntheta = 0;
+  while(thetaFile >> x){
+    thetaFile.getline(line,1000);  // Advance to next line.
+    thetaDist[Ntheta] = x;
+    Ntheta++;
+  }
+
+  thetaFile.close();
+  
 }
 //-------------------------------------------------------------------------
