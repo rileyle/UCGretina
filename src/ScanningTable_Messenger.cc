@@ -16,6 +16,9 @@ ScanningTable_Messenger::ScanningTable_Messenger(ScanningTable* ST)
   CartFrameCmd = new G4UIcmdWithoutParameter("/ScanningTable/IncludeCartFrame", this);
   CartFrameCmd->SetGuidance("Include the cart frame and GRETINA module mount.");
 
+  SlitCmd = new G4UIcmdWithoutParameter("/ScanningTable/IncludeSlits", this);
+  SlitCmd->SetGuidance("Include the slits.");
+
   SlitMountCmd = new G4UIcmdWithoutParameter("/ScanningTable/IncludeSlitMount", this);
   SlitMountCmd->SetGuidance("Include the slit assembly mount.");
 
@@ -72,6 +75,7 @@ ScanningTable_Messenger::~ScanningTable_Messenger()
   delete CloverCartCmd;
   delete CADPathCmd;
   delete CartFrameCmd;
+  delete SlitCmd;
   delete SlitMountCmd;
   delete CollimatorCmd;
   delete CollimatorInsertCmd;
@@ -94,6 +98,8 @@ void ScanningTable_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { scanningTable->SetCADPath(newValue); }
   if ( command == CartFrameCmd )
     { scanningTable->SetIncludeCartFrame(); }
+  if ( command == SlitCmd )
+    { scanningTable->SetIncludeSlits(); }
   if ( command == SlitMountCmd )
     { scanningTable->SetIncludeSlitMount(); }
   if ( command == CollimatorCmd )

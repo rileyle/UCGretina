@@ -38,6 +38,7 @@ class ScanningTable
   void SetIncludeCloverCart() { includeCloverCart = true; }
   void SetIncludeCartFrame() { includeCartFrame = true; }
   void SetIncludeSlitMount() { includeSlitMount = true; }
+  void SetIncludeSlits() { includeSlits = true; }
   void SetIncludeCollimator() { includeCollimator = true; }
   void SetIncludeCollimatorInsert() { includeCollimatorInsert = true; }
   void SetIncludeCollimatorMount() { includeCollimatorMount = true; }
@@ -59,6 +60,7 @@ class ScanningTable
   //flags
   G4bool includeCloverCart;
   G4bool includeCartFrame;
+  G4bool includeSlits;
   G4bool includeSlitMount;
   G4bool includeCollimator;
   G4bool includeCollimatorInsert;

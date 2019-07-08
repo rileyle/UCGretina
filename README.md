@@ -516,9 +516,13 @@ Optional commands for the scanning table:
 
 > Construct the scanning table frame and GRETINA mount.
 
+    /ScanningTable/IncludeSlits
+
+> Construct the slits.
+
     /ScanningTable/IncludeSlitMount
 
-> Construct the scanning table frame and GRETINA mount.
+> Construct the slit mount.
 
     /ScanningTable/IncludeCollimator
 

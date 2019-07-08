@@ -14,6 +14,7 @@ ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,
 
   includeCartFrame        = false;
   includeCloverCart       = false;
+  includeSlits            = false;
   includeSlitMount        = false;
   includeCollimator       = false;
   includeCollimatorInsert = false;
@@ -241,49 +242,6 @@ void ScanningTable::Construct()
   
   //--- Now the slit assembly -------------------------------------------------
 
-  // Slits on top
-  // BotPos = new G4ThreeVector(0., 90.335*mm, -8.8*mm);
-  // MidPos = new G4ThreeVector(0., 46.335*mm, -8.8*mm);
-  // TopPos = new G4ThreeVector(0., -44.335*mm, -8.8*mm);
-
-  G4cout << "   ... slit assembly (slit width "
-	 << slitWidth << " mm) ... " << G4endl;
-
-  // Slits on the bottom
-  BotPos = new G4ThreeVector(0., 0., -8.8*mm);
-  MidPos = new G4ThreeVector(0., 0., -8.8*mm);
-  TopPos = new G4ThreeVector(0., 0., -8.8*mm);
-
-  // (The STL files have 2 mm slits.)
-  G4ThreeVector *slitShift = new G4ThreeVector(0., slitWidth - 2.0*mm, 0.);
-  (*MidPos) += (*slitShift);
-  (*TopPos) += 2.0*(*slitShift);
-
-  const int ZSlitParts = 10;
-  G4String ZSlitPart[ZSlitParts];
-  G4Material* ZSlitMaterial[ZSlitParts];
-  ZSlitPart[0] = "ZSlitsBottomBracket";
-  ZSlitMaterial[0] = materialSlitBrackets;
-  ZSlitPart[1] = "ZSlitsLeftBracket";
-  ZSlitMaterial[1] = materialSlitBrackets;
-  ZSlitPart[2] = "ZSlitsRightBracket";
-  ZSlitMaterial[2] = materialSlitBrackets;
-  ZSlitPart[3] = "ZSlitsTopBracket";
-  ZSlitMaterial[3] = materialSlitBrackets;
-  ZSlitPart[4] = "ZSlitsLowerLeftWall";
-  ZSlitMaterial[4] = materialSlits;
-  ZSlitPart[5] = "ZSlitsLowerRightWall";
-  ZSlitMaterial[5] = materialSlits;
-  ZSlitPart[6] = "ZSlitsMidLeftWall";
-  ZSlitMaterial[6] = materialSlits;
-  ZSlitPart[7] = "ZSlitsMidRightWall";
-  ZSlitMaterial[7] = materialSlits;
-  ZSlitPart[8] = "ZSlitsUpperLeftWall";
-  ZSlitMaterial[8] = materialSlits;
-  ZSlitPart[9] = "ZSlitsUpperRightWall";
-  ZSlitMaterial[9] = materialSlits;
-  G4ThreeVector *UsePos;
-
   G4Colour lblue(0.0, 1.0, 1.0, 1.0);
   G4Colour lblue2(0.0, 1.0, 1.0, 0.3);
 
@@ -295,19 +253,64 @@ void ScanningTable::Construct()
   VisSlit2->SetVisibility(true);
   VisSlit2->SetForceWireframe(true);
   
-  for(int i=0;i<ZSlitParts;i++){
-    if(ZSlitPart[i] != ""){
-      CADFileName = CADModelPath + "/";
-      CADFileName += ZSlitPart[i];
-      CADFileName += ".stl";
-      CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
-				  (char*)"STL");
-      mesh->SetScale(mm);
-      mesh->SetOffset(G4ThreeVector(0., controllerZ, 0.));
+  if(includeSlits){
+  
+    // Slits on top
+    // BotPos = new G4ThreeVector(0., 90.335*mm, -8.8*mm);
+    // MidPos = new G4ThreeVector(0., 46.335*mm, -8.8*mm);
+    // TopPos = new G4ThreeVector(0., -44.335*mm, -8.8*mm);
+
+    G4cout << "   ... slit assembly (slit width "
+	   << slitWidth << " mm) ... " << G4endl;
+
+    // Slits on the bottom
+    BotPos = new G4ThreeVector(0., 0., -8.8*mm);
+    MidPos = new G4ThreeVector(0., 0., -8.8*mm);
+    TopPos = new G4ThreeVector(0., 0., -8.8*mm);
+
+    // (The STL files have 2 mm slits.)
+    G4ThreeVector *slitShift = new G4ThreeVector(0., slitWidth - 2.0*mm, 0.);
+    (*MidPos) += (*slitShift);
+    (*TopPos) += 2.0*(*slitShift);
+
+    const int ZSlitParts = 10;
+    G4String ZSlitPart[ZSlitParts];
+    G4Material* ZSlitMaterial[ZSlitParts];
+    ZSlitPart[0] = "ZSlitsBottomBracket";
+    ZSlitMaterial[0] = materialSlitBrackets;
+    ZSlitPart[1] = "ZSlitsLeftBracket";
+    ZSlitMaterial[1] = materialSlitBrackets;
+    ZSlitPart[2] = "ZSlitsRightBracket";
+    ZSlitMaterial[2] = materialSlitBrackets;
+    ZSlitPart[3] = "ZSlitsTopBracket";
+    ZSlitMaterial[3] = materialSlitBrackets;
+    ZSlitPart[4] = "ZSlitsLowerLeftWall";
+    ZSlitMaterial[4] = materialSlits;
+    ZSlitPart[5] = "ZSlitsLowerRightWall";
+    ZSlitMaterial[5] = materialSlits;
+    ZSlitPart[6] = "ZSlitsMidLeftWall";
+    ZSlitMaterial[6] = materialSlits;
+    ZSlitPart[7] = "ZSlitsMidRightWall";
+    ZSlitMaterial[7] = materialSlits;
+    ZSlitPart[8] = "ZSlitsUpperLeftWall";
+    ZSlitMaterial[8] = materialSlits;
+    ZSlitPart[9] = "ZSlitsUpperRightWall";
+    ZSlitMaterial[9] = materialSlits;
+    G4ThreeVector *UsePos;
+  
+    for(int i=0;i<ZSlitParts;i++){
+      if(ZSlitPart[i] != ""){
+	CADFileName = CADModelPath + "/";
+	CADFileName += ZSlitPart[i];
+	CADFileName += ".stl";
+	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
+				    (char*)"STL");
+	mesh->SetScale(mm);
+	mesh->SetOffset(G4ThreeVector(0., controllerZ, 0.));
      
-      G4VSolid *Slits = mesh->TessellatedMesh();
-      ZSlit_log = new G4LogicalVolume(Slits, ZSlitMaterial[i], 
-				      ZSlitPart[i], 0, 0, 0);
+	G4VSolid *Slits = mesh->TessellatedMesh();
+	ZSlit_log = new G4LogicalVolume(Slits, ZSlitMaterial[i], 
+					ZSlitPart[i], 0, 0, 0);
 	if(i == 4 || i == 5)
 	  UsePos = BotPos;
 	else if(i == 6 || i == 7)
@@ -316,56 +319,57 @@ void ScanningTable::Construct()
 	  UsePos = TopPos;
 	else
 	  UsePos = Pos2;
-      ZSlit_phys = new G4PVPlacement(G4Transform3D(NoRot, *UsePos),
-				     ZSlit_log,
-				     ZSlitPart[i],
-				     expHall_log,false,0);
+	ZSlit_phys = new G4PVPlacement(G4Transform3D(NoRot, *UsePos),
+				       ZSlit_log,
+				       ZSlitPart[i],
+				       expHall_log,false,0);
 
-      // if(i>3){
-      // 	// This doubles the slit wall thickness with additional copies
-      // 	G4ThreeVector* BP = new G4ThreeVector(0., 0., -8.8*mm + 16.22*mm);
-      // 	G4ThreeVector* MP = new G4ThreeVector(0., 0., -8.8*mm + 16.22*mm);
-      // 	G4ThreeVector* TP = new G4ThreeVector(0., 0., -8.8*mm + 16.22*mm);
-      // 	if(i == 4 || i == 5)
-      // 	  UsePos = BP;
-      // 	else if(i == 6 || i == 7)
-      // 	  UsePos = MP;
-      // 	else if(i == 8 || i == 9)
-      // 	  UsePos = TP;
-      // 	// (The STL files have 2 mm slits.)
-      // 	(*MP) += (*slitShift);
-      // 	(*TP) += 2.0*(*slitShift);
+	// if(i>3){
+	// 	// This doubles the slit wall thickness with additional copies
+	// 	G4ThreeVector* BP = new G4ThreeVector(0., 0., -8.8*mm + 16.22*mm);
+	// 	G4ThreeVector* MP = new G4ThreeVector(0., 0., -8.8*mm + 16.22*mm);
+	// 	G4ThreeVector* TP = new G4ThreeVector(0., 0., -8.8*mm + 16.22*mm);
+	// 	if(i == 4 || i == 5)
+	// 	  UsePos = BP;
+	// 	else if(i == 6 || i == 7)
+	// 	  UsePos = MP;
+	// 	else if(i == 8 || i == 9)
+	// 	  UsePos = TP;
+	// 	// (The STL files have 2 mm slits.)
+	// 	(*MP) += (*slitShift);
+	// 	(*TP) += 2.0*(*slitShift);
 
-      // 	G4VPhysicalVolume* ZS_phys 
-      // 	  = new G4PVPlacement(G4Transform3D(NoRot, *UsePos),
-      // 			      ZSlit_log,
-      // 			      ZSlitPart[i],
-      // 			      expHall_log,false,0);
-      // 	// ... and this triples it.
-      // 	BP->setZ(-8.8*mm + 2.0*16.22*mm);
-      // 	MP->setZ(-8.8*mm + 2.0*16.22*mm);
-      // 	TP->setZ(-8.8*mm + 2.0*16.22*mm);
-      //        // (The STL files have 2 mm slits.)  
-      //	(*MP) += (*slitShift);
-      //	(*TP) += 2.0*(*slitShift);
-      //
-      // 	if(i == 4 || i == 5)
-      // 	  UsePos = BP;
-      // 	else if(i == 6 || i == 7)
-      // 	  UsePos = MP;
-      // 	else if(i == 8 || i == 9)
-      // 	  UsePos = TP;
-      // 	ZS_phys 
-      // 	  = new G4PVPlacement(G4Transform3D(NoRot, *UsePos),
-      // 			      ZSlit_log,
-      // 			      ZSlitPart[i],
-      // 			      expHall_log,false,0);
-      //      }
+	// 	G4VPhysicalVolume* ZS_phys 
+	// 	  = new G4PVPlacement(G4Transform3D(NoRot, *UsePos),
+	// 			      ZSlit_log,
+	// 			      ZSlitPart[i],
+	// 			      expHall_log,false,0);
+	// 	// ... and this triples it.
+	// 	BP->setZ(-8.8*mm + 2.0*16.22*mm);
+	// 	MP->setZ(-8.8*mm + 2.0*16.22*mm);
+	// 	TP->setZ(-8.8*mm + 2.0*16.22*mm);
+	//        // (The STL files have 2 mm slits.)  
+	//	(*MP) += (*slitShift);
+	//	(*TP) += 2.0*(*slitShift);
+	//
+	// 	if(i == 4 || i == 5)
+	// 	  UsePos = BP;
+	// 	else if(i == 6 || i == 7)
+	// 	  UsePos = MP;
+	// 	else if(i == 8 || i == 9)
+	// 	  UsePos = TP;
+	// 	ZS_phys 
+	// 	  = new G4PVPlacement(G4Transform3D(NoRot, *UsePos),
+	// 			      ZSlit_log,
+	// 			      ZSlitPart[i],
+	// 			      expHall_log,false,0);
+	//      }
 
-      if(i<4)
-	ZSlit_log->SetVisAttributes(VisSlit2);
-      else
-	ZSlit_log->SetVisAttributes(VisSlit);
+	if(i<4)
+	  ZSlit_log->SetVisAttributes(VisSlit2);
+	else
+	  ZSlit_log->SetVisAttributes(VisSlit);
+      }
     }
   }
 
