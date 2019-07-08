@@ -328,6 +328,7 @@ void Gretina_Array:: ReadSolidFile()
       pPg->capThick   = -1.*mm;
       pPg->passThick1 = -1.*mm;
       pPg->passThick2 = -1.*mm;
+      pPg->passThick3 = -1.*mm;
       pPg->colx       =  0.;
       pPg->coly       =  0.;
       pPg->colz       =  0.;
@@ -362,6 +363,7 @@ void Gretina_Array:: ReadSolidFile()
       pPg->passThick2 = ((G4double)z) * mm;
       pPg->capSpace   = ((G4double)X) * mm;
       pPg->capThick   = ((G4double)Y) * mm;
+      pPg->passThick3 = ((G4double)Z) * mm;
     }
     else if(i2==0 && i3==2) {
       pPg->colx     = ((G4double)x);
@@ -500,29 +502,34 @@ void Gretina_Array:: ReadSolidFile()
       pPg->tubr = 0.;
     }
     
-    // passive areas
-    // at the back of the detector
+    // back passive layer
     if( pPg->passThick1 < 0. ) {
       pPg->passThick1 = 0.;
-      G4cout << " Warning! Passive layer will not be built in solid " << pPg->whichGe << G4endl;
+      G4cout << " Warning! Back passive layer will not be built in solid " << pPg->whichGe << G4endl;
     }
     else if( pPg->passThick1 > pPg->tubL ) {
       pPg->passThick1 = pPg->tubL;
-      G4cout << " Warning! Setting passive layer thickness to " 
+      G4cout << " Warning! Setting back passive layer thickness to " 
              <<  pPg->tubL/mm << " mm in solid " << pPg->whichGe << G4endl;
     }  
       
-    // around the coaxial hole
+    // coaxial and outer passive layers
     if( pPg->cylinderMakesSense ) {
       if( pPg->passThick2 < 0. ) {
         pPg->passThick2 = 0.;
-        G4cout << " Warning! Passive layer will not be built in solid " << pPg->whichGe << G4endl;
+        G4cout << " Warning! Coaxial passive layer will not be built in solid " << pPg->whichGe << G4endl;
       }
-      else if( pPg->passThick2 > (pPg->tubR-pPg->tubr) || pPg->passThick2 > pPg->thick ) {
+      if( pPg->passThick3 < 0. ) {
+	pPg->passThick3 = 0.;
+	G4cout << " Warning! Outer passive layer will not be built in solid " << pPg->whichGe << G4endl;
+      }
+      if( pPg->passThick2 + pPg->passThick3 > (pPg->tubR-pPg->tubr) ||
+	  pPg->passThick2 + pPg->passThick3 > pPg->thick ) {
         pPg->passThick2 = min(pPg->tubR-pPg->tubr, pPg->thick);
-        G4cout << " Warning! Setting passive layer thickness to " 
-               <<  (pPg->tubR-pPg->tubr)/mm << " mm in solid " << pPg->whichGe << G4endl;
+        G4cout << " Error! The coaxial and outer passive layer thicknesses leave no active volume in solid " << pPg->whichGe << G4endl;
+	exit(EXIT_FAILURE);
       }
+
     }
     
     if( pPg->makeCapsule && (pPg->capSpace <= 0.) ) {
@@ -1068,7 +1075,7 @@ void Gretina_Array::ConstructGeCrystals()
             pPg->pDetL1 = NULL;
         }            
       }
-      else {
+      else {   // (GRETINA/GRETA crystals)
         zSliceGe = new G4double[4];
         zSliceGe[0] = pPg->zCenter-pPg->tubL/2.-tolerance;  // LR: To avoid colocated planes in the G4IntersectionSolid
         zSliceGe[1] = zFace1 + pPg->thick;
@@ -1147,6 +1154,16 @@ void Gretina_Array::ConstructGeCrystals()
           }
           else
             pPg->pDetL2 = NULL;
+
+          if( pPg->passThick3 > 0. ) {
+	  {
+            // outer passive area (placed later as daughter of the original crystal)
+
+	    // *** LOOK AT HOW THE CAPSULES ARE MADE ***
+	    
+	  }
+          else
+            pPg->pDetL3 = NULL;
         }
       }
       sprintf(sName, "geDetCapsL%2.2d", nGe);
