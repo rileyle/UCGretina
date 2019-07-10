@@ -182,8 +182,16 @@ void TrackerGammaSD::EndOfEvent(G4HCofThisEvent* HCE)
 		   << NbHits << " hits for gamma tracking: " << G4endl;
 	    G4cout << "                            parent    creator" << G4endl;
 	    G4cout << "trackID   PID     process   track     process     det seg     Edep      X         Y         Z         Xo        Yo        Zo" << G4endl;
-	    for (i=0;i<NbHits;i++) (*gammaCollection)[i]->Print();
-
+	    G4double totE = 0;
+	    for (i=0;i<NbHits;i++){
+	      (*gammaCollection)[i]->Print();
+	      totE += (*gammaCollection)[i]->GetEdep();
+	    }
+	    G4cout << "total energy deposited = "
+		   << std::fixed << std::setprecision(2)
+		   << std::setw(10) << std::right
+		   << totE/keV << " keV" << G4endl;
+	    
 	  }
 
 
