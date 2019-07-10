@@ -142,12 +142,17 @@ class CpolyhPoints
     G4VPhysicalVolume   *pDetP2;     //> passivated area (coax)			    
 
   public:  
-    CConvexPolyhedron   *pPoly3;      //> original polyhedron  (*** NEED THIS?)
-    G4Polycone          *pCoax3;      //> cylinder             (*** NEED THIS?)
-    G4IntersectionSolid *pCaps3;      //> their intersection   (*** MAYBE A SUBTRACTION?)
+    CConvexPolyhedron   *pPoly3;      //> inner polyhedron
+    G4Tubs              *pTubsO3;     //> outer cylinder
+    G4Tubs              *pTubsI3;     //> inner cylinder
+    G4IntersectionSolid *pIntO3;      //> outer intersection
+    G4IntersectionSolid *pIntI3;      //> inner intersection
+    G4SubtractionSolid  *pSub3;       //> intermediate subtraction
+    G4SubtractionSolid  *pCaps3;      //> final passive region volume
     G4LogicalVolume     *pDetL3;      //> its logical
     G4VPhysicalVolume   *pDetP3;      //> passivated area (outer)
 
+  
   public:  
     G4VisAttributes     *pDetVA;     //> visualization attributes
 };

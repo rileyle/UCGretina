@@ -1110,12 +1110,12 @@ void Gretina_Array::ConstructGeCrystals()
             InnRadGe[1] = pPg->tubr;
 
             OutRadGe = new G4double[2];
-            OutRadGe[0] = pPg->tubR;
-            OutRadGe[1] = pPg->tubR;
+            OutRadGe[0] = pPg->tubR - pPg->passThick3;  // Nests inside the outer passive layer
+            OutRadGe[1] = pPg->tubR - pPg->passThick3;
 
             // passive area behind the detector (placed later as daughter of the original crystal)
             sprintf(sName, "geTubsB%2.2d", nGe);
-            pPg->pTubs1 = new G4Polycone(G4String(sName), 0.*deg, 360.*deg, 2, zSliceGe, InnRadGe, OutRadGe );
+            pPg->pTubs1 = new G4Polycone(G4String(sName), 0.*deg, 360.*deg, 2, zSliceGe, InnRadGe, OutRadGe);
             sprintf(sName, "gePassB%2.2d", nGe);
             pPg->pCaps1 = new G4IntersectionSolid(G4String(sName), pPg->pPoly, pPg->pTubs1, G4Transform3D( rm, G4ThreeVector() ) );
 
@@ -1155,20 +1155,51 @@ void Gretina_Array::ConstructGeCrystals()
           else
             pPg->pDetL2 = NULL;
 
-          if( pPg->passThick3 > 0. ) {
+          if( pPg->passThick3 > 0. ) 
 	  {
             // outer passive area (placed later as daughter of the original crystal)
+	    sprintf(sName, "piPoly%2.2d", nGe);
+	    pPg->pPoly3 = new CConvexPolyhedron(G4String(sName), pPg->vertex);
 
-	    // *** LOOK AT HOW THE CAPSULES ARE MADE ***
+	    for( G4int nSid=0; nSid<pPg->pPoly3->GetnPlanes(); nSid++ )
+	        pPg->pPoly3->MovePlane( nSid, -pPg->passThick3 );
+	    
+	    sprintf(sName, "geTubsO3%2.2d", nGe);
+	    pPg->pTubsO3 = new G4Tubs(G4String(sName), 0., pPg->tubR,
+				      pPg->tubL, 0.*deg, 360.*deg);
+	    sprintf(sName, "geTubsI3%2.2d", nGe);
+	    pPg->pTubsI3 = new G4Tubs(G4String(sName), 0., pPg->tubR-pPg->passThick3,
+				      pPg->tubL, 0.*deg, 360.*deg);
+	    
+	    sprintf(sName, "geTubsPolyO3%2.2d", nGe);
+	    pPg->pIntO3 = new G4IntersectionSolid(G4String(sName), pPg->pPoly, pPg->pTubsO3,
+						  G4Transform3D( rm, G4ThreeVector() ) );
+	    sprintf(sName, "geTubsPolyI3%2.2d", nGe);
+	    pPg->pIntI3 = new G4IntersectionSolid(G4String(sName), pPg->pPoly3, pPg->pTubsI3,
+						  G4Transform3D( rm, G4ThreeVector() ) );
+
+            sprintf(sName, "gePassSubO%2.2d", nGe);
+	    pPg->pSub3 = new G4SubtractionSolid(G4String(sName), pPg->pIntO3, pPg->pIntI3,
+						G4Transform3D( rm, G4ThreeVector() ) );
+	    sprintf(sName, "gePassO%2.2d", nGe);
+	    pPg->pCaps3
+	      = new G4SubtractionSolid(G4String(sName), pPg->pSub3, pPg->pTubsI3,
+				       G4Transform3D( rm,
+						      G4ThreeVector(0, 0, 2*pPg->tubL-2*pPg->passThick3) ) );
+	    
+	    sprintf(sName, "gePassOL%2.2d", nGe);
+	    pPg->pDetL3 = new G4LogicalVolume( pPg->pCaps3, matCryst, G4String(sName), 0, 0, 0 );
+	    pPg->pDetL3->SetVisAttributes( pPg->pDetVA );	    
 	    
 	  }
           else
             pPg->pDetL3 = NULL;
-        }
+	
+	  }
       }
       sprintf(sName, "geDetCapsL%2.2d", nGe);
       pPg->pDetL  = new G4LogicalVolume( pPg->pCaps, matCryst, G4String(sName), 0, 0, 0 ); // intersezione di Poly e Tubs
-    }
+      }
     else {
       sprintf(sName, "geDetPolyL%2.2d", nGe);
       pPg->pDetL  = new G4LogicalVolume( pPg->pPoly, matCryst, G4String(sName), 0, 0, 0 ); // solo i poliedri
@@ -1212,6 +1243,11 @@ void Gretina_Array::ConstructGeCrystals()
         sprintf(sName, "gePassCP%3.3d", nPh);
         pPg->pDetP2 =  new G4PVPlacement( 0, G4ThreeVector(), pPg->pDetL2, G4String(sName), pPg->pDetL, false, 0);
       }
+      if( pPg->pDetL3 ) {
+        pPg->pDetP3 = NULL;
+        sprintf(sName, "gePassOP%3.3d", nPh);
+        pPg->pDetP3 =  new G4PVPlacement( 0, G4ThreeVector(), pPg->pDetL3, G4String(sName), pPg->pDetL, false, 0);
+      }
     }
 
     pPg->pDetL->SetVisAttributes( pPg->pDetVA );
@@ -1219,15 +1255,22 @@ void Gretina_Array::ConstructGeCrystals()
     pPg->pDetL->SetSensitiveDetector( theDetector->GetGammaSD() );    //LR
     ngen++;
 
-    G4cout << "\n  Total Ge volume (" << pPg->pCaps->GetName() << ")     = "
+    G4cout << "\n  Total Ge volume (" << pPg->pCaps->GetName() << ")      = "
 	   << pPg->pCaps->GetCubicVolume()/cm3
 	   << " cm3" << G4endl;
-    G4cout << "    Back dead layer volume (" << pPg->pCaps1->GetName() << ")     = "
-	   << pPg->pCaps1->GetCubicVolume()/cm3
-	   << " cm3" << G4endl;
-    G4cout << "    Coaxial dead layer volume (" << pPg->pCoax2->GetName() << ") = "
-	   << pPg->pCoax2->GetCubicVolume()/cm3
-	   << " cm3\n" << G4endl;
+
+    if( pPg->pDetL1 )
+      G4cout << "    Back dead layer volume (" << pPg->pCaps1->GetName() << ")     = "
+	     << pPg->pCaps1->GetCubicVolume()/cm3
+	     << " cm3" << G4endl;
+    if( pPg->pDetL2 )
+      G4cout << "    Coaxial dead layer volume (" << pPg->pCoax2->GetName() << ")  = "
+	     << pPg->pCoax2->GetCubicVolume()/cm3
+	     << " cm3" << G4endl;
+    if( pPg->pDetL3 )
+      G4cout << "    Outer dead layer volume (" << pPg->pCaps3->GetName() << ")    = "
+	     << pPg->pCaps3->GetCubicVolume()/cm3
+	     << " cm3\n" << G4endl;
   }
   
   G4cout << "Number of generated crystals is " << ngen << G4endl;
@@ -1376,7 +1419,7 @@ void Gretina_Array::ConstructTheCapsules()
 	new G4PVPlacement( 0, G4ThreeVector(), pPg->pDetL, G4String(sName), pPv->pDetL, false, 0);
       }
     }
-    else {
+    else { // GRETA/GRETINA
       dist1 = pPg->capSpace;
       dist2 = dist1 + pPg->capThick;
       if( makeCapsule ) {
