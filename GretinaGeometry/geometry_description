@@ -2,6 +2,8 @@ AGATA Simulation Code - Geometry description
 by Enrico Farnea
 Version 4.3.0, November 27th, 2004
 
+Modified to describe UCGretina
+
 
 The code in the present version is suited to handle the proposed configurations for the AGATA and GRETA arrays, namely arrangements of clusters of encapsulated coaxial detectors with irregular shapes (grouped into the same cryostat). In order to obtain the maximal flexibility needed for geometry optimization, the relevant parameters are not encoded in the program, rather they are read from formatted ASCII files. The sequence of operations performed by the program to actually build the array is the following:
 
@@ -29,10 +31,10 @@ The format of the file is the following. For each shape, a series of lines will 
 where Shape # is the kind of crystal shape, corresponding to a prism with two parallel faces each having nSides sides; the line corresponds to point Point# which has coordinates (x y z) in the first face and (x' y' z') in the second. Additional information is encoded in other lines which can be distinguished having "0" instead of nSides:
 
     Shape#              0    0     holeR    cylR     cylL     cylX cylY cylZ
-    Shape#              0    1     holeL    thickB   thickC   capS   capT   capS+capT+tol
+    Shape#              0    1     holeL    thickB   thickC   capS   capT   thickO
     Shape#              0    2     colX    colY   colZ   0. 0. 0.
 
-Where the cylinder has radius cylR and length cylL and is intersected with the polyhedron through a traslation (cylX cylY cylZ); the coaxial hole has a radius holeR and is (cylL-holeL) long. The passivated areas are thickB (back) and thickC (coaxial) thick. The crystal-encapsulation spacing is capS and the capsule is capT thick; tol is a mechanical tolerance. The RGB color components for visualization are (colX colY colZ).
+Where the cylinder has radius cylR and length cylL and is intersected with the polyhedron through a traslation (cylX cylY cylZ); the coaxial hole has a radius holeR and is (cylL-holeL) long. The passivated areas are thickB (back), thickC (coaxial), and thickO (outer) thick. The crystal-encapsulation spacing is capS and the capsule is capT thick; tol is a mechanical tolerance. The RGB color components for visualization are (colX colY colZ).
 
 aclust
 The transformations needed to place the detectors within the cluster are given as composition of a rotation and a traslation. The rotation is obtained as following:

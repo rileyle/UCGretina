@@ -77,6 +77,7 @@ class CpolyhPoints
   public:
     G4double  passThick1;            //> at the back of the crystal
     G4double  passThick2;            //> around the coaxial hole
+    G4double  passThick3;            //> outer surfaces
     
   public:
     G4Point3D centerFace1;           //> center of front face
@@ -139,7 +140,19 @@ class CpolyhPoints
     G4IntersectionSolid *pCaps2;     //> intersection with polyhedron		    
     G4LogicalVolume     *pDetL2;     //> its logical				    
     G4VPhysicalVolume   *pDetP2;     //> passivated area (coax)			    
-    
+
+  public:  
+    CConvexPolyhedron   *pPoly3;      //> inner polyhedron
+    G4Tubs              *pTubsO3;     //> outer cylinder
+    G4Tubs              *pTubsI3;     //> inner cylinder
+    G4IntersectionSolid *pIntO3;      //> outer intersection
+    G4IntersectionSolid *pIntI3;      //> inner intersection
+    G4SubtractionSolid  *pSub3;       //> intermediate subtraction
+    G4SubtractionSolid  *pCaps3;      //> final passive region volume
+    G4LogicalVolume     *pDetL3;      //> its logical
+    G4VPhysicalVolume   *pDetP3;      //> passivated area (outer)
+
+  
   public:  
     G4VisAttributes     *pDetVA;     //> visualization attributes
 };
