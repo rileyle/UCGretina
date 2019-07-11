@@ -1819,10 +1819,10 @@ void Gretina_Array::ConstructSegments()
     if(printVolumes){
       G4cout << " Crystal type " << iPg << ": " << G4endl;
       G4cout << "   Segment volumes:" << G4endl;
-      G4cout << "                     Total      Coax Passive  Back Passive" << G4endl;
-      G4cout << "   Segment           [cm3]         [cm3]         [cm3]" << G4endl;
+      G4cout << "                     Total      Coax Passive  Back Passive Outer Passive" << G4endl;
+      G4cout << "   Segment           [cm3]         [cm3]         [cm3]         [cm3]" << G4endl;
     }
-    G4double segVol, backPassiveVol, coaxPassiveVol;
+    G4double segVol, backPassiveVol, coaxPassiveVol, outerPassiveVol;
 
     for( slice=0; slice<ppgerm->nslice; slice++ ) {
       for( sector=0; sector<ppgerm->npoints/2; sector++, indexS++) { 
@@ -1830,6 +1830,7 @@ void Gretina_Array::ConstructSegments()
 	segVol = 0.;
 	backPassiveVol = 0.;
 	coaxPassiveVol = 0.;
+	outerPassiveVol = 0.;
         // the four parts composing the segment
         for(int ss = 0; ss < 4; ss++) {
           switch (ss) {
@@ -1862,11 +1863,18 @@ void Gretina_Array::ConstructSegments()
 	  ppseg->pCaps  = new G4IntersectionSolid( G4String(sName1), ppseg->pPoly, ppgerm->pCaps, G4Transform3D( rm, G4ThreeVector() ) );
 
 	  // We make these to calculate the dead volume in the segment.
-	  sprintf(sName1, "SegmPassB_%5.5d", nGe ); 
-	  ppseg->pCaps1 = new G4IntersectionSolid( G4String(sName1), ppseg->pPoly, ppgerm->pCaps1, G4Transform3D( rm, G4ThreeVector() ) );
-	  sprintf(sName1, "SegmPassC_%5.5d", nGe ); 
-	  ppseg->pCaps2 = new G4IntersectionSolid( G4String(sName1), ppseg->pPoly, ppgerm->pCoax2, G4Transform3D( rm, G4ThreeVector() ) );
-	  
+	  if(ppgerm->pDetL1){
+	    sprintf(sName1, "SegmPassB_%5.5d", nGe ); 
+	    ppseg->pCaps1 = new G4IntersectionSolid( G4String(sName1), ppseg->pPoly, ppgerm->pCaps1, G4Transform3D( rm, G4ThreeVector() ) );
+	  }
+	  if(ppgerm->pDetL2){
+	    sprintf(sName1, "SegmPassC_%5.5d", nGe ); 
+	    ppseg->pCaps2 = new G4IntersectionSolid( G4String(sName1), ppseg->pPoly, ppgerm->pCoax2, G4Transform3D( rm, G4ThreeVector() ) );
+	  }
+	  if(ppgerm->pDetL3){
+	    sprintf(sName1, "SegmPassO_%5.5d", nGe ); 
+	    ppseg->pIntO3 = new G4IntersectionSolid( G4String(sName1), ppseg->pPoly, ppgerm->pCaps3, G4Transform3D( rm, G4ThreeVector() ) );
+	  }
 	  ppseg->pDetL  = new G4LogicalVolume( ppseg->pCaps, matCryst, G4String(sName2), 0, 0, 0 ); 
           ppseg->pDetL->SetVisAttributes( segVA[(indexS)%4] );      // in this way they get also the same color
           if( drawReadOut ) {
@@ -1875,9 +1883,13 @@ void Gretina_Array::ConstructSegments()
           }
 	  // These take a while, so only compute them if we're printing them.
 	  if(printVolumes){ 
-	    segVol         += ppseg->pCaps->GetCubicVolume();
-	    backPassiveVol += ppseg->pCaps1->GetCubicVolume();
-	    coaxPassiveVol += ppseg->pCaps2->GetCubicVolume();
+	    segVol          += ppseg->pCaps->GetCubicVolume();
+	    if(ppgerm->pDetL1)
+	      backPassiveVol  += ppseg->pCaps1->GetCubicVolume();
+	    if(ppgerm->pDetL2)
+	      coaxPassiveVol  += ppseg->pCaps2->GetCubicVolume();
+	    if(ppgerm->pDetL3)
+	      outerPassiveVol += ppseg->pIntO3->GetCubicVolume();
 	  }
           nSeg++;
           iSeg[iPg]++;
@@ -1887,12 +1899,14 @@ void Gretina_Array::ConstructSegments()
 		 << std::setw(8)
 		 << nGe 
 		 << std::fixed << std::setprecision(2) << std::setw(14)
-		 << segVol/cm3
-		 << std::fixed << std::setprecision(2) << std::setw(14)
-		 << coaxPassiveVol/cm3
-		 << std::fixed << std::setprecision(2) << std::setw(14)
-		 << backPassiveVol/cm3
-		 << G4endl;
+		 << segVol/cm3;
+	  G4cout << std::fixed << std::setprecision(2) << std::setw(14)
+		 << coaxPassiveVol/cm3;
+	  G4cout << std::fixed << std::setprecision(2) << std::setw(14)
+		 << backPassiveVol/cm3;
+	  G4cout << std::fixed << std::setprecision(2) << std::setw(14)
+		 << outerPassiveVol/cm3;
+	  G4cout << G4endl;
 	}
       }
     }
