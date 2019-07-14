@@ -37,6 +37,7 @@ class TrackerGammaHit : public G4VHit
       void SetDetNumb(G4int num) {detNumb=num;};
       void SetSegNumb(G4int num) {segNumb=num;};
       void SetEdep     (G4double de)      { edep = de; };
+      void SetKE       (G4double e)       { ke = e; };
       void SetPos      (G4ThreeVector xyz){ pos = xyz; };
       void SetPosCrys  (G4ThreeVector xyz){ posCrys = xyz; };
       void SetTrackOrigin(G4ThreeVector xyz){ trackOrigin = xyz; };
@@ -49,6 +50,7 @@ class TrackerGammaHit : public G4VHit
       G4int  GetDetNumb()            { return detNumb; };
       G4int  GetSegNumb()            { return segNumb; };
       G4double GetEdep()             { return edep; };
+      G4double GetKE()               { return ke; };
       G4ThreeVector GetPos()         { return pos; };
       G4ThreeVector GetPosCrys()     { return posCrys; };
       G4ThreeVector GetTrackOrigin() { return trackOrigin; };
@@ -63,6 +65,7 @@ class TrackerGammaHit : public G4VHit
       G4int         detNumb;
       G4int         segNumb;
       G4double      edep;
+      G4double      ke;
       G4ThreeVector pos;
       G4ThreeVector posCrys;
       G4ThreeVector trackOrigin;

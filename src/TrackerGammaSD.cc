@@ -153,6 +153,7 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   newHit->SetDetNumb    (detNum);
   newHit->SetSegNumb    (segCode);
   newHit->SetEdep       (edep);
+  newHit->SetKE         (aStep->GetTrack()->GetKineticEnergy());
   newHit->SetPos        (position);
   newHit->SetPosCrys    (posSol);
   newHit->SetTrackOrigin(aStep->GetTrack()->GetVertexPosition());
@@ -181,7 +182,7 @@ void TrackerGammaSD::EndOfEvent(G4HCofThisEvent* HCE)
 	    G4cout << "\n--------> event " << runManager->GetCurrentEvent()->GetEventID() << ", "
 		   << NbHits << " hits for gamma tracking: " << G4endl;
 	    G4cout << "                            parent    creator" << G4endl;
-	    G4cout << "trackID   PID     process   track     process     det seg     Edep      X         Y         Z         Xo        Yo        Zo" << G4endl;
+	    G4cout << "trackID   PID     process   track     process     det seg     Edep      KE         X         Y         Z         Xo        Yo        Zo" << G4endl;
 	    G4double totE = 0;
 	    for (i=0;i<NbHits;i++){
 	      (*gammaCollection)[i]->Print();
