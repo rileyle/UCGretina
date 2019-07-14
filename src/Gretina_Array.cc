@@ -1255,22 +1255,52 @@ void Gretina_Array::ConstructGeCrystals()
     pPg->pDetL->SetSensitiveDetector( theDetector->GetGammaSD() );    //LR
     ngen++;
 
+    G4double totalV = pPg->pCaps->GetCubicVolume()/cm3;
+    G4double backV = 0;
+    G4double coaxV = 0;
+    G4double outerV = 0;
+    G4double totalDeadV = 0;
+    
     G4cout << "\n  Total Ge volume (" << pPg->pCaps->GetName() << ")      = "
-	   << pPg->pCaps->GetCubicVolume()/cm3
+	   <<std::fixed<<std::setprecision(3)<<std::setw(7)<<std::right
+	   << totalV
 	   << " cm3" << G4endl;
 
-    if( pPg->pDetL1 )
+    G4cout << "\n    Dead layers: "
+	   <<std::fixed<<std::setprecision(2)<<std::setw(4)<<std::right
+	   << pPg->passThick1 << " mm (back), "
+      	   << pPg->passThick2 << " mm (coaxial), "
+	   << pPg->passThick3 << " mm (outer)"
+	   << G4endl;
+    
+    if( pPg->pDetL1 ){
+      backV = pPg->pCaps1->GetCubicVolume()/cm3;
+      totalDeadV += backV;
       G4cout << "    Back dead layer volume (" << pPg->pCaps1->GetName() << ")     = "
-	     << pPg->pCaps1->GetCubicVolume()/cm3
-	     << " cm3" << G4endl;
-    if( pPg->pDetL2 )
+	     <<std::fixed<<std::setprecision(3)<<std::setw(7)<<std::right
+	     << backV << " cm3, "
+	     << backV/totalV*100. << "%" << G4endl;
+    }
+    if( pPg->pDetL2 ){
+      coaxV = pPg->pCoax2->GetCubicVolume()/cm3;
+      totalDeadV += coaxV;
       G4cout << "    Coaxial dead layer volume (" << pPg->pCoax2->GetName() << ")  = "
-	     << pPg->pCoax2->GetCubicVolume()/cm3
-	     << " cm3" << G4endl;
-    if( pPg->pDetL3 )
+	     <<std::fixed<<std::setprecision(3)<<std::setw(7)<<std::right
+      	     << coaxV << " cm3, "
+	     << coaxV/totalV*100. << "%" << G4endl;
+    }
+    if( pPg->pDetL3 ){
+      outerV = pPg->pCaps3->GetCubicVolume()/cm3;
+      totalDeadV += outerV;
       G4cout << "    Outer dead layer volume (" << pPg->pCaps3->GetName() << ")    = "
-	     << pPg->pCaps3->GetCubicVolume()/cm3
-	     << " cm3\n" << G4endl;
+	     <<std::fixed<<std::setprecision(3)<<std::setw(7)<<std::right
+	     << outerV << " cm3, "
+	     << outerV/totalV*100. << "%" << G4endl;
+    }
+    G4cout << "                         Total dead volume = "
+      	   <<std::fixed<<std::setprecision(3)<<std::setw(7)<<std::right
+	   << totalDeadV << " cm3, "
+	   << totalDeadV/totalV*100. << "%\n" << G4endl;
   }
   
   G4cout << "Number of generated crystals is " << ngen << G4endl;
