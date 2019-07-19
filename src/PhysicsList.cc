@@ -272,9 +272,10 @@ void PhysicsList::AddReaction()
   while( (*particleIterator)() ){
     G4ParticleDefinition* particle = particleIterator->value();
     G4String particleName = particle->GetParticleName();
-    if ( particleName == "GenericIon" ) 
+    if ( particleName == "GenericIon" ){
       ph->RegisterProcess(react, particle);    
       ph->RegisterProcess(new G4StepLimiter, particle);
+    }
   }
 }
 
