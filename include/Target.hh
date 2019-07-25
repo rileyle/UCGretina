@@ -86,6 +86,7 @@ private:
   G4double sledBarZ5;
 
   Materials* materials;
+  G4String TargetMaterialName;
   G4Material* TargetMaterial;
   G4Material* frameMaterial;
   G4Material* tapeMaterial;
