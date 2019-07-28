@@ -128,19 +128,22 @@ class CpolyhPoints
     G4Polycone          *pCoax;      //> cylinder 
     G4IntersectionSolid *pCaps;      //> their intersection
     G4LogicalVolume     *pDetL;      //> its logical
-    
+
+  // Back passive volume
   public:  
     G4Polycone          *pTubs1;     //> cylinder (passive area behind detector)     
     G4IntersectionSolid *pCaps1;     //> intersection with polyhedron		    
     G4LogicalVolume     *pDetL1;     //> its logical				    
     G4VPhysicalVolume   *pDetP1;     //> passivated area (back)			    
-   
+
+  // Coaxial passive volume
   public:  
     G4Polycone          *pCoax2;     //> cylinder (passive area at the coaxial hole) 
     G4IntersectionSolid *pCaps2;     //> intersection with polyhedron		    
     G4LogicalVolume     *pDetL2;     //> its logical				    
     G4VPhysicalVolume   *pDetP2;     //> passivated area (coax)			    
 
+  // Outer passive volume
   public:  
     CConvexPolyhedron   *pPoly3;      //> inner polyhedron
     G4Tubs              *pTubsO3;     //> outer cylinder
@@ -152,6 +155,11 @@ class CpolyhPoints
     G4LogicalVolume     *pDetL3;      //> its logical
     G4VPhysicalVolume   *pDetP3;      //> passivated area (outer)
 
+  // Capsule
+  public:  
+    CConvexPolyhedron   *pPolyCap;     //> polyhedron
+    G4Tubs              *pTubsCap;     //> cylinder
+    G4IntersectionSolid *pIntCap;      //> intersection
   
   public:  
     G4VisAttributes     *pDetVA;     //> visualization attributes

@@ -1323,7 +1323,7 @@ void Gretina_Array::ConstructTheCapsules()
   G4RotationMatrix rm;
   rm.set(0, 0, 0);
   
-  if( !matWalls || !matBackWalls || !matHole ) {
+  if( !matWalls || !matHole ) {
     G4cout << G4endl << "----> Missing materials, cannot build the capsules!" << G4endl;
     return;
   }
@@ -1450,39 +1450,76 @@ void Gretina_Array::ConstructTheCapsules()
       }
     }
     else { // GRETA/GRETINA
+
+      // The capsule is a solid tubs cut with a polyhedron made of the wall material
+      // with a smaller one made of hole material defined as its daughter to create a void.
+      // The crystal (carrying its daughter passive volumes with it) is placed as a daughter
+      // of the inner void.
+
       dist1 = pPg->capSpace;
       dist2 = dist1 + pPg->capThick;
       if( makeCapsule ) {
 
-	pPv = &capsI[nPg];  
-	sprintf(sName, "vaPoly%2.2d", nGe);
-	pPv->pPoly  = new CConvexPolyhedron(G4String(sName), pPg->vertex);
-	for( nSid=0; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
-	  movePlane = pPv->pPoly->MovePlane( nSid, dist1 );
+	// Inner capsule void (matHole)
+        pPv = &capsI[nPg];  
 	pPv->whichGe = nGe;
-	sprintf(sName, "geVacPolyL%2.2d", nGe);
-	pPv->pDetL = new G4LogicalVolume( pPv->pPoly, matHole, G4String(sName), 0, 0, 0 ); 
-	//LR	pPv->pDetVA  = new G4VisAttributes( G4Color(pPg->colx, pPg->coly, pPg->colz) );
-	pPv->pDetVA  = new G4VisAttributes( G4Color(0, 0, 0) );
+	
+	sprintf(sName, "geCapPolyI%2.2d", nGe);
+	pPv->pPolyCap = new CConvexPolyhedron(G4String(sName), pPg->vertex);
+	
+	for( G4int nSid=0; nSid<pPv->pPolyCap->GetnPlanes(); nSid++ )
+	  pPv->pPolyCap->MovePlane( nSid, dist1 );
+
+	// G4Tubs are defined with a half-length, so this is twice the crystal
+	// length along z -- plenty for pushing out the forward plane but
+	// ends at the right place in back.
+	sprintf(sName, "geTubsICap%2.2d", nGe);
+	pPv->pTubsCap = new G4Tubs(G4String(sName), 0., pPg->tubR+dist1,
+				   pPg->tubL, 0.*deg, 360.*deg);  // <- CHECK 2.*dist2 HERE
+
+	sprintf(sName, "geTubsPolyICap%2.2d", nGe);
+	pPv->pIntCap = new G4IntersectionSolid(G4String(sName), pPv->pPolyCap, pPv->pTubsCap,
+					       G4Transform3D( rm, G4ThreeVector() ) );
+	
+	sprintf(sName, "geCapsuleVoidL%2.2d", nGe);
+	pPv->pDetL = new G4LogicalVolume( pPv->pIntCap, matHole, G4String(sName), 0, 0, 0 );
+
+	pPv->pDetVA = new G4VisAttributes( G4Color(0, 0, 0) );
 	pPv->pDetVA->SetForceWireframe(true);
 	pPv->pDetVA->SetVisibility(false);
 	pPv->pDetL->SetVisAttributes( pPv->pDetVA );
 
-	pPc = &capsO[nPg];  
-	sprintf(sName, "caPoly%2.2d", nGe);
-	pPc->pPoly  = new CConvexPolyhedron(G4String(sName), pPg->vertex);
-	for( nSid=0; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
-	  movePlane = pPc->pPoly->MovePlane( nSid, dist2 );
+	// Outer capsule volume (matWalls)
+	pPc = &capsO[nPg];
 	pPc->whichGe = nGe;
-	sprintf(sName, "geCapPolyL%2.2d", nGe);
-	pPc->pDetL = new G4LogicalVolume( pPc->pPoly, matWalls, G4String(sName), 0, 0, 0 );
-	//LR pPc->pDetVA  = new G4VisAttributes( G4Color(pPg->colx, pPg->coly, pPg->colz) );
-	pPc->pDetVA  = new G4VisAttributes( G4Color(0, 0, 0.5) );
+	
+	sprintf(sName, "geCapPolyO%2.2d", nGe);
+	pPc->pPolyCap = new CConvexPolyhedron(G4String(sName), pPg->vertex);
+	
+	for( G4int nSid=0; nSid<pPc->pPolyCap->GetnPlanes(); nSid++ )
+	  pPc->pPolyCap->MovePlane( nSid, dist2 );
+
+	// G4Tubs are defined with a half-length, so this is twice the crystal
+	// length along z -- plenty for pushing out the forward plane but
+	// ends at the right place in back.
+	sprintf(sName, "geTubsOCap%2.2d", nGe);
+	pPc->pTubsCap = new G4Tubs(G4String(sName), 0., pPg->tubR+dist2,
+				    pPg->tubL, 0.*deg, 360.*deg);
+
+	sprintf(sName, "geTubsPolyOCap%2.2d", nGe);
+	pPc->pIntCap = new G4IntersectionSolid(G4String(sName), pPc->pPolyCap, pPc->pTubsCap,
+					       G4Transform3D( rm, G4ThreeVector() ) );
+
+	sprintf(sName, "geCapsuleL%2.2d", nGe);
+	pPc->pDetL = new G4LogicalVolume( pPc->pIntCap, matWalls, G4String(sName), 0, 0, 0 );
+
+	pPc->pDetVA = new G4VisAttributes( G4Color(0, 0, 0.5) );
 	pPc->pDetVA->SetForceWireframe(true);
 	pPc->pDetL->SetVisAttributes( pPc->pDetVA );
 
 	new G4PVPlacement( 0, G4ThreeVector(), pPg->pDetL, G4String(sName), pPv->pDetL, false, 0);
 	new G4PVPlacement( 0, G4ThreeVector(), pPv->pDetL, G4String(sName), pPc->pDetL, false, 0);
+
       }
       else {
 	pPv = &capsO[nPg];  
