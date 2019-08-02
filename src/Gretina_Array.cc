@@ -1475,7 +1475,7 @@ void Gretina_Array::ConstructTheCapsules()
 	// ends at the right place in back.
 	sprintf(sName, "geTubsICap%2.2d", nGe);
 	pPv->pTubsCap = new G4Tubs(G4String(sName), 0., pPg->tubR+dist1,
-				   pPg->tubL, 0.*deg, 360.*deg);  // <- CHECK 2.*dist2 HERE
+				   pPg->tubL, 0.*deg, 360.*deg);
 
 	sprintf(sName, "geTubsPolyICap%2.2d", nGe);
 	pPv->pIntCap = new G4IntersectionSolid(G4String(sName), pPv->pPolyCap, pPv->pTubsCap,

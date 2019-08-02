@@ -85,7 +85,7 @@ void TrackerGammaHit::Print()
 	 << std::setw(12) << process
 	 << std::setw(3) << parentTrackID
 	 << std::setw(20) << creatorProcess
-	 << std::setw(3)  << detNumb
+	 << std::setw(4)  << detNumb
 	 << std::setw(3)  << segNumb
 	 << std::fixed << std::setprecision(2) << std::setw(10) << std::right
 	 << edep/keV
