@@ -96,10 +96,6 @@
   
   // Materials
 
-  G4Material* backWallMat = new G4Material("BackWallMaterial", 8.96*g/cm3, 1);
-  backWallMat->AddElement(elementCu, 1.);
-  myMaterials.push_back(backWallMat);
-
   G4Material* CD2 = new G4Material("CD2", 1.08*g/cm3, 2);
   CD2->AddElement(elementC, 1);
   CD2->AddElement(elementD, 2);

@@ -70,8 +70,7 @@ void Gretina_Array::InitData()
 
   matWallsName       = "Al";
 
-  matBackWallsName   = "BackWallMaterial";
-  //  matBackWallsName   = "Al";
+  matBackWallsName   = "Al";
 
   matHoleName        = "G4_Galactic";
 
