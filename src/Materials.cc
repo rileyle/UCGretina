@@ -161,6 +161,9 @@
   
   G4Material* Si = new G4Material("Si",      14., 28.0855*g/mole,  2.33*g/cm3);
   myMaterials.push_back(Si);
+
+  G4Material* Ti = new G4Material("Ti",      22., 47.90*g/mole,   4.506*g/cm3);
+  myMaterials.push_back(Ti);
   
   G4Material* Fe = new G4Material("Fe",      26., 55.85*g/mole,    7.87*g/cm3);
   myMaterials.push_back(Fe);
