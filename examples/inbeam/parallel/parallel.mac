@@ -2,14 +2,14 @@
 /Gretina/detector/enableCapsules
 /Gretina/detector/enableCryostats
 /Gretina/Shell full
+/Target/Material Be
+/Target/Thickness 2034.6 um  # 376 mg/cm^2
 /Target/Construct
 /Target/Sled
 /BeamTube/Construct
 /Gretina/update
 
 # Set reaction parameters ======================================================
-/Target/Material Be
-/Target/Thickness 2034.6 um  # 376 mg/cm^2
 /BeamIn/A 44
 /BeamIn/Z 16
 /BeamIn/KEu 100.0 MeV
