@@ -192,6 +192,8 @@ G4DynamicParticle* Outgoing_Beam::ReactionProduct()
 {
 
   //  G4cout << "Outgoing_Beam::ReactionProduct()" << G4endl;
+
+  //  G4cout << "targetExcitation = " << targetExcitation << G4endl;
     
   G4int Zout, Aout;
   G4double excitationEnergy = 0.;
