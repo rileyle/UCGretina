@@ -127,7 +127,7 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
     // as long it has already emitted its gamma(s)
     else if( ( volume1->GetName().contains("BeamTube")
 	       || volume1->GetName().contains("Chamber") )
-	     && aStep->GetTrack()->GetParticleDefinition()->GetParticleName().contains('[') ){
+	     && !aStep->GetTrack()->GetParticleDefinition()->GetParticleName().contains('[') ){
 
            // G4cout << "************************* SteppingAction: terminating track in "
       	   //   << volume1->GetName()

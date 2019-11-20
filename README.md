@@ -2,7 +2,7 @@
 
 ## Compile and install ##
 
-Install version [4.10.04.p03 of the Geant4 libraries](http://geant4.web.cern.ch/geant4/support/download.shtml). 
+Install version [4.10.05.p01 of the Geant4 libraries](http://geant4.web.cern.ch/geant4/support/download.shtml). 
 You will need the data files for low energy electromagnetic processes,
 photon evaporation, and radioactive decay.
 
@@ -14,7 +14,7 @@ GNUMakefile.
 Set up your environment (consider adding this to your `.bashrc`):
 
     $ source <Path to Geant4>/bin/geant4.sh
-    $ source <Path to Geant4>/share/Geant4-10.4.2/geant4make/geant4make.sh
+    $ source <Path to Geant4>/share/Geant4-10.5.1/geant4make/geant4make.sh
 
 Compile:
 
@@ -472,6 +472,15 @@ from which background gamma-rays are emitted.
 
 > Set the inner and outer radii of the background sphere 
 > (default: 3.0 m, 3.4 m). 
+
+### Gamma-Ray Angular Correlations (see also ./examples/sources/co60) ###
+
+In order to simulate angular correlations, the functionality must be
+activated in >geant4.10.3. Set the fCorrelatedGamma flag to true in
+
+    <PATH TO GEANT4.10>/source/processes/hadronic/models/de_excitation/management/src/G4DeexPrecoParameters.cc,
+
+recompile and reinstall geant4, and recompile UCGretina.
 
 ### Gamma-Ray Angular Distributions (see also ./examples/inbeam/angdist) ###
 

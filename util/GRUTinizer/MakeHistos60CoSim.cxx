@@ -84,14 +84,16 @@ void MakeHistograms(TRuntimeObjects& obj) {
   Int_t    energyNChannels = 4000;
   Double_t energyLlim = 0.;
   Double_t energyUlim = 4000.;
-
+  Double_t cosTheta  = -1;
+  Double_t mCosTheta = -1;
+  Double_t x1 = -1;
+  Double_t y1 = -1;
+  Double_t z1 = -1;
+  Double_t x2 = -1;
+  Double_t y2 = -1;
+  Double_t z2 = -1;
+  
   if(gretSim){
-    Double_t x1 = -1;
-    Double_t y1 = -1;
-    Double_t z1 = -1;
-    Double_t x2 = -1;
-    Double_t y2 = -1;
-    Double_t z2 = -1;
     for(int x=0; x<gretSim->Size(); x++){
       TGretSimHit hit = gretSim->GetGretinaSimHit(x);
       obj.FillHistogram("sim","emitted_energy",
@@ -117,10 +119,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	z2 = cos(hit.GetTheta());
       }
     }
-    Double_t cosTheta
+    cosTheta
       = (x1*x2+y1*y2+z1*z2)/(x1*x1+y1*y1+z1*z1)/(x2*x2+y2*y2+z2*z2);
     obj.FillHistogram("sim","emitted_delta",
-		      180, -1, 1.,
+		      100, -1, 1.,
 		      cosTheta);
   }
 
@@ -207,7 +209,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		      energyNChannels/8, energyLlim, energyUlim, mE,
 		      20, 0, 20, hit.NumberOfInteractions());
 
-    // Symmetrized gamma-gamma matrix
+    // Symmetrized gamma-gamma matrix and angular correlation
     for(int y=x+1; y<gretina->Size(); y++){
       TGretinaHit hit2 = gretina->GetGretinaHit(y);
       Double_t mE2 = measuredE(hit2.GetCoreEnergy());
@@ -217,8 +219,24 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogram("energy", "gamma_gamma",
 			energyNChannels/4, energyLlim, energyUlim, mE2,
 			energyNChannels/4, energyLlim, energyUlim, mE);
-    }
 
+      if( (mE > 1168. && mE < 1178. && mE2 > 1328. && mE2 < 1337.)
+	  || (mE2 > 1168. && mE2 < 1178. && mE > 1328. && mE < 1337.) ){
+	TVector3 r1 = hit.GetFirstIntPosition_2();
+	TVector3 r2 = hit2.GetFirstIntPosition_2();
+        mCosTheta = r1.Dot(r2)/r1.Mag()/r2.Mag();
+	obj.FillHistogram("position","delta",
+			  100, -1, 1.,
+			  mCosTheta);
+	obj.FillHistogram("position","cosTheta_mCosTheta",
+			  100, -1, 1.,
+			  cosTheta,
+			  100, -1, 1.,
+			  mCosTheta);
+      }
+
+    }
+    
     // Count segment fold
     int segment_fold = hit.NumberOfInteractions();
     for(int y=0; y < hit.NumberOfInteractions(); y++)

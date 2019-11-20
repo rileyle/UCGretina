@@ -2,8 +2,8 @@
 /Gretina/detector/enableCapsules
 /Gretina/detector/enableCryostats
 /Gretina/Shell full
-/Target/Material Be
-/Target/Thickness 2034.6 um  # 376 mg/cm^2
+/Target/Material Au
+/Target/Thickness 103.6 um  # 200 mg/cm^2
 /Target/Construct
 /Target/Sled
 /BeamTube/Construct
@@ -17,12 +17,12 @@
 /BeamIn/Focus/DX 4. mm
 /BeamIn/Focus/DY 8. mm
 
-/BeamOut/TargetA 9
-/BeamOut/TargetZ 4
+/BeamOut/TargetA 197
+/BeamOut/TargetZ 79
 /BeamOut/DA 0
 /BeamOut/DZ 0
-/BeamOut/LevelDataFile z16.a44.lvldata
-/BeamOut/ProjectileExcitation 2150 keV
+/BeamOut/LevelDataFile z79.a197.lvldata
+/BeamOut/TargetExcitation 547.5 keV
 /BeamOut/AngDistSigmaA 0.006 rad
 /BeamOut/AngDistSigmaB 0.006 rad
 /BeamOut/Update
@@ -41,5 +41,5 @@
 /Mode2/GretinaCoords
 /Mode2/S800KE 3.798 GeV
 #/Mode2/Print
-/Mode2/Filename s44_2150.dat
-/run/beamOn 1000
+/Mode2/Filename au197_548.dat
+/run/beamOn 100000
