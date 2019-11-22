@@ -10,8 +10,8 @@ Example fit with gamma-ray angular distributions
 	     transition lines in the level data file
 	     z16.a44.ad.lvldata.
 
-	     The script angDist.C plots the emitted angular
-	     distributions of the 1329 keV (a0,a2,a4 = 0, 0.3, 0.02)
-	     and 2150 keV (isotropic) transitions. 
+	     The script angDist.C plots the emitted angular 
+	     distributions of the 1329 keV (a0,a2,a4 = 0, 0.3, 0.02,
+	     red) and 2150 keV (isotropic, blue) transitions. 
 
 ================================================================================

@@ -43,13 +43,16 @@
 // -------------------------------------------------------------------
 
 #include "LevelManager.hh"
+#include "G4NuclearLevelData.hh"
+#include "G4ShellCorrection.hh"
 #include "G4HadronicException.hh"
+#include "G4Pow.hh"
 #include <iomanip>
 
 G4String G4LevelManager::fFloatingLevels[] = {
   "-", "+X", "+Y", "+Z", "+U", "+V", "+W", "+R", "+S", "+T", "+A", "+B", "+C"};
 
-G4LevelManager::G4LevelManager(size_t ntrans,
+G4LevelManager::G4LevelManager(G4int Z, G4int A, size_t ntrans,
                                const std::vector<G4double>& energies,
 			       const std::vector<G4int>& spin,
 			       const std::vector<const G4NucLevel*>& levels)
@@ -67,6 +70,27 @@ G4LevelManager::G4LevelManager(size_t ntrans,
     }
     //G4cout << "New G4LevelManager N= " << nTransitions << " " 
     //<< fLevelEnergy.size() << " <" << this << ">" << G4endl;
+  }
+  // J. Nucl. Sci. Tech. 31(2): 151-162 (1994)
+  fShellCorrection = G4NuclearLevelData::GetInstance()->
+    GetShellCorrection()->GetShellCorrection(A,Z);
+  G4double del = 12./std::sqrt((G4double)A);
+  G4int N = A - Z;
+  G4int In = N - (N/2)*2; 
+  G4int Iz = Z - (Z/2)*2;
+  G4double a13 = 1.0/G4Pow::GetInstance()->Z13(A);
+  if(In == 0 && Iz == 0) {
+    fPairingCorrection = 2*del;
+    fLevelDensity = 0.067946*A*(1.0 + 4.1277*a13);
+  } else if(In == 0 && Iz == 1) {
+    fPairingCorrection = del;
+    fLevelDensity = 0.053061*A*(1.0 + 7.1862*a13);
+  } else if(In == 1 && Iz == 0) {
+    fPairingCorrection = del;
+    fLevelDensity = 0.060920*A*(1.0 + 3.8767*a13);
+  } else {
+    fPairingCorrection = 0.0;
+    fLevelDensity = 0.065291*A*(1.0 + 4.4505*a13);
   }
 }
 
@@ -106,7 +130,7 @@ G4LevelManager::NearestLevelIndex(G4double energy, size_t index) const
 const G4String& G4LevelManager::FloatingType(size_t i) const
 {
 #ifdef G4VERBOSE
-  if(i > nTransitions) { PrintError(i, "Meta"); }
+  if(i > nTransitions) { PrintError(i, "FloatingType(idx)"); }
 #endif
   return fFloatingLevels[fSpin[i]/100000]; 
 }
@@ -116,10 +140,9 @@ void G4LevelManager::PrintError(size_t idx, const G4String& ss) const
 {
   G4String sss = "G4LevelManager::"+ss+"()";
   G4ExceptionDescription ed;
-  ed << "Index of a level " << idx << " > " 
-     << nTransitions << " (number of levels)";
-  G4Exception(sss,"had061",JustWarning,ed,"stop run");
-  throw G4HadronicException(__FILE__, __LINE__,"FATAL Hadronic Exception");
+  ed << "Index of a level " << idx << " >= " 
+     << nTransitions+1 << " (Nlevels) ";
+  G4Exception(sss,"had061",JustWarning,ed,"");
 }  
 #endif
 
