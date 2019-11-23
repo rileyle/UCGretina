@@ -475,12 +475,16 @@ from which background gamma-rays are emitted.
 
 ### Gamma-Ray Angular Correlations (see also ./examples/sources/co60) ###
 
-In order to simulate angular correlations, the functionality must be
-activated in >geant4.10.3. Set the fCorrelatedGamma flag to true in
+Starting With geant4.10.4, gamma-ray angular correlations are built
+into the `G4PhotonEvaporation/G4GammaTransition` classes. This
+functionality is disabled by default but is enabled in the UCGretina
+`PhysicsList`. The `./examples/sources/co60` example includes a
+simulation of the angular correlations in the 4 -> 2 -> 0 cascade in
+<SUP>60</SUP>Ni and also shows how to simulate isotropic distributions
+for comparison with correlated ones.
 
-    <PATH TO GEANT4.10>/source/processes/hadronic/models/de_excitation/management/src/G4DeexPrecoParameters.cc,
-
-recompile and reinstall geant4, and recompile UCGretina.
+_Important Note: the built-in gamma-ray angular correlation
+functionality is bypassed by `UCGretina_AD`._
 
 ### Gamma-Ray Angular Distributions (see also ./examples/inbeam/angdist) ###
 

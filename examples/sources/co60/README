@@ -1,5 +1,7 @@
 ================================================================================
 
+In order to simulate angular correlations, use geant4 version > 10.3.
+
 Realistic gamma-ray cascades from stationary sources can be simulated
 using the 
 
@@ -9,12 +11,6 @@ command. The macro file co60.mac illustrates this approach.
 Descriptions of transitions de-exciting states of the daughter nucleus
 (60Ni) are read from the level data file z28.a60.lvldata, which is
 provided with the PhotonEvaporationX.X data files.
-
-In order to simulate angular correlations, the functionality must be
-activated in >geant4.10.3. Set the fCorrelatedGamma flag to true in
-<PATH TO
-GEANT4.10>/source/processes/hadronic/models/de_excitation/management/src/G4DeexPrecoParameters.cc,
-recompile and reinstall geant4, and recompile UCGretina.
 
 The GRUTinizer histogram library
 ./util/GRUTinizer/MakeHistos60CoSim.cxx is provided. The
