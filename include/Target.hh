@@ -25,17 +25,19 @@ class Target
 
   G4LogicalVolume *expHall_log;
 
-  Target(G4LogicalVolume*,Materials*);
+  Target(Materials*);
   ~Target();
   
-  G4VPhysicalVolume *Construct();
+  G4VPhysicalVolume *Construct(G4LogicalVolume*);
   void setX(G4double);
   void setY(G4double);
   void setZ(G4double);
   void setMaterial(G4String);
   void setNStep(G4int);
   void setSourceFrame(G4String);
-  void setSled();
+  void setSled(){buildSled=true;}
+  void BuildSled();
+  
   void Report();
   G4LogicalVolume* GetTargetLog(){return Target_log;}
   G4Box* GetTarget(){return aTarget;}
@@ -146,6 +148,7 @@ private:
   G4int NStep;
 
   G4String sourceFrame;
+  bool buildSled;
 
 };
 

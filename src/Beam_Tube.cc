@@ -1,10 +1,9 @@
 #ifndef LHTARGET
 #include "Beam_Tube.hh"
 
-Beam_Tube::Beam_Tube(G4LogicalVolume* experimentalHall_log,Materials* mat)
+Beam_Tube::Beam_Tube(Materials* mat)
 {
   materials=mat;
-  expHall_log=experimentalHall_log;
   BTrmin = 3.0*2.54*cm - 0.058*2.54*cm;
   BTrmax = 3.0*2.54*cm;
   BTDz   = 40.65/2.*2.54*cm; 
@@ -27,8 +26,10 @@ Beam_Tube::Beam_Tube(G4LogicalVolume* experimentalHall_log,Materials* mat)
 Beam_Tube::~Beam_Tube()
 {;}
 //-----------------------------------------------------------------------------
-G4VPhysicalVolume* Beam_Tube::Construct()
+G4VPhysicalVolume* Beam_Tube::Construct(G4LogicalVolume* experimentalHall_log)
 {
+
+  expHall_log=experimentalHall_log;
 
   BeamTube = new G4Tubs("BeamTube",BTrmin,BTrmax,BTDz,BTSPhi,BTDPhi);
   

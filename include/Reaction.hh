@@ -2,6 +2,8 @@
 #ifndef Reaction_h
 #define Reaction_h 1
 
+#include <unordered_map>
+
 #include "G4ios.hh"
 #include "globals.hh"
 #include "G4VProcess.hh"
@@ -15,7 +17,13 @@
 #include "G4UserLimits.hh"
 #include "G4DynamicParticle.hh"
 #include "G4ParticleTable.hh"
+#include "G4NuclearPolarizationStore.hh"
+#include "G4Fragment.hh"
+#include "G4Clebsch.hh"
+
 #define  eps 0.00001
+
+class Reaction_Messenger;
 
 class Reaction : public G4VProcess 
 {
@@ -46,7 +54,7 @@ class Reaction : public G4VProcess
      virtual G4double AtRestGetPhysicalInteractionLength(
                              const G4Track& ,
 			     G4ForceCondition* 
-			    ){ return -1.0; };
+			    ){ return DBL_MAX; };
 			    
      //  no operation in  AtRestDoIt      
      virtual G4VParticleChange* AtRestDoIt(
@@ -70,12 +78,16 @@ class Reaction : public G4VProcess
 			     const G4Step& 
 			    ) {return NULL;};
 
+  void SetPopulation(G4int,G4double);
+
   private:
   
   // hide assignment operator as private 
-     Reaction& operator=(const Reaction&){return *this;};
+  Reaction& operator=(const Reaction&){return *this;};
 
   Outgoing_Beam* BeamOut;
+  Reaction_Messenger *theMessenger;
+  std::unordered_map<int,double> substates;
 };
 
 #endif

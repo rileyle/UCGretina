@@ -1,10 +1,11 @@
 #ifdef LHTARGET
 #include "Target_LH.hh"
 
-Target::Target(G4LogicalVolume* experimentalHall_log,Materials* mat)
+Target::Target(Materials* mat)
 {
   materials=mat;
-  expHall_log=experimentalHall_log;
+
+  buildSled=false;
 
   targetCellType = "thick";
 
@@ -56,8 +57,11 @@ Target::~Target()
 { delete target_limits;}
 
 //-----------------------------------------------------------------------------
-G4VPhysicalVolume* Target::Construct()
+G4VPhysicalVolume* Target::Construct(G4LogicalVolume* experimentalHall_log)
 {
+
+  expHall_log=experimentalHall_log;
+
   LHTarget = new G4AssemblyVolume();
 
   if(Greta)
@@ -86,6 +90,8 @@ G4VPhysicalVolume* Target::Construct()
   LHTargetRot.rotateZ(targetAngle);
 
   LHTarget->MakeImprint(expHall_log, *Pos, &LHTargetRot);
+
+  if(buildSled) BuildSled();
 
   return Target_phys;
 
@@ -1052,7 +1058,7 @@ void Target::setSourceFrame(G4String sF)
   G4cout<<"----> Source frame is set to "<<sourceFrame<< G4endl;                 
 }
 //-------------------------------------------------------------------
-void Target::setSled()
+void Target::BuildSled()
 {
   if(targetCellType != "notarget")
     G4cout<<"----> Warning: target sled specified with LH target. Proceeding with no sled. "<< G4endl;

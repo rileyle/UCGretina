@@ -45,6 +45,7 @@
 class DetectorConstruction;
 class PhysicsListMessenger;
 class G4VPhysicsConstructor;
+class PhysicsList_Messenger;
 
 #ifdef NEUTRONS
 // From LBE for neutrons
@@ -55,36 +56,42 @@ class G4StoppingPhysics;        // This builder encapsulate stopping processes
 
 class PhysicsList: public G4VModularPhysicsList
 {
-  public:
-    PhysicsList(DetectorConstruction*);
-   ~PhysicsList();
+public:
+  PhysicsList(DetectorConstruction*);
+  ~PhysicsList();
 
-    virtual void ConstructParticle();
-    virtual void ConstructProcess();
+  virtual void ConstructParticle();
+  virtual void ConstructProcess();
 
 #ifdef NEUTRONS
     // From LBE for neutrons
     virtual void ConstructHad();
 #endif
 
-    void SetOutgoingBeam(Outgoing_Beam *BO) {BeamOut = BO;}
-    void AddReaction();
+  void SetOutgoingBeam(Outgoing_Beam *BO) {BeamOut = BO;}
+  void AddReaction();
 
-    void AddPhysicsList(const G4String& name);
+  void AddPhysicsList(const G4String& name);
     
-    void AddDecay();
-    void AddRadioactiveDecay();
-    void AddStepMax();
+  void AddDecay();
+  void AddRadioactiveDecay();
+  void AddStepMax();
 
-    void GetRange(G4double);
+  void GetRange(G4double);
+
+  void SetGammaAngularCorrelations(bool);
+  void SetUsePolarizedPhysics(bool);
       
-  private:    
-    G4VPhysicsConstructor* fEmPhysicsList;
-    G4String               fEmName;
+private:    
+  G4VPhysicsConstructor* fEmPhysicsList;
+  G4String               fEmName;
     
-    DetectorConstruction* fDet;
+  DetectorConstruction* fDet;
 
-    Outgoing_Beam* BeamOut;
+  Outgoing_Beam* BeamOut;
+
+  PhysicsList_Messenger* theMessenger;
+  bool usePolar;
 
 #ifdef NEUTRONS
     // From LBE for neutrons

@@ -25,13 +25,11 @@ class LaBr
 
   G4LogicalVolume *expHall_log;
 
-  LaBr(G4LogicalVolume*,Materials*);
+  LaBr(Materials*);
   ~LaBr();
   
-  G4VPhysicalVolume *Construct();
-
+  G4VPhysicalVolume *Construct(G4LogicalVolume*);
   void MakeSensitive(TrackerGammaSD*);
-
   void setR(G4double);
   void setLength(G4double);
   void setMaterial(G4String);

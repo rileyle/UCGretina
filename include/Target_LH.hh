@@ -31,10 +31,10 @@ class Target
 
   G4LogicalVolume *expHall_log;
 
-  Target(G4LogicalVolume*,Materials*);
+  Target(Materials*);
   ~Target();
   
-  G4VPhysicalVolume *Construct();
+  G4VPhysicalVolume *Construct(G4LogicalVolume*);
   void ConstructBeamTube();
   G4VPhysicalVolume *Construct200mgCell();
   G4VPhysicalVolume *Construct50mgCell();
@@ -56,7 +56,8 @@ class Target
   void setMaterial(G4String);
   void setNStep(G4int);
   void setSourceFrame(G4String);
-  void setSled();
+  void setSled(){buildSled=true;}
+  void BuildSled();
   void SetGreta(){ Greta = true; }
   void setCutaway(){ Cutaway = true; }
   void Report();
@@ -72,6 +73,8 @@ class Target
 
 private:
   G4String targetCellType;
+
+  bool buildSled;
 
   G4double Target_thickness;
   G4double TargetDz;

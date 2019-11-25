@@ -1,10 +1,9 @@
 #ifndef LHTARGET
 #include "WU_Chamber.hh"
 
-WU_Chamber::WU_Chamber(G4LogicalVolume* experimentalHall_log,Materials* mat)
+WU_Chamber::WU_Chamber(Materials* mat)
 {
   materials=mat;
-  expHall_log=experimentalHall_log;
   BTrmin = 3.0*2.54*cm - 0.058*2.54*cm;
   BTrmax = 3.0*2.54*cm;
   BTDz=44.*cm; //LR (approx target to gate valve flange)
@@ -43,8 +42,10 @@ WU_Chamber::WU_Chamber(G4LogicalVolume* experimentalHall_log,Materials* mat)
 WU_Chamber::~WU_Chamber()
 {;}
 //-----------------------------------------------------------------------------
-G4VPhysicalVolume* WU_Chamber::Construct()
-{ //Building the hemispheres
+G4VPhysicalVolume* WU_Chamber::Construct(G4LogicalVolume* experimentalHall_log)
+{
+  expHall_log=experimentalHall_log;
+  //Building the hemispheres
   Hemisphere = new G4Sphere("Hemisphere",pRmin,pRmax,pSPhi,pDPhi,pSTheta,pDTheta);
 
   G4Tubs* Cylinder = new G4Tubs( "Cylinder", 0., 1.1*pRmax, smallCap, 0.*deg, 360.*deg);

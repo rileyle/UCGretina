@@ -27,10 +27,10 @@ class WU_Chamber
 
   G4LogicalVolume *expHall_log;
 
-  WU_Chamber(G4LogicalVolume*,Materials*);
+  WU_Chamber(Materials*);
   ~WU_Chamber();
   
-  G4VPhysicalVolume *Construct();
+  G4VPhysicalVolume *Construct(G4LogicalVolume*);
   void Report();
   
     private:
@@ -73,9 +73,7 @@ class WU_Chamber
 
   //default position
   G4RotationMatrix NoRot;
-  G4RotationMatrix Rot;
   G4RotationMatrix CylRot;
-  G4RotationMatrix BoxRot;
   G4ThreeVector *Pos0;
 
   //the tube

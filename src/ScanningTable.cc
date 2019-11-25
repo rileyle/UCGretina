@@ -1,13 +1,11 @@
 #ifdef SCANNING
 #include "ScanningTable.hh"
 
-ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,
-			     Materials* mat)
+ScanningTable::ScanningTable(Materials* mat)
 {
   CADModelPath = "./cadModels/";
 
   materials=mat;
-  expHall_log=experimentalHall_log;
 
   Pos0 = new G4ThreeVector(0., 0., 44.45*mm); // center flange @ (x,z) = (0,0)
   Pos2 = new G4ThreeVector(0., 0., -8.80*mm);
@@ -58,9 +56,9 @@ ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,
 ScanningTable::~ScanningTable()
 {;}
 //-----------------------------------------------------------------------------
-void ScanningTable::Construct()
+void ScanningTable::Construct(G4LogicalVolume* experimentalHall_log)
 {
-
+  expHall_log=experimentalHall_log;
   //--- First the physical cart: 8020 frame, base, top and back panel ---------
 
   G4cout << "Constructing the LBNL scanning table." << G4endl;
