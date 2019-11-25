@@ -82,18 +82,22 @@
 
   // Germanium defined via its isotopes
   G4Element* elGe = new G4Element("Germanium", "Ge", 5);
-  elGe->AddIsotope(Ge70, 0.2123);
-  elGe->AddIsotope(Ge72, 0.2766);
-  elGe->AddIsotope(Ge73, 0.0773);
-  elGe->AddIsotope(Ge74, 0.3594);
-  elGe->AddIsotope(Ge76, 0.0744);
+  elGe->AddIsotope(Ge70, 0.2057);
+  elGe->AddIsotope(Ge72, 0.2745);
+  elGe->AddIsotope(Ge73, 0.0775);
+  elGe->AddIsotope(Ge74, 0.3650);
+  elGe->AddIsotope(Ge76, 0.0773);
+
+  // Germanium without 74Ge
+  // G4Element* elGe = new G4Element("Germanium", "Ge", 4);
+  // elGe->AddIsotope(Ge70, 0.3239);
+  // elGe->AddIsotope(Ge72, 0.4323);
+  // elGe->AddIsotope(Ge73, 0.1220);
+  // elGe->AddIsotope(Ge76, 0.1217);
+
   myElements.push_back(elGe);
   
   // Materials
-
-  G4Material* backWallMat = new G4Material("BackWallMaterial", 8.96*g/cm3, 1);
-  backWallMat->AddElement(elementCu, 1.);
-  myMaterials.push_back(backWallMat);
 
   G4Material* CD2 = new G4Material("CD2", 1.08*g/cm3, 2);
   CD2->AddElement(elementC, 1);
@@ -160,6 +164,9 @@
   
   G4Material* Si = new G4Material("Si",      14., 28.0855*g/mole,  2.33*g/cm3);
   myMaterials.push_back(Si);
+
+  G4Material* Ti = new G4Material("Ti",      22., 47.90*g/mole,   4.506*g/cm3);
+  myMaterials.push_back(Ti);
   
   G4Material* Fe = new G4Material("Fe",      26., 55.85*g/mole,    7.87*g/cm3);
   myMaterials.push_back(Fe);

@@ -93,21 +93,28 @@ G4VPhysicalVolume* Target::Construct()
 //-----------------------------------------------------------------------------
 void Target::ConstructBeamTube(){
 
+  G4double Phi0 = 0.*deg;
+  G4double dPhi = 360.*deg;
+  if(Cutaway){
+    Phi0 = -90.*deg;
+    dPhi = 180.*deg;
+  }
+
   // Beam line segment
 
   G4Tubs* BeamTube0 = new G4Tubs("BeamTube0", BeamTubeRmin, BeamTubeRmax, 
-				BeamTubeDz, 0.*deg, 360.*deg); 
+				BeamTubeDz, Phi0, dPhi); 
   G4Tubs* BeamTee0 = new G4Tubs("BeamTee0", BeamTeeRmin, BeamTeeRmax, 
-				BeamTeeDz, 0.*deg, 360.*deg); 
+				BeamTeeDz, Phi0, dPhi); 
 
   G4Tubs* BeamTubeCutout = new G4Tubs("BeamTubeCutout", 0., BeamTeeRmax, 
-				      BeamTeeDz, 0.*deg, 360.*deg); 
+				      BeamTeeDz, Phi0, dPhi); 
 
   G4RotationMatrix BeamTeeRot = NoRot;
   BeamTeeRot.rotateX(90.0*deg);
 
   G4Tubs* BeamTeeCutout = new G4Tubs("BeamTeeCutout", 0., BeamTubeRmin, 
-				     BeamTubeDz, 0.*deg, 360.*deg); 
+				     BeamTubeDz, Phi0, dPhi); 
 
   G4SubtractionSolid* BeamTube 
     = new G4SubtractionSolid("BeamTube", BeamTube0, BeamTubeCutout,
@@ -361,19 +368,23 @@ G4VPhysicalVolume* Target::Construct200mgCell(){
 
   // The standard lH2 density doesn't apply here, so we have to set it.
   G4String name=TargetMaterial->GetName();
-  G4double Z=TargetMaterial->GetZ();
-  G4double A=TargetMaterial->GetA();
-  TargetMaterial=new G4Material(name, Z,A,targetDensity);
 
+  G4Colour blue (0.0,0.0,1.0); 
+  G4VisAttributes* Vis = new G4VisAttributes(blue);
+
+  if(name == "G4_Galactic"){
+    Vis->SetVisibility(false);
+  } else {
+    G4double Z=TargetMaterial->GetZ();
+    G4double A=TargetMaterial->GetA();
+    TargetMaterial=new G4Material(name, Z, A, targetDensity);
+    Vis->SetVisibility(true);
+    Vis->SetForceSolid(true);
+  }
   Target_log = new G4LogicalVolume(aTarget,TargetMaterial,"Target_log",0,0,0);
   target_limits= new G4UserLimits();
   target_limits->SetMaxAllowedStep(Target_thickness/NStep);
   Target_log->SetUserLimits(target_limits);
-
-  G4Colour blue (0.0,0.0,1.0); 
-  G4VisAttributes* Vis = new G4VisAttributes(blue);
-  Vis->SetVisibility(true);
-  Vis->SetForceSolid(true);
 
   Target_log->SetVisAttributes(Vis);
 
@@ -964,20 +975,13 @@ void Target::Report()
 //---------------------------------------------------------------------
 void Target::setMaterial(G4String materialName)
 {
+  
   if(materialName == "G4_Galactic" ||
      materialName == "vacuum"){
-
-    Target_log->SetMaterial(vacuum);
-    G4cout<<"----> Target material set to     "<<Target_log->GetMaterial()->GetName()<< G4endl;
-
-    G4Colour blue (0.0,0.0,1.0); 
-    G4VisAttributes* Vis = new G4VisAttributes(blue);
-    Vis->SetVisibility(false);
-
-    Target_log->SetVisAttributes(Vis);
-
+    TargetMaterial = vacuum;
+    G4cout<<"----> Target material set to     "<<TargetMaterial->GetName()<< G4endl;
   } else {
-    G4cout<<"----> Warning: User can't set the material of the LH Target to anything other than G4_Galactic. Ignoring Target::setMaterial("<< materialName << ")."<<G4endl;
+    G4cout<<"----> Warning: User can't set the material of the LH Target to anything other than G4_Galactic or vacuum. Ignoring Target::setMaterial("<< materialName << ")."<<G4endl;
   }
 }
 //-------------------------------------------------------------------

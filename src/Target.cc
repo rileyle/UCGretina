@@ -9,7 +9,7 @@ Target::Target(G4LogicalVolume* experimentalHall_log,Materials* mat)
   Target_side_x=50*mm;
   Target_side_y=50*mm;
   Target_thickness=0.1*mm;
-  TargetMaterial = materials->FindMaterial("G4_Galactic");
+  TargetMaterialName = "G4_Galactic";
 
   Pos = new G4ThreeVector(0.,0.,0.);
   Rot = G4RotationMatrix::IDENTITY;
@@ -28,6 +28,8 @@ Target::~Target()
 G4VPhysicalVolume* Target::Construct()
 {
 
+  TargetMaterial = materials->FindMaterial(TargetMaterialName);
+  
   aTarget = new G4Box("target",Target_side_x/2.,Target_side_y/2.,Target_thickness/2.);
 
   Target_log = new G4LogicalVolume(aTarget,TargetMaterial,"Target_log",0,0,0);
@@ -54,25 +56,26 @@ G4VPhysicalVolume* Target::Construct()
 //-----------------------------------------------------------------------------
 void Target::setX(G4double X)
 {
-   Target_side_x=X;
-   aTarget->SetXHalfLength(Target_side_x/2.);
-   G4cout<<"----> Target side X is set to "<<G4BestUnit(2.*aTarget->GetXHalfLength(),"Length")<<G4endl;
+
+  Target_side_x=X;
+  G4cout<<"----> Target side X is set to "<<G4BestUnit(Target_side_x,"Length")<<G4endl;
+
 }
 //-----------------------------------------------------------------------------
 void Target::setY(G4double Y)
 {
-   Target_side_y=Y;
-   aTarget->SetYHalfLength(Target_side_y/2.);
-   G4cout<<"----> Target side Y is set to "<<G4BestUnit(2.*aTarget->GetYHalfLength(),"Length")<<G4endl;
+
+  Target_side_y=Y;
+   G4cout<<"----> Target side Y is set to "<<G4BestUnit(Target_side_y,"Length")<<G4endl;
+
 }
 //-----------------------------------------------------------------------------
 void Target::setZ(G4double Z)
 {
-   Target_thickness=Z;
-   aTarget->SetZHalfLength(Target_thickness/2.);
-   target_limits->SetMaxAllowedStep(Target_thickness/NStep);
-   Target_log->SetUserLimits(target_limits);
-   G4cout<<"----> Target thickness is set to "<<G4BestUnit(2.*aTarget->GetZHalfLength(),"Length")<<G4endl;
+
+  Target_thickness=Z;
+  G4cout<<"----> Target thickness is set to "<<G4BestUnit(Target_thickness,"Length")<<G4endl;
+
 }
 //-----------------------------------------------------------------------------
 void Target::setNStep(G4int n)
@@ -96,21 +99,9 @@ void Target::Report()
 //---------------------------------------------------------------------
 void Target::setMaterial(G4String materialName)
 {
-  // search the material by its name 
-  TargetMaterial = materials->FindMaterial(materialName);  
-  Target_log->SetMaterial(TargetMaterial);
-  G4cout<<"----> Target material set to     "<<Target_log->GetMaterial()->GetName()<< G4endl;        
 
-  G4Colour blue (0.0, 0.0, 1.0); 
-  G4VisAttributes* Vis_6 = new G4VisAttributes(blue);
-  if(TargetMaterial->GetName() == "G4_Galactic"){
-    Vis_6->SetVisibility(false);
-  } else {
-    Vis_6->SetVisibility(true);
-    Vis_6->SetForceSolid(true);
-  }
-
-  Target_log->SetVisAttributes(Vis_6);
+  TargetMaterialName = materialName;
+  G4cout<<"----> Target material set to     "<<materialName<< G4endl;
          
 }
 //-------------------------------------------------------------------

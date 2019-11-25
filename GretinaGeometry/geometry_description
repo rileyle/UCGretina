@@ -1,0 +1,81 @@
+AGATA Simulation Code - Geometry description
+by Enrico Farnea
+Version 4.3.0, November 27th, 2004
+
+Modified to describe UCGretina
+
+
+The code in the present version is suited to handle the proposed configurations for the AGATA and GRETA arrays, namely arrangements of clusters of encapsulated coaxial detectors with irregular shapes (grouped into the same cryostat). In order to obtain the maximal flexibility needed for geometry optimization, the relevant parameters are not encoded in the program, rather they are read from formatted ASCII files. The sequence of operations performed by the program to actually build the array is the following:
+
+   1. Construction of the irregular convex polyhedra corresponding to the Germanium crystals; construction of the actual crystal shape through the intersection with a cylinder.
+   2. Generation of the encapsulation through the expansion of the original polyhedra (using the MovePlane method provided by the CConvexPolyhedron class).
+   3. Construction of the clusters: the clusters are obtained using a G4VAssemblyVolume object, where the individual encapsulated detectors are placed (each one with a different G4Transform transformation, obtained through a rotation followed by a traslation) together with the cryostat walls. The user is given the option, when compiling the code, to provide the cryostat walls relative to the cluster reference frame or relative to the crystals reference frames; in the latter case, the same transformations as the crystals will be applied.
+   4. Construction of the array: the clusters are placed using the MakeImprint method provided by G4VAssemblyVolume, each one using a different G4Transform transformation, obtained through a rotation followed by a traslation.
+
+Five files are required to build the full geometry; the default names are the following:
+
+   1. asolid: description of the detectors
+   2. aclust: description of the clusters
+   3. awalls: description of the cryostat walls
+   4. aeuler: transformations needed to place the clusters
+   5. aslice: description of the segmentation
+
+In the following, the content of each file will be described.
+
+asolid
+The coordinates (in mm) of the vertice for each crystal shape are given in this file. The polyhedra are assumed to have two parallel faces perpendicular to the z axis, of which the first one lying in the xy plane (z=0). The dimensions in mm of a cylinder having the z axis as its axis are given, in a way that the final crystal shape is obtained by intersecting the polyhedron with the cylinder. Two passivated areas can be placed at the back face of the detector and around the coaxial hole; their thickness is also given in this file, together with the crystal-encapsulation spacing and the encapsulation thickness.
+The format of the file is the following. For each shape, a series of lines will be included:
+
+     Shape #           nSides          Point#            x y z        x' y' z'
+
+where Shape # is the kind of crystal shape, corresponding to a prism with two parallel faces each having nSides sides; the line corresponds to point Point# which has coordinates (x y z) in the first face and (x' y' z') in the second. Additional information is encoded in other lines which can be distinguished having "0" instead of nSides:
+
+    Shape#              0    0     holeR    cylR     cylL     cylX cylY cylZ
+    Shape#              0    1     holeL    thickB   thickC   capS   capT   thickO
+    Shape#              0    2     colX    colY   colZ   0. 0. 0.
+
+Where the cylinder has radius cylR and length cylL and is intersected with the polyhedron through a traslation (cylX cylY cylZ); the coaxial hole has a radius holeR and is (cylL-holeL) long. The passivated areas are thickB (back), thickC (coaxial), and thickO (outer) thick. The crystal-encapsulation spacing is capS and the capsule is capT thick; tol is a mechanical tolerance. The RGB color components for visualization are (colX colY colZ).
+
+aclust
+The transformations needed to place the detectors within the cluster are given as composition of a rotation and a traslation. The rotation is obtained as following:
+
+   1. rotation R1 of an angle psi around the z axis
+   2. rotation R2 of an angle theta around the y axis
+   3. rotation R3 of an angle phi around the z axis
+
+The actual rotation is obtained as the product R = R3 R2 R1. The full transformation is obtained as T R, that is rotation followed by a traslation. The file contains the following information for each crystal:
+
+   Cluster #     Shape#    order    psi theta phi    x y z
+
+where Shape# is the same as defined in asolid, the angles are given in degrees and the distances in mm.
+
+aeuler
+The transformations needed to place the clusters are given as composition of a rotation and a traslation as discussed above. For each cluster the following information is provided:
+
+  order   Cluster#   psi theta phi  x y z
+
+where Cluster# is the same as defined in aclust.
+
+awalls
+Each wall composing the cryostat is described in a similar way as the polyhedra in asolid, namely:
+
+  Cluster#   Shape#   Wall#   dummy     nSides    order    x y z     x' y' z'
+
+where Cluster# is the same as given in aclust and Shape# is the same as given in asolid.
+
+aslices
+The segments are constructed as union of many convex polyhedra, obtained by division of the original polyhedron. It is possible to consider the same number of slices parallel to the faces for all of the solids; in this case, the file will look like this:
+
+       0
+     nSlices
+
+In order to emulate the actual segment shape as given by the electric field calculation, it is possible to consider subdivisions of the original polyhedra leading to slices non-parallel to the faces. In this case the file will look like this:
+
+     1
+   Shape#   zNext(inner)   zNext(outer)
+
+where zNext(inner,outer) is the thickness of the "slice" (in the z direction) respectively at the crystal axis and at the outer surface (where the segmentation is drawn parallel to the front face).
+
+
+
+

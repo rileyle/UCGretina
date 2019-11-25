@@ -2,7 +2,7 @@
 
 ## Compile and install ##
 
-Install version [4.10.04.p02 of the Geant4 libraries](http://geant4.web.cern.ch/geant4/support/download.shtml). 
+Install version [4.10.05.p01 of the Geant4 libraries](http://geant4.web.cern.ch/geant4/support/download.shtml). 
 You will need the data files for low energy electromagnetic processes,
 photon evaporation, and radioactive decay.
 
@@ -14,7 +14,7 @@ GNUMakefile.
 Set up your environment (consider adding this to your `.bashrc`):
 
     $ source <Path to Geant4>/bin/geant4.sh
-    $ source <Path to Geant4>/share/Geant4-10.4.2/geant4make/geant4make.sh
+    $ source <Path to Geant4>/share/Geant4-10.5.1/geant4make/geant4make.sh
 
 Compile:
 
@@ -36,7 +36,16 @@ To use the liquid hydrogen target:
 
     $ make LHTARGET=1
 
-(produces the binary UCGretina_LH)
+(produces the binary UCGretina_LH, can be compiled with AD=1 as well
+to produce the binary UCGretina_LH_AD)
+
+To activate neutron-related processes in the physics list (required for
+the `neutron` source type:
+
+    $ make NEUTRONS=1
+	
+(does not affect the executable name, can be used with any of the
+above flags)
 
 Executables are automatically installed in
 
@@ -58,24 +67,46 @@ packages.
 
 ### Geometry ###
 
+Five text files present in the working directory in which `UCGretina`
+is run determine the geometry of the crystals (`asolid`), including
+coaxial and back dead layers, the segmentation of crystals for readout
+(`aslice`), the assembly of crystals into quads (`acluster`), the
+aluminum vacuum jacket surrounding the crystals in each quad
+(`awalls`), and the placement of modules into the array
+(`aeuler`). The detector construction code is a modified version of
+the `AgataDetectorArray` class in the AGATA simulation code. The file
+`./GretinaGeometry/geometry_description_agata` describes the geometry
+file formats.
+
+Geometry files for several array configurations are provided in the
+`./GretinaGeometry` directory. The bash script `change_geometry.sh` is
+provided to create soft links in the current working directory to the
+geometry files with the path and root name supplied as a command line
+argument. For example,
+
+    $ ./change_geometry.sh <PATH TO GretinaGeometry>/GretinaNSCL/G120C4
+
+creates links to the 7-quad configuration used in the 
+GRETINA commissioning at the NSCL.
+
 Optional commands for setting target parameters:
 
     /Target/Material <material name>
-
+    
     /Target/X_length <double> <unit>
-
+    
     /Target/Y_length <double> <unit>
-
+    
     /Target/SetPosition_X <double> <unit>
-
+    
     /Target/SetPosition_Y <double> <unit>
-
+    
     /Target/SetPosition_Z <double> <unit>
-
+    
     /Target/Thickness <double> <unit>
-
+    
     /Target/ScaleDensity <double>
-
+    
     /Target/Sled
 
 Mandatory command for building a target/source frame:
@@ -85,9 +116,9 @@ Mandatory command for building a target/source frame:
 Optional commands for setting beam-tube geometry:
 
     /BeamTube/R_min <double> <unit>
-
+    
     /BeamTube/R_max <double> <unit>
-
+    
     /BeamTube/Length <double> <unit>
 
 Mandatory command for building the beam tube:
@@ -108,15 +139,15 @@ and 1.5 mm wall thickness):
 Optional commands for setting GRETA chamber geometry:
 
     /GretaChamber/R_min <double> <unit>
-
+    
     /GretaChamber/R_max <double> <unit>
 
 Optional commands for including GRETINA-related dead material:
 
     /Gretina/detector/enableCapsules
-
+    
     /Gretina/detector/enableCryostats
-
+    
     /Gretina/Shell < full || north || south || Greta || GretaLH || Greta_North || Greta_South || GretaLH_North || GretaLH_South >
 
 Optional command to omit the GRETINA detectors:
@@ -161,9 +192,9 @@ Optional commands related to the incoming beam:
 > file with format: 
 
 >       <Minimum DTA [%]> <Maximum DTA [%]> <DTA bin width [%]> 
->       <Channel 1 counts> 
->       <Channel 2 counts>
->       <Channel 3 counts>
+>       <Bin 1 counts> 
+>       <Bin 2 counts>
+>       <Bin 3 counts>
 >       ...
 
 > If this command is present, the incoming beam energy is set by
@@ -173,37 +204,43 @@ Optional commands related to the incoming beam:
 > momentum acceptance parameter should be set to zero: `/BeamIn/Dpp 0`.)
 
     /BeamIn/Focus/X <double> <unit>
-
+    
     /BeamIn/Focus/Y <double> <unit>
 
 > Offsets of the emission point of the incoming beam. (Z defaults to
 > -50 cm. If you change this, make sure it is upstream of the target!)
 
     /BeamIn/Focus/DX <double> <unit>
-
+    
     /BeamIn/Focus/DY <double> <unit>
 
 > Horizontal and vertical widths of the beam spot at the emission
 > point (not on target)
 
     /BeamIn/Focus/Ata0 <double> <unit>
-
+    
     /BeamIn/Focus/Bta0 <double> <unit>
 
 > Direction of the incoming beam (dispersive and nondispersive angles,
 > respectively)
 
     /BeamIn/Focus/maxAta <double> <unit> 
-
+    
     /BeamIn/Focus/maxBta <double> <unit>
 
 > Angular divergences of the incoming beam in the dispersive and
 > nondispersive directions, respectively.
 
+    /BeamIn/Excitation <double> <unit>
+
+> Excitation energy of the incoming beam. This generally only makes
+> sense in simulations of the the gamma decay of stationary excited
+> nuclei, for which the `/BeamOut/Source` command is present. 
+
 Mandatory commands related to the outgoing beam:
 
     /BeamOut/DA <int> 
-
+    
     /BeamOut/DZ <int>
 
 > Changes in mass number and atomic number of the reaction. The
@@ -211,7 +248,7 @@ Mandatory commands related to the outgoing beam:
 > Z+DZ)
 
     /BeamOut/TargetA <int>
-
+    
     /BeamOut/TargetZ <int>
 
 > Mass number and charge number of the target nucleus.
@@ -257,14 +294,14 @@ Optional commands related to the outgoing reaction product:
 >       <Channel 3 differential cross section [arbitrary units]>
 >       ...
 
-> If this file is presnet, the 2-body reaction will draw from this
+> If this file is present, the 2-body reaction will draw from this
 > distribution to determine the scattering-angle for each event. The
 > minimum and maximum scattering angles read from this file supersede
 > values set with the `/BeamOut/ThetaMin` and `/BeamOut/ThetaMax`
 > commands.
 
     /BeamOut/AngDistSigmaA <double> <unit>
-
+    
     /BeamOut/AngDistSigmaB <double> <unit>
 
 > Angular spreads of the lab-frame scattering angle distribution of
@@ -275,7 +312,7 @@ Optional commands related to the outgoing reaction product:
 > with the `/BeamOut/XsectFile` command.
 
     /BeamOut/ThetaMin <double> <unit>
-
+    
     /BeamOut/ThetaMax <double> <unit>
 
 > Limits of the scattering angle distribution used in the 2-body
@@ -297,20 +334,21 @@ Optional commands related to the outgoing reaction product:
 Mandatory commands
 
     /Experiment/RunSource
-
+    
     /Experiment/Source/Set <type>
 
 > Currently implemented types: `eu152`, `cs137`, `co56`, `co60`, 
 > `ra226`, `am241`, `photopeaks`, `eu152_peaks`, `co56_peaks`, 
-> `ra226`, `au`, `white`, `simple`
+> `ra226`, `au`, `white`, `simple`, `neutron`
 
 > The simple source type emits gamma rays of a single energy (set with
 > the `/Experiment/Source/setEnergy` command) 
 
 > The white source type emits gamma rays in a uniform energy
-> distribution between 100 keV and 10 MeV. These limits can be set
-> with the `/Experiment/Source/setWhiteLowE` and
-> `/Experiment/Source/setWhiteHighE` commands.
+> distribution set with the `/Experiment/Source/setWhiteLowE` and
+> `/Experiment/Source/setWhiteHighE` commands. The multiplicity
+> of the white source is set with the
+> `/Experiment/Source/setMultiplicity` command.
 
 > `eu152_peaks`, `co56_peaks`, and `photopeaks` sources produce 
 > selected gamma-rays from <SUP>152</SUP>Eu, <SUP>56</SUP>Co, and both, 
@@ -324,40 +362,82 @@ Mandatory commands
 > because these simulated sources emit a single gamma-ray per event,
 > while some gamma rays from these sources are emitted in cascades._
 
+> The `neutron` source type emits neutrons instead of gamma rays,
+> functioning in all other ways like the `simple` gamma-ray source.
+
 Optional commands
 
     /Experiment/Source/setEnergy <double> <unit>
 
-> Set the energy of the "simple" source type
+> Energy of the `simple` and `neutron` source types
 
     /Experiment/Source/setX <double> <unit>
     /Experiment/Source/setY <double> <unit>
     /Experiment/Source/setZ <double> <unit>
 
-> Set the position of the source.
+> Position of the source.
 
     /Experiment/Source/setR <double> <unit>
 
-> Set the radius of the source disk. 
+> Radius of the source disk. 
+
+    /Experiment/Source/setDX <double> <unit>
+	/Experiment/Source/setDY <double> <unit>
+
+> Horizontal (nondispersive) and vertical (dispersive) widths of a 
+> rectangular source. These override the `/Experiment/Source/setR` 
+> command.
+
+    /Experiment/Source/setSigmaX <double> <unit>
+	/Experiment/Source/setSigmaY <double> <unit>
+
+> Horizontal (nondispersive) and vertical (dispersive) sigma 
+> parameter of a Gaussian distribution of emission points. These 
+> override the `/Experiment/Source/setR` command. 
+
+> Note: The setDX, setDY and setSigmaX, setSigmaY can be mixed (to
+> give a flat dispersive and Gaussian nondispersive distribution of
+> emission points, e.g.).
 
     /Experiment/Source/CollimationAngle <double> <unit>
 
-> Set the angular spread of the collimated beam (about the collimation
+> Angular spread of the collimated beam (about the collimation
   direction).
 
     /Experiment/Source/CollimationDirection <double> <double> <double>
 
-> Set the X, Y, and Z components of a vector specifying the direction
-> of the collimated beam. 
+> X, Y, and Z components of a vector specifying the direction of the
+> collimated beam. 
 
-> (The above position, radius, and collimation commands have no effect
-> with the "white", "background", "bgwhite", and "muon" source types.)
+   /Experiment/Source/ThetaFile <filename>
+
+> File name for the theta distribution of the emitted particles. This 
+> is a text file with format: 
+
+>       <Minimum theta [rad]> <Maximum theta [rad]> <theta bin width [rad]> 
+>       <Bin 1 counts> 
+>       <Bin 2 counts>
+>       <Bin 3 counts>
+>       ...
+
+> If this command is present, the direction of each emitted particle is
+> set by drawing randomly from the given theta distribution.
+
+> (The above commands setting the position, radius, collimation, and 
+> theta distribution have no effect with the "white", "background", 
+> "bgwhite", and "muon" source types.)
 
     /Experiment/Source/setWhiteLowE  <double> <unit>
-
+    
     /Experiment/Source/setWhiteHighE <double> <unit>
 
-> Set the limits of the energy distribution of the "white" source type
+> Energy range of a flat distribution for the `white` and `bgwhite`
+> source types (also work with `simple` and `neutron` source types,
+> superseding setEnergy)
+
+    /Experiment/Source/setMultiplicity <int>
+
+> Multiplicity of the "white" and "bgwhite" source types
 
     /Target/sourceFrame <frame type>
 
@@ -370,7 +450,7 @@ Optional commands
 Mandatory commands for running background simulations
 
     /Experiment/RunSource
-
+    
     /Experiment/Source/Set < background || bgwhite || muon >
 
 > The `background` source type emits several gamma rays
@@ -387,11 +467,24 @@ from which background gamma-rays are emitted.
 > Set material for the background sphere (default: `G4_Galactic`).
 
     /BackgroundSphere/R_min <double> <unit>
-
+    
     /BackgroundSphere/R_max <double> <unit>
 
 > Set the inner and outer radii of the background sphere 
 > (default: 3.0 m, 3.4 m). 
+
+### Gamma-Ray Angular Correlations (see also ./examples/sources/co60) ###
+
+Starting With geant4.10.4, gamma-ray angular correlations are built
+into the `G4PhotonEvaporation/G4GammaTransition` classes. This
+functionality is disabled by default but is enabled in the UCGretina
+`PhysicsList`. The `./examples/sources/co60` example includes a
+simulation of the angular correlations in the 4 -> 2 -> 0 cascade in
+<SUP>60</SUP>Ni and also shows how to simulate isotropic distributions
+for comparison with correlated ones.
+
+_Important Note: the built-in gamma-ray angular correlation
+functionality is bypassed by `UCGretina_AD`._
 
 ### Gamma-Ray Angular Distributions (see also ./examples/inbeam/angdist) ###
 
@@ -406,6 +499,10 @@ gamma-ray angular distribution
 (theta relative to the beam axis) appended to the end of each of 
 the lines describing transitions.
 
+_Important Note: the built-in gamma-ray angular correlations are 
+bypassed entirely in this version of the code. The directions of 
+Gamma rays emitted in cascades are completely uncorrelated._
+
 ### LBL Scanning Table (see also ./examples/scan) ###
 
 (`UCGretina_Scan` only)
@@ -413,7 +510,7 @@ the lines describing transitions.
 _The geometries specified in `./GretinaGeometry/Scan0`, 
 `./GretinaGeometry/Scan1`, `./GretinaGeometry/Scan2`, and 
 `./GretinaGeometry/Scan3` orient the GRETINA module such that the 
-corresponding crystal is centered on the slits._
+corresponding crystal is centered on the slits.
 
 Mandatory command for building the scanning table:
 
@@ -432,9 +529,13 @@ Optional commands for the scanning table:
 
 > Construct the scanning table frame and GRETINA mount.
 
+    /ScanningTable/IncludeSlits
+
+> Construct the slits.
+
     /ScanningTable/IncludeSlitMount
 
-> Construct the scanning table frame and GRETINA mount.
+> Construct the slit mount.
 
     /ScanningTable/IncludeCollimator
 
@@ -456,18 +557,23 @@ Optional commands for the scanning table:
 
 > Construct the BGO anti-Compton shields.
 
-    /ScanningTable/SetXShift <double> <unit>
+    /ScanningTable/SetControllerX <double> <unit>
+    
+    /ScanningTable/SetControllerY <double> <unit>
 
-    /ScanningTable/SetYShift <double> <unit>
+> Set the horizontal positions of the source collimator relative to
+> the central axis of the GRETINA module. (These positions correspond
+> to those reported by the stepper motor controller. The controller
+> x axis points opposite the geant4 x axis, and the controller y axis
+> points along the geant4 z axis.) The horizontal position of the
+> source should not be set using the usual source positioning commands
+> (`/Experiment/Source/setX` and `/Experiment/Source/setZ`). 
 
-> Set the horizontal shifts of the source relative to the central axis
-> of the GRETINA module. (These positions correspond to those reported
-> by the stepper motor controller.)
+    /ScanningTable/SetControllerZ <double> <unit>
 
-    /ScanningTable/SetZShift <double> <unit>
-
-> Set the vertical shift of the slit assembly. (This position
-> corresponds to that reported by the stepper motor controller.) 
+> Set the vertical position of the slit assembly. (This position
+> corresponds to that reported by the stepper motor controller. The
+> controller z axis corresponds to the geant4 y axis.) 
 
     /ScanningTable/SetCloverZ <double> <unit>
 
@@ -610,7 +716,7 @@ Energies are expressed in keV, and positions are expressed in mm.
 > file. There are small deviations in crystal placement from the
 > design positions. Therefore, using the standard crmat file
 > introduces offsets in the crystal-frame hit patterns. Using the
-> internal transormations does not.
+> internal transformations does not.
 
     /Mode2/GretinaCoords
 
@@ -656,16 +762,16 @@ Energies are expressed in keV, and positions are expressed in mm.
 Run the macro file `vis/vis.mac` an interactive session:
 
     $ UCGretina
-
+    
     Idle> /control/execute vis/vis.mac
     Idle> exit
 
 This generates a VRML 2 file named `g4_XX.wrl` which can be viewed
-with a VRML viewer (like mayavi2). Macro files are included for
-visualizing GRETA, the LBL scanning table, and the liquid-hydrogen
-target setups. These scripts must be run in a directory with soft
-links (aclust, euler, aslice, asolid, awalls) to the appropriate
-GRETINA geometry files. 
+with a VRML viewer (like view3dscene, FreeWRL, or mayavi2). Macro
+files are included for visualizing GRETA, the LBL scanning table, and
+the liquid-hydrogen target setups. These scripts must be run in a
+directory with soft links (`aclust`, `euler`, `aslice`, `asolid`,
+`awalls`) to the appropriate GRETINA geometry files.
 
 The macro file `./vis/trajectories.mac` illustrates how to add particle
 trajectories to visulatizations.

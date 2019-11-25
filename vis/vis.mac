@@ -7,10 +7,10 @@
 /Gretina/update
 
 #start visualizer
-#/vis/open OGLIX
 /vis/open VRML2FILE
 
-# Disable auto refresh and quieten vis messages whilst scene and trajectories are established
+# Disable auto refresh and quieten vis messages while scene and
+#   trajectories are established 
 /vis/viewer/set/autoRefresh false
 /vis/verbose errors
 
@@ -31,4 +31,4 @@
 /vis/viewer/set/autoRefresh true
 /vis/verbose warnings
 
-
+/vis/viewer/refresh

@@ -62,7 +62,7 @@ public:
   // energies - list of excitation energies of nuclear levels starting
   //            from the ground state with energy zero 
   // spin - 2J, where J is the full angular momentum of the state 
-  explicit G4LevelManager(size_t ntrans,
+  explicit G4LevelManager(G4int Z, G4int A, size_t nlev,
 			  const std::vector<G4double>& energies,
 			  const std::vector<G4int>& spin,
 			  const std::vector<const G4NucLevel*>& levels); 
@@ -100,6 +100,12 @@ public:
 
   inline G4int FloatingLevel(size_t i) const;
 
+  inline G4double PairingCorrection() const;
+
+  inline G4double ShellCorrection() const;
+
+  inline G4double LevelDensity(G4double U) const;
+
   const G4String& FloatingType(size_t i) const;
 
   void StreamInfo(std::ostream& os) const;
@@ -118,6 +124,10 @@ private:
   std::vector<G4double>  fLevelEnergy;
   std::vector<G4int>    fSpin;
   std::vector<const G4NucLevel*> fLevels;
+  
+  G4double fPairingCorrection;
+  G4double fShellCorrection;
+  G4double fLevelDensity;
 
   size_t nTransitions;
 
@@ -134,7 +144,7 @@ inline size_t G4LevelManager::NumberOfTransitions() const
 inline const G4NucLevel* G4LevelManager::GetLevel(size_t i) const
 {
 #ifdef G4VERBOSE
-  if(i > nTransitions) { PrintError(i, "GetLevel"); }
+  if(i > nTransitions) { PrintError(i, "GetLevel(idx)"); }
 #endif
   return fLevels[i]; 
 }
@@ -142,7 +152,7 @@ inline const G4NucLevel* G4LevelManager::GetLevel(size_t i) const
 inline G4double G4LevelManager::LevelEnergy(size_t i) const
 {
 #ifdef G4VERBOSE
-  if(i > nTransitions) { PrintError(i, "LevelEnergy"); }
+  if(i > nTransitions) { PrintError(i, "LevelEnergy(idx)"); }
 #endif
   return fLevelEnergy[i]; 
 }
@@ -209,6 +219,21 @@ inline G4int G4LevelManager::FloatingLevel(size_t i) const
   if(i > nTransitions) { PrintError(i, "Floating"); }
 #endif
   return fSpin[i]/100000; 
+}
+
+inline G4double G4LevelManager::PairingCorrection() const
+{
+  return fPairingCorrection;
+}
+
+inline G4double G4LevelManager::ShellCorrection() const
+{
+  return fShellCorrection;
+}
+
+inline G4double G4LevelManager::LevelDensity(G4double) const
+{
+  return fLevelDensity;
 }
 
 #endif

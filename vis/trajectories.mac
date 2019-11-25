@@ -1,13 +1,16 @@
 /Gretina/detector/enableCapsules
 /Gretina/detector/enableCryostats
-/Gretina/Shell full
+#/Gretina/Shell full
 /Target/Construct
 /Target/Sled
 /BeamTube/Construct
 /Gretina/update
 
+# Source parameters ============================================================
+/Experiment/RunSource
+/Experiment/Source/Set simple
+
 #start visualizer
-#/vis/open OGLIX
 /vis/open VRML2FILE
 
 # Disable auto refresh and quieten vis messages while scene and
@@ -32,4 +35,4 @@
 /vis/viewer/set/autoRefresh true
 /vis/verbose warnings
 
-/run/beamOn 10
+/run/beamOn 100

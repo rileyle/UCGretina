@@ -28,6 +28,7 @@ TrackerGammaHit::TrackerGammaHit(const TrackerGammaHit& right)
   detNumb        = right.detNumb;
   segNumb        = right.segNumb;
   edep           = right.edep;
+  ke             = right.ke;
   pos            = right.pos;
   trackOrigin    = right.trackOrigin;
 }
@@ -44,6 +45,7 @@ const TrackerGammaHit& TrackerGammaHit::operator=(const TrackerGammaHit& right)
   detNumb        = right.detNumb;
   segNumb        = right.segNumb;
   edep           = right.edep;
+  ke             = right.ke;
   pos            = right.pos;
   trackOrigin    = right.trackOrigin;
   return *this;
@@ -79,14 +81,16 @@ void TrackerGammaHit::Print()
 {
 
   G4cout << std::setw(3)  << std::right << trackID 
-	 << std::setw(10) << particleID
-	 << std::setw(10) << process
+	 << std::setw(12) << particleID
+	 << std::setw(12) << process
 	 << std::setw(3) << parentTrackID
 	 << std::setw(20) << creatorProcess
-	 << std::setw(3)  << detNumb
+	 << std::setw(4)  << detNumb
 	 << std::setw(3)  << segNumb
 	 << std::fixed << std::setprecision(2) << std::setw(10) << std::right
 	 << edep/keV
+ 	 << std::setw(10) << std::right
+	 << ke/keV
  	 << std::setw(10) << std::right
          << pos.getX()/mm
 	 << std::setw(10) << std::right

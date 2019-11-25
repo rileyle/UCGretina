@@ -58,6 +58,7 @@ class G4LevelReader;
 class G4LevelManager;
 class G4PairingCorrection;
 class G4ShellCorrection;
+class G4Pow;
 
 class G4NuclearLevelData 
 {
@@ -103,8 +104,12 @@ public:
   G4PairingCorrection* GetPairingCorrection();
   G4ShellCorrection* GetShellCorrection();  
 
+  // access to correction values
+  G4double GetLevelDensity(G4int Z, G4int A, G4double U);
+  G4double GetPairingCorrection(G4int Z, G4int A);
+
   // stream only existing levels
-  void StreamLevels(std::ostream& os, G4int Z, G4int A) const;
+  void StreamLevels(std::ostream& os, G4int Z, G4int A);
 
   G4NuclearLevelData(G4NuclearLevelData &) = delete;
   G4NuclearLevelData & operator=(const G4NuclearLevelData &right) = delete;
@@ -117,6 +122,7 @@ private:
   G4LevelReader*         fLevelReader;
   G4PairingCorrection*   fPairingCorrection;
   G4ShellCorrection*     fShellCorrection;
+  G4Pow*                 fG4calc;
 
   static const G4int ZMAX = 118;
   static const G4int AMIN[ZMAX];

@@ -43,6 +43,7 @@ void EventInformation::AddEmittedGamma(G4double e,
       fEmittedGammaPosZ[fNEmittedGammas]     = pos->getZ()/mm;
       fEmittedGammaPhi[fNEmittedGammas]      = dir->getPhi()/rad;
       fEmittedGammaTheta[fNEmittedGammas]    = dir->getTheta()/rad;
+      fBeta[fNBetas] = 0;
       fNEmittedGammas++;
   }
     

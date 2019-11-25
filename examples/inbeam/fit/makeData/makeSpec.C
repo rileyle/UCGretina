@@ -36,7 +36,7 @@ void makeSpec() {
     bg2->SetBinContent(i,(Int_t)(thresh*bg2->GetBinContent(i)));
   }
 
-  GH1D* spectrum = bg1->Clone("s44spectrum");
+  GH1D* spectrum = (GH1D*)bg1->Clone("s44spectrum");
   spectrum->Add(bg2,1.0);
   for(Int_t i = 0; i < 3; i++)
     spectrum->Add(sim[i],1.0);

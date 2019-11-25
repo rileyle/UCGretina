@@ -14,17 +14,22 @@ ScanningTable::ScanningTable(G4LogicalVolume* experimentalHall_log,
 
   includeCartFrame        = false;
   includeCloverCart       = false;
+  includeSlits            = false;
   includeSlitMount        = false;
   includeCollimator       = false;
   includeCollimatorInsert = false;
   includeShield           = false;
   includeCuTarget         = false;
 
-  xShift  = 0.0*mm;
-  yShift  = 0.0*mm;
-  zShift  = 0.0*mm;
+  controllerX  = 0.0*mm;                   // geant4 -x
+  controllerY  = 0.0*mm;                   // geant4  z
+  controllerZ  = 0.0*mm;                   // geant4  y
+  controllerOffsetX = 0.0*mm;              // geant4 -x
+  //  controllerOffsetY = -44.45*mm + 16.5*mm; // geant4  z
+  controllerOffsetY = -44.45*mm;           // geant4  z
+  
   cloverZ = 0.0*mm;
-  //  cloverOffset = 343.88*mm; // Shield y position
+  //  cloverOffset = 343.88*mm; / Shield y position
   cloverOffset = 336.10*mm; // Mounts without shields
 
   collimatorRadius = 1.0*mm;
@@ -58,8 +63,12 @@ void ScanningTable::Construct()
 
   //--- First the physical cart: 8020 frame, base, top and back panel ---------
 
-  G4cout << "Constructing the LBL scanning table." << G4endl;
+  G4cout << "Constructing the LBNL scanning table." << G4endl;
 
+  G4cout << "   Controller at x = " << controllerX/mm << " mm, "
+         << controllerY/mm << " mm, "
+	 << controllerZ/mm << " mm" << G4endl;
+  
   G4cout << "   Loading STL files from directory:\n   " << CADModelPath 
 	 << "\n   and building Tessellated solids ... " << G4endl;
 
@@ -233,49 +242,6 @@ void ScanningTable::Construct()
   
   //--- Now the slit assembly -------------------------------------------------
 
-  // Slits on top
-  // BotPos = new G4ThreeVector(0., 90.335*mm, -8.8*mm);
-  // MidPos = new G4ThreeVector(0., 46.335*mm, -8.8*mm);
-  // TopPos = new G4ThreeVector(0., -44.335*mm, -8.8*mm);
-
-  G4cout << "   ... slit assembly (slit width "
-	 << slitWidth << " mm) ... " << G4endl;
-
-  // Slits on the bottom
-  BotPos = new G4ThreeVector(0., 0., -8.8*mm);
-  MidPos = new G4ThreeVector(0., 0., -8.8*mm);
-  TopPos = new G4ThreeVector(0., 0., -8.8*mm);
-
-  // (The STL files have 2 mm slits.)
-  G4ThreeVector *slitShift = new G4ThreeVector(0., slitWidth - 2.0*mm, 0.);
-  (*MidPos) += (*slitShift);
-  (*TopPos) += 2.0*(*slitShift);
-
-  const int ZSlitParts = 10;
-  G4String ZSlitPart[ZSlitParts];
-  G4Material* ZSlitMaterial[ZSlitParts];
-  ZSlitPart[0] = "ZSlitsBottomBracket";
-  ZSlitMaterial[0] = materialSlitBrackets;
-  ZSlitPart[1] = "ZSlitsLeftBracket";
-  ZSlitMaterial[1] = materialSlitBrackets;
-  ZSlitPart[2] = "ZSlitsRightBracket";
-  ZSlitMaterial[2] = materialSlitBrackets;
-  ZSlitPart[3] = "ZSlitsTopBracket";
-  ZSlitMaterial[3] = materialSlitBrackets;
-  ZSlitPart[4] = "ZSlitsLowerLeftWall";
-  ZSlitMaterial[4] = materialSlits;
-  ZSlitPart[5] = "ZSlitsLowerRightWall";
-  ZSlitMaterial[5] = materialSlits;
-  ZSlitPart[6] = "ZSlitsMidLeftWall";
-  ZSlitMaterial[6] = materialSlits;
-  ZSlitPart[7] = "ZSlitsMidRightWall";
-  ZSlitMaterial[7] = materialSlits;
-  ZSlitPart[8] = "ZSlitsUpperLeftWall";
-  ZSlitMaterial[8] = materialSlits;
-  ZSlitPart[9] = "ZSlitsUpperRightWall";
-  ZSlitMaterial[9] = materialSlits;
-  G4ThreeVector *UsePos;
-
   G4Colour lblue(0.0, 1.0, 1.0, 1.0);
   G4Colour lblue2(0.0, 1.0, 1.0, 0.3);
 
@@ -287,19 +253,64 @@ void ScanningTable::Construct()
   VisSlit2->SetVisibility(true);
   VisSlit2->SetForceWireframe(true);
   
-  for(int i=0;i<ZSlitParts;i++){
-    if(ZSlitPart[i] != ""){
-      CADFileName = CADModelPath + "/";
-      CADFileName += ZSlitPart[i];
-      CADFileName += ".stl";
-      CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
-				  (char*)"STL");
-      mesh->SetScale(mm);
-      mesh->SetOffset(G4ThreeVector(0., zShift, 0.));
+  if(includeSlits){
+  
+    // Slits on top
+    // BotPos = new G4ThreeVector(0., 90.335*mm, -8.8*mm);
+    // MidPos = new G4ThreeVector(0., 46.335*mm, -8.8*mm);
+    // TopPos = new G4ThreeVector(0., -44.335*mm, -8.8*mm);
+
+    G4cout << "   ... slit assembly (slit width "
+	   << slitWidth << " mm) ... " << G4endl;
+
+    // Slits on the bottom
+    BotPos = new G4ThreeVector(0., 0., -8.8*mm);
+    MidPos = new G4ThreeVector(0., 0., -8.8*mm);
+    TopPos = new G4ThreeVector(0., 0., -8.8*mm);
+
+    // (The STL files have 2 mm slits.)
+    G4ThreeVector *slitShift = new G4ThreeVector(0., slitWidth - 2.0*mm, 0.);
+    (*MidPos) += (*slitShift);
+    (*TopPos) += 2.0*(*slitShift);
+
+    const int ZSlitParts = 10;
+    G4String ZSlitPart[ZSlitParts];
+    G4Material* ZSlitMaterial[ZSlitParts];
+    ZSlitPart[0] = "ZSlitsBottomBracket";
+    ZSlitMaterial[0] = materialSlitBrackets;
+    ZSlitPart[1] = "ZSlitsLeftBracket";
+    ZSlitMaterial[1] = materialSlitBrackets;
+    ZSlitPart[2] = "ZSlitsRightBracket";
+    ZSlitMaterial[2] = materialSlitBrackets;
+    ZSlitPart[3] = "ZSlitsTopBracket";
+    ZSlitMaterial[3] = materialSlitBrackets;
+    ZSlitPart[4] = "ZSlitsLowerLeftWall";
+    ZSlitMaterial[4] = materialSlits;
+    ZSlitPart[5] = "ZSlitsLowerRightWall";
+    ZSlitMaterial[5] = materialSlits;
+    ZSlitPart[6] = "ZSlitsMidLeftWall";
+    ZSlitMaterial[6] = materialSlits;
+    ZSlitPart[7] = "ZSlitsMidRightWall";
+    ZSlitMaterial[7] = materialSlits;
+    ZSlitPart[8] = "ZSlitsUpperLeftWall";
+    ZSlitMaterial[8] = materialSlits;
+    ZSlitPart[9] = "ZSlitsUpperRightWall";
+    ZSlitMaterial[9] = materialSlits;
+    G4ThreeVector *UsePos;
+  
+    for(int i=0;i<ZSlitParts;i++){
+      if(ZSlitPart[i] != ""){
+	CADFileName = CADModelPath + "/";
+	CADFileName += ZSlitPart[i];
+	CADFileName += ".stl";
+	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
+				    (char*)"STL");
+	mesh->SetScale(mm);
+	mesh->SetOffset(G4ThreeVector(0., controllerZ, 0.));
      
-      G4VSolid *Slits = mesh->TessellatedMesh();
-      ZSlit_log = new G4LogicalVolume(Slits, ZSlitMaterial[i], 
-				      ZSlitPart[i], 0, 0, 0);
+	G4VSolid *Slits = mesh->TessellatedMesh();
+	ZSlit_log = new G4LogicalVolume(Slits, ZSlitMaterial[i], 
+					ZSlitPart[i], 0, 0, 0);
 	if(i == 4 || i == 5)
 	  UsePos = BotPos;
 	else if(i == 6 || i == 7)
@@ -308,56 +319,57 @@ void ScanningTable::Construct()
 	  UsePos = TopPos;
 	else
 	  UsePos = Pos2;
-      ZSlit_phys = new G4PVPlacement(G4Transform3D(NoRot, *UsePos),
-				     ZSlit_log,
-				     ZSlitPart[i],
-				     expHall_log,false,0);
+	ZSlit_phys = new G4PVPlacement(G4Transform3D(NoRot, *UsePos),
+				       ZSlit_log,
+				       ZSlitPart[i],
+				       expHall_log,false,0);
 
-      // if(i>3){
-      // 	// This doubles the slit wall thickness with additional copies
-      // 	G4ThreeVector* BP = new G4ThreeVector(0., 0., -8.8*mm + 16.22*mm);
-      // 	G4ThreeVector* MP = new G4ThreeVector(0., 0., -8.8*mm + 16.22*mm);
-      // 	G4ThreeVector* TP = new G4ThreeVector(0., 0., -8.8*mm + 16.22*mm);
-      // 	if(i == 4 || i == 5)
-      // 	  UsePos = BP;
-      // 	else if(i == 6 || i == 7)
-      // 	  UsePos = MP;
-      // 	else if(i == 8 || i == 9)
-      // 	  UsePos = TP;
-      // 	// (The STL files have 2 mm slits.)
-      // 	(*MP) += (*slitShift);
-      // 	(*TP) += 2.0*(*slitShift);
+	// if(i>3){
+	// 	// This doubles the slit wall thickness with additional copies
+	// 	G4ThreeVector* BP = new G4ThreeVector(0., 0., -8.8*mm + 16.22*mm);
+	// 	G4ThreeVector* MP = new G4ThreeVector(0., 0., -8.8*mm + 16.22*mm);
+	// 	G4ThreeVector* TP = new G4ThreeVector(0., 0., -8.8*mm + 16.22*mm);
+	// 	if(i == 4 || i == 5)
+	// 	  UsePos = BP;
+	// 	else if(i == 6 || i == 7)
+	// 	  UsePos = MP;
+	// 	else if(i == 8 || i == 9)
+	// 	  UsePos = TP;
+	// 	// (The STL files have 2 mm slits.)
+	// 	(*MP) += (*slitShift);
+	// 	(*TP) += 2.0*(*slitShift);
 
-      // 	G4VPhysicalVolume* ZS_phys 
-      // 	  = new G4PVPlacement(G4Transform3D(NoRot, *UsePos),
-      // 			      ZSlit_log,
-      // 			      ZSlitPart[i],
-      // 			      expHall_log,false,0);
-      // 	// ... and this triples it.
-      // 	BP->setZ(-8.8*mm + 2.0*16.22*mm);
-      // 	MP->setZ(-8.8*mm + 2.0*16.22*mm);
-      // 	TP->setZ(-8.8*mm + 2.0*16.22*mm);
-      //        // (The STL files have 2 mm slits.)  
-      //	(*MP) += (*slitShift);
-      //	(*TP) += 2.0*(*slitShift);
-      //
-      // 	if(i == 4 || i == 5)
-      // 	  UsePos = BP;
-      // 	else if(i == 6 || i == 7)
-      // 	  UsePos = MP;
-      // 	else if(i == 8 || i == 9)
-      // 	  UsePos = TP;
-      // 	ZS_phys 
-      // 	  = new G4PVPlacement(G4Transform3D(NoRot, *UsePos),
-      // 			      ZSlit_log,
-      // 			      ZSlitPart[i],
-      // 			      expHall_log,false,0);
-      //      }
+	// 	G4VPhysicalVolume* ZS_phys 
+	// 	  = new G4PVPlacement(G4Transform3D(NoRot, *UsePos),
+	// 			      ZSlit_log,
+	// 			      ZSlitPart[i],
+	// 			      expHall_log,false,0);
+	// 	// ... and this triples it.
+	// 	BP->setZ(-8.8*mm + 2.0*16.22*mm);
+	// 	MP->setZ(-8.8*mm + 2.0*16.22*mm);
+	// 	TP->setZ(-8.8*mm + 2.0*16.22*mm);
+	//        // (The STL files have 2 mm slits.)  
+	//	(*MP) += (*slitShift);
+	//	(*TP) += 2.0*(*slitShift);
+	//
+	// 	if(i == 4 || i == 5)
+	// 	  UsePos = BP;
+	// 	else if(i == 6 || i == 7)
+	// 	  UsePos = MP;
+	// 	else if(i == 8 || i == 9)
+	// 	  UsePos = TP;
+	// 	ZS_phys 
+	// 	  = new G4PVPlacement(G4Transform3D(NoRot, *UsePos),
+	// 			      ZSlit_log,
+	// 			      ZSlitPart[i],
+	// 			      expHall_log,false,0);
+	//      }
 
-      if(i<4)
-	ZSlit_log->SetVisAttributes(VisSlit2);
-      else
-	ZSlit_log->SetVisAttributes(VisSlit);
+	if(i<4)
+	  ZSlit_log->SetVisAttributes(VisSlit2);
+	else
+	  ZSlit_log->SetVisAttributes(VisSlit);
+      }
     }
   }
 
@@ -423,7 +435,7 @@ void ScanningTable::Construct()
 	if((i != 0) && (   i < 5  || i == 5  || i == 7 || i == 8 
 			|| i == 9 || i == 10 || i > 11)){
 	  mesh->SetScale(mm);
-	  mesh->SetOffset(G4ThreeVector(0., zShift, 0.));
+	  mesh->SetOffset(G4ThreeVector(0., controllerZ, 0.));
 	} else { // and parts that don't
 	  mesh->SetScale(mm);
 	  mesh->SetOffset(G4ThreeVector(0., 0., 0.));
@@ -451,20 +463,21 @@ void ScanningTable::Construct()
 	}
       }
     }
-    std::vector<G4TwoVector> polygon2;
-    polygon2.push_back( G4TwoVector(0*mm,          0*mm) );
-    polygon2.push_back( G4TwoVector(151.576*mm,    0*mm) );
-    polygon2.push_back( G4TwoVector(151.576*mm, -457.2*mm) );
-    polygon2.push_back( G4TwoVector(133.35*mm,  -457.2*mm) );
-    polygon2.push_back( G4TwoVector(0*mm,        -19.05*mm) );
 
-    std::vector<G4ExtrudedSolid::ZSection> zsections2;
-    zsections2.push_back( G4ExtrudedSolid::ZSection(0.,       0., 1.) );
-    zsections2.push_back( G4ExtrudedSolid::ZSection(19.05*mm, 0., 1.) );
-	
+    std::vector<G4TwoVector> polygon2(5);
+    polygon2[0] = G4TwoVector(0*mm,          0*mm);
+    polygon2[1] = G4TwoVector(151.576*mm,    0*mm);
+    polygon2[2] = G4TwoVector(151.576*mm, -457.2*mm);
+    polygon2[3] = G4TwoVector(133.35*mm,  -457.2*mm);
+    polygon2[4] = G4TwoVector(0*mm,        -19.05*mm);
+
     ZSlitAssemblyTriangle = new G4ExtrudedSolid("ZSlitAssemblyTriangle", 
 						polygon2,
-						zsections2);
+						19.05,
+						G4TwoVector(0*mm, 0*mm),
+						1.0,
+						G4TwoVector(0*mm, 0*mm),
+						1.0);
 
     ZSlitAssemblyTriangle_log 
       = new G4LogicalVolume(ZSlitAssemblyTriangle,
@@ -474,12 +487,12 @@ void ScanningTable::Construct()
     ZSlitAssemblyTriangle_log->SetVisAttributes(VisSlit2);
 
     ZSlitAssemblyTriangle1Shift.setX(171.2*mm);
-    ZSlitAssemblyTriangle1Shift.setY(397.38*mm + zShift);
+    ZSlitAssemblyTriangle1Shift.setY(397.38*mm + controllerZ);
     ZSlitAssemblyTriangle1Shift.setZ( -7.304*mm);
     ZSlitAssemblyTriangle1Pos = ZSlitAssemblyTriangle1Shift;
 
     ZSlitAssemblyTriangle2Shift.setX(-152.15*mm);
-    ZSlitAssemblyTriangle2Shift.setY( 397.38*mm + zShift);
+    ZSlitAssemblyTriangle2Shift.setY( 397.38*mm + controllerZ);
     ZSlitAssemblyTriangle2Shift.setZ(  -7.304*mm);
     ZSlitAssemblyTriangle2Pos = ZSlitAssemblyTriangle2Shift;
   
@@ -510,7 +523,7 @@ void ScanningTable::Construct()
     // better than G4PolyCones.
 
     G4cout << "   ... collimator (x, y = " 
-	   << xShift << ", " << yShift << " mm) ... " << G4endl;
+	   << controllerX << ", " << controllerY << " mm) ... " << G4endl;
 
     G4Tubs* CollimatorBase = new G4Tubs("CollimatorBase_vol",
 					0., 2.0*25.4*mm,
@@ -523,9 +536,9 @@ void ScanningTable::Construct()
 					     0, 0, 0);
 
     G4ThreeVector *collBasePos 
-      = new G4ThreeVector(Pos0->getX() + xShift, 
+      = new G4ThreeVector(Pos0->getX() - controllerX - controllerOffsetX, 
 			  Pos0->getY() + 165.2095*mm, 
-			  Pos0->getZ() - 44.45*mm + yShift);
+			  Pos0->getZ() + controllerY + controllerOffsetY);
     G4RotationMatrix collRot = G4RotationMatrix::IDENTITY;
     collRot.rotateX(90.*deg);
     CollimatorBase_phys = new G4PVPlacement(G4Transform3D(collRot, 
@@ -546,9 +559,9 @@ void ScanningTable::Construct()
 					     0, 0, 0);
 
     G4ThreeVector *collMid1Pos 
-      = new G4ThreeVector(Pos0->getX() + xShift, 
+      = new G4ThreeVector(Pos0->getX() - controllerX - controllerOffsetX, 
 			  Pos0->getY() + 196.9595*mm, 
-			  Pos0->getZ() - 44.45*mm + yShift);
+			  Pos0->getZ() + controllerY + controllerOffsetY);
     CollimatorMid1_phys = new G4PVPlacement(G4Transform3D(collRot, 
     							  *collMid1Pos),
     					    CollimatorMid1_log,
@@ -567,9 +580,9 @@ void ScanningTable::Construct()
 					     0, 0, 0);
 
     G4ThreeVector *collMid2Pos 
-      = new G4ThreeVector(Pos0->getX() + xShift, 
+      = new G4ThreeVector(Pos0->getX() - controllerX - controllerOffsetX, 
 			  Pos0->getY() + 202.372*mm, 
-			  Pos0->getZ() - 44.45*mm + yShift);
+			  Pos0->getZ() + controllerY + controllerOffsetY);
     CollimatorMid2_phys = new G4PVPlacement(G4Transform3D(collRot, 
     							  *collMid2Pos),
     					    CollimatorMid2_log,
@@ -588,9 +601,9 @@ void ScanningTable::Construct()
 					     0, 0, 0);
 
     G4ThreeVector *collMid3Pos 
-      = new G4ThreeVector(Pos0->getX() + xShift, 
+      = new G4ThreeVector(Pos0->getX() - controllerX - controllerOffsetX, 
 			  Pos0->getY() + 207.1115*mm, 
-			  Pos0->getZ() - 44.45*mm + yShift);
+			  Pos0->getZ() + controllerY + controllerOffsetY);
     CollimatorMid3_phys = new G4PVPlacement(G4Transform3D(collRot, 
     							  *collMid3Pos),
     					    CollimatorMid3_log,
@@ -609,9 +622,9 @@ void ScanningTable::Construct()
 					     0, 0, 0);
 
     G4ThreeVector *collBodyPos 
-      = new G4ThreeVector(Pos0->getX() + xShift, 
+      = new G4ThreeVector(Pos0->getX() - controllerX - controllerOffsetX, 
 			  Pos0->getY() + 249.301*mm, 
-			  Pos0->getZ() - 44.45*mm + yShift);
+			  Pos0->getZ() + controllerY + controllerOffsetY);
     CollimatorBody_phys = new G4PVPlacement(G4Transform3D(collRot, 
     							  *collBodyPos),
     					    CollimatorBody_log,
@@ -633,9 +646,9 @@ void ScanningTable::Construct()
 					   "CollimatorInsert_log", 
 					   0, 0, 0);
       G4ThreeVector *collIPos 
-	= new G4ThreeVector(Pos0->getX() + xShift, 
+	= new G4ThreeVector(Pos0->getX() - controllerX - controllerOffsetX, 
 			    Pos0->getY() + 249.301*mm, 
-			    Pos0->getZ() - 44.45*mm + yShift);
+			    Pos0->getZ() + controllerY + controllerOffsetY);
       collRot = G4RotationMatrix::IDENTITY;
       collRot.rotateX(90.*deg);
       Collimator_phys = new G4PVPlacement(G4Transform3D(collRot, *collIPos),
@@ -719,9 +732,12 @@ void ScanningTable::Construct()
 				    (char*)"STL");
 	mesh->SetScale(mm);
 	if(i < 4)
-	  mesh->SetOffset(G4ThreeVector(xShift, 0., 37.05*mm + yShift));
+	  mesh->SetOffset(G4ThreeVector(-controllerX - controllerOffsetX,
+					0.,
+					81.5*mm + controllerY + controllerOffsetY));
 	else if(i < 15)
-	  mesh->SetOffset(G4ThreeVector(0., 0., 37.05*mm + yShift));
+	  mesh->SetOffset(G4ThreeVector(0., 0.,
+					81.5*mm + controllerY+ controllerOffsetY));
 	else if (i > 14)
 	  mesh->SetOffset(G4ThreeVector(0., 0., 0.));
 
@@ -743,7 +759,7 @@ void ScanningTable::Construct()
   if (includeCloverCart) {
 
     G4cout << "   ... Clover cart (z = " 
-	   << zShift
+	   << controllerZ
 	   << " mm) ... " << G4endl;
 
     // This is the mount for the BGO anti-compton shields.
@@ -773,7 +789,8 @@ void ScanningTable::Construct()
     // 	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
     // 				    (char*)"STL");
     // 	mesh->SetScale(mm);
-    // 	mesh->SetOffset(G4ThreeVector(xShift, 0., yShift));
+    // 	mesh->SetOffset(G4ThreeVector(-controllerX - controllerOffsetX,
+    //                                 0., controllerY + controllerOffsetY));
 	
     // 	G4VSolid *CloverAssembly = mesh->TessellatedMesh();
 	
@@ -951,9 +968,9 @@ void ScanningTable::Construct()
 
     CuTarget_log->SetVisAttributes(VisSlit2);
 
-    CuTargetShift.setX(Pos0->getX() + xShift);
+    CuTargetShift.setX(Pos0->getX() - controllerX - controllerOffsetX);
     CuTargetShift.setY(Pos0->getY() + 249.301*mm + 148.2625*mm);
-    CuTargetShift.setZ(Pos0->getZ() -  44.45*mm + yShift);
+    CuTargetShift.setZ(Pos0->getZ() + controllerY + controllerOffsetY);
     CuTargetPos = CuTargetShift;
 
     CuTarget_phys = new G4PVPlacement(G4Transform3D(NoRot, 
@@ -977,7 +994,7 @@ void ScanningTable::Construct()
     CADMesh *meshCloverRightShield = new CADMesh((char*)CADFileName.data(), 
 						 (char*)"STL");
     meshCloverRightShield->SetScale(mm);
-    meshCloverRightShield->SetOffset(G4ThreeVector(0., zShift, 0.));
+    meshCloverRightShield->SetOffset(G4ThreeVector(0., controllerZ, 0.));
 
     G4VSolid *CloverRightShield = meshCloverRightShield->TessellatedMesh();
     CloverRightShield_log = new G4LogicalVolume(CloverRightShield, 
@@ -1010,7 +1027,7 @@ void ScanningTable::Construct()
     CADMesh *meshCloverLeftShield = new CADMesh((char*)CADFileName.data(), 
 						(char*)"STL");
     meshCloverLeftShield->SetScale(mm);
-    meshCloverLeftShield->SetOffset(G4ThreeVector(0., zShift, 0.));
+    meshCloverLeftShield->SetOffset(G4ThreeVector(0., controllerZ, 0.));
 
     G4VSolid *CloverLeftShield = meshCloverLeftShield->TessellatedMesh();
     CloverLeftShield_log = new G4LogicalVolume(CloverLeftShield, 

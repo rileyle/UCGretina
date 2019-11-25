@@ -21,6 +21,7 @@ public:
   void Report();
   void setA(G4int);
   void setZ(G4int);
+  void setEx(G4double e){Ex=e;};
   void setKE(G4double);
   void setKEu(G4double); 
   void setDTAFile(G4String);

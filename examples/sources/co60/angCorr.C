@@ -40,7 +40,7 @@ void angCorr(){
   c1->cd(3);
   mDelta->Sumw2();
   misoDelta->Sumw2();
-  GH1D *W = mDelta->Clone();
+  GH1D *W = (GH1D*)mDelta->Clone();
   W->Divide(misoDelta);
   W->SetMarkerStyle(20);
   W->Draw("PE1");

@@ -77,6 +77,7 @@ class CpolyhPoints
   public:
     G4double  passThick1;            //> at the back of the crystal
     G4double  passThick2;            //> around the coaxial hole
+    G4double  passThick3;            //> outer surfaces
     
   public:
     G4Point3D centerFace1;           //> center of front face
@@ -127,19 +128,39 @@ class CpolyhPoints
     G4Polycone          *pCoax;      //> cylinder 
     G4IntersectionSolid *pCaps;      //> their intersection
     G4LogicalVolume     *pDetL;      //> its logical
-    
+
+  // Back passive volume
   public:  
     G4Polycone          *pTubs1;     //> cylinder (passive area behind detector)     
     G4IntersectionSolid *pCaps1;     //> intersection with polyhedron		    
     G4LogicalVolume     *pDetL1;     //> its logical				    
     G4VPhysicalVolume   *pDetP1;     //> passivated area (back)			    
-   
+
+  // Coaxial passive volume
   public:  
     G4Polycone          *pCoax2;     //> cylinder (passive area at the coaxial hole) 
     G4IntersectionSolid *pCaps2;     //> intersection with polyhedron		    
     G4LogicalVolume     *pDetL2;     //> its logical				    
     G4VPhysicalVolume   *pDetP2;     //> passivated area (coax)			    
-    
+
+  // Outer passive volume
+  public:  
+    CConvexPolyhedron   *pPoly3;      //> inner polyhedron
+    G4Tubs              *pTubsO3;     //> outer cylinder
+    G4Tubs              *pTubsI3;     //> inner cylinder
+    G4IntersectionSolid *pIntO3;      //> outer intersection
+    G4IntersectionSolid *pIntI3;      //> inner intersection
+    G4SubtractionSolid  *pSub3;       //> intermediate subtraction
+    G4SubtractionSolid  *pCaps3;      //> final passive region volume
+    G4LogicalVolume     *pDetL3;      //> its logical
+    G4VPhysicalVolume   *pDetP3;      //> passivated area (outer)
+
+  // Capsule
+  public:  
+    CConvexPolyhedron   *pPolyCap;     //> polyhedron
+    G4Tubs              *pTubsCap;     //> cylinder
+    G4IntersectionSolid *pIntCap;      //> intersection
+  
   public:  
     G4VisAttributes     *pDetVA;     //> visualization attributes
 };

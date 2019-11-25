@@ -38,14 +38,18 @@ class ScanningTable
   void SetIncludeCloverCart() { includeCloverCart = true; }
   void SetIncludeCartFrame() { includeCartFrame = true; }
   void SetIncludeSlitMount() { includeSlitMount = true; }
+  void SetIncludeSlits() { includeSlits = true; }
   void SetIncludeCollimator() { includeCollimator = true; }
   void SetIncludeCollimatorInsert() { includeCollimatorInsert = true; }
   void SetIncludeCollimatorMount() { includeCollimatorMount = true; }
   void SetIncludeShield() { includeShield = true; }
   void SetIncludeCuTarget() { includeCuTarget = true; }
-  void SetXShift(G4double value) { xShift = value; }
-  void SetYShift(G4double value) { yShift = value; }
-  void SetZShift(G4double value) { zShift = value; }
+  void SetControllerX(G4double value) { controllerX = value; }
+  void SetControllerY(G4double value) { controllerY = value; }
+  void SetControllerZ(G4double value) { controllerZ = value; }
+  G4double GetControllerX() { return controllerX; }
+  G4double GetControllerY() { return controllerY; }
+  G4double GetControllerZ() { return controllerZ; }
   void SetCollR(G4double value)  { collimatorRadius = value; }
   void SetSlitWidth(G4double value)  { slitWidth = value; }
   void SetCloverZ(G4double value){ cloverZ = value; }
@@ -56,6 +60,7 @@ class ScanningTable
   //flags
   G4bool includeCloverCart;
   G4bool includeCartFrame;
+  G4bool includeSlits;
   G4bool includeSlitMount;
   G4bool includeCollimator;
   G4bool includeCollimatorInsert;
@@ -65,9 +70,11 @@ class ScanningTable
 
   G4String CADModelPath;
 
-  G4double xShift;
-  G4double yShift;
-  G4double zShift;
+  G4double controllerX;
+  G4double controllerY;
+  G4double controllerZ;
+  G4double controllerOffsetX;
+  G4double controllerOffsetY;
   G4double cloverZ;
   G4double cloverOffset;
 

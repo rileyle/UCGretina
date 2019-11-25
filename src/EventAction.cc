@@ -83,7 +83,9 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	     << G4endl;
     G4cout << eventInfo->GetNEmittedGammas() << " emitted gamma(s)" << G4endl;
     for(G4int i = 0; i< eventInfo->GetNEmittedGammas(); i++)
-      G4cout << "energy = " << eventInfo->GetEmittedGammaEnergy(i)
+      G4cout << std::fixed << std::setprecision(4) 
+	     << std::setw(12) << std::right
+	     << "energy = " << eventInfo->GetEmittedGammaEnergy(i)
 	     << " pos = " << eventInfo->GetEmittedGammaPosX(i)
 	     << ", " << eventInfo->GetEmittedGammaPosY(i)
 	     << ", " << eventInfo->GetEmittedGammaPosZ(i)
@@ -410,6 +412,7 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 
   // Write emitted gamma information from this event to 
   // the output file.
+
   writeSim(timestamp, eventInfo);
 
   if(event_id%everyNevents == 0 && event_id > 0) {
@@ -637,7 +640,7 @@ void EventAction::writeDecomp(long long int ts,
     }
 
   }
-
+  
   if(evOut){
     evfile << "D" << std::setw(4) << Ndecomp 
     	   << std::setw(12) << ts/10000 << G4endl;
@@ -704,7 +707,7 @@ void EventAction::writeSim(long long int ts, EventInformation* eventInfo)
     evfile << "E" << std::setw(4) << eventInfo->GetNEmittedGammas()  
 	   << std::setw(4) << eventInfo->GetFullEnergy()  
 	   << std::setw(12) << ts/10000 << G4endl;
-    for(G4int i = 0; i < eventInfo->GetNEmittedGammas(); i++)
+    for(G4int i = 0; i < eventInfo->GetNEmittedGammas(); i++){
       evfile << "     "
 	     << std::fixed << std::setprecision(4) 
 	     << std::right << std::setw(12) 
@@ -719,8 +722,9 @@ void EventAction::writeSim(long long int ts, EventInformation* eventInfo)
 	     << eventInfo->GetEmittedGammaPhi(i)
 	     << std::setw(12) 
 	     << eventInfo->GetEmittedGammaTheta(i)
-	     << std::setw(12) 
+	     << std::setw(12)
 	     << eventInfo->GetBeta(i) << G4endl;
+    }
   }
  
 }
@@ -784,7 +788,7 @@ void EventAction::openCrmatFile()
   crmatFile = open(crmatFileName.c_str(), O_RDONLY, 0);
   if(crmatFile < 0){
     G4cout << "ERROR opening crmatFile" << G4endl;
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   return;
 }
@@ -812,7 +816,7 @@ void EventAction::SetCrmatFile(G4String name) {
 
   if(size < 0){
     G4cout << "ERROR reading crmat file." << G4endl;
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   G4cout << "Read " << size << " bytes into crmat" << G4endl;

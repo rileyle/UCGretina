@@ -1,0 +1,12 @@
+Target Excitation Example
+
+   197Au(44S,44S') at 100 MeV/u populating the 547.5 keV state
+                   of the gold target.
+
+
+Important note: The lifetimes of excited states of the target must be
+                set to zero in order for the states to undergo gamma
+                decay before the beam particles leave the world
+                volume. Otherwise, gamma rays will be lost.
+		
+                

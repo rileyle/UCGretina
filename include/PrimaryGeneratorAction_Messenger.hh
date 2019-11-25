@@ -29,10 +29,15 @@ private:
   G4UIcmdWithADoubleAndUnit*   SrcECmd;
   G4UIcmdWithADoubleAndUnit*   SrcWLECmd;
   G4UIcmdWithADoubleAndUnit*   SrcWHECmd;
+  G4UIcmdWithAnInteger*        SrcMultCmd;
   G4UIcmdWithADoubleAndUnit*   SrcXCmd;
   G4UIcmdWithADoubleAndUnit*   SrcYCmd;
   G4UIcmdWithADoubleAndUnit*   SrcZCmd;
   G4UIcmdWithADoubleAndUnit*   SrcRCmd;
+  G4UIcmdWithADoubleAndUnit*   SrcDXCmd;
+  G4UIcmdWithADoubleAndUnit*   SrcDYCmd;
+  G4UIcmdWithADoubleAndUnit*   SrcSigXCmd;
+  G4UIcmdWithADoubleAndUnit*   SrcSigYCmd;
   G4UIcmdWithADoubleAndUnit*   SrcCollAngCmd;
   G4UIcmdWith3Vector*          SrcCollDirCmd;
   G4UIcmdWithoutParameter*     PGASCmd;
@@ -41,8 +46,8 @@ private:
   G4UIcmdWithoutParameter*     SrcTBCmd;
   G4UIcmdWithoutParameter*     SrcDFCmd;
   G4UIcmdWithoutParameter*     SrcDBCmd;
+  G4UIcmdWithAString*          SrcThetaFileCmd;
   G4UIcmdWithoutParameter*     SrcRepCmd;
-
 };
 
 
