@@ -25,10 +25,10 @@ public:
 
   G4LogicalVolume *expHall_log;
 
-  Greta_Chamber(G4LogicalVolume*,Materials*);
+  Greta_Chamber(Materials*);
   ~Greta_Chamber();
   
-  G4VPhysicalVolume *Construct();
+  G4VPhysicalVolume *Construct(G4LogicalVolume*);
   void setRmin(G4double r){ Rmin = r; }
   void setRmax(G4double r){ Rmax = r; }
   void setCutaway(){ Cutaway = true; }

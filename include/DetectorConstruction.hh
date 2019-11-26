@@ -104,6 +104,7 @@ private:
   Target* aTarget;
 
   Background_Sphere* BackgroundSphere;
+  Experimental_Hall* ExperimentalHall;
 
 #ifndef LHTARGET
 #ifndef SCANNING

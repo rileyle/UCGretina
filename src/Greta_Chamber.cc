@@ -1,10 +1,9 @@
 #ifndef LHTARGET
 #include "Greta_Chamber.hh"
 
-Greta_Chamber::Greta_Chamber(G4LogicalVolume* experimentalHall_log,Materials* mat)
+Greta_Chamber::Greta_Chamber(Materials* mat)
 {
   materials=mat;
-  expHall_log=experimentalHall_log;
 
   Rmin = 178.5*mm;
   Rmax = 180.0*mm;
@@ -22,9 +21,11 @@ Greta_Chamber::Greta_Chamber(G4LogicalVolume* experimentalHall_log,Materials* ma
 Greta_Chamber::~Greta_Chamber()
 {;}
 //-----------------------------------------------------------------------------
-G4VPhysicalVolume* Greta_Chamber::Construct()
+G4VPhysicalVolume* Greta_Chamber::Construct(G4LogicalVolume* experimentalHall_log)
 {
 
+  expHall_log=experimentalHall_log;
+  
   G4double Phi0 = 0.*deg;
   G4double dPhi = 360.*deg;
   if(Cutaway){

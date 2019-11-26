@@ -1,9 +1,8 @@
 #include "LaBr.hh"
 
-LaBr::LaBr(G4LogicalVolume* experimentalHall_log,Materials* mat)
+LaBr::LaBr(Materials* mat)
 {
   materials=mat;
-  expHall_log=experimentalHall_log;
 
   LaBr_Z = 3*cm; // Dirk's estimate for 2016 measurements
   
@@ -38,9 +37,9 @@ LaBr::LaBr(G4LogicalVolume* experimentalHall_log,Materials* mat)
 LaBr::~LaBr()
 {;}
 //-----------------------------------------------------------------------------
-G4VPhysicalVolume* LaBr::Construct()
+G4VPhysicalVolume* LaBr::Construct(G4LogicalVolume* experimentalHall_log)
 {
-
+  expHall_log=experimentalHall_log;
   // Crystal
   LaBr_Crys = new G4Tubs("LaBr", 0., LaBr_R, LaBr_Dz, 0., 360.*deg);
   

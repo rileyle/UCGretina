@@ -1,9 +1,8 @@
 #include "Background_Sphere.hh"
 
-Background_Sphere::Background_Sphere(G4LogicalVolume* experimentalHall_log,Materials* mat)
+Background_Sphere::Background_Sphere(Materials* mat)
 {
   materials=mat;
-  expHall_log=experimentalHall_log;
   BSrmin = 3.0*m;
   BSrmax = 3.4*m;
   Pos0 = new G4ThreeVector(0.,0.,0.);
@@ -13,9 +12,11 @@ Background_Sphere::Background_Sphere(G4LogicalVolume* experimentalHall_log,Mater
 Background_Sphere::~Background_Sphere()
 {;}
 //-----------------------------------------------------------------------------
-G4VPhysicalVolume* Background_Sphere::Construct()
+G4VPhysicalVolume* Background_Sphere::Construct(G4LogicalVolume* experimentalHall_log)
 {
-
+  
+  expHall_log=experimentalHall_log;
+  
   BackgroundSphere = new G4Sphere("BackgroundSphere",
 				  BSrmin,BSrmax,0.,360.*deg,
 				  0., 180.*deg);

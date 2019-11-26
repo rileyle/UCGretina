@@ -222,6 +222,9 @@
   G4Material* air          = NISTman->FindOrBuildMaterial("G4_AIR");
   myMaterials.push_back(air);
 
+  G4Material* Mg = NISTman->FindOrBuildMaterial("G4_Mg");
+  myMaterials.push_back(Mg);
+
 }
 
  Materials::~ Materials()

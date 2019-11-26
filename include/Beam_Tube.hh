@@ -23,10 +23,10 @@ class Beam_Tube
 
   G4LogicalVolume *expHall_log;
 
-  Beam_Tube(G4LogicalVolume*,Materials*);
+  Beam_Tube(Materials*);
   ~Beam_Tube();
   
-  G4VPhysicalVolume *Construct();
+  G4VPhysicalVolume *Construct(G4LogicalVolume*);
   void setRmin(G4double);
   void setRmax(G4double);
   void setLength(G4double);

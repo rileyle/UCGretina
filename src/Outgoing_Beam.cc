@@ -48,7 +48,7 @@ void Outgoing_Beam::setDecayProperties()
 
   // Load the particle table with ground states
   G4IonTable* ionTable = G4IonTable::GetIonTable();
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  particleTable = G4ParticleTable::GetParticleTable();
   beam  = ionTable->GetIon(Zin,Ain,0.);
   if(TarA == 1 && TarZ ==1)
     tarIn = particleTable->FindParticle("proton");
@@ -74,7 +74,7 @@ void Outgoing_Beam::setDecayProperties()
     }
   }
 
-  for(G4int j = 0; j < DA.size(); j++){
+  for(size_t j = 0; j < DA.size(); j++){
     ionGS.push_back(ionTable->GetIon(Zin+DZ[j],Ain+DA[j],0.));
     if(DA[j] == 0){
       tarOutGS.push_back(tarIn);
@@ -119,7 +119,7 @@ void Outgoing_Beam::setDecayProperties()
     G4cerr << "Error: level data file name not set." << G4endl;
     exit(EXIT_FAILURE);
   }
-  for(G4int j = 0; j < lvlDataFileNames.size(); j++){
+  for(size_t j = 0; j < lvlDataFileNames.size(); j++){
 
     G4int Z,A;
     if(targetExcitation){
@@ -210,8 +210,8 @@ G4DynamicParticle* Outgoing_Beam::ReactionProduct()
   G4ParticleDefinition* product
     = G4IonTable::GetIonTable()->GetIon(Zout, Aout, excitationEnergy);
 
-  //  G4cout << "  " << product->GetParticleName() << G4endl;
-  //  G4cout << "  ex = " << excitationEnergy << G4endl;
+  //G4cout << "  " << product->GetParticleName() << G4endl;
+  //G4cout << "  ex = " << excitationEnergy << G4endl;
   
   G4DynamicParticle* aReactionProduct
     = new G4DynamicParticle(product, GetOutgoingMomentum());

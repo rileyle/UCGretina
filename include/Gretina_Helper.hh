@@ -173,8 +173,16 @@ class CeulerAngles
 {
   // default empty creator/destructor
   public:
-     CeulerAngles() {};
-    ~CeulerAngles() {};
+     CeulerAngles() {
+       ps=th=ph=sqrt(-1);
+       whichGe=numPhys=-1;
+       trasl=G4ThreeVector(0,0,0);
+       rotMat=G4RotationMatrix::IDENTITY;
+       pTransf=NULL;
+     };
+    ~CeulerAngles() {
+      //Don't delete G4Transform3D* because it is owned by another object
+    };
 
   // all members are public  
   public:  
@@ -204,8 +212,17 @@ class CclusterAngles
 {
   // default empty creator/destructor
   public:
-     CclusterAngles() {};
-    ~CclusterAngles() {};
+     CclusterAngles() {
+       whichClus=nsolids=nwalls=-1;
+#ifdef ANTIC
+       nantic=-1;
+#endif
+       solids.clear();
+       pAssV=NULL;
+     };
+    ~CclusterAngles() {
+      //Do not delete G4AssemblyVolume* since Geant4 kernel owns this
+    };
 
   // all members are public  
   public:

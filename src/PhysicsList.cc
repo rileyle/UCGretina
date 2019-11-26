@@ -32,7 +32,7 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #include "PhysicsList.hh"
-//#include "PhysicsListMessenger.hh"
+#include "PhysicsList_Messenger.hh"
  
 //#include "PhysListEmStandard.hh"
 
@@ -47,6 +47,10 @@
 #include "G4EmLivermorePhysics.hh"
 #include "G4EmPenelopePhysics.hh"
 #include "G4EmLowEPPhysics.hh"
+
+#include "G4PolarizedPhotoElectricEffect.hh"
+#include "G4PolarizedCompton.hh"
+#include "G4PolarizedGammaConversion.hh"
 
 #include "DetectorConstruction.hh"
 
@@ -63,6 +67,7 @@
 #include "G4BaryonConstructor.hh"
 #include "G4IonConstructor.hh"
 #include "G4ShortLivedConstructor.hh"
+#include "G4Gamma.hh"
 
 #ifdef NEUTRONS
 // From LBE for neutrons
@@ -76,7 +81,7 @@
 PhysicsList::PhysicsList(DetectorConstruction* det) 
   : G4VModularPhysicsList(), fDet(det)
 {
-  //  fMessenger = new PhysicsListMessenger(this);
+  theMessenger = new PhysicsList_Messenger(this);
   SetVerboseLevel(1);
 
   // EM physics
@@ -106,7 +111,7 @@ PhysicsList::PhysicsList(DetectorConstruction* det)
 
 PhysicsList::~PhysicsList()
 {
-  //  delete fMessenger;
+  delete theMessenger;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -162,7 +167,25 @@ void PhysicsList::ConstructProcess()
   // Electromagnetic physics list
   //
   fEmPhysicsList->ConstructProcess();
-    
+  
+  if(usePolar){
+    G4ProcessManager *gpMan = G4Gamma::Gamma()->GetProcessManager();
+    G4ProcessVector* pv = gpMan->GetProcessList();
+    for(G4int i=0;i<pv->entries();i++){
+      if((*pv)[i]->GetProcessName()=="phot"){
+	gpMan->RemoveProcess((*pv)[i]);
+	gpMan->AddDiscreteProcess(new G4PolarizedPhotoElectricEffect);
+      }
+      if((*pv)[i]->GetProcessName()=="compt"){
+	gpMan->RemoveProcess((*pv)[i]);
+	gpMan->AddDiscreteProcess(new G4PolarizedCompton());
+      }
+      if((*pv)[i]->GetProcessName()=="conv"){
+	gpMan->RemoveProcess((*pv)[i]);
+	gpMan->AddDiscreteProcess(new G4PolarizedGammaConversion);
+      }
+    }
+  }
 
   // Beam Reaction
   AddReaction();
@@ -241,7 +264,7 @@ void PhysicsList::AddPhysicsList(const G4String& name)
     fEmName = name;
     delete fEmPhysicsList;
     fEmPhysicsList = new G4EmLivermorePhysics();
-    
+
   } else if (name == "empenelope") {
     fEmName = name;
     delete fEmPhysicsList;
@@ -277,10 +300,10 @@ void PhysicsList::AddReaction()
   while( (*particleIterator)() ){
     G4ParticleDefinition* particle = particleIterator->value();
     G4String particleName = particle->GetParticleName();
-    if ( particleName == "GenericIon" ){
+    G4String particleType = particle->GetParticleType();
+    if ( particleName == "proton" || particleName == "neutron" || particleType == "nucleus" ) 
       ph->RegisterProcess(react, particle);    
-      ph->RegisterProcess(new G4StepLimiter, particle);
-    }
+    ph->RegisterProcess(new G4StepLimiter, particle);
   }
 }
 
@@ -321,10 +344,11 @@ void PhysicsList::AddRadioactiveDecay()
   
   G4PhysicsListHelper* ph = G4PhysicsListHelper::GetPhysicsListHelper();  
   ph->RegisterProcess(radioactiveDecay, G4GenericIon::GenericIon());
-  
+
   // mandatory for G4NuclideTable
   //
   G4NuclideTable::GetInstance()->SetThresholdOfHalfLife(0.1*picosecond);
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -370,6 +394,16 @@ void PhysicsList::GetRange(G4double val)
   G4cout << "particle : " << part->GetParticleName()  << G4endl;
   G4cout << "energy   : " << G4BestUnit(val,"Energy") << G4endl;
   G4cout << "range    : " << G4BestUnit(cut,"Length") << G4endl;
+}
+
+void PhysicsList::SetGammaAngularCorrelations(bool val){
+  G4NuclearLevelData::GetInstance()->GetParameters()->SetCorrelatedGamma(val);
+  G4cout<<"Set correlated gamma "<<val<<G4endl;
+}
+
+void PhysicsList::SetUsePolarizedPhysics(bool use){
+  usePolar=use;
+  
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
