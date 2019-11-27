@@ -7,7 +7,9 @@
 /Target/Construct
 /Target/Sled
 /BeamTube/Construct
-/Gretina/update
+
+# Initialize run manager =======================================================
+/run/initialize
 
 # Set reaction parameters ======================================================
 /BeamIn/A 44

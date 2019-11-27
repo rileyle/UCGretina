@@ -3,8 +3,12 @@
 
 DetectorConstruction::DetectorConstruction()
 {
-
+#ifndef LHTARGET
   targetStatus   = false;
+#else
+  targetStatus   = true;
+#endif
+
 #ifndef SCANNING
   shellStatus    = "";
   s800Status     = false;
@@ -25,7 +29,6 @@ DetectorConstruction::DetectorConstruction()
 
   myMessenger = new DetectorConstruction_Messenger(this);
 
-  //  DefineMaterials();
   materials = new Materials();
 
   TrackerIon = new TrackerIonSD("IonTracker");
@@ -124,11 +127,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   return ExpHall_phys;
 }
 
-void DetectorConstruction::DefineMaterials()
-{
-  // Remove this method. All materials are now defined by the Materials class.
-}
-
 void DetectorConstruction::Placement()
 {
 
@@ -221,11 +219,11 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
   const char *aLine;
   G4String commandName;
 
-  commandName = "/Gretina/update";
-  aLine = commandName.c_str();
-  UpdateCmd = new G4UIcmdWithoutParameter(aLine, this);
-  UpdateCmd->SetGuidance("Update geometry.");
-  UpdateCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  //  commandName = "/Gretina/update";
+  //  aLine = commandName.c_str();
+  //  UpdateCmd = new G4UIcmdWithoutParameter(aLine, this);
+  //  UpdateCmd->SetGuidance("Update geometry.");
+  //  UpdateCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   commandName = "/Target/Construct";
   aLine = commandName.c_str();
@@ -292,7 +290,7 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
 
 DetectorConstruction_Messenger::~DetectorConstruction_Messenger()
 {
-  delete UpdateCmd;
+  //  delete UpdateCmd;
   delete TargetCmd;
   delete NoGretCmd;
 #ifndef SCANNING
@@ -313,9 +311,9 @@ DetectorConstruction_Messenger::~DetectorConstruction_Messenger()
 
 void DetectorConstruction_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
 { 
-  if( command == UpdateCmd ) {
-    myTarget->Placement();
-  } 
+  //  if( command == UpdateCmd ) {
+  //    myTarget->Placement();
+  //  } 
   if( command == TargetCmd ) {
     myTarget->SetTargetStatus(true);
   } 

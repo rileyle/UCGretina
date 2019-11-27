@@ -24,6 +24,9 @@ coincidence events observed by GRETINA. The ./angCorr.C script
 produces an angular distribution plot by dividing the position/delta
 spectrum by that from a simulation with no angular correlation.
 
+In order for the "measured" W plot to show a statistially significant
+angular correlation, simulate 1E7 events.
+
 ================================================================================
 o Running the simulation
 

@@ -6,7 +6,9 @@
 /Target/Bulge 1.0 mm
 /Target/Angle 30. deg
 /Target/Construct
-/Gretina/update
+
+# Initialize run manager =======================================================
+/run/initialize
 
 # Set reaction parameters ======================================================
 /BeamIn/A 44

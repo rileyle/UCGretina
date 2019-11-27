@@ -544,7 +544,7 @@ G4VPhysicalVolume* Target::Construct50mgCell(){
     LHTarget->AddPlacedVolume(DnstreamWindow_log, DSwindowPos, &NoRot);
 
   }
-#if(1)
+
   // Target Cell
   //
   // The window frames and clamp rings have inner radius 1.59 cm over
@@ -569,7 +569,7 @@ G4VPhysicalVolume* Target::Construct50mgCell(){
   G4ThreeVector TargetCellPos = G4ThreeVector(0., 0., -3.0*cm/2.);
   
   LHTarget->AddPlacedVolume(TargetCell_log, TargetCellPos, &NoRot);
-#endif
+
   return Target_phys;
 
 }

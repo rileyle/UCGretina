@@ -5,7 +5,9 @@
 /Target/Construct
 /Target/Sled
 /BeamTube/Construct
-/Gretina/update
+
+# Initialize run manager =======================================================
+/run/initialize
 
 # Source parameters ============================================================
 /BackgroundSphere/Material G4_CONCRETE

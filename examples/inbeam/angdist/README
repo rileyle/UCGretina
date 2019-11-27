@@ -1,17 +1,15 @@
 ================================================================================
-Example fit with gamma-ray angular distributions
+Gamma-ray angular distributions
 
-             This example is identical to ./examples/inbeam/fit
-	     (see ./examples/inbeam/fit for a detailed description)
-	     except that it uses UCGretina_AD, compiled with the AD
-	     flag set, enabling optional non-isotropic gamma-ray
-	     angular distributions. The coeeficients a0, a2, a4
-	     for each transition are the last three entries in the
-	     transition lines in the level data file
-	     z16.a44.ad.lvldata.
+             This example is identical to the simulation of the 1329 keV
+	     2+ -> 0+ gamma ray in 44S in ./examples/inbeam/fit
+	     except that it simulates the gamma-ray angular
+	     distribution resulting from alignment of the
+	     reaction product (100% oblate alignment).
 
-	     The script angDist.C plots the emitted angular 
-	     distributions of the 1329 keV (a0,a2,a4 = 0, 0.3, 0.02,
-	     red) and 2150 keV (isotropic, blue) transitions. 
+	     An isotropic angular distribution is also simulated, and
+	     the root script angDist.C compares the angular
+	     distributions of the emitted gamma rays (isotropic in blue,
+	     aligned in red) for comparison.
 
 ================================================================================

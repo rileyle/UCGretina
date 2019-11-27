@@ -4,7 +4,7 @@ void angDist(){
   GH1D *sim[nSim];       
   TString simFileName[nSim];
   simFileName[0] = "s44_1329_histos.root";
-  simFileName[1] = "s44_2150_histos.root";
+  simFileName[1] = "s44_1329_iso_histos.root";
 
   for(int i=0;i<nSim;i++) {
     TFile *sF = new TFile(simFileName[i]);

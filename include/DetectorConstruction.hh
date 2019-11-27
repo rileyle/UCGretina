@@ -69,8 +69,6 @@ public:
   G4double GetBGSphereRmin(){return BackgroundSphere->GetRmin();}
   G4double GetBGSphereRmax(){return BackgroundSphere->GetRmax();}
 
-  void DefineMaterials();
-
   void SetTargetStatus(G4bool stat){targetStatus = stat;}
   void SetGretinaStatus(G4bool stat){gretinaStatus = stat;}
 

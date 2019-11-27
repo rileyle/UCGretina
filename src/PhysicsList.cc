@@ -96,11 +96,6 @@ PhysicsList::PhysicsList(DetectorConstruction* det)
 
   BeamOut = NULL;
 
-#ifndef AD
-  // Activate gamma-ray angular correlations for G4PhotonEvaporation
-  G4NuclearLevelData::GetInstance()->GetParameters()->SetCorrelatedGamma(true);
-#endif
-
 #ifdef NEUTRONS
   // From LBE for neutrons
   stoppingPhysics = new G4StoppingPhysics;

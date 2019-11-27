@@ -7,7 +7,13 @@
 /Target/Construct
 /Target/Sled
 /BeamTube/Construct
-/Gretina/update
+
+# Gamma-ray angular correlation / polarization flags ===========================
+/PhysicsList/AngularCorrelations false
+/PhysicsList/SetGammaPolarization false
+
+# Initialize run manager =======================================================
+/run/initialize
 
 # Set reaction parameters ======================================================
 /BeamIn/A 44
@@ -21,8 +27,8 @@
 /BeamOut/TargetZ 4
 /BeamOut/DA 0
 /BeamOut/DZ 0
-/BeamOut/LevelDataFile z16.a44.ad.lvldata
-/BeamOut/ProjectileExcitation 2150 keV
+/BeamOut/LevelDataFile z16.a44.lvldata
+/BeamOut/ProjectileExcitation 1329 keV
 /BeamOut/AngDistSigmaA 0.006 rad
 /BeamOut/AngDistSigmaB 0.006 rad
 /BeamOut/Update
@@ -34,11 +40,12 @@
 # Tracking parameters ==========================================================
 #/GammaPrint/Track_Set
 #/IonPrint/Track_Set
+
 # Output parameters ============================================================
 /Mode2/PackingRes 0.0 mm
 /Mode2/crmatFile crmat.LINUX
 /Mode2/GretinaCoords
 /Mode2/S800KE 3.798 GeV
 #/Mode2/Print
-/Mode2/Filename s44_2150.dat
+/Mode2/Filename s44_1329_iso.dat
 /run/beamOn 100000

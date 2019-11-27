@@ -7,7 +7,13 @@
 /Target/Construct
 /Target/Sled
 /BeamTube/Construct
-/Gretina/update
+
+# Gamma-ray angular correlation / polarization flags ===========================
+/PhysicsList/AngularCorrelations true
+/PhysicsList/SetGammaPolarization true
+
+# Initialize run manager =======================================================
+/run/initialize
 
 # Set reaction parameters ======================================================
 /BeamIn/A 44
@@ -21,11 +27,18 @@
 /BeamOut/TargetZ 4
 /BeamOut/DA 0
 /BeamOut/DZ 0
-/BeamOut/LevelDataFile z16.a44.ad.lvldata
+/BeamOut/LevelDataFile z16.a44.lvldata
 /BeamOut/ProjectileExcitation 1329 keV
 /BeamOut/AngDistSigmaA 0.006 rad
 /BeamOut/AngDistSigmaB 0.006 rad
 /BeamOut/Update
+
+# 100% oblate alignment
+/reaction/population 4   0.5
+/reaction/population 2   0.0
+/reaction/population 0   0.0
+/reaction/population -2  0.0
+/reaction/population -4  0.5
 
 # Print simulation parameters to stdout ========================================
 /Target/Report

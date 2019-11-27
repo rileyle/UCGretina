@@ -5,7 +5,13 @@
 /Target/Construct
 /Target/Sled
 /BeamTube/Construct
-/Gretina/update
+
+# Gamma-ray angular correlation / polarization flags ===========================
+/PhysicsList/AngularCorrelations false
+/PhysicsList/SetGammaPolarization false
+
+# Initialize run manager =======================================================
+/run/initialize
 
 # Set source/decay parameters ==================================================
 
@@ -28,7 +34,7 @@
 # Load excited states of the daughter (60Ni) into the particle table.
 /BeamOut/DA 0
 /BeamOut/DZ +1
-/BeamOut/LevelDataFile iso.lvldata
+/BeamOut/LevelDataFile z28.a60.lvldata
 
 /BeamOut/Update
 

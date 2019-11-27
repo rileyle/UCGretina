@@ -1,7 +1,3 @@
-/ExpHall/X_length 2. m
-/ExpHall/Y_length 2. m
-/ExpHall/Z_length 2. m
-
 # Detector parameters ==========================================================
 /Gretina/detector/enableCapsules
 /ScanningTable/CADModelPath ../../cadModels
@@ -19,7 +15,18 @@
 /ScanningTable/SetControllerY    -64.9 mm   #  geant4 z
 /ScanningTable/SetControllerZ     -4.64 mm  #  geant4 y
 /ScanningTable/SetCloverZ   -24.34 mm       # y, actually
-/Gretina/update
+#/Gretina/update
+
+# Angular correlation / polarization flags =====================================
+/PhysicsList/AngularCorrelations true
+/PhysicsList/SetGammaPolarization true
+
+# Initialize RunManager ========================================================
+/run/initialize
+
+/ExpHall/X_length 2. m
+/ExpHall/Y_length 2. m
+/ExpHall/Z_length 2. m
 
 # Source parameters ============================================================
 /Experiment/RunSource
