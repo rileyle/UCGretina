@@ -33,7 +33,7 @@
 /BeamOut/AngDistSigmaB 0.006 rad
 /BeamOut/Update
 
-# 100% oblate alignment
+# 100% oblate alignment ========================================================
 /reaction/population 4   0.5
 /reaction/population 2   0.0
 /reaction/population 0   0.0

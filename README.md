@@ -20,12 +20,6 @@ Compile:
 
     $ make
 
-To enable gamma-ray angular distributions:
-
-    $ make AD=1
-
-(produces the binary UCGretina_AD)
-
 To use the LBL scanning table:
 
     $ make SCANNING=1
@@ -36,14 +30,13 @@ To use the liquid hydrogen target:
 
     $ make LHTARGET=1
 
-(produces the binary UCGretina_LH, can be compiled with AD=1 as well
-to produce the binary UCGretina_LH_AD)
+(produces the binary UCGretina_LH)
 
 To activate neutron-related processes in the physics list (required for
 the `neutron` source type:
 
     $ make NEUTRONS=1
-	
+
 (does not affect the executable name, can be used with any of the
 above flags)
 
@@ -158,9 +151,26 @@ Optional command to include a model of the S800 quadrupole:
 
     /Gretina/S800
 
-Mandatory command after setting any GRETINA parameters:
+### Gamma-Ray Angular Correlations (see also ./examples/sources/co60) ###
 
-    /Gretina/update
+Gamma-ray angular correlations are built into the
+`G4PhotonEvaporation/G4GammaTransition` classes (starting With
+geant4.10.4). This functionality is disabled by default but can be
+enabled with: 
+
+    /PhysicsList/AngularCorrelations true
+
+The `./examples/sources/co60` example includes a
+simulation of the angular correlations in the 4 -> 2 -> 0 cascade in
+<SUP>60</SUP>Ni and also shows how to simulate isotropic distributions
+for comparison with correlated ones.
+
+### Initialize the Run Manager ###
+
+After issuing the above commands as needed to pre-configure the
+simulation, the run manager must be initialized:
+
+    /run/initialize
 
 ### In-beam Simulations ###
 
@@ -329,6 +339,27 @@ Optional commands related to the outgoing reaction product:
 > described under **Source Simulations** below, in which gamma-rays are 
 > emitted as primary particles._ 
 
+### Gamma-Ray Angular Distributions (see also ./examples/inbeam/angdist) ###
+
+The alignment of the excited reaction product can be specified in
+in-beam simulations, leading to a net polarization of emitted gamma
+rays and a corresponding non-isotropic gamma-ray angular
+distribution. This functionality is disabled by default but can be
+enabled with:
+
+    /PhysicsList/AngularCorrelations true
+    /PhysicsList/SetGammaPolarization true
+
+(issued prior to the `/run/initialize` command)
+
+The alignment of the reation product is specified (after the 
+`/run/initialize` command) in terms of the population parameters P(m)
+of the magnetic substates, set using:
+
+    /reaction/population <2m> <P(m)>
+
+where m = -J, -J+1, ..., J-1, J and the P(m) sum to 1. 
+
 ### Source Simulations (see also ./examples/eu152) ###
 
 Mandatory commands
@@ -382,14 +413,14 @@ Optional commands
 > Radius of the source disk. 
 
     /Experiment/Source/setDX <double> <unit>
-	/Experiment/Source/setDY <double> <unit>
+    /Experiment/Source/setDY <double> <unit>
 
 > Horizontal (nondispersive) and vertical (dispersive) widths of a 
 > rectangular source. These override the `/Experiment/Source/setR` 
 > command.
 
     /Experiment/Source/setSigmaX <double> <unit>
-	/Experiment/Source/setSigmaY <double> <unit>
+    /Experiment/Source/setSigmaY <double> <unit>
 
 > Horizontal (nondispersive) and vertical (dispersive) sigma 
 > parameter of a Gaussian distribution of emission points. These 
@@ -473,41 +504,11 @@ from which background gamma-rays are emitted.
 > Set the inner and outer radii of the background sphere 
 > (default: 3.0 m, 3.4 m). 
 
-### Gamma-Ray Angular Correlations (see also ./examples/sources/co60) ###
-
-Starting With geant4.10.4, gamma-ray angular correlations are built
-into the `G4PhotonEvaporation/G4GammaTransition` classes. This
-functionality is disabled by default but is enabled in the UCGretina
-`PhysicsList`. The `./examples/sources/co60` example includes a
-simulation of the angular correlations in the 4 -> 2 -> 0 cascade in
-<SUP>60</SUP>Ni and also shows how to simulate isotropic distributions
-for comparison with correlated ones.
-
-_Important Note: the built-in gamma-ray angular correlation
-functionality is bypassed by `UCGretina_AD`._
-
-### Gamma-Ray Angular Distributions (see also ./examples/inbeam/angdist) ###
-
-(`UCGretina_AD` only)
-
-The level data file format described under /BeamOut/LevelDataFile` 
-above is modified to include coefficients a0, a2, a4 of the 
-gamma-ray angular distribution
-
-> W(theta) = a_0 + a_2 P_2[cos(theta)] + a_4 P_4[cos(theta)]
-
-(theta relative to the beam axis) appended to the end of each of 
-the lines describing transitions.
-
-_Important Note: the built-in gamma-ray angular correlations are 
-bypassed entirely in this version of the code. The directions of 
-Gamma rays emitted in cascades are completely uncorrelated._
-
 ### LBL Scanning Table (see also ./examples/scan) ###
 
 (`UCGretina_Scan` only)
 
-_The geometries specified in `./GretinaGeometry/Scan0`, 
+ The geometries specified in `./GretinaGeometry/Scan0`, 
 `./GretinaGeometry/Scan1`, `./GretinaGeometry/Scan2`, and 
 `./GretinaGeometry/Scan3` orient the GRETINA module such that the 
 corresponding crystal is centered on the slits.
