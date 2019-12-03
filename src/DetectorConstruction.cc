@@ -211,8 +211,10 @@ void DetectorConstruction::Placement()
 #endif
 
   if(gretinaStatus){
+#ifndef SCANNING
     the_Gretina_Array->SetNorthOffset(northOffset);
     the_Gretina_Array->SetSouthOffset(southOffset);
+#endif
     the_Gretina_Array->Placement();
   }
 }
