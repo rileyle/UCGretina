@@ -222,9 +222,9 @@ void Gretina_NSCL_Shell::HalfShell(G4String half)
   G4int iMin = 0;
   G4int iMax = 10;
   if(half == "north")
-    iMin = 5;
+    iMin = 4;
   if(half == "south")
-    iMax = 5;
+    iMax = 6;
   for(G4int i = iMin; i<iMax; i++){
     Rot = G4RotationMatrix::IDENTITY;
     Rot.rotateY( PosSP[i].getTheta() );
