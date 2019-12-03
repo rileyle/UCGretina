@@ -50,6 +50,8 @@ private:
   G4double         Rmax;
   G4double         smallPortRadius;
   G4double         modulePortRadius;
+  G4double         northOffset;
+  G4double         southOffset;
   G4ThreeVector    Pos;
   G4ThreeVector    Pos0;
   G4RotationMatrix Rot;
@@ -61,7 +63,10 @@ private:
 
 public:
     G4int  FindMaterials();
+    void   setNorthOffset(G4double off){northOffset = off;}
+    void   setSouthOffset(G4double off){southOffset = off;}
     void   Placement(G4String);
+    void   HalfShell(G4String);
 };
 
 #endif

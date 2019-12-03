@@ -86,6 +86,8 @@ public:
 
 #ifndef SCANNING
   void SetShellStatus(G4String stat){shellStatus = stat;}
+  void SetNorthOffset(G4double off){northOffset = off;}
+  void SetSouthOffset(G4double off){southOffset = off;}
   void SetS800Status(G4bool stat){s800Status = stat;}
   void SetLaBrStatus(G4bool stat){laBrStatus = stat;}
 #endif
@@ -122,6 +124,8 @@ private:
 
 #ifndef SCANNING
   G4String shellStatus;
+  G4double northOffset;
+  G4double southOffset;
   G4bool   s800Status;
   S800*    the_S800;
   G4bool   laBrStatus;
@@ -175,6 +179,8 @@ private:
   G4UIcmdWithoutParameter*     NoGretCmd;
 #ifndef SCANNING
   G4UIcmdWithAString*          ShellCmd;
+  G4UIcmdWithADoubleAndUnit*   NorthOffCmd;
+  G4UIcmdWithADoubleAndUnit*   SouthOffCmd;
   G4UIcmdWithoutParameter*     S800Cmd;
   G4UIcmdWithoutParameter*     LaBrCmd;
 #endif

@@ -161,21 +161,27 @@ class Gretina_Array
   private:
     G4ThreeVector               posShift;   
 
-  ///////////////////////////////////////////                               //LR
+  ////////////////////////////////////////////////////////////////
+  /// offsets away from the target applied to the north and south
+  /// halves of the mounting shell and corresponding modules
+  ////////////////////////////////////////////////////////////////
+  private:
+    G4double                    northOffset;
+    G4double                    southOffset;
+  
+  ///////////////////////////////////////////
   /// Cryostats             
   //////////////////////////////////////////
   public:
-    void SetCryostats(){cryostatStatus = true;};                            //LR
+    void SetCryostats(){cryostatStatus = true;};
 
   private:
-    G4ThreeVector               cryostatPos0;                               //LR
-    G4ThreeVector               cryostatPos;                                //LR
-    G4RotationMatrix            cryostatRot;                                //LR
-  //G4double                    cryostatRadius;                             //LR
-  //G4double                    cryostatLength;                             //LR
-    G4double                    cryostatZplanes[7];                         //LR
-    G4double                    cryostatRinner[7];                          //LR
-    G4double                    cryostatRouter[7];                          //LR
+    G4ThreeVector               cryostatPos0;
+    G4ThreeVector               cryostatPos;
+    G4RotationMatrix            cryostatRot;
+    G4double                    cryostatZplanes[7];
+    G4double                    cryostatRinner[7];
+    G4double                    cryostatRouter[7];
   /////////////////
   /// some flags 
   //////////////// 
@@ -185,7 +191,7 @@ class Gretina_Array
     G4bool                      useAncillary;   //> true: ancillary detectors will be constructed
     G4bool                      makeCapsule;    //> true: encapsulation will be generated
     G4bool                      useCylinder;    //> true: the intersection with the cylinder will be considered
-    G4bool                      cryostatStatus; //> true: include cryostats behind clusters //LR
+    G4bool                      cryostatStatus; //> true: include cryostats behind clusters
     G4bool                      readOut;        //> true: a segmentation have been defined  
     G4bool                      printVolumes;   //> true: report crystal, segment, and passive volumes
   
@@ -304,6 +310,8 @@ class Gretina_Array
     void SetThetaShift          ( G4double );
     void SetPhiShift            ( G4double );
     void SetPosShift            ( G4ThreeVector );
+    void SetNorthOffset         ( G4double );
+    void SetSouthOffset         ( G4double );
     void SetThetaPrisma         ( G4double );
 
   public:      

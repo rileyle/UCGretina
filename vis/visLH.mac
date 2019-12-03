@@ -5,7 +5,9 @@
 /Target/Angle 30. deg
 /Target/Cutaway
 /Target/Construct
-/Gretina/update
+
+# Initialize run manager =======================================================
+/run/initialize
 
 #start visualizer
 /vis/open VRML2FILE

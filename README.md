@@ -62,7 +62,7 @@ packages.
 
 Five text files present in the working directory in which `UCGretina`
 is run determine the geometry of the crystals (`asolid`), including
-coaxial and back dead layers, the segmentation of crystals for readout
+coaxial and back passive layers, the segmentation of crystals for readout
 (`aslice`), the assembly of crystals into quads (`acluster`), the
 aluminum vacuum jacket surrounding the crystals in each quad
 (`awalls`), and the placement of modules into the array
@@ -118,7 +118,6 @@ Mandatory command for building the beam tube:
 
     /BeamTube/Construct
 
-
 Mandatory command for building the WU chamber:
 
     /WUChamber/Construct
@@ -135,7 +134,7 @@ Optional commands for setting GRETA chamber geometry:
     
     /GretaChamber/R_max <double> <unit>
 
-Optional commands for including GRETINA-related dead material:
+Optional commands for including GRETINA-related passive material:
 
     /Gretina/detector/enableCapsules
     
@@ -143,11 +142,17 @@ Optional commands for including GRETINA-related dead material:
     
     /Gretina/Shell < full || north || south || Greta || GretaLH || Greta_North || Greta_South || GretaLH_North || GretaLH_South >
 
+Optional commands setting the offset of the north and south halves of the mounting shell (positive values correspond to backing away from the target):
+
+    /Gretina/NorthOffset <double> <unit>
+	
+    /Gretina/SouthOffset <double> <unit>
+
 Optional command to omit the GRETINA detectors:
 
     /Gretina/NoDetectors
 
-Optional command to include a model of the S800 quadrupole:
+Optional command to include a model of the S800 quadrupole and gate valve:
 
     /Gretina/S800
 

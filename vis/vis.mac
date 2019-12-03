@@ -4,7 +4,9 @@
 /Target/Construct
 /Target/Sled
 /BeamTube/Construct
-/Gretina/update
+
+# Initialize run manager =======================================================
+/run/initialize
 
 #start visualizer
 /vis/open VRML2FILE

@@ -54,6 +54,8 @@ private:
   G4double         S800PortRadius;
   G4double         notchWidth;
   G4double         notchThickness;
+  G4double         northOffset;
+  G4double         southOffset;
   G4ThreeVector    Pos;
   G4ThreeVector    Pos0;
   G4ThreeVector    PosNotch;
@@ -65,7 +67,10 @@ private:
 
 public:
     G4int  FindMaterials();
+    void   setNorthOffset(G4double off){northOffset = off;}
+    void   setSouthOffset(G4double off){southOffset = off;}
     void   Placement(G4String);
+    void   HalfShell(G4String);
 };
 
 #endif

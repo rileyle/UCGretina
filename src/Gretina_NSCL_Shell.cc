@@ -13,6 +13,8 @@ Gretina_NSCL_Shell::Gretina_NSCL_Shell()
   S800PortRadius   = 13.287*2.54*cm;     // SHEET 1
   notchWidth       = 15.59*2.54*cm;
   notchThickness   = 4.921*2.54*cm+10*cm;
+  northOffset      = 0.;
+  southOffset      = 0.;
 
   // Small port positions
   PosSP[0] = G4ThreeVector(-492.891*mm, -145.253*mm, -256.924*mm);
@@ -105,9 +107,7 @@ Gretina_NSCL_Shell::Gretina_NSCL_Shell()
   Pos0.setX(0.);
   Pos0.setY(0.);
   Pos0.setZ(180.0*mm);
-  //  Pos0.setX(90.734*mm);
-  //  Pos0.setY(26.7389*mm);
-  //  Pos0.setZ(153.053*mm);
+
   // Rescale to place the Tubs at a radial distance from the origin in the 
   // middle of the mounting shell. 
   Pos0.setMag((Rmin+Rmax)/2.*mm);
@@ -158,6 +158,21 @@ void Gretina_NSCL_Shell::Placement(G4String status)
     return;
   }
 
+  if(status == "full" || status == "north")
+    HalfShell("north");
+
+  if(status == "full" || status == "south")
+    HalfShell("south");
+  
+  G4cout << "Constructed the " << status << " shell." << G4endl;
+  G4cout << "  Shell radius: " << Rmin << " -- " << Rmax << G4endl;
+  G4cout << "  Shell material: " << matShell->GetName() << G4endl;
+
+}
+
+void Gretina_NSCL_Shell::HalfShell(G4String half)
+{
+
   if( FindMaterials() ) return;
 
   G4RunManager* runManager               = G4RunManager::GetRunManager();
@@ -169,13 +184,17 @@ void Gretina_NSCL_Shell::Placement(G4String status)
 
   G4double Phi0 =   0.*deg;
   G4double dPhi = 360.*deg;
-  if(status == "north"){
+
+  if(half == "north"){
     Phi0 = -90.*deg;
     dPhi = 180.*deg;
-  } else if(status == "south"){
+  } else if(half == "south"){
     Phi0 =  90.*deg;
     dPhi = 180.*deg;
-  }
+  } else
+    G4Exception("Gretina_NSCL_Shell::HalfShell()", "Error", FatalException,
+		"half argument must be set to north or south");
+
   G4Sphere* solidShell = new G4Sphere( "solidShell", Rmin, Rmax, Phi0, dPhi, 0., 180.*deg);
 
   // Beam Port  
@@ -197,18 +216,14 @@ void Gretina_NSCL_Shell::Placement(G4String status)
 
   shell = new G4SubtractionSolid ("Shell",shell,S800Port,G4Transform3D(Rot,G4ThreeVector(0.0,0.0,(Rmax+Rmin)/2))); 
 
-  //  G4Tubs* Dewar = new G4Tubs("Dewar", 0, .8*modulePortRadius, .7*(Rmin)/2., 0.*deg, 360.*deg);
-
-  //  G4LogicalVolume* logicDewar = new G4LogicalVolume(Dewar, matShell, "Dewar_log", 0, 0, 0 );
-
   // Subtract the small ports from the shell.
   G4Tubs* smallPort = new G4Tubs("smallPort", 0, smallPortRadius, 1.5*(Rmax-Rmin)/2., 0., 360.*deg);
 
   G4int iMin = 0;
   G4int iMax = 10;
-  if(status == "north")
+  if(half == "north")
     iMin = 5;
-  if(status == "south")
+  if(half == "south")
     iMax = 5;
   for(G4int i = iMin; i<iMax; i++){
     Rot = G4RotationMatrix::IDENTITY;
@@ -222,9 +237,9 @@ void Gretina_NSCL_Shell::Placement(G4String status)
 
   iMin = 0;
   iMax = 22;
-  if(status == "north")
+  if(half == "north")
     iMin = 10;
-  if(status == "south")
+  if(half == "south")
     iMax = 12;
   for(G4int i = iMin; i<iMax; i++){
     Pos = Pos0;
@@ -238,46 +253,23 @@ void Gretina_NSCL_Shell::Placement(G4String status)
     shell = new G4SubtractionSolid ("Shell",shell,modulePort,G4Transform3D(Rot,Pos));
   }
 
-
-  //  new G4PVPlacement(G4Transform3D(Rot,Pos*.86), logicDewar, "LNDewar", theDetector->HallLog(), false, 0 );
-
-  //  new G4PVPlacement(G4Transform3D(Rot,Pos*.86), logicDewar, "LNDewar", theDetector->HallLog(), false, 0 );
-
-  //  new G4PVPlacement(G4Transform3D(Rot,Pos*.86), logicDewar, "LNDewar", theDetector->HallLog(), false, 0 );
-
-  //  new G4PVPlacement(G4Transform3D(Rot,Pos*.86), logicDewar, "LNDewar", theDetector->HallLog(), false, 0 );
-
-  //  new G4PVPlacement(G4Transform3D(Rot,Pos*.86), logicDewar, "LNDewar", theDetector->HallLog(), false, 0 );
-
-  //  new G4PVPlacement(G4Transform3D(Rot,Pos*.86), logicDewar, "LNDewar", theDetector->HallLog(), false, 0 );
-
-  //  new G4PVPlacement(G4Transform3D(Rot,Pos*.86), logicDewar, "LNDewar", theDetector->HallLog(), false, 0 );
-
   G4Box* s800notch = new G4Box("s800notch", notchWidth/2.0, 40*cm, notchThickness/2.0);
 
   Rot = G4RotationMatrix::IDENTITY;
 
-  shell = new G4SubtractionSolid ("Shell",shell,s800notch,G4Transform3D(Rot,PosNotch));
-
-  //  G4Tubs* s800plane = new G4Tubs( "s800plane", 0., 1.1*Rmax, Rmax, 0., 360.*deg);
-
-  //  Rot = G4RotationMatrix::IDENTITY;
-
-  //  G4LogicalVolume* logicPlane = new G4LogicalVolume(s800plane, matShell, "Plane_log", 0, 0, 0 );
-
-  //  new G4PVPlacement(G4Transform3D(Rot,PosPlane), logicPlane, "Plane_log", theDetector->HallLog(), false, 0 );
-
-  //  G4IntersectionSolid* Shell = new G4IntersectionSolid ("Shell",shell,s800plane,G4Transform3D(Rot,PosPlane));
+  shell = new G4SubtractionSolid (half+"Shell",shell,s800notch,G4Transform3D(Rot,PosNotch));
 
   G4LogicalVolume* logicShell = new G4LogicalVolume(shell, matShell, "Shell_log", 0, 0, 0 );
 
-  new G4PVPlacement(0, G4ThreeVector(), "mountingShell", logicShell, theDetector->HallPhys(), false, 0 );
+  Pos = G4ThreeVector(0, 0, 0);
+  if(half == "north")
+    Pos.setX(northOffset);
+  else
+    Pos.setX(-southOffset);
+
+  new G4PVPlacement(0, Pos, half+"MountingShell", logicShell, theDetector->HallPhys(), false, 0 );
 
   G4VisAttributes *pVA = new G4VisAttributes( G4Colour(0.0, 1.0, 1.0) );
   logicShell->SetVisAttributes( pVA );
-
-  G4cout << "Constructed the " << status << " shell." << G4endl;
-  G4cout << "  Shell radius: " << Rmin << " -- " << Rmax << G4endl;
-  G4cout << "  Shell material: " << matShell->GetName() << G4endl;
 
 }

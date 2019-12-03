@@ -466,10 +466,10 @@ void Gretina_Array:: ReadSolidFile()
 
     //if( fabs((pPg->zFace2-pPg->zFace1) - pPg->tubL) < tolerance ){
     //  printf( "pPg->zFace2 = %12.6f, pPg->zFace1 = %12.6f, pPg->tubL =%12.6f",
-    //          pPg->zFace2, pPg->zFace1, pPg->tubL ); //LR
+    //          pPg->zFace2, pPg->zFace1, pPg->tubL );
     //  G4cout << " Warning! Increasing crystal length by "
-    //         << 2.*tolerance/mm << " mm in solid "                      //LR
-    //	     << pPg->whichGe << G4endl;                                   //LR
+    //         << 2.*tolerance/mm << " mm in solid "
+    //	     << pPg->whichGe << G4endl;
     //  pPg->tubL += 2.*tolerance;
     //}
     
@@ -1076,10 +1076,10 @@ void Gretina_Array::ConstructGeCrystals()
       }
       else {   // (GRETINA/GRETA crystals)
         zSliceGe = new G4double[4];
-        zSliceGe[0] = pPg->zCenter-pPg->tubL/2.-tolerance;  // LR: To avoid colocated planes in the G4IntersectionSolid
+        zSliceGe[0] = pPg->zCenter-pPg->tubL/2.-tolerance;  // To avoid colocated planes in the G4IntersectionSolid
         zSliceGe[1] = zFace1 + pPg->thick;
         zSliceGe[2] = zFace1 + pPg->thick;
-        zSliceGe[3] = pPg->zCenter+pPg->tubL/2.+tolerance;  // LR: "
+        zSliceGe[3] = pPg->zCenter+pPg->tubL/2.+tolerance;  // "
 
         InnRadGe = new G4double[4];
         InnRadGe[0] = 0.;
@@ -1250,8 +1250,8 @@ void Gretina_Array::ConstructGeCrystals()
     }
 
     pPg->pDetL->SetVisAttributes( pPg->pDetVA );
-    //    pPg->pDetL->SetSensitiveDetector( theDetector->GeSD() );    //LR
-    pPg->pDetL->SetSensitiveDetector( theDetector->GetGammaSD() );    //LR
+    //    pPg->pDetL->SetSensitiveDetector( theDetector->GeSD() );
+    pPg->pDetL->SetSensitiveDetector( theDetector->GetGammaSD() );
     ngen++;
 
     G4double totalV = pPg->pCaps->GetCubicVolume()/cm3;
@@ -1564,13 +1564,13 @@ void Gretina_Array::ConstructTheWalls()
       pPg->pPoly  = new CConvexPolyhedron(G4String(sName), pPg->vertex );
 
       sprintf(sName, "wlDetL%2.2d", nGe);
-      // Use a different material for the back walls                        //LR
-      if(nPg < 18)                                                          //LR
+      // Use a different material for the back walls
+      if(nPg < 18)
 	pPg->pDetL  = new G4LogicalVolume( pPg->pPoly, matWalls, G4String(sName), 0, 0, 0 );
-      else                                                                  //LR
-	pPg->pDetL  = new G4LogicalVolume( pPg->pPoly, matBackWalls, G4String(sName), 0, 0, 0 );                                                            //LR
+      else
+	pPg->pDetL  = new G4LogicalVolume( pPg->pPoly, matBackWalls, G4String(sName), 0, 0, 0 );
 
-      //LR      pPg->pDetVA = new G4VisAttributes( G4Colour(0.5, 0.5, 0.5) );
+      //      pPg->pDetVA = new G4VisAttributes( G4Colour(0.5, 0.5, 0.5) );
       pPg->pDetVA = new G4VisAttributes( G4Colour(1, 1, 1) );
       pPg->pDetVA->SetForceWireframe(true);
       pPg->pDetL->SetVisAttributes( pPg->pDetVA );
@@ -2050,9 +2050,9 @@ void Gretina_Array::PlaceTheClusters()
     pEc = &euler[nEa];
     nCl = pEc->whichGe;
     if(nCl < 0) continue;
-    
+
     nGe = pEc->numPhys;
-    
+
     for(nCa = 0; nCa < nClAng; nCa++) {
       pCa = &clust[nCa];
       if(pCa->whichClus != nCl) continue;
@@ -2076,11 +2076,16 @@ void Gretina_Array::PlaceTheClusters()
       }
 
       indexP = 1000 * nGe + maxSolids * nGe;
+
+      if(abs(pEc->ph/deg) <= 90.) // Northern half of the mounting shell
+	rotatedPos += G4ThreeVector( northOffset, 0, 0);
+      else                        // Southern half of the mounting shell
+      	rotatedPos += G4ThreeVector(-southOffset, 0, 0);
       
       transf = G4Transform3D( rm, rotatedPos );
       pCa->pAssV->MakeImprint(theDetector->HallLog(), transf, indexP-1);
 
-      // Place a Cryostat                                                   //LR
+      // Place a Cryostat
       if(cryostatStatus){
 	cryostatPos = cryostatPos0;
 	cryostatPos.rotateZ(pEc->ps);
@@ -2090,6 +2095,11 @@ void Gretina_Array::PlaceTheClusters()
 	cryostatRot.rotateY( cryostatPos.getTheta() );
 	cryostatRot.rotateZ( cryostatPos.getPhi() );
 
+	if(abs(pEc->ph/deg) <= 90.) // Northern half of the mounting shell
+	  cryostatPos += G4ThreeVector( northOffset, 0, 0);
+	else                        // Southern half of the mounting shell
+	  cryostatPos += G4ThreeVector(-southOffset, 0, 0);
+	
 	new G4PVPlacement(G4Transform3D(cryostatRot,cryostatPos), logicCryostat, "Cryostat", theDetector->HallLog(), false, 0 );
       }
 
@@ -2275,12 +2285,12 @@ void Gretina_Array::WriteHeader(std::ofstream &outFileLMD, G4double unit)
   else
     outFileLMD << "CAPSULES 0" << G4endl;
     
-  //  G4RunManager * runManager = G4RunManager::GetRunManager();          // LR
-  //  RunAction* theRun    = (RunAction*) runManager->GetUserRunAction(); // LR
+  //  G4RunManager * runManager = G4RunManager::GetRunManager();
+  //  RunAction* theRun    = (RunAction*) runManager->GetUserRunAction();
   
-  //  G4int verboseLevel = theRun->GetVerbose();                          // LR
-  //       Maybe fix the messenger someday.                               // LR
-  G4int verboseLevel = 1;                                                 // LR
+  //  G4int verboseLevel = theRun->GetVerbose();
+  //       Maybe fix the messenger someday.
+  G4int verboseLevel = 1;
 
   if( verboseLevel > 0 ) {
         
@@ -3451,7 +3461,31 @@ void Gretina_Array::SetPosShift( G4ThreeVector shift )
   G4cout.unsetf(ios::fixed);
   G4cout.precision(prec);
 }
-  
+
+void Gretina_Array::SetNorthOffset( G4double off )
+{
+  northOffset = off;
+
+  G4int prec = G4cout.precision(4);
+  G4cout.setf(ios::fixed);
+  G4cout  << " --> The northern hemisphere will be offset by "
+          << std::setw(8) << northOffset/mm <<" mm" << G4endl;
+  G4cout.unsetf(ios::fixed);
+  G4cout.precision(prec);
+}
+
+void Gretina_Array::SetSouthOffset( G4double off )
+{
+  southOffset = off;
+
+  G4int prec = G4cout.precision(4);
+  G4cout.setf(ios::fixed);
+  G4cout  << " --> The southern hemisphere will be offset by "
+          << std::setw(8) << southOffset/mm <<" mm" << G4endl;
+  G4cout.unsetf(ios::fixed);
+  G4cout.precision(prec);
+}
+
 ///////////////////
 // The Messenger
 ///////////////////

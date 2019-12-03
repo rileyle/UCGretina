@@ -7,9 +7,10 @@ Greta_Shell::Greta_Shell()
   Rmin      = 1022.0/2.0*mm;
   Rmax      = 1276.0/2.0*mm;
 
-  //  mountPortRadius   = 3.0/2.0*2.54*cm;   // DETAIL F, SHEET2
-  smallPortRadius   = 7.0/2.0*2.54*cm;   // DETAIL C, SHEET2
+  smallPortRadius  = 7.0/2.0*2.54*cm;   // DETAIL C, SHEET2
   modulePortRadius = 12.008/2.0*2.54*cm; // DETAIL A, SHEET2
+  northOffset      = 0.;
+  southOffset      = 0.;
 
   // Small port positions
   PosSP[0] = G4ThreeVector(-492.891*mm, -145.253*mm, -256.924*mm);
@@ -24,22 +25,21 @@ Greta_Shell::Greta_Shell()
   PosSP[9] = G4ThreeVector( 492.891*mm,  145.253*mm,  256.924*mm);
 
   // North: -1,  Split: 0,  South: 1
-  SmallPortStatus[0] = -1;
-  SmallPortStatus[1] = 1;
-  SmallPortStatus[2] = 1;
-  SmallPortStatus[3] = -1;
-  SmallPortStatus[4] = -1;
-  SmallPortStatus[5] = 1;
-  SmallPortStatus[6] = 1;
+  SmallPortStatus[0] =  1;
+  SmallPortStatus[1] =  1;
+  SmallPortStatus[2] =  1;
+  SmallPortStatus[3] =  1;
+  SmallPortStatus[4] =  0;
+  SmallPortStatus[5] =  0;
+  SmallPortStatus[6] = -1;
   SmallPortStatus[7] = -1;
   SmallPortStatus[8] = -1;
-  SmallPortStatus[9] = 1;
+  SmallPortStatus[9] = -1;
 
   // Module Port Euler angles (relative to Slot 0)
-  // Psi                              Slot   Hemisphere
+  // Psi                                   Slot   Hemisphere
   // Theta
   // Phi
-  
   ModuleEuler[0][0] =     0.000000*deg;   //  0    North
   ModuleEuler[0][1] =    31.717473*deg;
   ModuleEuler[0][2] =   -54.000000*deg;
@@ -171,9 +171,7 @@ Greta_Shell::Greta_Shell()
   Pos0.setX(0.);
   Pos0.setY(0.);
   Pos0.setZ(180.0*mm);
-  //  Pos0.setX(90.734*mm);
-  //  Pos0.setY(26.7389*mm);
-  //  Pos0.setZ(153.053*mm);
+
   // Rescale to place the Tubs at a radial distance from the origin in the 
   // middle of the mounting shell. 
   Pos0.setMag((Rmin+Rmax)/2.*mm);
@@ -183,8 +181,6 @@ Greta_Shell::Greta_Shell()
   // euler angles.
   Rot0.rotateY( Pos0.getTheta() );
   Rot0.rotateZ( Pos0.getPhi() );
-
-  Rot = G4RotationMatrix::IDENTITY;
 
 }
 
@@ -221,6 +217,29 @@ void Greta_Shell::Placement(G4String status)
     return;
   }
 
+  if(status == "Greta" || status == "Greta_North")
+    HalfShell("north");
+
+  if(status == "Greta" || status == "Greta_South")
+    HalfShell("south");
+
+  if(status == "GretaLH" || status == "GretaLH_North")
+    HalfShell("LH_north");
+
+  if(status == "GretaLH" || status == "GretaLH_South")
+    HalfShell("LH_south");
+  
+  G4cout << "Constructed the " << status << " shell." << G4endl;
+  G4cout << "  Shell radius: " << Rmin << " -- " << Rmax << G4endl;
+  G4cout << "  Shell material: " << matShell->GetName() << G4endl;
+
+}
+
+void Greta_Shell::HalfShell(G4String half)
+{
+
+  Rot = G4RotationMatrix::IDENTITY;
+
   if( FindMaterials() ) return;
 
   G4RunManager* runManager               = G4RunManager::GetRunManager();
@@ -230,18 +249,18 @@ void Greta_Shell::Placement(G4String status)
   // The GRETA mounting shell
   //////////////////////////////////////////////////
 
-  G4double Phi0 = 0*deg;
-  G4double dPhi = 360*deg;
+  G4double Phi0 =   0.*deg;
+  G4double dPhi = 360.*deg;
 
-  if (status == "Greta_North" || status == "GretaLH_North" ) {
-	Phi0 =  -90.*deg;
-        dPhi = 180.*deg;
-  }
-
-  if (status == "Greta_South" || status == "GretaLH_South" ) {
-	Phi0 =  90.*deg;
-        dPhi = 180.*deg;
-  }
+  if ( half == "north" || half == "LH_north" ) {
+    Phi0 = -90.*deg;
+    dPhi = 180.*deg;
+  } else if ( half == "south" || half == "LH_south" ) {
+    Phi0 =  90.*deg;
+    dPhi = 180.*deg;
+  } else
+    G4Exception("Greta_Shell::HalfShell()", "Error", FatalException,
+		"half argument must be set to north, south, LH_north, or LH_south");
 
   G4Sphere* solidShell = new G4Sphere( "solidShell", Rmin, Rmax, Phi0, dPhi, 0., 180.*deg);
 
@@ -260,15 +279,15 @@ void Greta_Shell::Placement(G4String status)
     Rot = G4RotationMatrix::IDENTITY;
     Rot.rotateY( PosSP[i].getTheta() );
     Rot.rotateZ( PosSP[i].getPhi() );
-    if( ( ( status == "Greta_North" || status == "GretaLH_North" ) && ModulePortStatus[i] == -1 ) ||
-        ( ( status == "Greta_South" || status == "GretaLH_South" ) && ModulePortStatus[i] ==  1 ) ||
-	status == "Greta" ||
-        status == "GretaLH" )
+    if( ( ( half == "north" || half == "LH_north" )
+	  && SmallPortStatus[i] <= 0 ) ||
+        ( ( half == "south" || half == "LH_south" )
+	  && SmallPortStatus[i] >= 0 ) )
       shell = new G4SubtractionSolid ("Shell",shell,smallPort,G4Transform3D(Rot,PosSP[i]));
-  } 
+  }
 
   // Make space for the LH target
-  if( status == "GretaLH" || status == "GretaLH_North" || status == "GretaLH_South"){
+  if( half == "LH_north" || half == "LH_south" ){
     G4Box* PortBox = new G4Box("PortBox", modulePortRadius, Rmax-Rmin, modulePortRadius);
 
     Rot = G4RotationMatrix::IDENTITY;
@@ -295,25 +314,25 @@ void Greta_Shell::Placement(G4String status)
     Rot.rotateY( Pos.getTheta() );
     Rot.rotateZ( Pos.getPhi() );
 
-    if( ( ( status == "Greta_North" || status == "GretaLH_North" )
-	  && ModulePortStatus[i] == -1 ) ||
-        ( ( status == "Greta_South" || status == "GretaLH_South" ) 
-	  && ModulePortStatus[i] ==  1 ) ||
-	status == "Greta" ||
-        status == "GretaLH" )
-          shell = new G4SubtractionSolid ("Shell",shell,modulePort,G4Transform3D(Rot,Pos));	
+    if( ( ( half == "north" || half == "LH_north" )
+	  && ModulePortStatus[i] <= 0 ) ||
+        ( ( half == "south" || half == "LH_south" ) 
+	  && ModulePortStatus[i] >= 0 ) )
+          shell = new G4SubtractionSolid ("Shell",shell,modulePort,G4Transform3D(Rot,Pos));
 
   }
 
   G4LogicalVolume* logicShell = new G4LogicalVolume(shell, matShell, "Shell_log", 0, 0, 0 );
 
-  new G4PVPlacement(0, G4ThreeVector(), "mountingShell", logicShell, theDetector->HallPhys(), false, 0 );
+  Pos = G4ThreeVector(0, 0, 0);
+  if(half == "north" || half == "LH_north")
+    Pos.setX(northOffset);
+  else
+    Pos.setX(-southOffset);
+
+  new G4PVPlacement(0, Pos, half+"MountingShell", logicShell, theDetector->HallPhys(), false, 0 );
 
   G4VisAttributes *pVA = new G4VisAttributes( G4Colour(0.0, 1.0, 1.0) );
   logicShell->SetVisAttributes( pVA );
-
-  G4cout << "Constructed the " << status << " shell." << G4endl;
-  G4cout << "  Shell radius: " << Rmin << " -- " << Rmax << G4endl;
-  G4cout << "  Shell material: " << matShell->GetName() << G4endl;
 
 }

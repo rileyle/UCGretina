@@ -18,7 +18,9 @@
 /ScanningTable/SetControllerY  -64.9 mm  # away;  G4 z
 /ScanningTable/SetControllerZ   -4.64 mm # up
 /ScanningTable/SetCloverZ      -24.34 mm # up
-/Gretina/update
+
+# Initialize run manager =======================================================
+/run/initialize
 
 # Source parameters ============================================================
 /Experiment/RunSource

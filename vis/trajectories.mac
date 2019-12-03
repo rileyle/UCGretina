@@ -4,7 +4,9 @@
 /Target/Construct
 /Target/Sled
 /BeamTube/Construct
-/Gretina/update
+
+# Initialize run manager =======================================================
+/run/initialize
 
 # Source parameters ============================================================
 /Experiment/RunSource
@@ -36,3 +38,4 @@
 /vis/verbose warnings
 
 /run/beamOn 100
+

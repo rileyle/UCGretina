@@ -11,6 +11,8 @@ DetectorConstruction::DetectorConstruction()
 
 #ifndef SCANNING
   shellStatus    = "";
+  northOffset = 0;
+  southOffset = 0;
   s800Status     = false;
   laBrStatus     = false;
 #endif
@@ -185,6 +187,8 @@ void DetectorConstruction::Placement()
       shellStatus == "north" ||
       shellStatus == "south"){
     Gretina_NSCL_Shell* Shell = new Gretina_NSCL_Shell();
+    Shell->setNorthOffset(northOffset);
+    Shell->setSouthOffset(southOffset);
     Shell->Placement(shellStatus);
   } else if ( shellStatus == "Greta" ||
 	      shellStatus == "GretaLH" || 
@@ -193,6 +197,8 @@ void DetectorConstruction::Placement()
 	      shellStatus == "GretaLH_North" ||
 	      shellStatus == "GretaLH_South" ){
     Greta_Shell* Shell = new Greta_Shell();
+    Shell->setNorthOffset(northOffset);
+    Shell->setSouthOffset(southOffset);
     Shell->Placement(shellStatus);
   }
   if( s800Status ){
@@ -204,9 +210,11 @@ void DetectorConstruction::Placement()
   }
 #endif
 
-  if(gretinaStatus)
+  if(gretinaStatus){
+    the_Gretina_Array->SetNorthOffset(northOffset);
+    the_Gretina_Array->SetSouthOffset(southOffset);
     the_Gretina_Array->Placement();
-
+  }
 }
 
 ///////////////////
@@ -270,8 +278,20 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
   commandName = "/Gretina/Shell";
   aLine = commandName.c_str();
   ShellCmd = new G4UIcmdWithAString(aLine, this);
-  ShellCmd->SetGuidance("Construct the GRETINA mounting shell (full/north/south).");
+  ShellCmd->SetGuidance("Construct the mounting shell (full/north/south).");
   ShellCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  commandName = "/Gretina/NorthOffset";
+  aLine = commandName.c_str();
+  NorthOffCmd = new G4UIcmdWithADoubleAndUnit(aLine, this);
+  NorthOffCmd->SetGuidance("North mounting shell offset (positive -> away from target).");
+  NorthOffCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  commandName = "/Gretina/SouthOffset";
+  aLine = commandName.c_str();
+  SouthOffCmd = new G4UIcmdWithADoubleAndUnit(aLine, this);
+  SouthOffCmd->SetGuidance("South mounting shell offset (positive -> away from target).");
+  SouthOffCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   commandName = "/Gretina/S800";
   aLine = commandName.c_str();
@@ -295,6 +315,8 @@ DetectorConstruction_Messenger::~DetectorConstruction_Messenger()
   delete NoGretCmd;
 #ifndef SCANNING
   delete ShellCmd;
+  delete NorthOffCmd;
+  delete SouthOffCmd;
   delete S800Cmd;
   delete LaBrCmd;
 #endif
@@ -341,6 +363,12 @@ void DetectorConstruction_Messenger::SetNewValue(G4UIcommand* command,G4String n
 #ifndef SCANNING
   if( command == ShellCmd ) {
     myTarget->SetShellStatus(newValue);
+  }
+  if( command == NorthOffCmd ) {
+    myTarget->SetNorthOffset(NorthOffCmd->GetNewDoubleValue(newValue));
+  }
+  if( command == SouthOffCmd ) {
+    myTarget->SetSouthOffset(SouthOffCmd->GetNewDoubleValue(newValue));
   }
   if( command == S800Cmd ) {
     myTarget->SetS800Status(true);
