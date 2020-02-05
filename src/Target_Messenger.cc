@@ -97,13 +97,13 @@ void Target_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
   if( command == ZCmd )
    { aTarget->setZ(ZCmd->GetNewDoubleValue(newValue));}
   if( command == ScDTarCmd )
-   { aTarget->ScaleDensity(ScDTarCmd->GetNewDoubleValue(newValue));}
+   { aTarget->setDensityScale(ScDTarCmd->GetNewDoubleValue(newValue));}
   if( command == PosXCmd )
-   { aTarget->SetPosition(PosXCmd->GetNewDoubleValue(newValue), 0., 0.);}
+   { aTarget->setPosition(PosXCmd->GetNewDoubleValue(newValue), 0., 0.);}
   if( command == PosYCmd )
-   { aTarget->SetPosition(0., PosYCmd->GetNewDoubleValue(newValue), 0.);}
+   { aTarget->setPosition(0., PosYCmd->GetNewDoubleValue(newValue), 0.);}
   if( command == PosZCmd )
-   { aTarget->SetPosition(0., 0., PosZCmd->GetNewDoubleValue(newValue));}
+   { aTarget->setPosition(0., 0., PosZCmd->GetNewDoubleValue(newValue));}
   if( command == NSCmd )
    { aTarget->setNStep(NSCmd->GetNewIntValue(newValue));}
   if( command == RepCmd )

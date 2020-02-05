@@ -11,7 +11,7 @@ Target::Target(Materials* mat)
   Target_side_y=50*mm;
   Target_thickness=0.1*mm;
   TargetMaterialName = "G4_Galactic";
-
+  Target_density_scale = 1.0;
   Pos = new G4ThreeVector(0.,0.,0.);
   Rot = G4RotationMatrix::IDENTITY;
   Rot.rotateZ(45.*deg);
@@ -29,7 +29,14 @@ Target::~Target()
 G4VPhysicalVolume* Target::Construct(G4LogicalVolume* experimentalHall_log)
 {
   expHall_log=experimentalHall_log;
+
   TargetMaterial = materials->FindMaterial(TargetMaterialName);
+  G4String name=TargetMaterial->GetName();
+  G4double Z=TargetMaterial->GetZ();
+  G4double A=TargetMaterial->GetA();
+  G4double density=TargetMaterial->GetDensity();
+  density*=Target_density_scale;
+  TargetMaterial=new G4Material(name, Z,A,density);
 
   aTarget = new G4Box("target",Target_side_x/2.,Target_side_y/2.,Target_thickness/2.);
 
@@ -108,61 +115,20 @@ void Target::setMaterial(G4String materialName)
          
 }
 //-------------------------------------------------------------------
+void Target::setDensityScale(G4double scale)
+{
+  Target_density_scale = scale;
+  G4cout<<"----> Scaling target density by     "<< scale << G4endl;
+}
+//-------------------------------------------------------------------
 void Target::setTargetReactionDepth(G4double depth)
 {
   //  G4cout<<"\n----> The depth is "<<G4BestUnit(depth,"Length")<< G4endl;;
   target_limits->SetUserMinRange(depth);
 }
 //-----------------------------------------------------------------------------
-void Target::SetPosition(G4double x, G4double y, G4double z)
+void Target::setPosition(G4double x, G4double y, G4double z)
 {
-
-  G4ThreeVector Sep;
-  Sep.setX(Pos->getX() + x);
-  Sep.setY(Pos->getY() + y);
-  Sep.setZ(Pos->getZ() + z);
-  Target_phys->SetTranslation(Sep);
-
-  if(sledFrame_phys != NULL){
-    sledFrame_phys->SetTranslation(sledFrame_phys->GetTranslation() + Sep);
-  }
-  if(sledRunner1_phys != NULL){
-    sledRunner1_phys->SetTranslation(sledRunner1_phys->GetTranslation() + Sep);
-  }
-  if(sledRunner2_phys != NULL){
-    sledRunner2_phys->SetTranslation(sledRunner2_phys->GetTranslation() + Sep);
-  }  
-  if(sledBar != NULL){
-    std::vector<G4VPhysicalVolume*>::iterator it
-      = sledBar->GetVolumesIterator();
-    for (unsigned int i = 0; i < sledBar->TotalImprintedVolumes(); i++){
-      (*it)->SetTranslation((*it)->GetTranslation() + Sep);
-      it++;
-    }
-  }
-  if(euFrame_phys != NULL){
-    euFrame_phys->SetTranslation(euFrame_phys->GetTranslation() + Sep);
-  }
-  if(euTape_phys != NULL){
-    euTape_phys->SetTranslation(euTape_phys->GetTranslation() + Sep);
-  }
-  if(csFrame_phys != NULL){
-    csFrame_phys->SetTranslation(csFrame_phys->GetTranslation() + Sep);
-  }
-  if(csRing_phys != NULL){
-    csRing_phys->SetTranslation(csRing_phys->GetTranslation() + Sep);
-  }
-  if(csTape_phys != NULL){
-    csTape_phys->SetTranslation(csTape_phys->GetTranslation() + Sep);
-  }
-  if(coFrame_phys != NULL){
-    coFrame_phys->SetTranslation(coFrame_phys->GetTranslation() + Sep);
-  }
-
-  x=Target_phys->GetTranslation().getX();
-  y=Target_phys->GetTranslation().getY();
-  z=Target_phys->GetTranslation().getZ();
-
   Pos->setX(x);
   Pos->setY(y);
   Pos->setZ(z);
@@ -172,23 +138,6 @@ void Target::SetPosition(G4double x, G4double y, G4double z)
     	 << G4BestUnit(y,"Length") << ", "
 	 << G4BestUnit(z,"Length") << ", "
 	 << G4endl;
-}
-//---------------------------------------------------------------------
-void Target::ScaleDensity(G4double scale)
-{
-  // search the material by its name 
-  G4String name=TargetMaterial->GetName();
-  G4double Z=TargetMaterial->GetZ();
-  G4double A=TargetMaterial->GetA();
-  G4double density=TargetMaterial->GetDensity();
-  density*=scale;
-  TargetMaterial=new G4Material(name, Z,A,density);
-  Target_log->SetMaterial(TargetMaterial);
-  G4cout<<"----> Target material set to     "<<Target_log->GetMaterial()->GetName()<< G4endl;  
-  G4cout<<"----> Target Z set to            "<<Target_log->GetMaterial()->GetZ()<< G4endl;  
-  G4cout<<"----> Target mole mass set to       "<<Target_log->GetMaterial()->GetA()/g*mole<<" g/mole"<< G4endl;  
-  G4cout<<"----> Target density set to         "<<Target_log->GetMaterial()->GetDensity()/g*cm3<<" g/cm3"<< G4endl;    
-             
 }
 //---------------------------------------------------------------------
 void Target::setSourceFrame(G4String sF)

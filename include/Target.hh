@@ -33,6 +33,7 @@ class Target
   void setY(G4double);
   void setZ(G4double);
   void setMaterial(G4String);
+  void setDensityScale(G4double);
   void setNStep(G4int);
   void setSourceFrame(G4String);
   void setSled(){buildSled=true;}
@@ -43,9 +44,7 @@ class Target
   G4Box* GetTarget(){return aTarget;}
   G4VPhysicalVolume* GetTargetPlacement(){return Target_phys;}
   void setTargetReactionDepth(G4double);
-  void ScaleDensity(G4double);
-  //  void SetPositionZ(G4double);
-  void SetPosition(G4double, G4double, G4double);
+  void setPosition(G4double, G4double, G4double);
   G4double GetTargetThickness(){return Target_thickness;}
   G4ThreeVector* GetPos(){return Pos;}
 
@@ -54,6 +53,7 @@ private:
   G4double Target_side_x;
   G4double Target_side_y;
   G4double Target_thickness;
+  G4double Target_density_scale;
   G4double frameInnerRadius;
   G4double frameOuterRadius;
   G4double tapeThickness;
