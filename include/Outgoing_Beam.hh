@@ -50,7 +50,6 @@ public:
   void setTarEx(G4double ex){ TarEx=ex; }
   void ScanInitialConditions(const G4Track &);
   void SetSource(){source=true;}
-  void SetInFlight(){inflight=true;}
   void SetThetaMin(G4double t){theta_min=t;}
   void SetThetaMax(G4double t){theta_max=t;}
   void SetThetaSigmaA(G4double sig){sigma_a=sig;}
@@ -62,7 +61,6 @@ public:
   G4int    getTarA(){return TarA;}
   G4int    getTarZ(){return TarZ;}
   G4bool   Source(){return source;}
-  G4bool   InFlight(){return inflight;}
   G4double GetThetaMax(){return theta_max;}
   G4double GetThetaMin(){return theta_min;}
   G4double GetThetaSigmaA(){return sigma_a;}
@@ -103,7 +101,6 @@ private:
   std::vector<G4ParticleDefinition*> ionGS;
   std::vector<G4ParticleDefinition*> tarOutGS;
   
-  G4bool inflight;
   G4bool source;
 
   G4bool targetExcitation;

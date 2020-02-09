@@ -59,6 +59,9 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 
   }
 
+  // Event filter code goes here.
+  eventInfo->SetWriteEvent(true); // Unfiltered
+  
 }
 
 void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)

@@ -30,18 +30,10 @@ void RunAction::BeginOfRunAction(const G4Run* run)
     evaction->SetEveryNEvents(1);
 
 
-  G4cout << " Simulating " << run->GetNumberOfEventToBeProcessed();
-  if(BeamOut->Source()){
-    G4cout << " stationary source nuclei" << G4endl;
-  } else if(BeamOut->InFlight()) {
-    G4cout << " beam ions" << G4endl;
-    evaction->SetInBeam(true);
-  } else {
-    G4cout << " source events "<<G4endl;
-  }
+  G4cout << " Simulating " << run->GetNumberOfEventToBeProcessed()
+	 << " events." << G4endl;
 
-
-if(evaction->EvOut())
+  if(evaction->EvOut())
     G4cout << " Writing ASCII output to " 
 	   << evaction->GetOutFileName() << G4endl;
   if(evaction->Mode2Out())

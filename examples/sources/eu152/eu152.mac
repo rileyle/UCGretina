@@ -3,6 +3,7 @@
 /Gretina/detector/enableCryostats
 /Gretina/Shell full
 /Target/Construct
+/Target/sourceFrame eu152_Z2707
 /Target/Sled
 /BeamTube/Construct
 
@@ -10,15 +11,6 @@
 /run/initialize
 
 # Set source/decay parameters ==================================================
-
-# Source position and dimensions
-/BeamIn/Focus/Z  0. mm
-/BeamIn/Focus/X  0. mm
-/BeamIn/Focus/Y  0. mm
-/BeamIn/Focus/DX 0. mm
-/BeamIn/Focus/DY 0. mm
-
-/Target/sourceFrame eu152_Z2707
 
 # Turn off the Reaction process (G4RadioactiveDecay handles the beta decay).
 /process/inactivate Reaction
@@ -29,6 +21,13 @@
 /BeamIn/Z 63
 /BeamIn/KEu 0. keV      
 
+# Source position and dimensions
+/BeamIn/Focus/Z  0. mm
+/BeamIn/Focus/X  0. mm
+/BeamIn/Focus/Y  0. mm
+/BeamIn/Focus/DX 0. mm
+/BeamIn/Focus/DY 0. mm
+
 # Load level schemes of the daughters (152Sm, 152Gd).
 /BeamOut/DA 0
 /BeamOut/DZ -1
@@ -38,6 +37,7 @@
 /BeamOut/LevelDataFile z64.a152.lvldata
 
 /BeamOut/Update
+
 # Print simulation parameters to stdout ========================================
 /Target/Report
 /ExpHall/Report
@@ -51,4 +51,5 @@
 /Mode2/crmatFile crmat.LINUX
 /Mode2/GretinaCoords
 /Mode2/Filename eu152.dat
+
 /run/beamOn 1000000

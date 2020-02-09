@@ -8,6 +8,7 @@ EventInformation::EventInformation() {
   fbta      = sqrt(-1.0);
   fdta      = sqrt(-1.0);
   fyta      = sqrt(-1.0);
+  fwrite    = true;
 }
 
 void EventInformation::AddEmittedGamma(G4double e, 

@@ -96,6 +96,8 @@ PhysicsList::PhysicsList(DetectorConstruction* det)
 
   BeamOut = NULL;
 
+  usePolar = false;
+  
 #ifdef NEUTRONS
   // From LBE for neutrons
   stoppingPhysics = new G4StoppingPhysics;
@@ -296,7 +298,8 @@ void PhysicsList::AddReaction()
     G4ParticleDefinition* particle = particleIterator->value();
     G4String particleName = particle->GetParticleName();
     G4String particleType = particle->GetParticleType();
-    if ( particleName == "proton" || particleName == "neutron" || particleType == "nucleus" ) 
+    //if ( particleName == "proton" || particleName == "neutron" || particleType == "nucleus" ) 
+    if ( particleName == "GenericIon" )
       ph->RegisterProcess(react, particle);    
     ph->RegisterProcess(new G4StepLimiter, particle);
   }
@@ -398,7 +401,6 @@ void PhysicsList::SetGammaAngularCorrelations(bool val){
 
 void PhysicsList::SetUsePolarizedPhysics(bool use){
   usePolar=use;
-  
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

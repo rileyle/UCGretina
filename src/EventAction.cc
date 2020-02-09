@@ -42,8 +42,9 @@ void EventAction::BeginOfEventAction(const G4Event* ev)
   evt = ev;
 
   // Add a G4UserEventInformation object to store event info
+  EventInformation* eventInfo = new EventInformation;
   G4EventManager::
-    GetEventManager()->SetUserInformation(new EventInformation);
+    GetEventManager()->SetUserInformation(eventInfo);
 
   G4SDManager * SDman = G4SDManager::GetSDMpointer();
 
@@ -53,6 +54,9 @@ void EventAction::BeginOfEventAction(const G4Event* ev)
       ionCollectionID=SDman->GetCollectionID("ionCollection");
     }
 
+  // For event filter
+  eventInfo->SetWriteEvent(false);
+  
   // G4cout<<"+++++ Begin of event "<<evt->GetEventID()<<G4endl;
 
 }
@@ -66,8 +70,49 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 
   G4int event_id=evt->GetEventID();
 
+  if(event_id%everyNevents == 0 && event_id > 0) {
+    Timerintern.Stop();
+    timerCount++;
+    eventsPerSecond += 
+      ((double)everyNevents/Timerintern.GetRealElapsed() 
+       - eventsPerSecond)/timerCount;
+    G4cout << std::fixed << std::setprecision(0) << std::setw(3) 
+	   << std::setfill(' ')
+	   << (float)event_id/NTotalEvents*100 << " %   "
+	   << eventsPerSecond << " events/s ";
+
+    G4double hours, minutes, seconds;
+    G4double time = (float)(NTotalEvents - event_id)/eventsPerSecond;
+    hours = floor(time/3600.0);
+    if(hours>0){
+      G4cout << std::setprecision(0) << std::setw(2) 
+	     << hours << ":";
+      G4cout << std::setfill('0');
+    } else {
+      G4cout << std::setfill(' ');
+    }
+    minutes = floor(fmod(time,3600.0)/60.0);
+    if(minutes>0){
+      G4cout << std::setprecision(0) << std::setw(2) << minutes << ":";
+      G4cout << std::setfill('0');
+    } else {
+      G4cout << std::setfill(' ');
+    }
+    seconds = fmod(time,60.0);
+    if(seconds>0)
+      G4cout << std::setprecision(0) << std::setw(2) << seconds;
+    G4cout << std::setfill(' ');
+    G4cout << " remaining       "
+	   << "\r"<<std::flush;
+    Timerintern.Start();
+  }
+  
   EventInformation* eventInfo = (EventInformation*)evt->GetUserInformation();
 
+  // Event filter
+  if(!eventInfo->WriteEvent())
+    return;
+  
   // All Mode 2 output from this event gets this timestamp.
   long long int timestamp = (long long int)10000*event_id;
 
@@ -414,43 +459,6 @@ void EventAction::EndOfEventAction(const G4Event* ev)
   // the output file.
 
   writeSim(timestamp, eventInfo);
-
-  if(event_id%everyNevents == 0 && event_id > 0) {
-    Timerintern.Stop();
-    timerCount++;
-    eventsPerSecond += 
-      ((double)everyNevents/Timerintern.GetRealElapsed() 
-       - eventsPerSecond)/timerCount;
-    G4cout << std::fixed << std::setprecision(0) << std::setw(3) 
-	   << std::setfill(' ')
-	   << (float)event_id/NTotalEvents*100 << " %   "
-	   << eventsPerSecond << " events/s ";
-
-    G4double hours, minutes, seconds;
-    G4double time = (float)(NTotalEvents - event_id)/eventsPerSecond;
-    hours = floor(time/3600.0);
-    if(hours>0){
-      G4cout << std::setprecision(0) << std::setw(2) 
-	     << hours << ":";
-      G4cout << std::setfill('0');
-    } else {
-      G4cout << std::setfill(' ');
-    }
-    minutes = floor(fmod(time,3600.0)/60.0);
-    if(minutes>0){
-      G4cout << std::setprecision(0) << std::setw(2) << minutes << ":";
-      G4cout << std::setfill('0');
-    } else {
-      G4cout << std::setfill(' ');
-    }
-    seconds = fmod(time,60.0);
-    if(seconds>0)
-      G4cout << std::setprecision(0) << std::setw(2) << seconds;
-    G4cout << std::setfill(' ');
-    G4cout << " remaining       "
-	   << "\r"<<std::flush;
-    Timerintern.Start();
-  }
 
   G4cout.flags( f );
 

@@ -13,7 +13,6 @@ Outgoing_Beam::Outgoing_Beam()
   TarZ = 1;
   targetExcitation=false;
   source=false;
-  inflight=false;
   sigma_a=0.;
   sigma_b=0.;
   theta_max=180.*deg;
@@ -145,9 +144,6 @@ void Outgoing_Beam::setDecayProperties()
     }
   }
 
-  if(beamIn->getKE(beam) > 0.)
-    SetInFlight();
-  
   //  ionTable()->DumpTable();
 }
 
