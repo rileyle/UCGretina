@@ -22,6 +22,7 @@ public:
   void SetBTA(G4double b){fbta = b;}
   void SetDTA(G4double d){fdta = d;}
   void SetYTA(G4double y){fyta = y;}
+  void SetFilterCode(G4int c){ffiltercode = c;}
   void SetWriteEvent(G4bool b){fwrite = b;}
 
   G4double GetEmittedGammaEnergy(G4int i){ return fEmittedGammaEnergies[i]; }
@@ -38,6 +39,7 @@ public:
   G4double GetBTA(){return fbta;}
   G4double GetDTA(){return fdta;}
   G4double GetYTA(){return fyta;}
+  G4int    GetFilterCode(){return ffiltercode;}
   G4bool   WriteEvent(){return fwrite;}
 
 private:
@@ -57,6 +59,7 @@ private:
   G4double fbta;
   G4double fdta;
   G4double fyta;
+  G4int    ffiltercode;
   G4bool   fwrite;
 };
 

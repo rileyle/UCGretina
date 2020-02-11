@@ -2,13 +2,14 @@
 
 EventInformation::EventInformation() { 
   fNEmittedGammas = 0;
-  fNBetas = 0;
-  fFullEnergy = -1;
-  fata      = sqrt(-1.0);
-  fbta      = sqrt(-1.0);
-  fdta      = sqrt(-1.0);
-  fyta      = sqrt(-1.0);
-  fwrite    = true;
+  fNBetas         = 0;
+  fFullEnergy     = -1;
+  fata            = sqrt(-1.0);
+  fbta            = sqrt(-1.0);
+  fdta            = sqrt(-1.0);
+  fyta            = sqrt(-1.0);
+  ffiltercode     = 0;
+  fwrite          = true;
 }
 
 void EventInformation::AddEmittedGamma(G4double e, 
