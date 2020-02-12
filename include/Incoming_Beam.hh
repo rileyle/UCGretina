@@ -41,6 +41,8 @@ public:
   G4int getZ()    {return Z;}
   G4double getEx(){return Ex;}
   G4double getKE(G4ParticleDefinition*);
+  G4double getKE(){return KE;}
+  G4double getKEu(){return KEu;}
   G4double getAta0(){return ata0;}
   G4double getBta0(){return bta0;}
   G4ThreeVector getPosition();

@@ -63,7 +63,7 @@ int main(int argc,char** argv)
   PrimaryGeneratorAction_Messenger* generatorActionMessenger = new PrimaryGeneratorAction_Messenger(generatorAction);
 
   runManager->SetUserAction(generatorAction);
-  RunAction* runAction = new RunAction(detector,BeamOut,eventAction);
+  RunAction* runAction = new RunAction(detector,BeamIn,eventAction);
   runManager->SetUserAction(runAction);
 
   TrackingAction* trackingAction = new TrackingAction(eventAction);

@@ -7,7 +7,6 @@
 #include "globals.hh"
 #include "G4UnitsTable.hh"
 #include "Incoming_Beam.hh"
-#include "Outgoing_Beam.hh"
 #include "EventAction.hh"
 
 class DetectorConstruction;
@@ -15,7 +14,7 @@ class DetectorConstruction;
 class RunAction : public G4UserRunAction
 {
   public:
-    RunAction(DetectorConstruction*,Outgoing_Beam*,EventAction*);
+    RunAction(DetectorConstruction*, Incoming_Beam*, EventAction*);
    ~RunAction();
 
   public:
@@ -24,7 +23,7 @@ class RunAction : public G4UserRunAction
 
   private:
   DetectorConstruction* myDetector;
-  Outgoing_Beam* BeamOut;
+  Incoming_Beam* BeamIn;
   EventAction* evaction;
 
 };

@@ -118,12 +118,19 @@ G4DecayProducts* G4ITDecay::DecayIt(G4double)
       //gammaDir.setTheta(CLHEP::pi/2.);
       const G4LevelManager *lman = G4NuclearLevelData::GetInstance()->GetLevelManager(parentZ,parentA);
       size_t pIndex = lman->NearestLevelIndex(predecayEnergy);
-      size_t dIndex = lman->NearestLevelIndex(parentNucleus.GetExcitationEnergy()-eOrGamma->GetMomentum().getT());
+      //      size_t dIndex = lman->NearestLevelIndex(parentNucleus.GetExcitationEnergy()-eOrGamma->GetMomentum().getT());
+      size_t dIndex = lman->NearestLevelIndex(predecayEnergy-eOrGamma->GetMomentum().getT());
       const G4NucLevel *level = lman->GetLevel(pIndex);
-      G4double mpRatio = level->MultipolarityRatio(dIndex);
+      // Look up the index of the transition.
+      size_t tIndex;
+      for(tIndex = 0; tIndex< lman->NumberOfTransitions(); tIndex++)
+	if(level->FinalExcitationIndex(tIndex) == dIndex) break;
+      //      G4double mpRatio = level->MultipolarityRatio(dIndex);
+      G4double mpRatio = level->MultipolarityRatio(tIndex);
       G4int JP1=lman->SpinTwo(pIndex);
       G4int JP2=lman->SpinTwo(dIndex);
-      G4int MP = level->TransitionType(dIndex);
+      //      G4int MP = level->TransitionType(dIndex);
+      G4int MP = level->TransitionType(tIndex);
       int Lbar;
       if(MP<99)//Not mixed transition
 	Lbar=MP/2;

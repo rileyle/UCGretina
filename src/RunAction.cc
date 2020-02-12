@@ -3,7 +3,7 @@
 #include "G4Timer.hh"
 extern G4Timer Timer;
 
-RunAction::RunAction(DetectorConstruction* detector, Outgoing_Beam* BO,EventAction* ev): myDetector(detector), BeamOut(BO),evaction(ev)
+RunAction::RunAction(DetectorConstruction* detector, Incoming_Beam* BI,EventAction* ev): myDetector(detector), BeamIn(BI), evaction(ev)
 {
   
 }
@@ -29,10 +29,12 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   else
     evaction->SetEveryNEvents(1);
 
-
   G4cout << " Simulating " << run->GetNumberOfEventToBeProcessed()
 	 << " events." << G4endl;
 
+  if(BeamIn->getKE()>0)
+    evaction->SetInBeam(true);
+  
   if(evaction->EvOut())
     G4cout << " Writing ASCII output to " 
 	   << evaction->GetOutFileName() << G4endl;
