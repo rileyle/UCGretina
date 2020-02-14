@@ -298,8 +298,9 @@ void PhysicsList::AddReaction()
     G4ParticleDefinition* particle = particleIterator->value();
     G4String particleName = particle->GetParticleName();
     G4String particleType = particle->GetParticleType();
-    //if ( particleName == "proton" || particleName == "neutron" || particleType == "nucleus" ) 
-    if ( particleName == "GenericIon" )
+    if ( particleName == "proton"   || particleName == "neutron" ||
+	 particleName == "deuteron" || particleName == "triton"  ||
+	 particleType == "nucleus" )
       ph->RegisterProcess(react, particle);    
     ph->RegisterProcess(new G4StepLimiter, particle);
   }
