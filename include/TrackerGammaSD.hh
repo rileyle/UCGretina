@@ -31,12 +31,16 @@ class TrackerGammaSD : public G4VSensitiveDetector
       void Initialize(G4HCofThisEvent*);
       G4bool ProcessHits(G4Step*, G4TouchableHistory*);
       void EndOfEvent(G4HCofThisEvent*);
+      void SetPHDA(G4double a){phdA = a;}
+      void SetPHDB(G4double b){phdB = b;}
 
   private:
       TrackerGammaHitsCollection* gammaCollection;
       G4int         depth;
       G4bool        print;
       G4int         primaryGammaID;
+      G4double      phdA;
+      G4double      phdB;
 
 };
 

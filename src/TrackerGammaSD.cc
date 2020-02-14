@@ -20,6 +20,8 @@ TrackerGammaSD::TrackerGammaSD(G4String name)
   G4String HCname;
   collectionName.insert(HCname="gammaCollection");
   print = false;
+  phdA = 0.21;
+  phdB = 1.099;
 
 }
 
@@ -73,10 +75,22 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   // and all secondary gammas).
   G4double edep = aStep->GetTotalEnergyDeposit();
 
+  G4String particleType = aStep->GetTrack()->GetDefinition()->GetParticleType();
+  G4String particleName = aStep->GetTrack()->GetDefinition()->GetParticleName();
+  G4String processName
+    = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
+  //  G4cout << " &&& particleType = " << particleType 
+  //	 << ", particleName = " << particleName << G4endl;
+  
+  // Pulse height defect for (n,n')
+  // Joa Ljungvall and Johan Nyberg, NPA546, 553–573 (2005), Figure 3
+  if( ( particleType == "nucleus" && processName == "ionIoni" ) ||
+      ( particleName == "neutron" && processName == "hadElastic" ) )
+    edep = phdA*pow(edep, phdB);
+
   // Keep the gamma parent of pair-production tracks for hit processing.
   if(edep<0.001*eV
-     && aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() 
-     != "conv") 
+     && processName != "conv") 
     return false;
 
   G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();
@@ -143,8 +157,8 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
 
   newHit->SetTrackID  (aStep->GetTrack()->GetTrackID());
 
-  newHit->SetParticleID(aStep->GetTrack()->GetDefinition()->GetParticleName());
-  newHit->SetProcess(aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName());
+  newHit->SetParticleID(particleName);
+  newHit->SetProcess(processName);
   newHit->SetParentTrackID(aStep->GetTrack()->GetParentID());
   if( aStep->GetTrack()->GetCreatorProcess() )
     newHit->SetCreatorProcess(aStep->GetTrack()->GetCreatorProcess()->GetProcessName());

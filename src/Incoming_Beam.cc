@@ -7,7 +7,8 @@ Incoming_Beam::Incoming_Beam()
   A=20;
   Z=12;
   Ex=0.;
-  KEu=100*MeV;
+  //  KEu=100*MeV;
+  KEu=0;
   KE=KEu*A;
   dtaFileName = "";
   Ndta = 0;
