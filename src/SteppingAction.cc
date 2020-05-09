@@ -88,6 +88,8 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   // 	   << G4endl;
   // }
 
+  G4String particleName = aStep->GetTrack()->GetDefinition()->GetParticleName();
+  
   if( aStep->GetTrack()->GetDefinition()->GetParticleType() == "nucleus" 
       && aStep->GetTrack()->GetParentID() > 0
       && aStep->GetPostStepPoint()->GetStepStatus() != fWorldBoundary ){
@@ -126,7 +128,13 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
     // Kill a reaction product once it hits the chamber or beamline
     // as long it has already emitted its gamma(s)
     else if( ( volume1->GetName().contains("BeamTube")
-	       || volume1->GetName().contains("Chamber") )
+	       || volume1->GetName().contains("BeamTee")
+	       || volume1->GetName().contains("Cell")
+	       || volume1->GetName().contains("Chamber")
+	       || volume1->GetName().contains("sled")
+	       || volume1->GetName().contains("Frame")
+	       || volume1->GetName().contains("Tape")
+	       || volume1->GetName().contains("Ring") )
 	     && !aStep->GetTrack()->GetParticleDefinition()->GetParticleName().contains('[') ){
 
            // G4cout << "************************* SteppingAction: terminating track in "
@@ -135,6 +143,14 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
 
       aStep->GetTrack()->SetTrackStatus(fStopAndKill);
 	
+    }
+    // Kill light charged particles at rest
+    else if( ( particleName == "proton"    || particleName == "deuteron"
+	       || particleName == "triton" || particleName == "alpha" )
+	     && aStep->GetTrack()->GetKineticEnergy() < 0.1*keV ){
+
+      aStep->GetTrack()->SetTrackStatus(fStopAndKill);
+      
     }
 
   }
