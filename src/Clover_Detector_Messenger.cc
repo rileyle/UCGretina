@@ -1,4 +1,3 @@
-#ifdef SCANNING
 #include "Clover_Detector_Messenger.hh"
 
 Clover_Detector_Messenger::Clover_Detector_Messenger(Clover_Detector* SD)
@@ -45,5 +44,3 @@ void Clover_Detector_Messenger::SetNewValue(G4UIcommand* command,G4String newVal
   if( command == ZCmd )
     {CloverDet->setZ(ZCmd->GetNewDoubleValue(newValue));}
 }
-
-#endif

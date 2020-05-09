@@ -15,6 +15,7 @@ DetectorConstruction::DetectorConstruction()
   southOffset = 0;
   s800Status     = false;
   laBrStatus     = false;
+  fdsStatus     = false;
 #endif
   
 #ifndef LHTARGET
@@ -83,6 +84,10 @@ DetectorConstruction::DetectorConstruction()
 
   the_Gretina_Array = new Gretina_Array();
   the_Gretina_Array_Messenger = new Gretina_Array_Messenger(the_Gretina_Array);
+
+  // FDS
+
+  the_FDS = new FDS();
 
 }
 
@@ -217,6 +222,9 @@ void DetectorConstruction::Placement()
 #endif
     the_Gretina_Array->Placement();
   }
+
+  if(fdsStatus)
+    the_FDS->Placement(ExpHall_log);
 }
 
 ///////////////////
@@ -306,6 +314,13 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
   LaBrCmd = new G4UIcmdWithoutParameter(aLine, this);
   LaBrCmd->SetGuidance("Construct the LaBr.");
   LaBrCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  commandName = "/FDS/Construct";
+  aLine = commandName.c_str();
+  FDSCmd = new G4UIcmdWithoutParameter(aLine, this);
+  FDSCmd->SetGuidance("Construct the FRIB Decay Station.");
+  FDSCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
 #endif
   
 }
@@ -321,6 +336,7 @@ DetectorConstruction_Messenger::~DetectorConstruction_Messenger()
   delete SouthOffCmd;
   delete S800Cmd;
   delete LaBrCmd;
+  delete FDSCmd;
 #endif
 #ifndef LHTARGET
 #ifndef SCANNING
@@ -377,6 +393,9 @@ void DetectorConstruction_Messenger::SetNewValue(G4UIcommand* command,G4String n
   } 
   if( command == LaBrCmd ) {
     myTarget->SetLaBrStatus(true);
+  } 
+  if( command == FDSCmd ) {
+    myTarget->SetFDSStatus(true);
   } 
 
 #endif

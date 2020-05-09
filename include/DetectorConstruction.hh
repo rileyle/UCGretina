@@ -1,5 +1,5 @@
-#ifndef DetectorConstruction_H
-#define DetectorConstruction_H 1
+#ifndef DetectorConstruction_h
+#define DetectorConstruction_h 1
 
 #include "G4VUserDetectorConstruction.hh"
 #include "Materials.hh"
@@ -31,6 +31,7 @@
 #include "Gretina_Array.hh"
 #include "S800.hh"
 #include "LaBr.hh"
+#include "FDS.hh"
 #include "G4LogicalVolume.hh"
 #include "G4VPhysicalVolume.hh"
 #include "TrackerIonSD.hh"
@@ -41,6 +42,7 @@
 
 class Gretina_Array;
 class Gretina_Array_Messenger;
+class FDS;
 class DetectorConstruction_Messenger;
 
 class DetectorConstruction : public G4VUserDetectorConstruction
@@ -52,6 +54,7 @@ public:
 
   G4VPhysicalVolume* Construct();
   Gretina_Array* GetGretina(){ return the_Gretina_Array;}
+  FDS* GetFDS(){ return the_FDS;}
   TrackerGammaSD* GetGammaSD(){ return TrackerGamma;}
 #ifdef LHTARGET
   G4UnionSolid* GetTarget(){return aTarget->GetTarget();}	
@@ -71,6 +74,7 @@ public:
 
   void SetTargetStatus(G4bool stat){targetStatus = stat;}
   void SetGretinaStatus(G4bool stat){gretinaStatus = stat;}
+  void SetFDSStatus(G4bool stat){fdsStatus = stat;}
 
 #ifndef LHTARGET
 #ifndef SCANNING
@@ -130,6 +134,8 @@ private:
   S800*    the_S800;
   G4bool   laBrStatus;
   LaBr*    the_LaBr;
+  G4bool   fdsStatus;
+  FDS*     the_FDS;
 #endif
   
   Gretina_Array*   the_Gretina_Array;
@@ -183,6 +189,7 @@ private:
   G4UIcmdWithADoubleAndUnit*   SouthOffCmd;
   G4UIcmdWithoutParameter*     S800Cmd;
   G4UIcmdWithoutParameter*     LaBrCmd;
+  G4UIcmdWithoutParameter*     FDSCmd;
 #endif
 #ifndef LHTARGET
 #ifndef SCANNING
@@ -193,7 +200,7 @@ private:
   G4UIcmdWithAString*          CloverCmd;
 #endif
 #endif
- 
+
 public:
   void SetNewValue(G4UIcommand*, G4String);
 };

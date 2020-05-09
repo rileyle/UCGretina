@@ -1,4 +1,4 @@
-#ifndef LHTARGET
+#ifdef SCANNING
 #ifndef Scanning_Table_Messenger_h
 #define Scanning_Table_Messenger_h
 

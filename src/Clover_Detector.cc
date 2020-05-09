@@ -1,4 +1,3 @@
-#ifdef SCANNING
 #include "Clover_Detector.hh"
 
 Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
@@ -29,6 +28,9 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   thetad = 90.*deg;
   phid = 90.*deg;
 
+  DetTheta = 0.;
+  DetPhi = 0.;
+  
   Rot0=G4RotationMatrix::IDENTITY;
   Rot0.rotateX(180.*deg);
   Rot0.rotateY(90.*deg+thetad);
@@ -113,6 +115,7 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
     DetRot.rotateY(200.*deg);
   else if(orientation == "left")
     DetRot.rotateY(160.*deg);
+
 }
 
 Clover_Detector::~Clover_Detector()
@@ -121,6 +124,17 @@ Clover_Detector::~Clover_Detector()
 
 G4VPhysicalVolume* Clover_Detector::Construct()
 {
+
+  if(orientation = "FDS"){
+    DetPos.setX(0.);
+    DetPos.setY(0.);
+    DetPos.setZ(185.*mm);     // LR: Check this!!
+    DetPos.rotateZ(DetPsi);
+    DetPos.rotateY(DetTheta);
+    DetPos.rotateZ(DetPhi);
+    DetRot.rotateY(DetPos.getTheta());
+    DetRot.rotateZ(DetPos.getPhi());
+  }
 
   // Leaf
 
@@ -342,22 +356,3 @@ void Clover_Detector::MakeSensitive(TrackerGammaSD* TrackerGamma)
   detector_log->SetSensitiveDetector(TrackerGamma);
 }
 //---------------------------------------------------------------------
-void Clover_Detector::setX(G4double x)
-{
-  DetPos.setX(x);
-  //  detector_phys->SetTranslation(DetPos);
-}
-//---------------------------------------------------------------------
-void Clover_Detector::setY(G4double y)
-{
-  DetPos.setY(y);
-  //  detector_phys->SetTranslation(DetPos);
-}
-//---------------------------------------------------------------------
-void Clover_Detector::setZ(G4double z)
-{
-  DetPos.setZ(z);
-  //  detector_phys->SetTranslation(DetPos);
-}
-//---------------------------------------------------------------------
-#endif

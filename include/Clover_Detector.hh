@@ -1,5 +1,5 @@
-#ifndef Clover_Detector_H
-#define Clover_Detector_H 1
+#ifndef Clover_Detector_h
+#define Clover_Detector_h 1
 
 #include "G4Material.hh"
 #include "Materials.hh"
@@ -26,10 +26,10 @@
 #include "G4Transform3D.hh"
 #include "Randomize.hh"
 #include "globals.hh"
-#include <iostream>
-#include <iomanip>
+//#include <iostream>
+//#include <iomanip>
 
-using namespace std;
+//using namespace std;
 
 class Clover_Detector 
 {
@@ -43,13 +43,17 @@ public:
 
   G4VPhysicalVolume *Construct();
 
-  void setX(G4double x);
-  void setY(G4double y);
-  void setZ(G4double z);
+  void setX(G4double x){ DetPos.setX(x); }
+  void setY(G4double y){ DetPos.setY(y); }
+  void setZ(G4double z){ DetPos.setZ(z); }
 
+  void setTheta(G4double th){ DetTheta = th; }
+  void setPhi(G4double ph){ DetPhi = ph; }
+  void setPsi(G4double psi){ DetPsi = psi; }
+  
   void MakeSensitive(TrackerGammaSD*);
 
-  private:
+private:
 
   G4String orientation;
 
@@ -61,7 +65,6 @@ public:
   G4LogicalVolume* corner_log;
   G4LogicalVolume* cover_log;
   G4LogicalVolume* Cubox_log;
-  
 
   // Physical volumes
  
@@ -125,6 +128,9 @@ public:
   G4ThreeVector Leaf3Pos;
   G4double thetad;
   G4double phid;
+  G4double DetTheta;
+  G4double DetPhi;
+  G4double DetPsi;
   G4double LeafShift;
   G4ThreeVector Leaf0Shift;
   G4ThreeVector Leaf0Pos;

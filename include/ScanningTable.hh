@@ -1,6 +1,6 @@
 #ifdef SCANNING
-#ifndef ScanningTable_H
-#define ScanningTable_H 1
+#ifndef ScanningTable_h
+#define ScanningTable_h 1
 
 #include "G4Material.hh"
 #include "Materials.hh"
