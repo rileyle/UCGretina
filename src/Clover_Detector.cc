@@ -126,9 +126,9 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 {
 
   if(orientation = "FDS"){
-    DetPos.setX(0.);
-    DetPos.setY(0.);
-    DetPos.setZ(185.*mm);     // LR: Check this!!
+    //    DetPos.setX(0.);
+    //    DetPos.setY(0.);
+    //    DetPos.setZ(185.*mm);
     DetPos.rotateZ(DetPsi);
     DetPos.rotateY(DetTheta);
     DetPos.rotateZ(DetPhi);

@@ -4,8 +4,6 @@
 /FDS/Clover/EulerFile clovers
 /Target/Construct
 /Target/sourceFrame eu152_Z2707
-/Target/Sled
-/BeamTube/Construct
 
 # Initialize run manager =======================================================
 /run/initialize

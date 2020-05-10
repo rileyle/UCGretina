@@ -53,6 +53,9 @@ void FDS::Placement(G4LogicalVolume* experimentalHall_log)
     aClover->setTheta(pEc->th);
     aClover->setPhi(pEc->ph);
     aClover->setPsi(pEc->ps);
+    aClover->setX(pEc->trasl.x());
+    aClover->setY(pEc->trasl.y());
+    aClover->setZ(pEc->trasl.z());
     aClover->Construct();
     aClover->MakeSensitive( theDetector->GetGammaSD() );
   }
