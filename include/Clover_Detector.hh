@@ -100,6 +100,7 @@ private:
   G4double spanningAngle;
   G4double CCoffset;
   G4double CCradius;
+  G4double CCdepth;
   G4double wallZoffset; 
   G4double walloffset;
   G4double corneroffset;

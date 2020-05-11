@@ -1,4 +1,4 @@
-all:  eu152_histos.root
+all:  eff1MeV_histos.root
 	echo "Geant4 simulations done."
 
 # Pattern rules for running Geant4 simulations and sorting the output

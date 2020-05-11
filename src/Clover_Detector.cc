@@ -12,12 +12,18 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   Al = materials->FindMaterial("Al");
   Cu = materials->FindMaterial("Cu");
 
+  // Eurysys CLOVER 4X50X80 SEG2 manual p. 19
   Length      = 8.0*cm;  // crystal length
   Radius      = 2.5*cm;  // crystal radius
-  boxlength   = 4.5*cm;
+  boxlength   = 4.5*cm;  // box cutting planar boundaries on crystals
   torusradius = 0.5*cm;  // "bevel" radius of front-face edges
   covergap    = 0.5*cm;  // front face of cover to front faces of crystals
+  LeafShift   = 2.23*cm; // x and y crystal offset relative to central axis
+  CCoffset = 0.06*cm;    // central contact x and y offset relative to the box
 
+  CCradius = .5*cm;      // central contact radius (based on GRETINA crystals)
+  CCdepth  = 5.*cm;      // David Radford/Mitch Allmond best guess
+  
   startAngle    = 0.*deg;
   spanningAngle = 360.*deg;
 
@@ -28,16 +34,14 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   thetad = 90.*deg;
   phid = 90.*deg;
 
-  DetTheta = 0.;
-  DetPhi = 0.;
+  DetTheta = 0.; // For non scanning-table placement
+  DetPhi = 0.;   // For non scanning-table placement
 
-  DetCode = 0;
+  DetCode = 0;   // For non scanning-table placement
   
   Rot0=G4RotationMatrix::IDENTITY;
   Rot0.rotateX(180.*deg);
   Rot0.rotateY(90.*deg+thetad);
-
-  LeafShift = 2.23*cm; // x and y offset relative to central axis
 
   // Upper left (facing clover)
   Leaf0Shift.setX(LeafShift);
@@ -62,9 +66,6 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   Leaf3Shift.setY(-LeafShift);
   Leaf3Shift.setZ((Length + torusradius)/2. + covergap);
   Leaf3Pos = Pos0 + Leaf3Shift;
-
-  CCoffset = 0.06*cm; // central contact x and y offset relative to the box
-  CCradius = .5*cm; // central contact radius
 
   wallrot=G4RotationMatrix::IDENTITY;
   
@@ -104,7 +105,7 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   Cuboxshift.setZ(Length + covergap + Cuboxlength/2.);
   Cuboxpos = Pos0 + Cuboxshift;
 
-  // Final Clover placement
+  // Final Clover placement (scanning table)
   if(orientation == "right")
     DetPos.setX(  -72.06*mm );
   else if(orientation == "left")
@@ -128,9 +129,6 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 {
 
   if(orientation = "FDS"){
-    //    DetPos.setX(0.);
-    //    DetPos.setY(0.);
-    //    DetPos.setZ(185.*mm);
     DetPos.rotateZ(DetPsi);
     DetPos.rotateY(DetTheta);
     DetPos.rotateZ(DetPhi);
@@ -138,7 +136,7 @@ G4VPhysicalVolume* Clover_Detector::Construct()
     DetRot.rotateZ(DetPos.getPhi());
   }
 
-  // Leaf
+  // Single clover leaf ========================================================
 
   detector = new G4Tubs("detector", 0, Radius, (Length-torusradius)/2., 
 			0., 360.*deg);
@@ -167,8 +165,6 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 			   G4Transform3D(G4RotationMatrix(),
 					 G4ThreeVector(0.,0.,torusradius)));
 
-  //Actually building detector
-
   bevel = 
     new G4UnionSolid("bevel", detector, torus2,
 		     G4Transform3D(G4RotationMatrix(),
@@ -178,7 +174,8 @@ G4VPhysicalVolume* Clover_Detector::Construct()
   subtract = 
     new G4SubtractionSolid("subtraction", bevel, CCsub,
 			   G4Transform3D(G4RotationMatrix(),
-					 G4ThreeVector(0.*cm,0.*cm,1.*cm)));
+					 G4ThreeVector(0.*cm,0.*cm,
+						       Length-CCdepth)));
 
   intersect = new G4IntersectionSolid ("intersect", subtract, box, 
 				       G4Transform3D(G4RotationMatrix(),
@@ -186,9 +183,14 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 								   CCoffset, 
 								   0.)));
 
+   // G4cout << "\n  Total HPGe volume = "
+   // 	 <<std::fixed<<std::setprecision(3)<<std::setw(7)<<std::right
+   // 	 << intersect->GetCubicVolume()/cm3*4.
+   // 	 << " cm3" << G4endl;
+  
   detector_log = new G4LogicalVolume(intersect, HpGe, "Leaf_log", 0, 0, 0);
 
-  // Cryosatat
+  // Cryosatat =================================================================
 
   boxout = new G4Box("box", coverwidth/2., coverwidth/2., coverlength/2.);
 
@@ -263,7 +265,7 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 
   cover_log = new G4LogicalVolume(coveru, Al, "cover_log", 0, 0, 0);
 
-  // Copper Backing
+  // Copper backing ============================================================
 
   Cubox = new G4Box("copperbox", boxlength + .03*cm, boxlength + .03*cm, 
 		    Cuboxlength/2.);
@@ -299,11 +301,6 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 						       LeafShift,
 						       0.)));
 
-  //  G4cout << "\n  Total HPGe volume = "
-  //	 <<std::fixed<<std::setprecision(3)<<std::setw(7)<<std::right
-  //	 << CuboxCut4->GetCubicVolume()/cm3*4.
-  //	 << " cm3" << G4endl;
-  
   Cubox_log = new G4LogicalVolume(CuboxCut4,Cu,"Cubox_log",0,0,0);
 
   assemblyclover = new G4AssemblyVolume();
