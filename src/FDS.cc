@@ -34,8 +34,7 @@ void FDS::Placement(G4LogicalVolume* experimentalHall_log)
 
   G4cout << G4endl << "Placing FDS clovers ... " << G4endl;
   
-  //  G4int    nGe, nCl, nEa, nCa, nPg, nSol, nPt, indexP;
-  G4int nGe, nCl, nEa;
+  G4int nCl, nEa;
   CeulerAngles* pEc = NULL;
 
   for(nEa = 0; nEa < nCloverEuler; nEa++) {
@@ -43,9 +42,6 @@ void FDS::Placement(G4LogicalVolume* experimentalHall_log)
     nCl = pEc->whichGe;  // (cluster type: N/A here)
     //    G4cout << "##### nCl = pEc->whichGe = " << nCl << G4endl;
     if(nCl < 0) continue;
-    
-    nGe = pEc->numPhys; // (slot number)
-    G4cout << "##### slot number = nGe = pEc->numPhys = " << nGe << G4endl;
 
     materials = new Materials();
     Clover_Detector* aClover
@@ -56,8 +52,13 @@ void FDS::Placement(G4LogicalVolume* experimentalHall_log)
     aClover->setX(pEc->trasl.x());
     aClover->setY(pEc->trasl.y());
     aClover->setZ(pEc->trasl.z());
+    aClover->setCode(31000 + 4*(pEc->numPhys) - 1);
     aClover->Construct();
     aClover->MakeSensitive( theDetector->GetGammaSD() );
+
+    G4cout << " Placed clover " << pEc->numPhys << ", DetCode = "
+	   << 31000 + 4*(pEc->numPhys) - 1 << G4endl;
+    
   }
   
   // Clover Shields   (... coming real soon now)

@@ -22,7 +22,7 @@
 
 # Output parameters ============================================================
 /Mode2/PackingRes 0.0 mm
-/Mode2/crmatFile crmat.LINUX
+#/Mode2/crystalXforms # no crmat for the FDS clovers
 /Mode2/GretinaCoords
 /Mode2/Filename eff1MeV.dat
 

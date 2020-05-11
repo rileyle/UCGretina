@@ -30,6 +30,8 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
 
   DetTheta = 0.;
   DetPhi = 0.;
+
+  DetCode = 0;
   
   Rot0=G4RotationMatrix::IDENTITY;
   Rot0.rotateX(180.*deg);
@@ -62,7 +64,7 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   Leaf3Pos = Pos0 + Leaf3Shift;
 
   CCoffset = 0.06*cm; // central contact x and y offset relative to the box
-  CCradius = .6*cm; // central contact radius
+  CCradius = .5*cm; // central contact radius
 
   wallrot=G4RotationMatrix::IDENTITY;
   
@@ -297,6 +299,11 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 						       LeafShift,
 						       0.)));
 
+  //  G4cout << "\n  Total HPGe volume = "
+  //	 <<std::fixed<<std::setprecision(3)<<std::setw(7)<<std::right
+  //	 << CuboxCut4->GetCubicVolume()/cm3*4.
+  //	 << " cm3" << G4endl;
+  
   Cubox_log = new G4LogicalVolume(CuboxCut4,Cu,"Cubox_log",0,0,0);
 
   assemblyclover = new G4AssemblyVolume();
@@ -321,13 +328,12 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 
   assemblyclover->AddPlacedVolume(Cubox_log,Cuboxpos,&wallrot);
 
-  G4int index = 0;
   if(orientation == "left")
-    index = 31000 + 4*31 - 1;
+    DetCode = 31000 + 4*31 - 1;
   else if(orientation == "right")
-    index = 31000 + 4*32 - 1;
+    DetCode = 31000 + 4*32 - 1;
 
-  assemblyclover->MakeImprint(expHall_log, DetPos, &DetRot, index);
+  assemblyclover->MakeImprint(expHall_log, DetPos, &DetRot, DetCode);
 
   //Visualization Attributes
 

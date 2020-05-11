@@ -50,6 +50,8 @@ public:
   void setTheta(G4double th){ DetTheta = th; }
   void setPhi(G4double ph){ DetPhi = ph; }
   void setPsi(G4double psi){ DetPsi = psi; }
+
+  void setCode(G4int c){ DetCode = c; }
   
   void MakeSensitive(TrackerGammaSD*);
 
@@ -57,6 +59,8 @@ private:
 
   G4String orientation;
 
+  G4int DetCode;
+  
   // Logical volumes
 
   G4LogicalVolume* detector_log;
