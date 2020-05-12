@@ -13,16 +13,19 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
   Cu = materials->FindMaterial("Cu");
 
   // Eurysys CLOVER 4X50X80 SEG2 manual p. 19
-  Length      = 8.0*cm;  // crystal length
-  Radius      = 2.5*cm;  // crystal radius
-  boxlength   = 4.5*cm;  // box cutting planar boundaries on crystals
-  torusradius = 0.5*cm;  // "bevel" radius of front-face edges
-  covergap    = 0.5*cm;  // front face of cover to front faces of crystals
-  LeafShift   = 2.23*cm; // x and y crystal offset relative to central axis
-  CCoffset = 0.06*cm;    // central contact x and y offset relative to the box
+  Length      = 80*mm;   // crystal length
+  Radius      = 25*mm;   // crystal radius
+  boxlength   = 45*mm;   // box cutting planar boundaries on crystals
+  torusradius =  5*mm;   // "bevel" radius of front-face edges
+  covergap    =  5*mm;   // front face of cover to front faces of crystals
+  LeafShift   = 22.3*mm; // x and y crystal offset relative to central axis
+  CCoffset    =  0.5*mm; // central contact x and y offset relative to the box
 
-  CCradius = .5*cm;      // central contact radius (based on GRETINA crystals)
-  CCdepth  = 5.*cm;      // David Radford/Mitch Allmond best guess
+  CCradius    = 5*mm;    // central contact radius (based on GRETINA crystals)
+  CCdepth     = 50*mm;   // David Radford/Mitch Allmond best guess
+
+  coaxialDLThickness = 0.5*mm;
+  outerDLThickness = 0.5*mm;
   
   startAngle    = 0.*deg;
   spanningAngle = 360.*deg;
@@ -69,18 +72,18 @@ Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
 
   wallrot=G4RotationMatrix::IDENTITY;
   
-  wallZoffset = 10.0*cm;
+  wallZoffset = 100*mm;
 
-  coverlength    = 24.0*cm;
-  coverwidth     = 10.1*cm;
-  coverthickness = .2*cm;
+  coverlength    = 240*mm;
+  coverwidth     = 101*mm;
+  coverthickness = 1.5*mm;
   covershift.setZ(coverlength/2.);
   coverpos = Pos0 + covershift;
 
-  cornerRadius = 1.55*cm;
+  cornerRadius = 15.5*mm;
   corneroffset = coverwidth/2. - cornerRadius;
 
-  Cuboxlength = 4.00*cm;
+  Cuboxlength = 40.0*mm;
 
   cornershift.setX(-corneroffset);
   cornershift.setY(corneroffset);
@@ -125,7 +128,7 @@ Clover_Detector::~Clover_Detector()
 {
 }
 
-G4VPhysicalVolume* Clover_Detector::Construct()
+void Clover_Detector::Construct()
 {
 
   if(orientation = "FDS"){
@@ -136,60 +139,93 @@ G4VPhysicalVolume* Clover_Detector::Construct()
     DetRot.rotateZ(DetPos.getPhi());
   }
 
+  //Visualization Attributes ===================================================
+
+  //   Clover Crystal
+  G4Colour dgreen (0.0,0.75, 0.0, 1.0); 
+  G4VisAttributes* Vis_1 = new G4VisAttributes(dgreen);
+  Vis_1->SetVisibility(true);
+  Vis_1->SetForceSolid(true);
+
+  //   Can
+  G4Colour transGrey (0.8, 0.8, 0.8, 0.2);
+  G4VisAttributes* Vis_2 = new G4VisAttributes(transGrey);
+  Vis_2->SetVisibility(true);
+  Vis_2->SetForceSolid(false);
+  Vis_2->SetForceWireframe(true);
+  
   // Single clover leaf ========================================================
 
-  detector = new G4Tubs("detector", 0, Radius, (Length-torusradius)/2., 
-			0., 360.*deg);
-
+  G4IntersectionSolid* intersect = Bulletized_Boxed_Cylinder(0);
+  
+  // ... central contact
   CCsub = new G4Tubs("CCsub", 0, CCradius, Length/2., 0., 360.*deg);
 
-  box = new G4Box("box", boxlength/2., boxlength/2., 9.0*cm);
-
-  // creating curved bevel on the front edge
-
-  torus = new G4Torus("torus", 0, torusradius, Radius - torusradius,
-		      0., 360.*deg);
-
-  torusbox = new G4Box("torusbox", Radius + torusradius*3., 
-		       Radius+torusradius*3., 
-		       torusradius);
- 
-  torustube = new G4Tubs("torustube", 0, Radius-torusradius, torusradius, 
-			 0., 360.*deg);
-
-  torus1 = new G4UnionSolid("torus2", torustube, torus,
-			    G4Transform3D(G4RotationMatrix(),G4ThreeVector()));
-
-  torus2 = 
-    new G4SubtractionSolid("torus1", torus1, torusbox, 
+  G4SubtractionSolid* leaf =
+    new G4SubtractionSolid("subtraction", intersect, CCsub,
 			   G4Transform3D(G4RotationMatrix(),
-					 G4ThreeVector(0.,0.,torusradius)));
-
-  bevel = 
-    new G4UnionSolid("bevel", detector, torus2,
-		     G4Transform3D(G4RotationMatrix(),
-				   G4ThreeVector(0,0,
-						 -(Length-torusradius)/2.)));
-
-  subtract = 
-    new G4SubtractionSolid("subtraction", bevel, CCsub,
-			   G4Transform3D(G4RotationMatrix(),
-					 G4ThreeVector(0.*cm,0.*cm,
+					 G4ThreeVector(0., 0,
 						       Length-CCdepth)));
 
-  intersect = new G4IntersectionSolid ("intersect", subtract, box, 
-				       G4Transform3D(G4RotationMatrix(),
-						     G4ThreeVector(CCoffset, 
-								   CCoffset, 
-								   0.)));
+  leaf_log = new G4LogicalVolume(leaf, HpGe, "Leaf_log", 0, 0, 0);
 
-   // G4cout << "\n  Total HPGe volume = "
-   // 	 <<std::fixed<<std::setprecision(3)<<std::setw(7)<<std::right
-   // 	 << intersect->GetCubicVolume()/cm3*4.
-   // 	 << " cm3" << G4endl;
+  leaf_log->SetVisAttributes(Vis_1);
   
-  detector_log = new G4LogicalVolume(intersect, HpGe, "Leaf_log", 0, 0, 0);
+  // G4cout << "\n  Total HPGe volume = "
+  // 	 <<std::fixed<<std::setprecision(3)<<std::setw(7)<<std::right
+  // 	 << leaf->GetCubicVolume()/cm3*4.
+  // 	 << " cm3" << G4endl;
+  
+  // Outer dead layer (including back DL for now)
 
+  if(outerDLThickness > 0){
+    G4IntersectionSolid* outerDLcutout =
+      Bulletized_Boxed_Cylinder(outerDLThickness);
+
+    G4SubtractionSolid* outerDL =
+      new G4SubtractionSolid("subtraction", intersect, outerDLcutout,
+			     G4Transform3D(G4RotationMatrix(),
+					   G4ThreeVector(0., 0, 0.)));
+    outerDL =
+      new G4SubtractionSolid("outerDL", outerDL, CCsub,
+			     G4Transform3D(G4RotationMatrix(),
+					   G4ThreeVector(0., 0,
+							 Length-CCdepth)));
+
+    G4LogicalVolume* outerDL_log =
+      new G4LogicalVolume( outerDL, HpGe, "outerDL_log", 0, 0, 0 );
+
+    // Place outer dead layer as a daugter of the leaf logical volume
+    new G4PVPlacement( 0, G4ThreeVector(), outerDL_log, "outerDeadLayer",
+		       leaf_log, false, 0);
+
+    outerDL_log->SetVisAttributes(Vis_2);
+  }
+  
+  // Coaxial dead layer
+  if(coaxialDLThickness > 0){
+    G4double zSlice[4] = {Length/2.-CCdepth-coaxialDLThickness,
+			  Length/2.-CCdepth,
+			  Length/2.-CCdepth,
+			  Length/2.-outerDLThickness};
+    G4double rIn[4]    = {0., 0., CCradius, CCradius};
+    G4double rOut[4]   = {CCradius+coaxialDLThickness,
+			  CCradius+coaxialDLThickness,
+			  CCradius+coaxialDLThickness,
+			  CCradius+coaxialDLThickness};
+    G4Polycone* coaxialDL =
+      new G4Polycone("coaxialDL", 0.*deg, 360.*deg, 4, zSlice, rIn, rOut);
+
+    G4LogicalVolume* coaxialDL_log =
+      new G4LogicalVolume( coaxialDL, HpGe, "coaxialDL_log", 0, 0, 0 );
+  
+    // Place coaxial dead layer as a daugter of the leaf logical volume
+    new G4PVPlacement( 0, G4ThreeVector(), coaxialDL_log, "coaxialDeadLayer",
+		       leaf_log, false, 0);
+
+    coaxialDL_log->SetVisAttributes(Vis_2);
+  }
+  
   // Cryosatat =================================================================
 
   boxout = new G4Box("box", coverwidth/2., coverwidth/2., coverlength/2.);
@@ -265,6 +301,8 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 
   cover_log = new G4LogicalVolume(coveru, Al, "cover_log", 0, 0, 0);
 
+  cover_log->SetVisAttributes(Vis_2);
+
   // Copper backing ============================================================
 
   Cubox = new G4Box("copperbox", boxlength + .03*cm, boxlength + .03*cm, 
@@ -303,23 +341,27 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 
   Cubox_log = new G4LogicalVolume(CuboxCut4,Cu,"Cubox_log",0,0,0);
 
+  Cubox_log->SetVisAttributes(Vis_2);
+ 
+  // Assemble the clover
+
   assemblyclover = new G4AssemblyVolume();
 
   Rot0.rotateZ(180.*deg);
 
-  assemblyclover->AddPlacedVolume(detector_log,Leaf0Pos,&Rot0);
+  assemblyclover->AddPlacedVolume(leaf_log,Leaf0Pos,&Rot0);
  
   Rot0.rotateZ(90.*deg);
 
-  assemblyclover->AddPlacedVolume(detector_log,Leaf1Pos,&Rot0);
+  assemblyclover->AddPlacedVolume(leaf_log,Leaf1Pos,&Rot0);
 
   Rot0.rotateZ(90.*deg);
   
-  assemblyclover->AddPlacedVolume(detector_log,Leaf2Pos,&Rot0);
+  assemblyclover->AddPlacedVolume(leaf_log,Leaf2Pos,&Rot0);
 
   Rot0.rotateZ(90.*deg);
 
-  assemblyclover->AddPlacedVolume(detector_log,Leaf3Pos,&Rot0);
+  assemblyclover->AddPlacedVolume(leaf_log,Leaf3Pos,&Rot0);
 
   assemblyclover->AddPlacedVolume(cover_log,coverpos,&wallrot);
 
@@ -332,30 +374,62 @@ G4VPhysicalVolume* Clover_Detector::Construct()
 
   assemblyclover->MakeImprint(expHall_log, DetPos, &DetRot, DetCode);
 
-  //Visualization Attributes
+  return;
+}
+//---------------------------------------------------------------------
+G4IntersectionSolid* Clover_Detector::Bulletized_Boxed_Cylinder(G4double offset)
+{
+  // Cylindrical crystal
+  G4Tubs* detector = 
+    new G4Tubs("detector", 0, Radius-offset, (Length-torusradius)/2.-offset,
+	       0., 360.*deg);
 
-  //   Clover Crystal
-  G4Colour dgreen (0.0,0.75, 0.0, 1.0); 
-  G4VisAttributes* Vis_1 = new G4VisAttributes(dgreen);
-  Vis_1->SetVisibility(true);
-  Vis_1->SetForceSolid(true);
+  // Bulletized cap (height torusradius along z)
+  G4Torus* torus = new G4Torus("torus", 0, torusradius - offset,
+			       Radius - torusradius - offset,
+			       0., 360.*deg);
 
-  //   Can
-  G4Colour transGrey (0.8, 0.8, 0.8, 0.2);
-  G4VisAttributes* Vis_2 = new G4VisAttributes(transGrey);
-  Vis_2->SetVisibility(true);
-  Vis_2->SetForceSolid(false);
-  Vis_2->SetForceWireframe(true);
-
-  detector_log->SetVisAttributes(Vis_1);
-  cover_log->SetVisAttributes(Vis_2);
-  Cubox_log->SetVisAttributes(Vis_2);
+  G4Box* torusbox = new G4Box("torusbox", Radius + torusradius*3., 
+			      Radius + torusradius*3., 
+			      torusradius - offset);
  
-  return detector_phys;
+  G4Tubs* torustube =
+    new G4Tubs("torustube", 0, Radius - torusradius - offset,
+	       torusradius - offset, 
+	       0., 360.*deg);
+
+  G4UnionSolid* torus1 =
+    new G4UnionSolid("torus2", torustube, torus,
+		     G4Transform3D(G4RotationMatrix(),G4ThreeVector()));
+
+  G4SubtractionSolid* torus2 =
+    new G4SubtractionSolid("torus1", torus1, torusbox, 
+			   G4Transform3D(G4RotationMatrix(),
+					 G4ThreeVector(0.,0.,
+						       torusradius-offset)));
+  // Bulletized cylinder
+  G4UnionSolid* bevel =
+    new G4UnionSolid("bevel", detector, torus2,
+		     G4Transform3D(G4RotationMatrix(),
+				   G4ThreeVector(0,0,
+						 -(Length-torusradius)/2.
+						 +offset)));
+
+  // ... with planar sides
+  G4Box* box = new G4Box("box", boxlength/2.-offset, boxlength/2.-offset,
+			 1.1*Length);
+
+  G4IntersectionSolid* intersect =
+    new G4IntersectionSolid ("intersect", bevel, box, 
+			     G4Transform3D(G4RotationMatrix(),
+					   G4ThreeVector(CCoffset, 
+							 CCoffset, 
+							 0.)));
+  return intersect;
 }
 //---------------------------------------------------------------------
 void Clover_Detector::MakeSensitive(TrackerGammaSD* TrackerGamma)
 {
-  detector_log->SetSensitiveDetector(TrackerGamma);
+  leaf_log->SetSensitiveDetector(TrackerGamma);
 }
 //---------------------------------------------------------------------

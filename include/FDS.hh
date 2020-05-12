@@ -25,16 +25,18 @@ public:
 
   void Placement(G4LogicalVolume*);
     
-  void SetFDSCloverEuler(G4String file){fdsCloverEulerFile = file;}
-  void SetFDSShieldEuler(G4String file){fdsShieldEulerFile = file;}
-  void SetFDSLaBrEuler(G4String file){fdsLaBrEulerFile = file;}
+  void SetCloverEuler(G4String file){cloverEulerFile = file;}
+  void SetCloverOuterDL(G4double t){cloverOuterDL = t;}
+  void SetCloverCoaxialDL(G4double t){cloverCoaxialDL = t;}
+  void SetShieldEuler(G4String file){shieldEulerFile = file;}
+  void SetLaBrEuler(G4String file){labrEulerFile = file;}
 
 private:
   FDS_Messenger *myMessenger;
 
-  void ReadFDSCloverEulerFile();
-  void ReadFDSShieldEulerFile();
-  void ReadFDSLaBrEulerFile();
+  void ReadCloverEulerFile();
+  void ReadShieldEulerFile();
+  void ReadLaBrEulerFile();
 
   Materials* materials;
   
@@ -45,9 +47,12 @@ private:
   std::vector<CeulerAngles> shieldEuler;
   std::vector<CeulerAngles> labrEuler;
   
-  G4String fdsCloverEulerFile;
-  G4String fdsShieldEulerFile;
-  G4String fdsLaBrEulerFile;
+  G4String cloverEulerFile;
+  G4String shieldEulerFile;
+  G4String labrEulerFile;
+
+  G4double cloverOuterDL;
+  G4double cloverCoaxialDL;
 
 };
 

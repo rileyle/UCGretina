@@ -12,20 +12,20 @@
 
 class Clover_Detector_Messenger: public G4UImessenger
 {
-  public:
-    Clover_Detector_Messenger(Clover_Detector*);
-   ~Clover_Detector_Messenger();
+public:
+  Clover_Detector_Messenger(Clover_Detector*);
+  ~Clover_Detector_Messenger();
     
-    void SetNewValue(G4UIcommand*, G4String);
+  void SetNewValue(G4UIcommand*, G4String);
     
-  private:
-    Clover_Detector* CloverDet;
+private:
+  Clover_Detector* CloverDet;
    
-    G4UIdirectory*             CloverDir;  
+  G4UIdirectory*             CloverDir;  
 
-    G4UIcmdWithADoubleAndUnit* XCmd;
-    G4UIcmdWithADoubleAndUnit* YCmd;
-    G4UIcmdWithADoubleAndUnit* ZCmd;
+  G4UIcmdWithADoubleAndUnit* XCmd;
+  G4UIcmdWithADoubleAndUnit* YCmd;
+  G4UIcmdWithADoubleAndUnit* ZCmd;
 };
 
 

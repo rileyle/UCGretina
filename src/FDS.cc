@@ -4,9 +4,11 @@
 FDS::FDS()
 {
   myMessenger = new FDS_Messenger(this);
-  fdsCloverEulerFile = "";
-  fdsShieldEulerFile = "";
-  fdsLaBrEulerFile   = "";
+  cloverEulerFile = "";
+  shieldEulerFile = "";
+  labrEulerFile   = "";
+  cloverOuterDL   = 0.5*mm;
+  cloverCoaxialDL = 0.5*mm;
 }
 
 FDS::~FDS()
@@ -17,12 +19,12 @@ FDS::~FDS()
 
 void FDS::Placement(G4LogicalVolume* experimentalHall_log)
 {
-  if(fdsCloverEulerFile != "")
-    ReadFDSCloverEulerFile();
-  if(fdsShieldEulerFile != "")
-    ReadFDSShieldEulerFile();
-  if(fdsLaBrEulerFile != "")
-    ReadFDSLaBrEulerFile();
+  if(cloverEulerFile != "")
+    ReadCloverEulerFile();
+  if(shieldEulerFile != "")
+    ReadShieldEulerFile();
+  if(labrEulerFile != "")
+    ReadLaBrEulerFile();
   
   // The detector placement below follows Gretina_Array::PlaceTheClusters()
   
@@ -32,7 +34,7 @@ void FDS::Placement(G4LogicalVolume* experimentalHall_log)
   
   // Clover Detectors
 
-  G4cout << G4endl << "Placing FDS clovers ... " << G4endl;
+  G4cout << G4endl << "Placing clovers ... " << G4endl;
   
   G4int nCl, nEa;
   CeulerAngles* pEc = NULL;
@@ -53,6 +55,8 @@ void FDS::Placement(G4LogicalVolume* experimentalHall_log)
     aClover->setY(pEc->trasl.y());
     aClover->setZ(pEc->trasl.z());
     aClover->setCode(31000 + 4*(pEc->numPhys) - 1);
+    aClover->setOuterDLThickness(cloverOuterDL);
+    aClover->setCoaxialDLThickness(cloverCoaxialDL);
     aClover->Construct();
     aClover->MakeSensitive( theDetector->GetGammaSD() );
 
@@ -67,7 +71,7 @@ void FDS::Placement(G4LogicalVolume* experimentalHall_log)
 
 }
 
-void FDS::ReadFDSCloverEulerFile()
+void FDS::ReadCloverEulerFile()
 {
   // Following the euler file approach used in the Gretina_Array class.
   
@@ -76,16 +80,16 @@ void FDS::ReadFDSCloverEulerFile()
   G4int     lline, i1, i2;
   float     pps, th, ph, x, y, z;
   
-  if( (fp = fopen(fdsCloverEulerFile, "r")) == NULL) {
-    G4cout << "\nError opening Euler-angle file " << fdsCloverEulerFile
+  if( (fp = fopen(cloverEulerFile, "r")) == NULL) {
+    G4cout << "\nError opening Euler-angle file " << cloverEulerFile
 	   << G4endl;
     exit(EXIT_FAILURE);
   }
 
   cloverEuler.clear();
 
-  G4cout << "\nReading Euler angles for the FDS clovers from file "
-	 << fdsCloverEulerFile << " ..." << G4endl;
+  G4cout << "\nReading Euler angles for the clovers from file "
+	 << cloverEulerFile << " ..." << G4endl;
   nCloverEuler = 0;
   
   G4RotationMatrix  rm;
@@ -123,23 +127,23 @@ void FDS::ReadFDSCloverEulerFile()
   G4cout << nCloverEuler << " Euler angles read." << G4endl;
 }
 
-void FDS::ReadFDSShieldEulerFile()
+void FDS::ReadShieldEulerFile()
 {
   FILE      *fp;
   char      line[256];
   G4int     lline, i1, i2;
   float     pps, th, ph, x, y, z;
   
-  if( (fp = fopen(fdsShieldEulerFile, "r")) == NULL) {
-    G4cout << "\nError opening Euler-angle file " << fdsShieldEulerFile
+  if( (fp = fopen(shieldEulerFile, "r")) == NULL) {
+    G4cout << "\nError opening Euler-angle file " << shieldEulerFile
 	   << G4endl;
     exit(EXIT_FAILURE);
   }
 
   shieldEuler.clear();
 
-  G4cout << "\nReading Euler angles for the FDS clover shields from file "
-	 << fdsShieldEulerFile << " ..." << G4endl;
+  G4cout << "\nReading Euler angles for the clover shields from file "
+	 << shieldEulerFile << " ..." << G4endl;
   nShieldEuler = 0;
   
   G4RotationMatrix  rm;
@@ -177,23 +181,23 @@ void FDS::ReadFDSShieldEulerFile()
   G4cout << nShieldEuler << " Euler angles read." << G4endl;
 }
 
-void FDS::ReadFDSLaBrEulerFile()
+void FDS::ReadLaBrEulerFile()
 {
   FILE      *fp;
   char      line[256];
   G4int     lline, i1, i2;
   float     pps, th, ph, x, y, z;
   
-  if( (fp = fopen(fdsLaBrEulerFile, "r")) == NULL) {
-    G4cout << "\nError opening Euler-angle file " << fdsLaBrEulerFile
+  if( (fp = fopen(labrEulerFile, "r")) == NULL) {
+    G4cout << "\nError opening Euler-angle file " << labrEulerFile
 	   << G4endl;
     exit(EXIT_FAILURE);
   }
 
   labrEuler.clear();
 
-  G4cout << "\nReading Euler angles for the FDS clover shields from file "
-	 << fdsLaBrEulerFile << " ..." << G4endl;
+  G4cout << "\nReading Euler angles for the clover shields from file "
+	 << labrEulerFile << " ..." << G4endl;
   nLaBrEuler = 0;
   
   G4RotationMatrix  rm;

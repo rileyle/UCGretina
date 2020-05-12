@@ -5,6 +5,7 @@
 #include "FDS.hh"
 
 #include "G4UIcmdWithAString.hh"
+#include "G4UIcmdWithADoubleAndUnit.hh"
 
 class FDS;
 
@@ -18,13 +19,15 @@ private:
   FDS* myTarget;
 
   G4UIdirectory* FDSDir;
-  G4UIdirectory* FDSCloverDir;
-  G4UIdirectory* FDSShieldDir;
-  G4UIdirectory* FDSLaBrDir;
+  G4UIdirectory* CloverDir;
+  G4UIdirectory* ShieldDir;
+  G4UIdirectory* LaBrDir;
 
-  G4UIcmdWithAString* FDSCloverEulerCmd;
-  G4UIcmdWithAString* FDSShieldEulerCmd;
-  G4UIcmdWithAString* FDSLaBrEulerCmd;
+  G4UIcmdWithAString* CloverEulerCmd;
+  G4UIcmdWithADoubleAndUnit* CloverOuterDLCmd;
+  G4UIcmdWithADoubleAndUnit* CloverCoaxDLCmd;
+  G4UIcmdWithAString* ShieldEulerCmd;
+  G4UIcmdWithAString* LaBrEulerCmd;
 
 public:
   void SetNewValue(G4UIcommand*, G4String);

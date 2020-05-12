@@ -6,6 +6,7 @@
 #include "G4Tubs.hh"
 #include "G4Box.hh"
 #include "G4Torus.hh"
+#include "G4Polycone.hh"
 #include "G4LogicalVolume.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4ThreeVector.hh"
@@ -41,7 +42,7 @@ public:
   Clover_Detector(G4LogicalVolume*, Materials*, G4String);
   ~Clover_Detector();
 
-  G4VPhysicalVolume *Construct();
+  void Construct();
 
   void setX(G4double x){ DetPos.setX(x); }
   void setY(G4double y){ DetPos.setY(y); }
@@ -52,18 +53,23 @@ public:
   void setPsi(G4double psi){ DetPsi = psi; }
 
   void setCode(G4int c){ DetCode = c; }
+
+  void setOuterDLThickness(G4double t){ outerDLThickness = t; }
+  void setCoaxialDLThickness(G4double t){ coaxialDLThickness = t; }
   
   void MakeSensitive(TrackerGammaSD*);
 
 private:
 
+  G4IntersectionSolid* Bulletized_Boxed_Cylinder(G4double);
+  
   G4String orientation;
 
   G4int DetCode;
   
   // Logical volumes
 
-  G4LogicalVolume* detector_log;
+  G4LogicalVolume* leaf_log;
   G4LogicalVolume* fill_log;
   G4LogicalVolume* wall_log;
   G4LogicalVolume* corner_log;
@@ -101,6 +107,8 @@ private:
   G4double CCoffset;
   G4double CCradius;
   G4double CCdepth;
+  G4double outerDLThickness;
+  G4double coaxialDLThickness;
   G4double wallZoffset; 
   G4double walloffset;
   G4double corneroffset;
@@ -152,33 +160,24 @@ private:
   G4ThreeVector Cuboxshift;
   G4ThreeVector Cuboxpos;
 
-  G4Tubs* detector;
   G4Tubs* CCsub;
   G4Tubs* fill;
-  G4Torus* torus;
   G4Tubs* cornerCut;
   G4Tubs* corner;
   G4Tubs* CuboxCut;
-  G4Tubs* torustube;
   G4Box* boxout;
   G4Box* boxin;
-  G4Box* box;
   G4Box* Cubox;
-  G4Box* torusbox;
   G4SubtractionSolid* cover;
   G4SubtractionSolid* coversub;
   G4SubtractionSolid* CuboxCut1;
   G4SubtractionSolid* CuboxCut2;
   G4SubtractionSolid* CuboxCut3;
   G4SubtractionSolid* CuboxCut4;
-  G4SubtractionSolid* torus2;
   G4SubtractionSolid* detector_cut;
   G4UnionSolid* coveru;
-  G4UnionSolid* torus1;
-  G4UnionSolid* bevel;
   G4Box* wall;
   G4SubtractionSolid* subtract;
-  G4IntersectionSolid* intersect;
 
 };
 

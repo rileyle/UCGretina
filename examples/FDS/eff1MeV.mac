@@ -2,6 +2,8 @@
 /Gretina/NoDetectors
 /FDS/Construct
 /FDS/Clover/EulerFile clovers
+/FDS/Clover/OuterDeadLayer   0.03 mm // from the UCSeGA model
+/FDS/Clover/CoaxialDeadLayer 0.4 mm  // from the UCSeGA model
 /Target/Construct
 
 # Initialize run manager =======================================================

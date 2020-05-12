@@ -9,30 +9,43 @@ FDS_Messenger::FDS_Messenger(FDS* pTarget)
  
   FDSDir = new G4UIdirectory("/FDS/");
   FDSDir->SetGuidance("FRIB Decay Station control.");
-  FDSCloverDir = new G4UIdirectory("/FDS/Clover/");
-  FDSCloverDir->SetGuidance("FRIB Decay Station clover array control.");
-  FDSShieldDir = new G4UIdirectory("/FDS/Clover/Shield/");
-  FDSShieldDir->SetGuidance("FRIB Decay Station clover shield control.");
-  FDSLaBrDir = new G4UIdirectory("/FDS/LaBr/");
-  FDSLaBrDir->SetGuidance("FRIB Decay Station LaBr array control.");
+  CloverDir = new G4UIdirectory("/FDS/Clover/");
+  CloverDir->SetGuidance("FRIB Decay Station clover array control.");
+  ShieldDir = new G4UIdirectory("/FDS/Clover/Shield/");
+  ShieldDir->SetGuidance("FRIB Decay Station clover shield control.");
+  LaBrDir = new G4UIdirectory("/FDS/LaBr/");
+  LaBrDir->SetGuidance("FRIB Decay Station LaBr array control.");
   
   commandName = "/FDS/Clover/EulerFile";
   aLine = commandName.c_str();
-  FDSCloverEulerCmd = new G4UIcmdWithAString(aLine, this);
-  FDSCloverEulerCmd->SetGuidance("Set the clover Euler-angle file for the FDS.");
-  FDSCloverEulerCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  CloverEulerCmd = new G4UIcmdWithAString(aLine, this);
+  CloverEulerCmd->SetGuidance("Set the clover Euler-angle file for the FDS.");
+  CloverEulerCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  commandName = "/FDS/Clover/OuterDeadLayer";
+  aLine = commandName.c_str();
+  CloverOuterDLCmd = new G4UIcmdWithADoubleAndUnit(aLine, this);
+  CloverOuterDLCmd->SetGuidance("Set the clover outer dead layer thickness.");
+  CloverOuterDLCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  commandName = "/FDS/Clover/OuterDeadLayer";
+
+  commandName = "/FDS/Clover/CoaxialDeadLayer";
+  aLine = commandName.c_str();
+  CloverCoaxDLCmd = new G4UIcmdWithADoubleAndUnit(aLine, this);
+  CloverCoaxDLCmd->SetGuidance("Set the clover coaxial dead layer thickness.");
+  CloverCoaxDLCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   commandName = "/FDS/Clover/Shield/EulerFile";
   aLine = commandName.c_str();
-  FDSShieldEulerCmd = new G4UIcmdWithAString(aLine, this);
-  FDSShieldEulerCmd->SetGuidance("Set the clover shield Euler-angle file for the FDS.");
-  FDSShieldEulerCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  ShieldEulerCmd = new G4UIcmdWithAString(aLine, this);
+  ShieldEulerCmd->SetGuidance("Set the clover shield Euler-angle file for the FDS.");
+  ShieldEulerCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   commandName = "/FDS/LaBr/EulerFile";
   aLine = commandName.c_str();
-  FDSLaBrEulerCmd = new G4UIcmdWithAString(aLine, this);
-  FDSLaBrEulerCmd->SetGuidance("Set the LaBr Euler-angle file for the FDS.");
-  FDSLaBrEulerCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  LaBrEulerCmd = new G4UIcmdWithAString(aLine, this);
+  LaBrEulerCmd->SetGuidance("Set the LaBr Euler-angle file for the FDS.");
+  LaBrEulerCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
   
 }
 
@@ -40,25 +53,35 @@ FDS_Messenger::FDS_Messenger(FDS* pTarget)
 
 FDS_Messenger::~FDS_Messenger()
 {
-  delete FDSCloverEulerCmd;
-  delete FDSShieldEulerCmd;
-  delete FDSLaBrEulerCmd;
+  delete CloverEulerCmd;
+  delete CloverOuterDLCmd;
+  delete CloverCoaxDLCmd;
+  delete ShieldEulerCmd;
+  delete LaBrEulerCmd;
 }
 
 
 void FDS_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
 { 
 
-  if( command == FDSCloverEulerCmd ) {
-    myTarget->SetFDSCloverEuler(newValue);
+  if( command == CloverEulerCmd ) {
+    myTarget->SetCloverEuler(newValue);
   }
 
-  if( command == FDSShieldEulerCmd ) {
-    myTarget->SetFDSShieldEuler(newValue);
+  if( command == CloverOuterDLCmd ) {
+    myTarget->SetCloverOuterDL(CloverOuterDLCmd->GetNewDoubleValue(newValue));
   }
 
-  if( command == FDSLaBrEulerCmd ) {
-    myTarget->SetFDSLaBrEuler(newValue);
+  if( command == CloverCoaxDLCmd ) {
+    myTarget->SetCloverCoaxialDL(CloverCoaxDLCmd->GetNewDoubleValue(newValue));
+  }
+
+  if( command == ShieldEulerCmd ) {
+    myTarget->SetShieldEuler(newValue);
+  }
+
+  if( command == LaBrEulerCmd ) {
+    myTarget->SetLaBrEuler(newValue);
   }
 
 }
