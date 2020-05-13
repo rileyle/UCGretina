@@ -1,7 +1,3 @@
-/ExpHall/X_length 2. m
-/ExpHall/Y_length 2. m
-/ExpHall/Z_length 2. m
-
 # Detector parameters ==========================================================
 /Gretina/detector/enableCapsules
 /ScanningTable/CADModelPath ../../cadModels
@@ -14,13 +10,17 @@
 /ScanningTable/IncludeCollimatorInsert
 /ScanningTable/SetCollimatorRadius 0.5 mm
 /ScanningTable/IncludeCollimatorMount
-/ScanningTable/SetControllerX    0.0 mm  # left; -G4 x
-/ScanningTable/SetControllerY  -64.9 mm  # away;  G4 z
-/ScanningTable/SetControllerZ   -4.64 mm # up
-/ScanningTable/SetCloverZ      -24.34 mm # up
+/ScanningTable/SetControllerX     10.0 mm   # -geant4 x
+/ScanningTable/SetControllerY    -64.9 mm   #  geant4 z
+/ScanningTable/SetControllerZ     -4.64 mm  #  geant4 y
+/ScanningTable/SetCloverZ   -24.34 mm       # y, actually
 
 # Initialize run manager =======================================================
 /run/initialize
+
+/ExpHall/X_length 2. m
+/ExpHall/Y_length 2. m
+/ExpHall/Z_length 2. m
 
 # Source parameters ============================================================
 /Experiment/RunSource

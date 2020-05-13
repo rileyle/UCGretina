@@ -154,14 +154,14 @@ void DetectorConstruction::Placement()
   scanningTable->Construct(ExpHall_log);
   if( cloverStatus == "left"  || cloverStatus == "both" ){
     G4cout << "Constructing left clover detector." << G4endl;
-    leftClover = new Clover_Detector(ExpHall_log, materials, "left");
+    leftClover = new Clover_Detector(ExpHall_log, "left");
     leftClover->setY(scanningTable->GetCloverZ());
     leftClover->Construct();
     leftClover->MakeSensitive(TrackerGamma);
   }
   if( cloverStatus == "right" || cloverStatus == "both" ){
     G4cout << "Constructing right clover detector." << G4endl;
-    rightClover = new Clover_Detector(ExpHall_log, materials, "right");
+    rightClover = new Clover_Detector(ExpHall_log, "right");
     rightClover->setY(scanningTable->GetCloverZ());
     rightClover->Construct();
     rightClover->MakeSensitive(TrackerGamma);
