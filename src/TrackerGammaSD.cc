@@ -62,7 +62,11 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
     detCode = 0;
     detNum  = 132;
   }
-  else { // GRETINA or Clover
+  else if(name.contains("Leaf")){ // Clover
+    detCode = theTouchable->GetReplicaNumber(0);
+    detNum = detCode%1000;
+  }
+  else { // GRETINA
     detCode = theTouchable->GetReplicaNumber(0);
     if(detCode == 0)
       detCode = theTouchable->GetReplicaNumber(depth);
