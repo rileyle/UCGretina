@@ -38,8 +38,6 @@ private:
   void ReadShieldEulerFile();
   void ReadLaBrEulerFile();
 
-  Materials* materials;
-  
   G4int nCloverEuler;
   G4int nShieldEuler;
   G4int nLaBrEuler;

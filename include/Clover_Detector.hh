@@ -37,9 +37,8 @@ class Clover_Detector
 public:
 
   G4LogicalVolume *expHall_log;
-  Materials* materials;
   
-  Clover_Detector(G4LogicalVolume*, Materials*, G4String);
+  Clover_Detector(G4LogicalVolume*, G4String);
   ~Clover_Detector();
 
   void Construct();

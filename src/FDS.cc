@@ -45,9 +45,8 @@ void FDS::Placement(G4LogicalVolume* experimentalHall_log)
     //    G4cout << "##### nCl = pEc->whichGe = " << nCl << G4endl;
     if(nCl < 0) continue;
 
-    materials = new Materials();
     Clover_Detector* aClover
-      = new Clover_Detector(experimentalHall_log, materials, "FDS");
+      = new Clover_Detector(experimentalHall_log, "FDS");
     aClover->setTheta(pEc->th);
     aClover->setPhi(pEc->ph);
     aClover->setPsi(pEc->ps);

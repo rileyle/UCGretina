@@ -1,16 +1,15 @@
 #include "Clover_Detector.hh"
 
 Clover_Detector::Clover_Detector(G4LogicalVolume* experimentalHall_log,
-				 Materials* mat, G4String orient)
+				 G4String orient)
 {
   orientation = orient;
 
-  materials=mat;
   expHall_log=experimentalHall_log;
 
-  HpGe = materials->FindMaterial("Germanium");
-  Al = materials->FindMaterial("Al");
-  Cu = materials->FindMaterial("Cu");
+  HpGe = G4Material::GetMaterial("Germanium");
+  Al   = G4Material::GetMaterial("Al");
+  Cu   = G4Material::GetMaterial("Cu");
 
   // Eurysys CLOVER 4X50X80 SEG2 manual p. 19
   Length      = 80*mm;   // crystal length
@@ -131,7 +130,8 @@ Clover_Detector::~Clover_Detector()
 void Clover_Detector::Construct()
 {
 
-  if(orientation = "FDS"){
+  // For non scanning-table placement
+  if(orientation != "left" && orientation != "right"){
     DetPos.rotateZ(DetPsi);
     DetPos.rotateY(DetTheta);
     DetPos.rotateZ(DetPhi);
