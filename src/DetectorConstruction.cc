@@ -40,54 +40,50 @@ DetectorConstruction::DetectorConstruction()
   TrackerGamma = new TrackerGammaSD("GammaTracker");
   TrackerGammaSDMessenger = new TrackerGammaSD_Messenger(TrackerGamma);
 
-  ExperimentalHall = new Experimental_Hall(materials);
+  ExperimentalHall = new Experimental_Hall();
   ExperimentalHallMessenger = new Experimental_Hall_Messenger(ExperimentalHall);
   
   // Background sphere
-  BackgroundSphere = new Background_Sphere(materials);
+  BackgroundSphere = new Background_Sphere();
   BackgroundSphereMessenger = new Background_Sphere_Messenger(BackgroundSphere);
 
 #ifndef LHTARGET
 #ifndef SCANNING
   // Beam Tube
 
-  BeamTube = new Beam_Tube(materials);
+  BeamTube = new Beam_Tube();
   BeamTubeMessenger = new Beam_Tube_Messenger(BeamTube);
 
   // Greta Chamber
 
-  GretaChamber = new Greta_Chamber(materials);
+  GretaChamber = new Greta_Chamber();
   GretaChamberMessenger = new Greta_Chamber_Messenger(GretaChamber);
 
   // WU Chamber
-  WUChamber = new WU_Chamber(materials);
+  WUChamber = new WU_Chamber();
 
 #else
   // Scanning Table
-  scanningTable = new ScanningTable(materials);
+  scanningTable = new ScanningTable();
   ScanningTableMessenger = new ScanningTable_Messenger(scanningTable);
 #endif
 #endif
 
 #ifndef SCANNING  
-  // S800 Quadrupole
-  the_S800 = new S800(materials);
-  the_LaBr = new LaBr(materials);
+  the_S800 = new S800();
+  the_LaBr = new LaBr();
+  the_FDS = new FDS();
 #endif
   
   // Target
 
-  aTarget = new Target(materials);
+  aTarget = new Target();
   TargetMessenger = new Target_Messenger(aTarget);
 
   // GRETINA
 
   the_Gretina_Array = new Gretina_Array();
   the_Gretina_Array_Messenger = new Gretina_Array_Messenger(the_Gretina_Array);
-
-  // FDS
-
-  the_FDS = new FDS();
 
 }
 
@@ -159,14 +155,14 @@ void DetectorConstruction::Placement()
   scanningTable->Construct(ExpHall_log);
   if( cloverStatus == "left"  || cloverStatus == "both" ){
     G4cout << "Constructing left clover detector." << G4endl;
-    leftClover = new Clover_Detector(ExpHall_log, materials, "left");
+    leftClover = new Clover_Detector(ExpHall_log, "left");
     leftClover->setY(scanningTable->GetCloverZ());
     leftClover->Construct();
     leftClover->MakeSensitive(TrackerGamma);
   }
   if( cloverStatus == "right" || cloverStatus == "both" ){
     G4cout << "Constructing right clover detector." << G4endl;
-    rightClover = new Clover_Detector(ExpHall_log, materials, "right");
+    rightClover = new Clover_Detector(ExpHall_log, "right");
     rightClover->setY(scanningTable->GetCloverZ());
     rightClover->Construct();
     rightClover->MakeSensitive(TrackerGamma);
@@ -223,8 +219,11 @@ void DetectorConstruction::Placement()
     the_Gretina_Array->Placement();
   }
 
+#ifndef SCANNING
   if(fdsStatus)
     the_FDS->Placement(ExpHall_log);
+#endif
+
 }
 
 ///////////////////
@@ -236,12 +235,6 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
 
   const char *aLine;
   G4String commandName;
-
-  //  commandName = "/Gretina/update";
-  //  aLine = commandName.c_str();
-  //  UpdateCmd = new G4UIcmdWithoutParameter(aLine, this);
-  //  UpdateCmd->SetGuidance("Update geometry.");
-  //  UpdateCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   commandName = "/Target/Construct";
   aLine = commandName.c_str();
@@ -327,7 +320,6 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
 
 DetectorConstruction_Messenger::~DetectorConstruction_Messenger()
 {
-  //  delete UpdateCmd;
   delete TargetCmd;
   delete NoGretCmd;
 #ifndef SCANNING
@@ -351,9 +343,6 @@ DetectorConstruction_Messenger::~DetectorConstruction_Messenger()
 
 void DetectorConstruction_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
 { 
-  //  if( command == UpdateCmd ) {
-  //    myTarget->Placement();
-  //  } 
   if( command == TargetCmd ) {
     myTarget->SetTargetStatus(true);
   } 

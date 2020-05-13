@@ -31,7 +31,7 @@ class Target
 
   G4LogicalVolume *expHall_log;
 
-  Target(Materials*);
+  Target();
   ~Target();
   
   G4VPhysicalVolume *Construct(G4LogicalVolume*);
@@ -136,7 +136,6 @@ private:
   //elements
 
   //materials
-  Materials* materials;
   G4Material* lH2;
   G4Material* vacuum;
   G4Material* Aluminum;

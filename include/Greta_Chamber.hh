@@ -25,7 +25,7 @@ public:
 
   G4LogicalVolume *expHall_log;
 
-  Greta_Chamber(Materials*);
+  Greta_Chamber();
   ~Greta_Chamber();
   
   G4VPhysicalVolume *Construct(G4LogicalVolume*);
@@ -43,7 +43,6 @@ private:
   G4double BTDz;
 
   //materials
-  Materials* materials;
   G4Material* ChamberMaterial;
 
   //logical volume

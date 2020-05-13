@@ -1,11 +1,9 @@
 #ifdef SCANNING
 #include "ScanningTable.hh"
 
-ScanningTable::ScanningTable(Materials* mat)
+ScanningTable::ScanningTable()
 {
   CADModelPath = "./cadModels/";
-
-  materials=mat;
 
   Pos0 = new G4ThreeVector(0., 0., 44.45*mm); // center flange @ (x,z) = (0,0)
   Pos2 = new G4ThreeVector(0., 0., -8.80*mm);
@@ -34,23 +32,23 @@ ScanningTable::ScanningTable(Materials* mat)
 
   slitWidth = 2.0*mm;
 
-  material8020 = materials->FindMaterial("Al");
-  materialCartBase = materials->FindMaterial("ssteel");
-  materialCartTop = materials->FindMaterial("ssteel");
-  materialCartBack = materials->FindMaterial("ssteel");
-  materialSlitBrackets = materials->FindMaterial("Al");
-  materialSlits = materials->FindMaterial("Hevimet");
-  materialSlitAssembly = materials->FindMaterial("Al");
-  materialSlitAssemblyCollimator = materials->FindMaterial("Cu");
-  materialSlitAssemblyPlug = materials->FindMaterial("Hevimet");
-  materialTranslation = materials->FindMaterial("G10");
-  materialTranslationAssembly = materials->FindMaterial("ssteel");
-  materialCsCollimator = materials->FindMaterial("Hevimet");
-  materialCsCollimatorMount = materials->FindMaterial("Al");
-  materialClover = materials->FindMaterial("Germanium");
-  materialCloverShield = materials->FindMaterial("Al");
-  materialRollers = materials->FindMaterial("G4_TEFLON");
-  materialCuTarget = materials->FindMaterial("Cu");
+  material8020 = G4Material::GetMaterial("Al");
+  materialCartBase = G4Material::GetMaterial("ssteel");
+  materialCartTop = G4Material::GetMaterial("ssteel");
+  materialCartBack = G4Material::GetMaterial("ssteel");
+  materialSlitBrackets = G4Material::GetMaterial("Al");
+  materialSlits = G4Material::GetMaterial("Hevimet");
+  materialSlitAssembly = G4Material::GetMaterial("Al");
+  materialSlitAssemblyCollimator = G4Material::GetMaterial("Cu");
+  materialSlitAssemblyPlug = G4Material::GetMaterial("Hevimet");
+  materialTranslation = G4Material::GetMaterial("G10");
+  materialTranslationAssembly = G4Material::GetMaterial("ssteel");
+  materialCsCollimator = G4Material::GetMaterial("Hevimet");
+  materialCsCollimatorMount = G4Material::GetMaterial("Al");
+  materialClover = G4Material::GetMaterial("Germanium");
+  materialCloverShield = G4Material::GetMaterial("Al");
+  materialRollers = G4Material::GetMaterial("G4_TEFLON");
+  materialCuTarget = G4Material::GetMaterial("Cu");
 }
 
 ScanningTable::~ScanningTable()

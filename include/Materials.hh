@@ -1,5 +1,5 @@
-#ifndef Materials_h
-#define Materials_h 1
+#ifndef Materials_H
+#define Materials_H 1
 
 #include "G4Material.hh"
 #include "G4NistManager.hh"

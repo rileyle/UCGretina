@@ -1,5 +1,5 @@
-#ifndef DetectorConstruction_h
-#define DetectorConstruction_h 1
+#ifndef DetectorConstruction_H
+#define DetectorConstruction_H 1
 
 #include "G4VUserDetectorConstruction.hh"
 #include "Materials.hh"
@@ -54,7 +54,6 @@ public:
 
   G4VPhysicalVolume* Construct();
   Gretina_Array* GetGretina(){ return the_Gretina_Array;}
-  FDS* GetFDS(){ return the_FDS;}
   TrackerGammaSD* GetGammaSD(){ return TrackerGamma;}
 #ifdef LHTARGET
   G4UnionSolid* GetTarget(){return aTarget->GetTarget();}	
@@ -74,7 +73,6 @@ public:
 
   void SetTargetStatus(G4bool stat){targetStatus = stat;}
   void SetGretinaStatus(G4bool stat){gretinaStatus = stat;}
-  void SetFDSStatus(G4bool stat){fdsStatus = stat;}
 
 #ifndef LHTARGET
 #ifndef SCANNING
@@ -89,6 +87,8 @@ public:
 #endif
 
 #ifndef SCANNING
+  FDS* GetFDS(){ return the_FDS;}
+  void SetFDSStatus(G4bool stat){fdsStatus = stat;}
   void SetShellStatus(G4String stat){shellStatus = stat;}
   void SetNorthOffset(G4double off){northOffset = off;}
   void SetSouthOffset(G4double off){southOffset = off;}

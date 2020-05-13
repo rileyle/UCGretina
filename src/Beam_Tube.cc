@@ -1,9 +1,8 @@
 #ifndef LHTARGET
 #include "Beam_Tube.hh"
 
-Beam_Tube::Beam_Tube(Materials* mat)
+Beam_Tube::Beam_Tube()
 {
-  materials=mat;
   BTrmin = 3.0*2.54*cm - 0.058*2.54*cm;
   BTrmax = 3.0*2.54*cm;
   BTDz   = 40.65/2.*2.54*cm; 
@@ -16,11 +15,9 @@ Beam_Tube::Beam_Tube(Materials* mat)
   BTFlangeDz     = 0.55/2.0*2.54*cm;
   BTFlangeOffset = (14.762-0.3)*2.54*cm;
 
-  //  Pos0 = new G4ThreeVector(0.,0.,0.);
   BTPos       = new G4ThreeVector(0., 0., BTOffset);
   BTFlangePos = new G4ThreeVector(0., 0., BTFlangeOffset);
-  BeamTubeMaterial = materials->FindMaterial("Al");
-
+  BeamTubeMaterial = G4Material::GetMaterial("Al");
 }
 
 Beam_Tube::~Beam_Tube()
@@ -115,7 +112,7 @@ void Beam_Tube::Report()
 void Beam_Tube::setMaterial(G4String materialName)
 {
   // search the material by its name 
-  BeamTubeMaterial = materials->FindMaterial(materialName);  
+  BeamTubeMaterial = G4Material::GetMaterial(materialName);  
   BeamTube_log->SetMaterial(BeamTubeMaterial);
   BeamTubeFlange_log->SetMaterial(BeamTubeMaterial);
   G4cout<<" ----> Beam Tube material set to     "<<BeamTube_log->GetMaterial()->GetName()<< G4endl;                 
