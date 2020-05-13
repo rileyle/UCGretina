@@ -1,14 +1,13 @@
 #include "Experimental_Hall.hh"
 
-Experimental_Hall::Experimental_Hall(Materials* mat)
+Experimental_Hall::Experimental_Hall()
 {
-  materials=mat;
+  //  materials=mat;
   expHall_x = 400.*cm;
   expHall_y = 400.*cm;
   expHall_z = 400.*cm;
 
-  ExperimentalHallMaterial = materials->FindMaterial("G4_Galactic");
-
+  ExperimentalHallMaterial = G4Material::GetMaterial("G4_Galactic");
 }
 
 Experimental_Hall::~Experimental_Hall()
@@ -66,7 +65,7 @@ void Experimental_Hall::Report()
 void Experimental_Hall::setMaterial(G4String materialName)
 {
   // search the material by its name 
-  ExperimentalHallMaterial = materials->FindMaterial(materialName);  
+  ExperimentalHallMaterial = G4Material::GetMaterial(materialName);  
   ExperimentalHall_log->SetMaterial(ExperimentalHallMaterial);
   G4cout<<"----> Exp. Hall material set to     "<<ExperimentalHall_log->GetMaterial()->GetName()<< G4endl;                 
 }

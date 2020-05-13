@@ -1,10 +1,8 @@
 #ifndef LHTARGET
 #include "Target.hh"
 
-Target::Target(Materials* mat)
+Target::Target()
 {
-  materials=mat;
-
   buildSled=false;
 
   Target_side_x=50*mm;
@@ -19,7 +17,6 @@ Target::Target(Materials* mat)
   NStep=20;
 
   sourceFrame = "";
-
 }
 
 Target::~Target()
@@ -30,7 +27,7 @@ G4VPhysicalVolume* Target::Construct(G4LogicalVolume* experimentalHall_log)
 {
   expHall_log=experimentalHall_log;
 
-  TargetMaterial = materials->FindMaterial(TargetMaterialName);
+  TargetMaterial = G4Material::GetMaterial(TargetMaterialName);
   G4String name=TargetMaterial->GetName();
   G4double Z=TargetMaterial->GetZ();
   G4double A=TargetMaterial->GetA();
@@ -149,12 +146,12 @@ void Target::setSourceFrame(G4String sF)
 
   if(sourceFrame == "eu152_Z2707"){
 
-    frameMaterial = materials->FindMaterial("Al");
+    frameMaterial = G4Material::GetMaterial("Al");
     //    frameThickness = 2.9*mm; // Used prior to 3/2012
     frameThickness = 1.2*mm;       // Dirk Weisshaar 3/4/2012
     frameInnerRadius = 3.8*cm/2.0; // Source data sheet
     frameOuterRadius = 5.4*cm/2.0; // Source data sheet
-    tapeMaterial = materials->FindMaterial("G4_POLYETHYLENE"); // Source data sheet
+    tapeMaterial = G4Material::GetMaterial("G4_POLYETHYLENE"); // Source data sheet
     tapeThickness = 0.012*cm;      // Source data sheet
 
     euFrame = new G4Tubs("euFrame",frameInnerRadius,frameOuterRadius,frameThickness/2.,0.,360.*deg);
@@ -167,11 +164,11 @@ void Target::setSourceFrame(G4String sF)
 
   } else if(sourceFrame == "cs137_E2879"){
 
-    frameMaterial = materials->FindMaterial("Al");
+    frameMaterial = G4Material::GetMaterial("Al");
     frameThickness = 0.7*mm;
     frameInnerRadius = 2.54*13./16.*cm/2.0;
     frameOuterRadius = 2.54*cm/2.0;
-    tapeMaterial = materials->FindMaterial("G4_POLYETHYLENE");
+    tapeMaterial = G4Material::GetMaterial("G4_POLYETHYLENE");
     tapeThickness = 0.016*cm;
 
     csFrame = new G4Tubs("csFrame",frameInnerRadius,frameOuterRadius,frameThickness/2.,0.,360.*deg);
@@ -191,7 +188,7 @@ void Target::setSourceFrame(G4String sF)
 
   } else if(sourceFrame == "co56_2012"){
 
-    frameMaterial = materials->FindMaterial("Fe");
+    frameMaterial = G4Material::GetMaterial("Fe");
     frameThickness = 0.05*mm;
     frameSide_x = 25.0*mm;
     frameSide_y = 25.0*mm;
@@ -208,7 +205,7 @@ void Target::setSourceFrame(G4String sF)
 void Target::BuildSled()
 {
 
-  sledMaterial = materials->FindMaterial("G10");
+  sledMaterial = G4Material::GetMaterial("G10");
 
   G4double tolerance = 0.1*mm;
 

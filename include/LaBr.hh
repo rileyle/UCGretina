@@ -25,7 +25,7 @@ class LaBr
 
   G4LogicalVolume *expHall_log;
 
-  LaBr(Materials*);
+  LaBr();
   ~LaBr();
   
   G4VPhysicalVolume *Construct(G4LogicalVolume*);
@@ -47,7 +47,6 @@ class LaBr
   G4double LaBrCap_Thick;
 
   //materials
-  Materials* materials;
   G4Material* LaBrMaterial;
   G4Material* LaBrPMTMaterial;
   G4Material* LaBrCapMaterial;

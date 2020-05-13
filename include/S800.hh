@@ -24,7 +24,7 @@ class S800
 
   G4LogicalVolume *expHall_log;
 
-  S800(Materials*);
+  S800();
   ~S800();
   
   G4VPhysicalVolume *Construct(G4LogicalVolume*);
@@ -45,12 +45,10 @@ class S800
   G4double S800_Offset;
 
   //materials
-  Materials* materials;
   G4Material* S800Material;
 
   //default position
   G4RotationMatrix NoRot;
-  //  G4ThreeVector *Pos0;
   G4ThreeVector *S800_Pos;
   G4ThreeVector *S800GateValve_Pos;
 

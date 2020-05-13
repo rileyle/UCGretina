@@ -3,7 +3,7 @@
 
 
 #include "G4Material.hh"
-#include "Materials.hh"
+//#include "Materials.hh"
 #include "G4Box.hh"
 #include "G4LogicalVolume.hh"
 #include "G4VPhysicalVolume.hh"
@@ -20,7 +20,8 @@ class Experimental_Hall
 {
   public:
 
-  Experimental_Hall(Materials*);
+  //  Experimental_Hall(Materials*);
+  Experimental_Hall();
   ~Experimental_Hall();
   
   G4VPhysicalVolume *Construct();
@@ -38,7 +39,7 @@ class Experimental_Hall
   G4double expHall_z;
 
   //materials
-  Materials* materials;
+  //  Materials* materials;
   G4Material* ExperimentalHallMaterial;
 
   //the box

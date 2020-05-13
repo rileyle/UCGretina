@@ -30,7 +30,7 @@ class ScanningTable
 
   G4LogicalVolume *expHall_log;
 
-  ScanningTable(Materials*);
+  ScanningTable();
   ~ScanningTable();
   
   void Construct(G4LogicalVolume*);
@@ -56,7 +56,7 @@ class ScanningTable
   G4double GetCloverZ() { return cloverZ + cloverOffset; }
   void Report();
   
-    private:
+private:
   //flags
   G4bool includeCloverCart;
   G4bool includeCartFrame;
@@ -83,7 +83,6 @@ class ScanningTable
   G4double slitWidth;
   
   //materials
-  Materials* materials;
   G4Material* material8020;
   G4Material* materialCartBase;
   G4Material* materialCartTop;
@@ -123,7 +122,6 @@ class ScanningTable
   G4ThreeVector *BotPos;
   G4ThreeVector *MidPos;
   G4ThreeVector *TopPos;
-  //  G4ThreeVector *UsePos;
   G4ThreeVector CuTargetShift;
   G4ThreeVector CuTargetPos;
   G4ThreeVector CloverMountShift;

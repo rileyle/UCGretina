@@ -1,9 +1,7 @@
 #include "LaBr.hh"
 
-LaBr::LaBr(Materials* mat)
+LaBr::LaBr()
 {
-  materials=mat;
-
   LaBr_Z = 3*cm; // Dirk's estimate for 2016 measurements
   
   // Dimensions based on Mirion LABR-1.5x1.5 LaBr3(Ce) Scintillation Detector
@@ -12,19 +10,19 @@ LaBr::LaBr(Materials* mat)
   LaBr_R  = 0.75*2.54*cm;
   LaBr_Dz = 0.75*2.54*cm;
 
-  LaBrMaterial = materials->FindMaterial("LaBr3");
+  LaBrMaterial = G4Material::GetMaterial("LaBr3");
 
   LaBrPMT_R  = 1.156*2.54*cm;
   LaBrPMT_Dz = 2.25*2.54*cm;
 
-  LaBrPMTMaterial = materials->FindMaterial("Al");
+  LaBrPMTMaterial = G4Material::GetMaterial("Al");
 
   // G4Polycone is defined relatve to 1 end instead of the center.
   LaBrCap_Thick = 1.0*mm;                        // wall thickness
   LaBrCap_R     = LaBr_R  + 2.*LaBrCap_Thick;    // outer
   LaBrCap_L     = 2.*LaBr_Dz + 2.*LaBrCap_Thick; // outer
   
-  LaBrCapMaterial = materials->FindMaterial("Al");
+  LaBrCapMaterial = G4Material::GetMaterial("Al");
 
   LaBrPos    = new G4ThreeVector(0., 0.,
 				 -LaBr_Dz - 2.*LaBrCap_Thick - LaBr_Z);
@@ -146,7 +144,7 @@ void LaBr::Report()
 void LaBr::setMaterial(G4String materialName)
 {
   // search the material by its name 
-  LaBrMaterial = materials->FindMaterial(materialName);  
+  LaBrMaterial = G4Material::GetMaterial(materialName);  
   LaBr_log->SetMaterial(LaBrMaterial);
   G4cout<<"----> LaBr material set to     "<<LaBr_log->GetMaterial()->GetName()<< G4endl;                 
 }

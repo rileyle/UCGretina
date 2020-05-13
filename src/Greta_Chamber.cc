@@ -1,9 +1,8 @@
 #ifndef LHTARGET
 #include "Greta_Chamber.hh"
 
-Greta_Chamber::Greta_Chamber(Materials* mat)
+Greta_Chamber::Greta_Chamber()
 {
-  materials=mat;
 
   Rmin = 178.5*mm;
   Rmax = 180.0*mm;
@@ -12,7 +11,7 @@ Greta_Chamber::Greta_Chamber(Materials* mat)
   BTrmax = 20.0*mm;
   BTDz = (127.6/2*cm - Rmax)/2.;
 
-  ChamberMaterial = materials->FindMaterial("Al");
+  ChamberMaterial = G4Material::GetMaterial("Al");
 
   Cutaway = false;
 

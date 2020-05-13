@@ -25,7 +25,7 @@ class Target
 
   G4LogicalVolume *expHall_log;
 
-  Target(Materials*);
+  Target();
   ~Target();
   
   G4VPhysicalVolume *Construct(G4LogicalVolume*);
@@ -87,7 +87,6 @@ private:
   G4double sledBarY5;
   G4double sledBarZ5;
 
-  Materials* materials;
   G4String TargetMaterialName;
   G4Material* TargetMaterial;
   G4Material* frameMaterial;
