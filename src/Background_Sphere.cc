@@ -1,12 +1,12 @@
 #include "Background_Sphere.hh"
 
-Background_Sphere::Background_Sphere(Materials* mat)
+Background_Sphere::Background_Sphere()
 {
-  materials=mat;
+  //  materials=mat;
   BSrmin = 3.0*m;
   BSrmax = 3.4*m;
   Pos0 = new G4ThreeVector(0.,0.,0.);
-  BackgroundSphereMaterial = materials->FindMaterial("G4_Galactic");
+  BackgroundSphereMaterial = G4Material::GetMaterial("G4_Galactic");
 }
 
 Background_Sphere::~Background_Sphere()
@@ -77,7 +77,7 @@ void Background_Sphere::Report()
 void Background_Sphere::setMaterial(G4String materialName)
 {
   // search the material by its name 
-  BackgroundSphereMaterial = materials->FindMaterial(materialName);  
+  BackgroundSphereMaterial = G4Material::GetMaterial(materialName);  
   BackgroundSphere_log->SetMaterial(BackgroundSphereMaterial);
   G4cout<<"----> Background Sphere material set to     "<<BackgroundSphere_log->GetMaterial()->GetName()<< G4endl;                 
 }

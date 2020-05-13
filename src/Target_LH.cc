@@ -1,20 +1,18 @@
 #ifdef LHTARGET
 #include "Target_LH.hh"
 
-Target::Target(Materials* mat)
+Target::Target()
 {
-  materials=mat;
-
   buildSled=false;
 
   targetCellType = "thick";
 
-  lH2            = materials->FindMaterial("G4_lH2");
-  vacuum         = materials->FindMaterial("G4_Galactic");
-  Aluminum       = materials->FindMaterial("Al");
-  Copper         = materials->FindMaterial("Cu");
-  StainlessSteel = materials->FindMaterial("ssteel");
-  Kapton         = materials->FindMaterial("Kapton");
+  lH2            = G4Material::GetMaterial("G4_lH2");
+  vacuum         = G4Material::GetMaterial("G4_Galactic");
+  Aluminum       = G4Material::GetMaterial("Al");
+  Copper         = G4Material::GetMaterial("Cu");
+  StainlessSteel = G4Material::GetMaterial("ssteel");
+  Kapton         = G4Material::GetMaterial("Kapton");
 
   Pos = new G4ThreeVector(0.,0.,0.);
   NoRot = G4RotationMatrix::IDENTITY;
@@ -1012,11 +1010,11 @@ void Target::setSourceFrame(G4String sF)
 
   if(sourceFrame == "eu152_Z2707"){
 
-    frameMaterial = materials->FindMaterial("Al");
+    frameMaterial = G4Material::GetMaterial("Al");
     frameThickness = 2.9*mm;
     frameInnerRadius = 3.8*cm/2.0;
     frameOuterRadius = 5.4*cm/2.0;
-    tapeMaterial = materials->FindMaterial("G4_POLYETHYLENE");
+    tapeMaterial = G4Material::GetMaterial("G4_POLYETHYLENE");
     tapeThickness = 0.012*cm;
 
     tape_r = frameInnerRadius - .2*cm; //in order to remove overlap
@@ -1031,11 +1029,11 @@ void Target::setSourceFrame(G4String sF)
 
   } else if(sourceFrame == "cs137_E2879"){
 
-    frameMaterial = materials->FindMaterial("Al");
+    frameMaterial = G4Material::GetMaterial("Al");
     frameThickness = 0.7*mm;
     frameInnerRadius = 2.54*13./16.*cm/2.0;
     frameOuterRadius = 2.54*cm/2.0;
-    tapeMaterial = materials->FindMaterial("G4_POLYETHYLENE");
+    tapeMaterial = G4Material::GetMaterial("G4_POLYETHYLENE");
     tapeThickness = 0.016*cm;
 
     csFrame = new G4Tubs("csFrame",frameInnerRadius,frameOuterRadius,frameThickness/2.,0.,360.*deg);
@@ -1063,7 +1061,7 @@ void Target::BuildSled()
   if(targetCellType != "notarget")
     G4cout<<"----> Warning: target sled specified with LH target. Proceeding with no sled. "<< G4endl;
   else{
-    sledMaterial = materials->FindMaterial("G10");
+    sledMaterial = G4Material::GetMaterial("G10");
 
     G4double tolerance = 0.1*mm;
 

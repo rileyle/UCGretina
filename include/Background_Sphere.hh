@@ -22,7 +22,7 @@ class Background_Sphere
 
   G4LogicalVolume *expHall_log;
 
-  Background_Sphere(Materials*);
+  Background_Sphere();
   ~Background_Sphere();
   
   G4VPhysicalVolume *Construct(G4LogicalVolume*);
@@ -40,7 +40,6 @@ class Background_Sphere
   G4double BSrmax;
 
   //materials
-  Materials* materials;
   G4Material* BackgroundSphereMaterial;
 
   //default position

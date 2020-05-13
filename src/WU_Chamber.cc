@@ -1,9 +1,8 @@
 #ifndef LHTARGET
 #include "WU_Chamber.hh"
 
-WU_Chamber::WU_Chamber(Materials* mat)
+WU_Chamber::WU_Chamber()
 {
-  materials=mat;
   BTrmin = 3.0*2.54*cm - 0.058*2.54*cm;
   BTrmax = 3.0*2.54*cm;
   BTDz=44.*cm; //LR (approx target to gate valve flange)
@@ -34,9 +33,9 @@ WU_Chamber::WU_Chamber(Materials* mat)
   LTLength2=120*mm + 84.33*mm;
   LTDistance= RingDistance;
   Pos0 = new G4ThreeVector(0.,0.,0.);
-  BeamTubeMaterial = materials->FindMaterial("Al");
-  Brass = materials->FindMaterial("Cu");
-  Glass = materials->FindMaterial("Si");
+  BeamTubeMaterial = G4Material::GetMaterial("Al");
+  Brass = G4Material::GetMaterial("Cu");
+  Glass = G4Material::GetMaterial("Si");
 }
 
 WU_Chamber::~WU_Chamber()

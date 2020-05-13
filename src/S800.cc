@@ -1,9 +1,7 @@
 #include "S800.hh"
 
-S800::S800(Materials* mat)
+S800::S800()
 {
-  materials=mat;
-
   S800_R      = 280.*mm; // Est.
   S800_Dz     = 100.*mm; // Est.
 
@@ -21,7 +19,7 @@ S800::S800(Materials* mat)
 					S800GateValve_yOffset,
 					S800GateValve_zOffset);
   
-  S800Material = materials->FindMaterial("Steel");
+  S800Material = G4Material::GetMaterial("Steel");
 }
 
 S800::~S800()
@@ -111,7 +109,7 @@ void S800::Report()
 void S800::setMaterial(G4String materialName)
 {
   // search the material by its name 
-  S800Material = materials->FindMaterial(materialName);  
+  S800Material = G4Material::GetMaterial(materialName);  
   S800_log->SetMaterial(S800Material);
   G4cout<<"----> S800 material set to     "<<S800_log->GetMaterial()->GetName()<< G4endl;                 
 }

@@ -23,7 +23,7 @@ class Beam_Tube
 
   G4LogicalVolume *expHall_log;
 
-  Beam_Tube(Materials*);
+  Beam_Tube();
   ~Beam_Tube();
   
   G4VPhysicalVolume *Construct(G4LogicalVolume*);
@@ -47,7 +47,6 @@ class Beam_Tube
   G4double BTFlangeOffset;
 
   //materials
-  Materials* materials;
   G4Material* BeamTubeMaterial;
 
   //default position
