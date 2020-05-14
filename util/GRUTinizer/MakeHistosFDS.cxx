@@ -118,6 +118,39 @@ void MakeHistograms(TRuntimeObjects& obj) {
     //		      180, 0., 180.,
     //		      hit.GetTheta()*TMath::RadToDeg());
 
+    if(hit.GetSegmentId(0)==1)
+      obj.FillHistogram("position", "theta_vs_phi_R",
+			360, -180., 180.,
+			hitpos.Phi()*TMath::RadToDeg(),
+			180, 0., 180.,
+			hitpos.Theta()*TMath::RadToDeg());
+    if(hit.GetSegmentId(0)==2){
+      obj.FillHistogram("position", "theta_vs_phi_M",
+			360, -180., 180.,
+			hitpos.Phi()*TMath::RadToDeg(),
+			180, 0., 180.,
+			hitpos.Theta()*TMath::RadToDeg());
+      if(hit.GetCrystalId()%4 == 0 || hit.GetCrystalId()%4 == 3)
+	obj.FillHistogram("position", "theta_vs_phi_MR",
+			  360, -180., 180.,
+			  hitpos.Phi()*TMath::RadToDeg(),
+			  180, 0., 180.,
+			  hitpos.Theta()*TMath::RadToDeg());
+      if(hit.GetCrystalId()%4 == 1 || hit.GetCrystalId()%4 == 2)
+	obj.FillHistogram("position", "theta_vs_phi_ML",
+			  360, -180., 180.,
+			  hitpos.Phi()*TMath::RadToDeg(),
+			  180, 0., 180.,
+			  hitpos.Theta()*TMath::RadToDeg());
+    }
+    if(hit.GetSegmentId(0)==3){
+      obj.FillHistogram("position", "theta_vs_phi_L",
+			360, -180., 180.,
+			hitpos.Phi()*TMath::RadToDeg(),
+			180, 0., 180.,
+			hitpos.Theta()*TMath::RadToDeg());
+    }
+
     // Position spectra in crystal coordinates
     if(hit.NumberOfInteractions()){
     
