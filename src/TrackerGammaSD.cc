@@ -100,16 +100,12 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();
 
   G4VPhysicalVolume* topVolume;
-  //#ifdef SCANNING
   if( detNum < 124 ) // GRETINA
-  //#endif
     topVolume = theTouchable->GetVolume(depth);
-  //#ifdef SCANNING
   else if( detNum > 123 ) // Clover or LaBr
     topVolume = theTouchable->GetVolume(0);
   else
     topVolume = NULL;
-  //#endif
 
   G4ThreeVector frameTrans = topVolume->GetFrameTranslation();
 
@@ -129,9 +125,7 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
     = (DetectorConstruction*)runManager->GetUserDetectorConstruction();
 
   if(theDetector->GetGretina()->GetReadOut()){
-    //#ifdef SCANNING
     if( detNum < 124 ){ // GRETINA
-    //#endif
       segCode = 
 	theDetector->GetGretina()->GetSegmentNumber( detCode, posSol );
 
@@ -151,9 +145,34 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
 	  sector=5;
       }
       segCode = sector + 6 * slice;
-    //#ifdef SCANNING
     }
-    //#endif
+  } else if( name.contains("Leaf") ){ // Clover
+    // Crystal/segment labels follow
+    // Eurysys CLOVER 4X50X80 SEG2 manual p. 18
+    if( name.contains("pv_0") ){ // Crystal 1
+      if(posSol.getX() > 0)
+    	segCode = 1; // L
+      else if(posSol.getX() < 0)
+    	segCode = 2; // M
+    }
+    if( name.contains("pv_1") ){ // Crystal 2
+      if(posSol.getY() > 0)
+    	segCode = 3; // R
+      else if(posSol.getY() < 0)
+    	segCode = 2; // M
+    }
+    if( name.contains("pv_2") ){ // Crystal 3
+      if(posSol.getX() > 0)
+    	segCode = 3; // R
+      else if(posSol.getX() < 0)
+    	segCode = 2; // M
+    }
+    if( name.contains("pv_3") ){ // Crystal 4
+      if(posSol.getY() > 0)
+    	segCode = 1; // L
+      else if(posSol.getY() < 0)
+    	segCode = 2; // M
+    }
   } else {
     segCode = -1;
   }
