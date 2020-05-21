@@ -2,14 +2,14 @@
 
 ## Compile and install ##
 
-Install version [4.10.05.p01 of the Geant4 libraries](http://geant4.web.cern.ch/geant4/support/download.shtml). You will need the data files for low energy electromagnetic processes, photon evaporation, and radioactive decay.
+Install version [4.10.06.p01 of the Geant4 libraries](http://geant4.web.cern.ch/geant4/support/download.shtml). You will need the data files for low energy electromagnetic processes, photon evaporation, and radioactive decay.
 
 Simulating the LBL scanning table requires the external [CADMesh](https://github.com/christopherpoole/cadmesh) package. Paths to the CADMesh `include` and `lib` directories must be set in the GNUMakefile.
 
 Set up your environment (consider adding this to your `.bashrc`):
 
     $ source <Path to Geant4>/bin/geant4.sh
-    $ source <Path to Geant4>/share/Geant4-10.5.1/geant4make/geant4make.sh
+    $ source <Path to Geant4>/share/Geant4-10.6.1/geant4make/geant4make.sh
 
 Compile:
 

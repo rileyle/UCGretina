@@ -168,7 +168,7 @@ void PhysicsList::ConstructProcess()
   if(usePolar){
     G4ProcessManager *gpMan = G4Gamma::Gamma()->GetProcessManager();
     G4ProcessVector* pv = gpMan->GetProcessList();
-    for(G4int i=0;i<pv->entries();i++){
+    for(unsigned int i=0;i<pv->entries();i++){
       if((*pv)[i]->GetProcessName()=="phot"){
 	gpMan->RemoveProcess((*pv)[i]);
 	gpMan->AddDiscreteProcess(new G4PolarizedPhotoElectricEffect);
@@ -298,9 +298,7 @@ void PhysicsList::AddReaction()
     G4ParticleDefinition* particle = particleIterator->value();
     G4String particleName = particle->GetParticleName();
     G4String particleType = particle->GetParticleType();
-    if ( particleName == "proton"   || particleName == "neutron" ||
-	 particleName == "deuteron" || particleName == "triton"  ||
-	 particleName == "alpha"    || particleType == "nucleus" )
+    if ( particleType == "nucleus" )
       ph->RegisterProcess(react, particle);    
     ph->RegisterProcess(new G4StepLimiter, particle);
   }
@@ -411,6 +409,8 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
 
 // Hadronic processes ////////////////////////////////////////////////////////
 
+#include "G4HadronicParameters.hh"
+
 // Elastic processes:
 #include "G4HadronElasticProcess.hh"
 #include "G4HadronCaptureProcess.hh"
@@ -423,6 +423,10 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
 #include "G4ChipsProtonElasticXS.hh"
 #include "G4ChipsNeutronElasticXS.hh"
 #include "G4ComponentAntiNuclNuclearXS.hh"  
+#include "G4ChipsKaonMinusElasticXS.hh"
+#include "G4ChipsKaonPlusElasticXS.hh"
+#include "G4ChipsKaonZeroElasticXS.hh"
+#include "G4BGGNucleonElasticXS.hh"
 #include "G4CrossSectionElastic.hh"
 
 // Inelastic processes:
@@ -450,8 +454,7 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
 #include "G4ExcitedStringDecay.hh"
 #include "G4CascadeInterface.hh"
 #include "G4CrossSectionInelastic.hh"
-#include "G4PiNuclearCrossSection.hh"
-#include "G4CrossSectionPairGG.hh"
+#include "G4BGGPionInelasticXS.hh"
 #include "G4ChipsKaonMinusInelasticXS.hh"
 #include "G4ChipsKaonPlusInelasticXS.hh"
 #include "G4ChipsKaonZeroInelasticXS.hh"
@@ -478,24 +481,24 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
 // to those particles with GHEISHA interactions (INTRC > 0).
 // The processes are: Elastic scattering and Inelastic scattering.
 // F.W.Jones  09-JUL-1998
-void PhysicsList::ConstructHad() 
+ void PhysicsList::ConstructHad() 
 {
   // Elastic scattering
-  const G4double elastic_elimitPi = 1.0*CLHEP::GeV;
-
   G4HadronElastic* elastic_lhep0 = new G4HadronElastic();
-  G4HadronElastic* elastic_lhep1 = new G4HadronElastic();
-  elastic_lhep1->SetMaxEnergy( elastic_elimitPi );
-
   G4ChipsElasticModel* elastic_chip = new G4ChipsElasticModel();
-
   G4ElasticHadrNucleusHE* elastic_he = new G4ElasticHadrNucleusHE(); 
-  elastic_he->SetMinEnergy( elastic_elimitPi );
+
+  const G4double elastic_elimitAntiNuc = 100.0*CLHEP::MeV;
+  G4AntiNuclElastic* elastic_anuc = new G4AntiNuclElastic();
+  elastic_anuc->SetMinEnergy( elastic_elimitAntiNuc );
+  G4CrossSectionElastic* elastic_anucxs = new G4CrossSectionElastic( elastic_anuc->GetComponentCrossSection() );
+  G4HadronElastic* elastic_lhep2 = new G4HadronElastic();
+  elastic_lhep2->SetMaxEnergy( elastic_elimitAntiNuc );
 
   // Inelastic scattering
   const G4double theFTFMin0 =    0.0*CLHEP::GeV;
   const G4double theFTFMin1 =    4.0*CLHEP::GeV;
-  const G4double theFTFMax =   100.0*CLHEP::TeV;
+  const G4double theFTFMax = G4HadronicParameters::Instance()->GetMaxEnergy();
   const G4double theBERTMin0 =   0.0*CLHEP::GeV;
   const G4double theBERTMin1 =  19.0*CLHEP::MeV;
   const G4double theBERTMax =    5.0*CLHEP::GeV;
@@ -536,8 +539,6 @@ void PhysicsList::ConstructHad()
   theIonBC->SetMinEnergy( theIonBCMin );
   theIonBC->SetMaxEnergy( theIonBCMax );
 
-  G4VCrossSectionDataSet * thePiData = new G4CrossSectionPairGG(
-  (G4PiNuclearCrossSection*)G4CrossSectionDataSetRegistry::Instance()->GetCrossSectionDataSet(G4PiNuclearCrossSection::Default_Name()), 91*CLHEP::GeV );
   G4VCrossSectionDataSet * theAntiNucleonData = new G4CrossSectionInelastic( new G4ComponentAntiNuclNuclearXS );
   G4ComponentGGNuclNuclXsc * ggNuclNuclXsec = new G4ComponentGGNuclNuclXsc();
   G4VCrossSectionDataSet * theGGNuclNuclData = new G4CrossSectionInelastic(ggNuclNuclXsec);
@@ -555,12 +556,11 @@ void PhysicsList::ConstructHad()
           // Elastic scattering
           G4HadronElasticProcess* theElasticProcess = new G4HadronElasticProcess;
           theElasticProcess->AddDataSet( new G4BGGPionElasticXS( particle ) );
-          theElasticProcess->RegisterMe( elastic_lhep1 );
           theElasticProcess->RegisterMe( elastic_he );
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
 	  G4PionPlusInelasticProcess* theInelasticProcess = new G4PionPlusInelasticProcess("inelastic");
-          theInelasticProcess->AddDataSet( thePiData );
+          theInelasticProcess->AddDataSet( new G4BGGPionInelasticXS( G4PionPlus::Definition() ) );
 	  theInelasticProcess->RegisterMe( theFTFModel1 );
           theInelasticProcess->RegisterMe( theBERTModel0 );
 	  pmanager->AddDiscreteProcess( theInelasticProcess );
@@ -571,12 +571,11 @@ void PhysicsList::ConstructHad()
           // Elastic scattering
           G4HadronElasticProcess* theElasticProcess = new G4HadronElasticProcess;
           theElasticProcess->AddDataSet( new G4BGGPionElasticXS( particle ) );
-          theElasticProcess->RegisterMe( elastic_lhep1 );
           theElasticProcess->RegisterMe( elastic_he );
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
 	  G4PionMinusInelasticProcess* theInelasticProcess = new G4PionMinusInelasticProcess("inelastic");
-          theInelasticProcess->AddDataSet( thePiData );
+          theInelasticProcess->AddDataSet( new G4BGGPionInelasticXS( G4PionMinus::Definition() ) );
 	  theInelasticProcess->RegisterMe( theFTFModel1 );
           theInelasticProcess->RegisterMe( theBERTModel0 );
 	  pmanager->AddDiscreteProcess( theInelasticProcess );
@@ -587,6 +586,7 @@ void PhysicsList::ConstructHad()
           // Elastic scattering
           G4HadronElasticProcess* theElasticProcess = new G4HadronElasticProcess;
           theElasticProcess->RegisterMe( elastic_lhep0 );
+          theElasticProcess->AddDataSet( G4CrossSectionDataSetRegistry::Instance()->GetCrossSectionDataSet(G4ChipsKaonPlusElasticXS::Default_Name()));
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
           G4KaonPlusInelasticProcess* theInelasticProcess = new G4KaonPlusInelasticProcess("inelastic");
@@ -601,6 +601,7 @@ void PhysicsList::ConstructHad()
           // Elastic scattering
           G4HadronElasticProcess* theElasticProcess = new G4HadronElasticProcess;
           theElasticProcess->RegisterMe( elastic_lhep0 );
+          theElasticProcess->AddDataSet( G4CrossSectionDataSetRegistry::Instance()->GetCrossSectionDataSet(G4ChipsKaonZeroElasticXS::Default_Name()));
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
           G4KaonZeroSInelasticProcess* theInelasticProcess = new G4KaonZeroSInelasticProcess("inelastic");
@@ -615,6 +616,7 @@ void PhysicsList::ConstructHad()
           // Elastic scattering
           G4HadronElasticProcess* theElasticProcess = new G4HadronElasticProcess;
           theElasticProcess->RegisterMe( elastic_lhep0 );
+          theElasticProcess->AddDataSet( G4CrossSectionDataSetRegistry::Instance()->GetCrossSectionDataSet(G4ChipsKaonZeroElasticXS::Default_Name()));
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
           G4KaonZeroLInelasticProcess* theInelasticProcess = new G4KaonZeroLInelasticProcess("inelastic");
@@ -629,6 +631,7 @@ void PhysicsList::ConstructHad()
           // Elastic scattering
           G4HadronElasticProcess* theElasticProcess = new G4HadronElasticProcess;
           theElasticProcess->RegisterMe( elastic_lhep0 );
+          theElasticProcess->AddDataSet( G4CrossSectionDataSetRegistry::Instance()->GetCrossSectionDataSet(G4ChipsKaonMinusElasticXS::Default_Name()));
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
           G4KaonMinusInelasticProcess* theInelasticProcess = new G4KaonMinusInelasticProcess("inelastic");
@@ -643,6 +646,7 @@ void PhysicsList::ConstructHad()
           // Elastic scattering
           G4HadronElasticProcess* theElasticProcess = new G4HadronElasticProcess;
           theElasticProcess->AddDataSet(G4CrossSectionDataSetRegistry::Instance()->GetCrossSectionDataSet(G4ChipsProtonElasticXS::Default_Name()));
+          theElasticProcess->AddDataSet( new G4BGGNucleonElasticXS( G4Proton::Proton() ) );
           theElasticProcess->RegisterMe( elastic_chip );
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
@@ -656,12 +660,6 @@ void PhysicsList::ConstructHad()
       else if (particleName == "anti_proton") 
 	{
           // Elastic scattering
-          const G4double elastic_elimitAntiNuc = 100.0*CLHEP::MeV;
-          G4AntiNuclElastic* elastic_anuc = new G4AntiNuclElastic();
-          elastic_anuc->SetMinEnergy( elastic_elimitAntiNuc );
-          G4CrossSectionElastic* elastic_anucxs = new G4CrossSectionElastic( elastic_anuc->GetComponentCrossSection() );
-          G4HadronElastic* elastic_lhep2 = new G4HadronElastic();
-          elastic_lhep2->SetMaxEnergy( elastic_elimitAntiNuc );
           G4HadronElasticProcess* theElasticProcess = new G4HadronElasticProcess;
           theElasticProcess->AddDataSet( elastic_anucxs );
           theElasticProcess->RegisterMe( elastic_lhep2 );
@@ -715,7 +713,9 @@ void PhysicsList::ConstructHad()
 	{
           // Elastic scattering
           G4HadronElasticProcess* theElasticProcess = new G4HadronElasticProcess;
-          theElasticProcess->RegisterMe( elastic_lhep0 );
+          theElasticProcess->AddDataSet( elastic_anucxs );
+          theElasticProcess->RegisterMe( elastic_lhep2 );
+          theElasticProcess->RegisterMe( elastic_anuc );
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
 	  G4AntiNeutronInelasticProcess* theInelasticProcess = new G4AntiNeutronInelasticProcess("inelastic");
@@ -729,6 +729,7 @@ void PhysicsList::ConstructHad()
           // Elastic scattering
           G4HadronElasticProcess* theElasticProcess = new G4HadronElasticProcess;
           theElasticProcess->RegisterMe( elastic_lhep0 );
+          theElasticProcess->AddDataSet( theGGNuclNuclData );
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
 	  G4DeuteronInelasticProcess* theInelasticProcess = new G4DeuteronInelasticProcess("inelastic");
@@ -743,6 +744,7 @@ void PhysicsList::ConstructHad()
           // Elastic scattering
           G4HadronElasticProcess* theElasticProcess = new G4HadronElasticProcess;
           theElasticProcess->RegisterMe( elastic_lhep0 );
+          theElasticProcess->AddDataSet( theGGNuclNuclData );
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
 	  G4TritonInelasticProcess* theInelasticProcess = new G4TritonInelasticProcess("inelastic");
@@ -757,6 +759,7 @@ void PhysicsList::ConstructHad()
           // Elastic scattering
           G4HadronElasticProcess* theElasticProcess = new G4HadronElasticProcess;
           theElasticProcess->RegisterMe( elastic_lhep0 );
+          theElasticProcess->AddDataSet( theGGNuclNuclData );
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
 	  G4AlphaInelasticProcess* theInelasticProcess = new G4AlphaInelasticProcess("inelastic");

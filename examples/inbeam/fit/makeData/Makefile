@@ -21,4 +21,4 @@ s44_spectrum.root : makeSpec.C \
 	cp s44_spectrum.root ..
 
 clean:
-	rm *.log *.dat *.root
+	rm *.log *.root

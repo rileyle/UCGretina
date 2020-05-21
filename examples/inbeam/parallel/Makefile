@@ -12,5 +12,4 @@ all: parallel_histos.root
 	rm $*.dat
 
 clean:
-	rm *.log *.dat *.root
-	$(MAKE) -C makeData clean
+	rm *.log *.root
