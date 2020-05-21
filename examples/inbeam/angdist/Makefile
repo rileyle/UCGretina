@@ -11,4 +11,4 @@ all: s44_1329_histos.root   s44_1329_iso_histos.root
 	rm $*.dat
 
 clean:
-	rm *.log *.dat *.root
+	rm *.log *.root
