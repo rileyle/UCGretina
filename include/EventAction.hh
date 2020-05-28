@@ -53,6 +53,8 @@ class EventAction : public G4UserEventAction
     void SetPackRes(G4double res) { packingRes = res; }
     void SetS800KE(G4double ke) { S800KE = ke; }
     G4double GetS800KE() { return S800KE; }
+    void SetAllS800() { allS800 = true; }
+    G4bool AllS800() { return allS800; }
     const G4Event* GetEvent() { return evt; }
     void SetPrint(){ print = true; }
 
@@ -86,6 +88,7 @@ class EventAction : public G4UserEventAction
     G4double hitTolerance;
     G4double packingRes;
     G4double S800KE;
+    G4bool allS800;
     const G4Event* evt;
     G4bool print;
     G4bool fisInBeam;

@@ -43,6 +43,9 @@ EventAction_Messenger::EventAction_Messenger(EventAction* EA):theEventAction(EA)
   S800KECmd = new G4UIcmdWithADoubleAndUnit("/Mode2/S800KE",this);
   S800KECmd->SetGuidance("Average KE for computing dta for writing S800 events.");
 
+  allS800Cmd = new G4UIcmdWithoutParameter("/Mode2/AllS800",this);
+  allS800Cmd->SetGuidance("Write S800 data for all events.");
+
   printCmd = new G4UIcmdWithoutParameter("/Mode2/Print",this);
   printCmd->SetGuidance("Write mode 2 event information to stdout.");
 
@@ -67,6 +70,7 @@ EventAction_Messenger::~EventAction_Messenger()
   delete coordsCmd;
   delete PackResCmd;
   delete S800KECmd;
+  delete allS800Cmd;
   delete printCmd;
 
 }
@@ -98,6 +102,8 @@ void EventAction_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
     {theEventAction->SetPackRes(PackResCmd->GetNewDoubleValue(newValue));}
   if( command == S800KECmd )
     {theEventAction->SetS800KE(S800KECmd->GetNewDoubleValue(newValue));}
+  if( command == allS800Cmd )
+    {theEventAction->SetAllS800();}
   if( command == printCmd )
     {theEventAction->SetPrint();}
 

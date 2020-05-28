@@ -425,6 +425,11 @@ G4VPhysicalVolume* Target::Construct200mgCell(){
     G4ThreeVector USwindowPos = G4ThreeVector(0., 0.,
 					      -TargetDz-windowThickness);
 
+
+    G4UserLimits* window_limits= new G4UserLimits();
+    window_limits->SetMaxAllowedStep(windowThickness/NStep);
+    UpstreamWindow_log->SetUserLimits(window_limits);
+
     UpstreamWindow_log->SetVisAttributes(Vis2);
     LHTarget->AddPlacedVolume(UpstreamWindow_log, USwindowPos, &NoRot);
 
@@ -440,6 +445,8 @@ G4VPhysicalVolume* Target::Construct200mgCell(){
     G4ThreeVector DSwindowPos = G4ThreeVector(0., 0., 
 					      TargetDz+windowThickness);
 
+    DnstreamWindow_log->SetUserLimits(window_limits);
+    
     DnstreamWindow_log->SetVisAttributes(Vis2);
     LHTarget->AddPlacedVolume(DnstreamWindow_log, DSwindowPos, &NoRot);
 
@@ -1001,6 +1008,8 @@ void Target::Report()
   if(Cutaway)
       G4cout<<"----> Constructing the cutaway view. For visualization only!" << G4endl;
   G4cout<<"----> Target bulge thickness set to " << BulgeDz/mm << " mm." << G4endl;
+  if(windows)
+    G4cout<<"----> Constructing the Kapton windows." << G4endl;
   G4cout<<"----> Target angle set to " << targetAngle/deg << " deg." << G4endl;
   G4cout<<"----> Target material set to  "<<Target_log->GetMaterial()->GetName()<< G4endl;   
   G4cout<<"----> Target density:         "<<Target_log->GetMaterial()->GetDensity()/mg*cm3 << " mg/cm^3" << G4endl;   

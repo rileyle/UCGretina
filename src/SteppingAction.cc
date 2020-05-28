@@ -91,7 +91,7 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   G4String particleName = aStep->GetTrack()->GetDefinition()->GetParticleName();
   
   if( aStep->GetTrack()->GetDefinition()->GetParticleType() == "nucleus" 
-      && aStep->GetTrack()->GetParentID() > 0
+      && ( aStep->GetTrack()->GetParentID() > 0 || eventAction->AllS800() )
       && aStep->GetPostStepPoint()->GetStepStatus() != fWorldBoundary ){
 
     // get initial and final volumes of the current step
