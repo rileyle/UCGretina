@@ -265,7 +265,11 @@ Optional commands related to the outgoing reaction product:
 
     /BeamOut/Source
 
-> Simulate a stationary source using the in-beam simulation framework. The incoming beam particle decays into the outgoing beam particle. A level scheme file must be used. The energy of the incoming beam must be set to zero, and the position of incoming beam must be set to the desired source position. _This is an independent approach to that described under **Source Simulations** below, in which gamma-rays are emitted as primary particles._ 
+> Simulate a stationary source using the in-beam simulation framework. The incoming beam particle decays into the outgoing beam particle. The decay of the incoming beam is handled by the  `G4RadioactiveDecay` process. A level scheme file must be used. The energy of the incoming beam must be set to zero, and the position of incoming beam must be set to the desired source position (see `./examples/sources/eu152/eu152.mac`,  `./examples/sources/co60`, and `./examples/sources/ho166`). _This is an independent approach to that described under **Source Simulations** below, in which gamma-rays are emitted as primary particles._ 
+
+    /process/inactivate Reaction
+
+> Turns off the Reaction process. This is required for simulations of stationary sources (with the /BeamOut/Source command) in which the `G4RadioactiveDecay` process manages gamma-ray emission. This can also be used for simulations of the beam passing through the target without reacting.
 
 ### Gamma-Ray Angular Distributions (see also ./examples/inbeam/angdist) ###
 
@@ -282,7 +286,7 @@ The alignment of the reation product is specified (after the `/run/initialize` c
 
 where m = -J, -J+1, ..., J-1, J and the P(m) sum to 1. 
 
-### Source Simulations (see also ./examples/eu152) ###
+### Source Simulations (see also ./examples/eu152/eu152_gammas.mac) ###
 
 Mandatory commands
 
@@ -572,6 +576,10 @@ Energies are expressed in keV, and positions are expressed in mm.
     /Mode2/S800KE <float> <unit>
 
 > Specifies the kinetic energy of the reaction product centered in the acceptance of the S800. This is needed for calculating DTA (dT/T) values of the S800 tracking events in the Mode2 output. 
+
+    /Mode2/AllS800
+
+> All S800 events are written, even in the absence of detected gamma rays.
 
     /Mode2/Print
 
