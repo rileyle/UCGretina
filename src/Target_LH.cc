@@ -36,7 +36,7 @@ Target::Target()
   GretaBTrmax = 20.0*mm;
   GretaBTDz = (127.6/2*cm - GretaChamberRmax)/2.;
 
-  BulgeDz = 1.0*mm;
+  BulgeDz = 0.0*mm;
 
   windowThickness = 125.*um;
   windows = false;
@@ -360,6 +360,9 @@ G4VPhysicalVolume* Target::Construct200mgCell(){
 
   G4Polycone* Target0 = new G4Polycone("Target0",  0., 360.*deg, 
 				       6, TzPlane, TrInner, TrOuter);
+
+  if(BulgeDz < 0.001*mm)
+    BulgeDz = 0.001*mm;
   G4Ellipsoid* Bulge = new G4Ellipsoid("Bulge",BulgeR,BulgeR,BulgeDz);
   G4UnionSolid* Target1 =
     new G4UnionSolid("target1", Target0, Bulge,
@@ -403,6 +406,12 @@ G4VPhysicalVolume* Target::Construct200mgCell(){
   // Include "Target" in the volume name so that it is included
   // in determining when the reaction product leaves the target.
   if(windows){
+
+    G4Colour red (1.0,0.0,0.0); 
+    G4VisAttributes* Vis2 = new G4VisAttributes(red);
+    Vis2->SetVisibility(true);
+    Vis2->SetForceWireframe(true);
+
     G4SubtractionSolid* UpstreamWindow 
       = new G4SubtractionSolid("UpStrTargetWindow", Bulge, Bulge,
 			       G4Transform3D(NoRot,
@@ -415,7 +424,13 @@ G4VPhysicalVolume* Target::Construct200mgCell(){
 			    0, 0, 0);
     G4ThreeVector USwindowPos = G4ThreeVector(0., 0.,
 					      -TargetDz-windowThickness);
-    
+
+
+    G4UserLimits* window_limits= new G4UserLimits();
+    window_limits->SetMaxAllowedStep(windowThickness/NStep);
+    UpstreamWindow_log->SetUserLimits(window_limits);
+
+    UpstreamWindow_log->SetVisAttributes(Vis2);
     LHTarget->AddPlacedVolume(UpstreamWindow_log, USwindowPos, &NoRot);
 
     G4SubtractionSolid* DnstreamWindow 
@@ -429,11 +444,14 @@ G4VPhysicalVolume* Target::Construct200mgCell(){
 			    0, 0, 0);
     G4ThreeVector DSwindowPos = G4ThreeVector(0., 0., 
 					      TargetDz+windowThickness);
+
+    DnstreamWindow_log->SetUserLimits(window_limits);
     
+    DnstreamWindow_log->SetVisAttributes(Vis2);
     LHTarget->AddPlacedVolume(DnstreamWindow_log, DSwindowPos, &NoRot);
 
   }
-#if(1)
+
   // Target Cell
   //
   // The window frames and clamp rings have inner radius 1.9 cm over
@@ -454,7 +472,7 @@ G4VPhysicalVolume* Target::Construct200mgCell(){
   G4ThreeVector TargetCellPos = G4ThreeVector(0., 0., -3.7*cm/2.);
 
   LHTarget->AddPlacedVolume(TargetCell_log, TargetCellPos, &NoRot);
-#endif
+
   return Target_phys;
 
 }
@@ -463,7 +481,7 @@ G4VPhysicalVolume* Target::Construct50mgCell(){
 
   // Liquid Hydrogen
   //
-  // (Thick target, 50 mg/cm^2 nominal) 
+  // (Thin target, 50 mg/cm^2 nominal) 
   //
   // The window frames have an inner radius 1.59 cm over
   // 1.15 cm at either end of the cell. The region between the frames
@@ -477,7 +495,9 @@ G4VPhysicalVolume* Target::Construct50mgCell(){
 
   G4Tubs* Target0 = new G4Tubs("Target0", 0., 2.0*cm, TargetDz,
 			       0., 360.*deg);
-			       
+
+  if(BulgeDz < 0.001*mm)
+    BulgeDz = 0.001*mm;
   G4Ellipsoid* Bulge = new G4Ellipsoid("Bulge",BulgeR,BulgeR,BulgeDz);
   G4UnionSolid* Target1 =
     new G4UnionSolid("target1", Target0, Bulge,
@@ -488,15 +508,25 @@ G4VPhysicalVolume* Target::Construct50mgCell(){
 			     G4Transform3D(NoRot,
 					   G4ThreeVector(0., 0., TargetDz)));
 
-  Target_log = new G4LogicalVolume(aTarget,lH2,"Target_log",0,0,0);
-  target_limits= new G4UserLimits();
-  target_limits->SetMaxAllowedStep(Target_thickness/NStep);
-  Target_log->SetUserLimits(target_limits);
+  // The standard lH2 density doesn't apply here, so we have to set it.
+  G4String name=TargetMaterial->GetName();
 
   G4Colour blue (0.0,0.0,1.0); 
   G4VisAttributes* Vis = new G4VisAttributes(blue);
-  Vis->SetVisibility(true);
-  Vis->SetForceSolid(true);
+
+  if(name == "G4_Galactic"){
+    Vis->SetVisibility(false);
+  } else {
+    G4double Z=TargetMaterial->GetZ();
+    G4double A=TargetMaterial->GetA();
+    TargetMaterial=new G4Material(name, Z, A, targetDensity);
+    Vis->SetVisibility(true);
+    Vis->SetForceSolid(true);
+  }
+  Target_log = new G4LogicalVolume(aTarget,TargetMaterial,"Target_log",0,0,0);
+  target_limits= new G4UserLimits();
+  target_limits->SetMaxAllowedStep(Target_thickness/NStep);
+  Target_log->SetUserLimits(target_limits);
 
   Target_log->SetVisAttributes(Vis);
 
@@ -504,41 +534,45 @@ G4VPhysicalVolume* Target::Construct50mgCell(){
 				  Target_log,"Target",expHall_log,false,0);
 
   // Cell windows
+  //
+  // Include "Target" in the volume name so that it is included
+  // in determining when the reaction product leaves the target.
   if(windows){
+
+    G4Colour red (1.0,0.0,0.0); 
+    G4VisAttributes* Vis2 = new G4VisAttributes(red);
+    Vis2->SetVisibility(true);
+    Vis2->SetForceWireframe(true);
+
     G4SubtractionSolid* UpstreamWindow 
-      = new G4SubtractionSolid("UpstreamWindow", Bulge, Bulge,
+      = new G4SubtractionSolid("UpStrTargetWindow", Bulge, Bulge,
 			       G4Transform3D(NoRot,
 					     G4ThreeVector(0., 
 							   0., 
 							   windowThickness)));
 
     G4LogicalVolume* UpstreamWindow_log
-      = new G4LogicalVolume(UpstreamWindow, Kapton, "UpstreamWindow_log", 
+      = new G4LogicalVolume(UpstreamWindow, Kapton, "UpStrTargetWindow_log", 
 			    0, 0, 0);
-
-    G4Colour red (1.0,0.0,0.0); 
-    G4VisAttributes* Vis2 = new G4VisAttributes(red);
-    Vis2->SetVisibility(true);
-    UpstreamWindow_log->SetVisAttributes(Vis2);
-
     G4ThreeVector USwindowPos = G4ThreeVector(0., 0.,
 					      -TargetDz-windowThickness);
-    
+
+    UpstreamWindow_log->SetVisAttributes(Vis2);
     LHTarget->AddPlacedVolume(UpstreamWindow_log, USwindowPos, &NoRot);
 
     G4SubtractionSolid* DnstreamWindow 
-      = new G4SubtractionSolid("DnstreamWindow", Bulge, Bulge,
+      = new G4SubtractionSolid("DnStrTargetWindow", Bulge, Bulge,
 			       G4Transform3D(NoRot,
 					     G4ThreeVector(0., 
 							   0., 
 							   -windowThickness)));
     G4LogicalVolume* DnstreamWindow_log
-      = new G4LogicalVolume(DnstreamWindow, Kapton, "DnstreamWindow_log", 
+      = new G4LogicalVolume(DnstreamWindow, Kapton, "DnStrTargetWindow_log", 
 			    0, 0, 0);
-    DnstreamWindow_log->SetVisAttributes(Vis2);
     G4ThreeVector DSwindowPos = G4ThreeVector(0., 0., 
 					      TargetDz+windowThickness);
 
+    DnstreamWindow_log->SetVisAttributes(Vis2);
     LHTarget->AddPlacedVolume(DnstreamWindow_log, DSwindowPos, &NoRot);
 
   }
@@ -565,7 +599,7 @@ G4VPhysicalVolume* Target::Construct50mgCell(){
     = new G4LogicalVolume(TargetCell, Aluminum, "TargetCell_log", 0, 0, 0);
 
   G4ThreeVector TargetCellPos = G4ThreeVector(0., 0., -3.0*cm/2.);
-  
+
   LHTarget->AddPlacedVolume(TargetCell_log, TargetCellPos, &NoRot);
 
   return Target_phys;
@@ -586,7 +620,8 @@ G4VPhysicalVolume* Target::ConstructEmptyCell(){
 
   G4Tubs* Target0 = new G4Tubs("Target0", 0., 2.0*cm, TargetDz,
 			       0., 360.*deg);
-			       
+  if(BulgeDz < 0.001*mm)
+    BulgeDz = 0.001*mm;
   G4Ellipsoid* Bulge = new G4Ellipsoid("Bulge",BulgeR,BulgeR,BulgeDz);
   G4UnionSolid* Target1 =
     new G4UnionSolid("target1", Target0, Bulge,
@@ -638,7 +673,9 @@ G4VPhysicalVolume* Target::ConstructNoCell(){
 
   G4Tubs* Target0 = new G4Tubs("Target0", 0., 2.0*cm, TargetDz,
 			       0., 360.*deg);
-			       
+
+  if(BulgeDz < 0.001*mm)
+    BulgeDz = 0.001*mm;
   G4Ellipsoid* Bulge = new G4Ellipsoid("Bulge",BulgeR,BulgeR,BulgeDz);
   G4UnionSolid* Target1 =
     new G4UnionSolid("target1", Target0, Bulge,
@@ -971,6 +1008,8 @@ void Target::Report()
   if(Cutaway)
       G4cout<<"----> Constructing the cutaway view. For visualization only!" << G4endl;
   G4cout<<"----> Target bulge thickness set to " << BulgeDz/mm << " mm." << G4endl;
+  if(windows)
+    G4cout<<"----> Constructing the Kapton windows." << G4endl;
   G4cout<<"----> Target angle set to " << targetAngle/deg << " deg." << G4endl;
   G4cout<<"----> Target material set to  "<<Target_log->GetMaterial()->GetName()<< G4endl;   
   G4cout<<"----> Target density:         "<<Target_log->GetMaterial()->GetDensity()/mg*cm3 << " mg/cm^3" << G4endl;   

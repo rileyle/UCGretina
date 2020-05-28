@@ -11,6 +11,7 @@ EventAction::EventAction()
   hitTolerance = 0.00001*mm;
   packingRes = 0.*mm;
   S800KE = 1.0;
+  allS800 = false;
   outFileName = "";
   outDetsOnly = false;
   evOut = false;
@@ -451,10 +452,18 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 		  measuredX, measuredY, measuredZ, 
 		  measuredEdep, segmentEdep);
       
+    } else {
+      // Write S800 event to the output file with no detected gammas
+      // if the allS800 flag is set.
+      if(allS800 && fisInBeam)
+	writeS800(timestamp, 
+		  eventInfo->GetATA(), 
+		  eventInfo->GetBTA(), 
+		  eventInfo->GetDTA(), 
+		  eventInfo->GetYTA());
     }
-    
   }
-
+  
   // Write emitted gamma information from this event to 
   // the output file.
 
