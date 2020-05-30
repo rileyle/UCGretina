@@ -2,6 +2,7 @@
 
 Background_Sphere::Background_Sphere()
 {
+  //  materials=mat;
   BSrmin = 3.0*m;
   BSrmax = 3.4*m;
   Pos0 = new G4ThreeVector(0.,0.,0.);
@@ -19,7 +20,7 @@ G4VPhysicalVolume* Background_Sphere::Construct(G4LogicalVolume* experimentalHal
   BackgroundSphere = new G4Sphere("BackgroundSphere",
 				  BSrmin,BSrmax,0.,360.*deg,
 				  0., 180.*deg);
-  
+
   BackgroundSphere_log = new G4LogicalVolume(BackgroundSphere,
 					     BackgroundSphereMaterial,
 					     "BackgroundSphere_log",0,0,0);
@@ -47,7 +48,6 @@ void Background_Sphere::setRmin(G4double Rmin)
     {
       BSrmin=Rmin;
       G4cout<<"----> Background Sphere inner radius set to "<<G4BestUnit(BSrmin,"Length")<< G4endl;;
-      BackgroundSphere->SetInnerRadius(BSrmin);
     }
   else
     G4cout<<"----> inner radius "<<G4BestUnit(Rmin,"Length")<<" has to be smaller than the outer radius of "<<G4BestUnit(BSrmax,"Length")<<G4endl;
@@ -59,7 +59,6 @@ void Background_Sphere::setRmax(G4double Rmax)
     {
       BSrmax=Rmax;
       G4cout<<"----> Background Sphere outer radius set to "<<G4BestUnit(BSrmax,"Length")<< G4endl;;
-      BackgroundSphere->SetOuterRadius(BSrmax);
     }
   else
     G4cout<<"----> outer radius "<<G4BestUnit(Rmax,"Length")<<" has to be larger than the inner radius of "<<G4BestUnit(BSrmin,"Length")<<G4endl;
@@ -77,6 +76,5 @@ void Background_Sphere::setMaterial(G4String materialName)
 {
   // search the material by its name 
   BackgroundSphereMaterial = G4Material::GetMaterial(materialName);  
-  BackgroundSphere_log->SetMaterial(BackgroundSphereMaterial);
-  G4cout<<"----> Background Sphere material set to     "<<BackgroundSphere_log->GetMaterial()->GetName()<< G4endl;                 
+  G4cout<<"----> Background Sphere material set to     "<<materialName<< G4endl;                 
 }
