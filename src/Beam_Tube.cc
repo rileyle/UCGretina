@@ -73,7 +73,7 @@ void Beam_Tube::setRmin(G4double Rmin)
     {
       BTrmin=Rmin;
       G4cout<<"----> Beam Tube inner radius set to "<<G4BestUnit(BTrmin,"Length")<< G4endl;;
-      BeamTube->SetInnerRadius(BTrmin);
+      //      BeamTube->SetInnerRadius(BTrmin);
     }
   else
     G4cout<<"----> inner radius "<<G4BestUnit(Rmin,"Length")<<" has to be smaller than the outer radius of "<<G4BestUnit(BTrmax,"Length")<<G4endl;
@@ -85,7 +85,7 @@ void Beam_Tube::setRmax(G4double Rmax)
     {
       BTrmax=Rmax;
       G4cout<<"----> Beam Tube outer radius set to "<<G4BestUnit(BTrmax,"Length")<< G4endl;;
-      BeamTube->SetOuterRadius(BTrmax);
+      //      BeamTube->SetOuterRadius(BTrmax);
     }
   else
     G4cout<<"----> outer radius "<<G4BestUnit(Rmax,"Length")<<" has to be larger than the inner radius of "<<G4BestUnit(BTrmin,"Length")<<G4endl;
@@ -95,7 +95,7 @@ void Beam_Tube::setLength(G4double length)
 {
       BTDz=length/2.;
       G4cout<<"----> Beam Tube length set to "<<G4BestUnit(2.*BTDz,"Length")<< G4endl;;
-      BeamTube->SetZHalfLength(BTDz);
+      //      BeamTube->SetZHalfLength(BTDz);
 
 }
 //-----------------------------------------------------------------------------
@@ -113,8 +113,9 @@ void Beam_Tube::setMaterial(G4String materialName)
 {
   // search the material by its name 
   BeamTubeMaterial = G4Material::GetMaterial(materialName);  
-  BeamTube_log->SetMaterial(BeamTubeMaterial);
-  BeamTubeFlange_log->SetMaterial(BeamTubeMaterial);
-  G4cout<<" ----> Beam Tube material set to     "<<BeamTube_log->GetMaterial()->GetName()<< G4endl;                 
+  //  BeamTube_log->SetMaterial(BeamTubeMaterial);
+  //  BeamTubeFlange_log->SetMaterial(BeamTubeMaterial);
+  //  G4cout<<" ----> Beam Tube material set to     "<<BeamTube_log->GetMaterial()->GetName()<< G4endl;                 
+  G4cout<<" ----> Beam Tube material set to     "<<materialName<< G4endl;                 
 }
 #endif

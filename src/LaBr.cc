@@ -121,7 +121,6 @@ void LaBr::MakeSensitive(TrackerGammaSD* TrackerGamma)
 void LaBr::setR(G4double R)
 {
   LaBr_R=R;
-  LaBr_Crys->SetOuterRadius(R);
   G4cout<<"----> LaBr quadrupole radius set to "<<G4BestUnit(R,"Length")<< G4endl;
 }
 //-----------------------------------------------------------------------------
@@ -129,8 +128,6 @@ void LaBr::setLength(G4double length)
 {
       LaBr_Dz=length/2.;
       G4cout<<"----> LaBr length set to "<<G4BestUnit(2.*LaBr_Dz,"Length")<< G4endl;;
-      LaBr_Crys->SetZHalfLength(LaBr_Dz);
-
 }
 //-----------------------------------------------------------------------------
 void LaBr::Report()
@@ -145,6 +142,5 @@ void LaBr::setMaterial(G4String materialName)
 {
   // search the material by its name 
   LaBrMaterial = G4Material::GetMaterial(materialName);  
-  LaBr_log->SetMaterial(LaBrMaterial);
-  G4cout<<"----> LaBr material set to     "<<LaBr_log->GetMaterial()->GetName()<< G4endl;                 
+  G4cout<<"----> LaBr material set to     "<<materialName<< G4endl;                 
 }
