@@ -86,7 +86,6 @@ G4VPhysicalVolume* S800::Construct(G4LogicalVolume* experimentalHall_log)
 void S800::setR(G4double R)
 {
   S800_R=R;
-  S800_Quad->SetOuterRadius(R);
   G4cout<<"----> S800 quadrupole radius set to "<<G4BestUnit(R,"Length")<< G4endl;
 }
 //-----------------------------------------------------------------------------
@@ -94,8 +93,6 @@ void S800::setLength(G4double length)
 {
       S800_Dz=length/2.;
       G4cout<<"----> S800 length set to "<<G4BestUnit(2.*S800_Dz,"Length")<< G4endl;;
-      S800_Quad->SetZHalfLength(S800_Dz);
-
 }
 //-----------------------------------------------------------------------------
 void S800::Report()
@@ -110,6 +107,5 @@ void S800::setMaterial(G4String materialName)
 {
   // search the material by its name 
   S800Material = G4Material::GetMaterial(materialName);  
-  S800_log->SetMaterial(S800Material);
-  G4cout<<"----> S800 material set to     "<<S800_log->GetMaterial()->GetName()<< G4endl;                 
+  G4cout<<"----> S800 material set to     "<<materialName<< G4endl;                 
 }
