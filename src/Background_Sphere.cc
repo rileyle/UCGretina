@@ -32,11 +32,15 @@ G4VPhysicalVolume* Background_Sphere::Construct(G4LogicalVolume* experimentalHal
 
   // Visualization Attributes
 
-  G4Colour lblue (0.0, 1.0, 1.0,0.3); 
+  G4Colour lblue (0.0, 1.0, 1.0, 0.1); 
   G4VisAttributes* Vis = new G4VisAttributes(lblue);
-  Vis->SetVisibility(false);
-  Vis->SetForceSolid(false);
-
+  if(BackgroundSphereMaterial->GetName() == "G4_Galactic"){
+    Vis->SetVisibility(false);
+  } else {
+    Vis->SetVisibility(true);
+    Vis->SetForceWireframe(true);
+  }
+  
   BackgroundSphere_log->SetVisAttributes(Vis);
 
   return BackgroundSphere_phys;
