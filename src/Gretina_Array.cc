@@ -1021,6 +1021,9 @@ void Gretina_Array::ConstructGeCrystals()
     
     pPg->pDetVA  = new G4VisAttributes( G4Color(pPg->colx, pPg->coly, pPg->colz) );
 
+    //pPg->pDetVA  = new G4VisAttributes( G4Color(1, 1, 1) );   // to see passive layers
+    //pPg->pDetVA->SetForceWireframe(true);                     // to see passive layers
+    
     G4double zFace1 = pPg->zFace1;
     
     pPg->pDetL1 = NULL;

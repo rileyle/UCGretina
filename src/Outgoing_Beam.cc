@@ -75,7 +75,7 @@ void Outgoing_Beam::setDecayProperties()
 
   for(size_t j = 0; j < DA.size(); j++){
     ionGS.push_back(ionTable->GetIon(Zin+DZ[j],Ain+DA[j],0.));
-    if(DA[j] == 0){
+    if(DA[j] == 0 && DZ[j] == 0){
       tarOutGS.push_back(tarIn);
     } else if(TarA-DA[j] == 1 && TarZ-DZ[j] ==1){
       tarOutGS.push_back(particleTable->FindParticle("proton"));
