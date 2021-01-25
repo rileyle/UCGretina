@@ -25,8 +25,6 @@ else
 ifdef SCANNING
   name := UCGretina_Scan
   CPPFLAGS  += -DSCANNING
-  CPPFLAGS  += -I/usr/local/CADMesh/include
-  EXTRALIBS += -L/usr/local/CADMesh/lib -lcadmesh -lassimp -ltet
 else
   name := UCGretina
 endif

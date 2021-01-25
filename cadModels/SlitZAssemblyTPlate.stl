@@ -10835,6 +10835,5 @@ solid Mesh
       vertex 147.637497 200.342270 131.572006
     endloop
   endfacet
-
-endSolid Mesh
+endsolid Mesh
   
