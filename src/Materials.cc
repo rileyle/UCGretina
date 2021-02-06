@@ -73,6 +73,9 @@
   G4Element* elementPb = new G4Element("Lead",      "Pb", 82.,207.2*g/mole);
   myElements.push_back(elementPb);
 
+  G4Element* elementBi = new G4Element("Bismuth",   "Bi", 83.,208.98*g/mole);
+  myElements.push_back(elementBi);
+
   // Germanium isotopes
   G4Isotope* Ge70 = new G4Isotope("Ge70", 32, 70, 69.9242*g/mole);
   G4Isotope* Ge72 = new G4Isotope("Ge72", 32, 72, 71.9221*g/mole);
@@ -191,6 +194,9 @@
     
   G4Material* Pb = new G4Material("Pb",      82., 207.2*g/mole,    11.34*g/cm3);
   myMaterials.push_back(Pb);
+
+  G4Material* Bi = new G4Material("Bi",      83., 208.98*g/mole,   9.747*g/cm3);
+  myMaterials.push_back(Bi);
   
   // define materials from the G4 NIST database
   NISTman = G4NistManager::Instance();
