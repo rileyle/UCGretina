@@ -5,10 +5,10 @@ all:  eu152_gammas_histos.root \
 # Pattern rules for running Geant4 simulations and sorting the output
 # into Root histograms
 %.dat : %.mac
-	UCGretina $*.mac | tee $*.log
+	UCGretina $*.mac 2>&1 | tee $*.log
 
 %_histos.root : %.dat
-	grutinizer -qH $*.dat -o /dev/null --hist-output $*_histos.root | tee $*_grut.log
+	grutinizer -qH $*.dat -o /dev/null --hist-output $*_histos.root 2>&1 | tee $*_grut.log
 	rm $*.dat
 
 clean:
