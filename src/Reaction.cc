@@ -83,6 +83,7 @@ G4VParticleChange* Reaction::PostStepDoIt(
 
 	BeamOut->SetReactionFlag(1);
 
+#ifdef POL
 	if(theProduct){
 	  //This is a bit heavy, but lets me get the excitation energy
 	  G4int Z = theProduct->GetParticleDefinition()->GetAtomicNumber();
@@ -113,6 +114,7 @@ G4VParticleChange* Reaction::PostStepDoIt(
 	  auto pol = nucPstore->FindOrBuild(frag.GetZ_asInt(),frag.GetA_asInt(),frag.GetExcitationEnergy());
 	  pol->SetPolarization(polV);
 	}
+#endif
 
       }
 

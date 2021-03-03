@@ -11,10 +11,12 @@ PhysicsList_Messenger::PhysicsList_Messenger(PhysicsList* pl):aPhysicsList(pl){
   CorrCmd->SetGuidance("Turn gamma-ray angular correlations on/off");
   CorrCmd->SetParameterName("choice",false);
   CorrCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-  
+
+#ifdef POL
   PolCmd = new G4UIcmdWithABool("/PhysicsList/SetGammaPolarization",this);
   PolCmd->SetGuidance("Enable/disable polarized gamma-ray physics");
   PolCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+#endif
 
   AddCmd = new G4UIcmdWithAString("/PhysicsList/SelectPhysics",this);
   AddCmd->SetGuidance("Select the physics list to use");
@@ -24,7 +26,9 @@ PhysicsList_Messenger::PhysicsList_Messenger(PhysicsList* pl):aPhysicsList(pl){
 
 PhysicsList_Messenger::~PhysicsList_Messenger(){
   delete CorrCmd;
+#ifdef POL
   delete PolCmd;
+#endif
   delete AddCmd;
   delete physDir;
 }
@@ -32,8 +36,10 @@ PhysicsList_Messenger::~PhysicsList_Messenger(){
 void PhysicsList_Messenger::SetNewValue(G4UIcommand* command, G4String newValue){
   if( command == CorrCmd)
     aPhysicsList->SetGammaAngularCorrelations(CorrCmd->GetNewBoolValue(newValue));
+#ifdef POL
   if( command == PolCmd)
     aPhysicsList->SetUsePolarizedPhysics(PolCmd->GetNewBoolValue(newValue));
+#endif
   if( command == AddCmd)
     aPhysicsList->AddPhysicsList(newValue);
 }

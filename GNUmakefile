@@ -34,6 +34,10 @@ ifdef HIGHMULT
   CPPFLAGS  += -DHIGHMULT
 endif
 
+ifdef POL
+  CPPFLAGS  += -DPOL
+endif
+
 ############################################
 ## uncomment for geant v. 4.7.1 and above
 ###########################################

@@ -27,6 +27,10 @@ To use the liquid hydrogen target:
 
 (produces the binary UCGretina_LH)
 
+To include EM and nuclear polarization in the physics list:
+
+    $ make POL=1
+
 To activate neutron-related processes in the physics list (required for the `neutron` source type:
 
     $ make NEUTRONS=1
@@ -273,14 +277,14 @@ Optional commands related to the outgoing reaction product:
 
 ### Gamma-Ray Angular Distributions (see also ./examples/inbeam/angdist) ###
 
-The alignment of the excited reaction product can be specified in in-beam simulations, leading to a net polarization of emitted gamma rays and a corresponding non-isotropic gamma-ray angular distribution. This functionality is disabled by default but can be enabled with:
+The alignment of the excited reaction product can be specified in in-beam simulations, leading to a net polarization of emitted gamma rays and a corresponding non-isotropic gamma-ray angular distribution. This functionality is disabled by default but can be enabled by compiling with the POL= flag and using the commands:
 
     /PhysicsList/AngularCorrelations true
     /PhysicsList/SetGammaPolarization true
 
 (issued prior to the `/run/initialize` command)
 
-The alignment of the reation product is specified (after the `/run/initialize` command) in terms of the population parameters P(m) of the magnetic substates, set using:
+The alignment of the reaction product is specified (after the `/run/initialize` command) in terms of the population parameters P(m) of the magnetic substates, set using:
 
     /reaction/population <2m> <P(m)>
 
@@ -300,7 +304,7 @@ Mandatory commands
 
 > The white source type emits gamma rays in a uniform energy distribution set with the `/Experiment/Source/setWhiteLowE` and `/Experiment/Source/setWhiteHighE` commands. The multiplicity of the white source is set with the `/Experiment/Source/setMultiplicity` command.
 
-> `eu152_peaks`, `co56_peaks`, and `photopeaks` sources produce selected gamma-rays from <SUP>152</SUP>Eu, <SUP>56</SUP>Co, and both, respectively. The gamma rays are emitted in equal quantities to facilitiate determining photopeak efficiencies by fitting the photopeaks directly.
+> `eu152_peaks`, `co56_peaks`, and `photopeaks` sources produce selected gamma-rays from <SUP>152</SUP>Eu, <SUP>56</SUP>Co, and both, respectively. The gamma rays are emitted in equal quantities to facilitate determining photopeak efficiencies by fitting the photopeaks directly.
 
 > _Note: The `eu152`, `co56`, `co60`, and `ra226` source types reproduce empirically-observed relative intensities. However, the total number of gamma rays simulated does not correspond to the number of decays of the source, because these simulated sources emit a single gamma-ray per event, while some gamma rays from these sources are emitted in cascades._
 
@@ -606,6 +610,6 @@ Run the macro file `vis/vis.mac` an interactive session:
 
 This generates a VRML 2 file named `g4_XX.wrl` which can be viewed with a VRML viewer (like view3dscene, FreeWRL, or mayavi2). Macro files are included for visualizing GRETA, the LBL scanning table, and the liquid-hydrogen target setups. These scripts must be run in a directory with soft links (`aclust`, `euler`, `aslice`, `asolid`, `awalls`) to the appropriate GRETINA geometry files.
 
-The macro file `./vis/trajectories.mac` illustrates how to add particle trajectories to visulatizations.
+The macro file `./vis/trajectories.mac` illustrates how to add particle trajectories to visualizations.
 
 Within mayavi2, the python scripts `./vis/mlab.animate.py` and `./vis/mlab.movie.py` can be run (File -> Run Python Script). The former animates the scene, and the latter saves the animation frames as a series of .png files which can be stitched together into an animated png or gif.
