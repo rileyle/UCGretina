@@ -1,5 +1,7 @@
 # UCGretina #
 
+Cite: [L.A.Riley, D.Weisshaar, H.L.Crawford et al., UCGretina GEANT4 simulation of the GRETINA Gamma-Ray Energy Tracking Array, Nucl. Instr. Meth. A1003, 165305 (2021)](https://doi.org/10.1016/j.nima.2021.165305)
+
 ## Compile and install ##
 
 Install version [Geant4 10.7 of the Geant4 libraries](https://geant4.web.cern.ch/geant4/support/download.shtml). You will need the data files for low energy electromagnetic processes, photon evaporation, and radioactive decay.
@@ -9,7 +11,7 @@ The model of the GRETINA scanning table uses version 2.0.3 of the external [CADM
 Set up your environment (consider adding this to your `.bashrc`):
 
     $ source <Path to Geant4>/bin/geant4.sh
-    $ source <Path to Geant4>/share/Geant4-10.7.0/geant4make/geant4make.sh
+    $ source <Path to Geant4>/share/Geant4-10.7.1/geant4make/geant4make.sh
 
 Compile:
 
