@@ -14,7 +14,6 @@
 
 #include "TGretina.h"
 #include "TS800.h"
-#include "TBank29.h"
 #include "TS800.h"
 #include "TGretSim.h"
 #include "GValue.h"
@@ -77,7 +76,6 @@ extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
   InitMap();
   TGretina *gretina = obj.GetDetector<TGretina>();
-  TBank29  *bank29  = obj.GetDetector<TBank29>();
   TS800 *s800       = obj.GetDetector<TS800>();
   TGretSim *gretSim = obj.GetDetector<TGretSim>();
   
@@ -191,30 +189,30 @@ void MakeHistograms(TRuntimeObjects& obj) {
     if(hit.NumberOfInteractions()){
       obj.FillHistogram("position",
 			Form("crys_%d_x", hit.GetCrystalId()),
-			1200, -60, 60, hit.GetLocalPosition(0).X());
+			1200, -60, 60, hit.GetLocalIntPosition(0).X());
 
       obj.FillHistogram("position",
 			Form("crys_%d_y", hit.GetCrystalId()),
-			1200, -60, 60, hit.GetLocalPosition(0).Y());
+			1200, -60, 60, hit.GetLocalIntPosition(0).Y());
 
       obj.FillHistogram("position",
 			Form("crys_%d_z", hit.GetCrystalId()),
-			1200, -10, 100, hit.GetLocalPosition(0).Z());
+			1200, -10, 100, hit.GetLocalIntPosition(0).Z());
 
       obj.FillHistogram("position",
 			Form("crys_%d_xy", hit.GetCrystalId()),
-			1200, -60, 60, hit.GetLocalPosition(0).X(),
-			1200, -60, 60, hit.GetLocalPosition(0).Y());
+			1200, -60, 60, hit.GetLocalIntPosition(0).X(),
+			1200, -60, 60, hit.GetLocalIntPosition(0).Y());
 
       obj.FillHistogram("position",
 			Form("crys_%d_xz", hit.GetCrystalId()),
-			1200, -60, 60,  hit.GetLocalPosition(0).X(),
-			1200, -10, 100, hit.GetLocalPosition(0).Z());
+			1200, -60, 60,  hit.GetLocalIntPosition(0).X(),
+			1200, -10, 100, hit.GetLocalIntPosition(0).Z());
 
       obj.FillHistogram("position",
 			Form("crys_%d_yz", hit.GetCrystalId()),
-			1200, -60, 60,  hit.GetLocalPosition(0).Y(),
-			1200, -10, 100, hit.GetLocalPosition(0).Z());
+			1200, -60, 60,  hit.GetLocalIntPosition(0).Y(),
+			1200, -10, 100, hit.GetLocalIntPosition(0).Z());
     }
     
     for(int y=0; y < hit.NumberOfInteractions(); y++){
