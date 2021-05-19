@@ -64,7 +64,7 @@ extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
   InitMap();
   TGretina *gretina = obj.GetDetector<TGretina>();
-  TS800    *s800    = obj.GetDetector<TS800>();
+  //  TS800    *s800    = obj.GetDetector<TS800>();
   TS800Sim *s800Sim = obj.GetDetector<TS800Sim>();
   TGretSim *gretSim = obj.GetDetector<TGretSim>();
 
@@ -76,7 +76,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   Double_t energyUlim = 8192.;
 
   if(gretSim){
-    for(int x=0; x<gretSim->Size(); x++){
+    for(unsigned int x=0; x<gretSim->Size(); x++){
       TGretSimHit hit = gretSim->GetGretinaSimHit(x);
       obj.FillHistogram("sim","emitted_energy",
 			energyNChannels, energyLlim, energyUlim,
@@ -184,7 +184,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   Double_t calorimeterEnergy_gaus = 0.;
   std::vector<TGretinaHit> hits;
   
-  for(int x=0; x<gretina->Size(); x++){
+  for(unsigned int x=0; x<gretina->Size(); x++){
 
     TGretinaHit hit = gretina->GetGretinaHit(x);
 
@@ -222,7 +222,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
       // Symmetrized gamma-gamma
       Double_t e1 = hit.GetDoppler(betas[i])*gRandom->Gaus(1,1./1000.);
-      for(int y=x+1; y<gretina->Size(); y++){
+      for(unsigned int y=x+1; y<gretina->Size(); y++){
 
 	TGretinaHit hit2 = gretina->GetGretinaHit(y);
 	Double_t e2 = hit2.GetDoppler(betas[i])*gRandom->Gaus(1,1./1000.);
@@ -300,10 +300,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
     // CAUTION: This clustering includes neighbors of neighbors!
     std::vector<TGretinaHit> cluster;
     cluster.push_back(currentHit);
-    int lastClusterSize = 0;
+    unsigned int lastClusterSize = 0;
     while(lastClusterSize < cluster.size()){
-      for(int i = 0; i < cluster.size(); i++){
-	for(int j = 0; j < hits.size(); j++){
+      for(unsigned int i = 0; i < cluster.size(); i++){
+	for(unsigned int j = 0; j < hits.size(); j++){
 	  TVector3 distance = cluster[i].GetCrystalPosition()
 	                       - hits[j].GetCrystalPosition();
 
@@ -326,9 +326,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
     Double_t addbackEnergy = 0.;
     Double_t addbackEnergy_gaus = 0.;
     TVector3 firstHitPos;
-    Int_t firstHitHoleNum;
+    Int_t firstHitHoleNum = -1;
     Double_t firstHitEnergy = 0;
-    for(int i = 0; i < cluster.size(); i++){
+    for(unsigned int i = 0; i < cluster.size(); i++){
       addbackEnergy += cluster[i].GetCoreEnergy();
       addbackEnergy_gaus +=
 	cluster[i].GetCoreEnergy()*gRandom->Gaus(1,1./1000.);
@@ -343,7 +343,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	firstHitEnergy = cluster[i].GetIntAssignEng(0);
       }
       
-      for(int j = i+1; j < cluster.size(); j++){
+      for(unsigned int j = i+1; j < cluster.size(); j++){
 	TVector3 distance =   cluster[i].GetCrystalPosition()
 	                    - cluster[j].GetCrystalPosition();
 	if(distance.Mag() < 80.) neighbors++;

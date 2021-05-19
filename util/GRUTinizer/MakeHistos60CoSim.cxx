@@ -76,7 +76,7 @@ extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
   InitMap();
   TGretina *gretina = obj.GetDetector<TGretina>();
-  TS800 *s800       = obj.GetDetector<TS800>();
+  //  TS800 *s800       = obj.GetDetector<TS800>();
   TGretSim *gretSim = obj.GetDetector<TGretSim>();
   
   Int_t    energyNChannels = 4000;
@@ -92,7 +92,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   Double_t z2 = -1;
   
   if(gretSim){
-    for(int x=0; x<gretSim->Size(); x++){
+    for(unsigned int x=0; x<gretSim->Size(); x++){
       TGretSimHit hit = gretSim->GetGretinaSimHit(x);
       obj.FillHistogram("sim","emitted_energy",
 			energyNChannels, energyLlim, energyUlim,
@@ -134,14 +134,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
   Double_t eGateLlim = 1327.5;
   Double_t eGateUlim = 1337.5;
   int iGate = -1;
-  for(int i=0; i<gretina->Size(); i++){
+  for(unsigned int i=0; i<gretina->Size(); i++){
     TGretinaHit hit = gretina->GetGretinaHit(i);
     if( hit.GetCoreEnergy() > eGateLlim &&
         hit.GetCoreEnergy() < eGateUlim )
       iGate = i;
   }
   if(iGate>=0){
-    for(int i=0; i<gretina->Size(); i++){
+    for(unsigned int i=0; i<gretina->Size(); i++){
       TGretinaHit hit = gretina->GetGretinaHit(i);
       if(i != iGate){
 	Double_t mE = measuredE(hit.GetCoreEnergy());
@@ -175,7 +175,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   }
 
   // Addback preprocessing
-  for(int x=0; x<gretina->Size(); x++){
+  for(unsigned int x=0; x<gretina->Size(); x++){
 
     TGretinaHit hit = gretina->GetGretinaHit(x);
     
@@ -190,7 +190,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   
   int max_layer = -1;
 
-  for(int x=0; x<gretina->Size(); x++){
+  for(unsigned int x=0; x<gretina->Size(); x++){
 
     TGretinaHit hit = gretina->GetGretinaHit(x);
     Double_t mE = measuredE(hit.GetCoreEnergy());
@@ -208,7 +208,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		      20, 0, 20, hit.NumberOfInteractions());
 
     // Symmetrized gamma-gamma matrix and angular correlation
-    for(int y=x+1; y<gretina->Size(); y++){
+    for(unsigned int y=x+1; y<gretina->Size(); y++){
       TGretinaHit hit2 = gretina->GetGretinaHit(y);
       Double_t mE2 = measuredE(hit2.GetCoreEnergy());
       obj.FillHistogram("energy", "gamma_gamma",
@@ -369,10 +369,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
     // CAUTION: This clustering includes neighbors of neighbors!
     std::vector<TGretinaHit> cluster;
     cluster.push_back(currentHit);
-    int lastClusterSize = 0;
+    unsigned int lastClusterSize = 0;
     while(lastClusterSize < cluster.size()){
-      for(int i = 0; i < cluster.size(); i++){
-	for(int j = 0; j < hits.size(); j++){
+      for(unsigned int i = 0; i < cluster.size(); i++){
+	for(unsigned int j = 0; j < hits.size(); j++){
 	  TVector3 distance = cluster[i].GetCrystalPosition()
 	                       - hits[j].GetCrystalPosition();
 
@@ -393,9 +393,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
     // and count the pairs of neighbors.
     Int_t neighbors = 0;
     Double_t addbackEnergy = 0.;
-    for(int i = 0; i < cluster.size(); i++){
+    for(unsigned int i = 0; i < cluster.size(); i++){
       addbackEnergy += measuredE(cluster[i].GetCoreEnergy());
-      for(int j = i+1; j < cluster.size(); j++){
+      for(unsigned int j = i+1; j < cluster.size(); j++){
 	TVector3 distance =   cluster[i].GetCrystalPosition()
 	                    - cluster[j].GetCrystalPosition();
 	if(distance.Mag() < 80.) neighbors++;
