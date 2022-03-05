@@ -1,4 +1,4 @@
-all: au197_548_histos.root
+all: au197_548_histos.root    simple_279_histos.root
 	echo "Geant4 simulations done."
 
 # Pattern rules for running Geant4 simulations and sorting the output
