@@ -235,7 +235,9 @@ G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
   }
 
   // Relativistic kinematics ===================================================
-  //       Baldin et al, Kinematics of Nuclear Reactions, Pergamon (1961)
+  // R. E. Phillips and S. T. Thornton,
+  // A FORTRAN PROGRAM FOR RELATIVISTIC KINEMATIC CALCULATIONS IN TWO-BODY
+  // NUCLEAR REACTIONS, ORNL-4179, UC-34-Physics (1967)
 
   G4double E3Lab = 1/(ET*ET - p1*p1*cos(theta3)*cos(theta3))// Beam-like product
     *( ET*( m2*(KEIn + m1) + (m1*m1+m2*m2+m3*m3-m4*m4)/2. )
