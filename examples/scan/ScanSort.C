@@ -110,7 +110,7 @@ void loadSim(TString fileName) {
   Int_t lo = 0;
   Int_t hi = lo+nChannels*keVperChannel;
 
-  sim = new TH1F("clover","clover", nChannels, float(lo), float(hi));
+  TH1F* sim = new TH1F("clover","clover", nChannels, float(lo), float(hi));
 
   Int_t nHoles = 3;
   Int_t hole[] = { 31, 32, 33 };
@@ -234,7 +234,7 @@ void loadSim(TString fileName) {
   Int_t nGamma = 0;
   Int_t nBuffer = 0;
   Int_t nReaction = 0;
-  Int_t nGamma, nEvent;
+  Int_t nEvent;
   Int_t nHits;
   Int_t fullEnergy;
   Float_t Egamma;
@@ -300,7 +300,7 @@ void loadSim(TString fileName) {
 
 	// No addback
 	//   Hit position = first hit in crystal
-	if(!Edep[detNum[k]] > 0.){
+	if(!(Edep[detNum[k]] > 0.)){
 	  xHit[detNum[k]] = x;
 	  yHit[detNum[k]] = y;
 	  zHit[detNum[k]] = z;
@@ -431,11 +431,13 @@ void ScanSort(TString simFile){
   loadGretina("ScanSort.inp");
 
   TString rootFile = simFile.Copy();
-  rootFile.Replace(rootFile.Index(".out",4,0,0),4,".root",5);
+  //  rootFile.Replace(rootFile.Index(".out",4,0,0),4,".root",5);
+  rootFile.Replace(rootFile.Index(".out",4),4,".root",5);
   TFile *rF = new TFile(rootFile,"recreate");
 
   TString sourceType = simFile.Copy();
-  sourceType.Replace(sourceType.Index(".out",4,0,0),4,"",0);
+  //  sourceType.Replace(sourceType.Index(".out",4,0,0),4,"",0);
+  sourceType.Replace(sourceType.Index(".out",4),4,"",0);
 
   cout << "... sorting events in " << simFile << " ...\n" << endl;
 

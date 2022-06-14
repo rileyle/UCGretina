@@ -10,9 +10,9 @@
 #include "G4DAWNFILE.hh"
 //LR #include "G4GAGTree.hh"
 #include "G4HepRepFile.hh"
-#include "G4HepRep.hh"
+//#include "G4HepRep.hh"
 #include "G4RayTracer.hh"
-#include "G4VRML1File.hh"
+//#include "G4VRML1File.hh"
 #include "G4VRML2File.hh"
 
 // Needing external packages or libraries...
@@ -62,9 +62,9 @@ void VisManager::RegisterGraphicsSystems () {
   RegisterGraphicsSystem (new G4DAWNFILE);
   //LR RegisterGraphicsSystem (new G4GAGTree);
   RegisterGraphicsSystem (new G4HepRepFile);
-  RegisterGraphicsSystem (new G4HepRep);
+  //LR RegisterGraphicsSystem (new G4HepRep);
   RegisterGraphicsSystem (new G4RayTracer);
-  RegisterGraphicsSystem (new G4VRML1File);
+  //LR RegisterGraphicsSystem (new G4VRML1File);
   RegisterGraphicsSystem (new G4VRML2File);
 
   // Graphics systems needing external packages or libraries...

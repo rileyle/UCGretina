@@ -25,7 +25,7 @@ G4VPhysicalVolume* Experimental_Hall::Construct()
   ExperimentalHall_phys = new G4PVPlacement(0,G4ThreeVector(),
 					    ExperimentalHall_log,"expHall",0,false,0);
 
-  ExperimentalHall_log-> SetVisAttributes (G4VisAttributes::Invisible);
+  ExperimentalHall_log-> SetVisAttributes (G4VisAttributes::GetInvisible());
   
   return ExperimentalHall_phys;
 }
