@@ -18,7 +18,7 @@
 
 # Angular correlation / polarization flags =====================================
 /PhysicsList/AngularCorrelations true
-/PhysicsList/SetGammaPolarization true
+#/PhysicsList/SetGammaPolarization true
 
 # Initialize RunManager ========================================================
 /run/initialize
