@@ -33,6 +33,8 @@ To include EM and nuclear polarization in the physics list:
 
     $ make POL=1
 
+Implementation and validation of this capability is described here: [C. Morse, H. L. Crawford, A. O. Macchiavelli et al., The polarization sensitivity of GRETINA, Nucl. Instr. Meth. A1025, 166155 (2022)](https://doi.org/10.1016/j.nima.2021.166155)
+
 To activate neutron-related processes in the physics list (required for the `neutron` source type:
 
     $ make NEUTRONS=1
