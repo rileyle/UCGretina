@@ -8,7 +8,9 @@ all:  eu152_gammas_histos.root \
 	UCGretina $*.mac 2>&1 | tee $*.log
 
 %_histos.root : %.dat
-	grutinizer -qH $*.dat -o /dev/null --hist-output $*_histos.root 2>&1 | tee $*_grut.log
+	grutinizer gvalues.val -qH $*.dat -o /dev/null \
+	${GRUTSYS}/lib/libMakeHistosSourcesSim.so \
+	--hist-output $*_histos.root 2>&1 | tee $*_grut.log
 	rm $*.dat
 
 clean:
