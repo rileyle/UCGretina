@@ -48,11 +48,9 @@
 #include "G4EmPenelopePhysics.hh"
 #include "G4EmLowEPPhysics.hh"
 
-#ifdef POL
 #include "G4PolarizedPhotoElectricEffect.hh"
 #include "G4PolarizedCompton.hh"
 #include "G4PolarizedGammaConversion.hh"
-#endif
 
 #include "DetectorConstruction.hh"
 
@@ -100,9 +98,7 @@ PhysicsList::PhysicsList(DetectorConstruction* det)
 
   BeamOut = NULL;
 
-#ifdef POL
   usePolar = false;
-#endif
 
 #ifdef NEUTRONS
   // From LBE for neutrons
@@ -171,7 +167,6 @@ void PhysicsList::ConstructProcess()
   //
   fEmPhysicsList->ConstructProcess();
   
-#ifdef POL
   if(usePolar){
     G4ProcessManager *gpMan = G4Gamma::Gamma()->GetProcessManager();
     G4ProcessVector* pv = gpMan->GetProcessList();
@@ -190,7 +185,6 @@ void PhysicsList::ConstructProcess()
       }
     }
   }
-#endif
   
   // Beam Reaction
   AddReaction();
@@ -425,11 +419,10 @@ void PhysicsList::SetGammaAngularCorrelations(bool val){
   G4cout<<"Set correlated gamma "<<val<<G4endl;
 }
 
-#ifdef POL
 void PhysicsList::SetUsePolarizedPhysics(bool use){
   usePolar=use;
 }
-#endif
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

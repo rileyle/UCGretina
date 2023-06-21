@@ -35,6 +35,7 @@ ifdef HIGHMULT
 endif
 
 ifdef POL
+  name := UCGretina_Pol
   CPPFLAGS  += -DPOL
 endif
 

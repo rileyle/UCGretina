@@ -7,7 +7,6 @@
 #include "G4ios.hh"
 #include "globals.hh"
 #include "G4VProcess.hh"
-//#include "DetectorConstruction.hh"
 #include "Outgoing_Beam.hh"
 #include "G4VParticleChange.hh"
 #include "G4ParticleChange.hh"

@@ -29,10 +29,11 @@ To use the liquid hydrogen target:
 
 (produces the binary UCGretina_LH)
 
-To include EM and nuclear polarization in the physics list:
+To include nuclear polarization (alignment) of the reaction product in the `Reaction` class:
 
     $ make POL=1
 
+(produces the binary `UCGretina_Pol`)
 Implementation and validation of this capability is described here: [C. Morse, H. L. Crawford, A. O. Macchiavelli et al., The polarization sensitivity of GRETINA, Nucl. Instr. Meth. A1025, 166155 (2022)](https://doi.org/10.1016/j.nima.2021.166155)
 
 To activate neutron-related processes in the physics list (required for the `neutron` source type:
@@ -279,16 +280,14 @@ Optional commands related to the outgoing reaction product:
 
 > Turns off the Reaction process. This is required for simulations of stationary sources (with the /BeamOut/Source command) in which the `G4RadioactiveDecay` process manages gamma-ray emission. This can also be used for simulations of the beam passing through the target without reacting.
 
-### Gamma-Ray Angular Distributions (see also ./examples/inbeam/angdist) ###
+### Nuclear Alignment (Polarization) and Gamma-Ray Angular Distributions (see also ./examples/inbeam/angdist) ###
 
-The alignment of the excited reaction product can be specified in in-beam simulations, leading to a net polarization of emitted gamma rays and a corresponding non-isotropic gamma-ray angular distribution. This functionality is disabled by default but can be enabled by compiling with the POL= flag and using the commands:
+The alignment of the excited reaction product can be specified in in-beam simulations, leading to a net polarization of emitted gamma rays and a corresponding non-isotropic gamma-ray angular distribution. This functionality can be enabled by compiling with the `POL=1` flag (producing an executable named `UCGretina_Pol`) and using the commands (issued prior to the `/run/initialize` command):
 
     /PhysicsList/AngularCorrelations true
     /PhysicsList/SetGammaPolarization true
 
-(issued prior to the `/run/initialize` command)
-
-The alignment of the reaction product is specified (after the `/run/initialize` command) in terms of the population parameters P(m) of the magnetic substates, set using:
+The alignment of the reaction product must be specified (after the `/run/initialize` command) in terms of the population parameters P(m) of the magnetic substates, set using:
 
     /reaction/population <2m> <P(m)>
 

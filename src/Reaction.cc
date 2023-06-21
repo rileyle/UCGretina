@@ -96,6 +96,13 @@ G4VParticleChange* Reaction::PostStepDoIt(
 	  size_t index = 0;
 	  index = lman->NearestLevelIndex(Ex,index);
 	  G4int twoJ = lman->SpinTwo(index);
+	  if(substates.size() != (size_t)twoJ+1){
+	    G4cerr << "Error: Reaction population parameter count != 2J+1."
+		   << "\n  Use /reaction/population macro-file commands."
+		   << "\n  (required when UCGretina is compiled with POL=1)"
+		   << G4endl;
+	    exit(EXIT_FAILURE);
+	  }
 	  std::vector<std::vector<G4complex>> polV;
 	  polV.resize(twoJ+1);
 	  G4double cosTheta = aTrack.GetMomentumDirection().cosTheta();

@@ -4,7 +4,7 @@ all: s44_1329_histos.root   s44_1329_iso_histos.root
 # Pattern rules for running Geant4 simulations and sorting the output
 # into Root histograms
 %.dat : %.mac
-	UCGretina $*.mac 2>&1 | tee $*.log
+	UCGretina_Pol $*.mac 2>&1 | tee $*.log
 
 %_histos.root : %.dat
 	grutinizer gvalues.val -qH $*.dat -o /dev/null \

@@ -22,9 +22,7 @@ private:
   G4UIdirectory* physDir;
 
   G4UIcmdWithABool* CorrCmd;
-#ifdef POL
   G4UIcmdWithABool* PolCmd;
-#endif
   G4UIcmdWithAString* AddCmd;
 };
 
