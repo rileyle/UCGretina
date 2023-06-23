@@ -165,6 +165,7 @@ void EventAction::EndOfEventAction(const G4Event* ev)
       G4double X0[100*MAX_INTPTS];
       G4double Y0[100*MAX_INTPTS];
       G4double Z0[100*MAX_INTPTS];
+      G4double globalTime[100*MAX_INTPTS];
       G4int NCons[100*MAX_INTPTS];
       G4double packingRes2 = packingRes*packingRes;
 
@@ -193,6 +194,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	G4double en  = (*gammaCollection)[i]->GetEdep()/keV;
 	totalEdep += en;
 
+	G4double gt  = (*gammaCollection)[i]->GetGlobalTime()*1.e3;
+	
 	NCons[i] = -1;
 	G4bool processed = false;	
 
@@ -201,15 +204,23 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 
 	  // Combine multiple gamma hits at the same position.
 	  // (This is rare, but it happens.)
-	  if(i > 0 
+	  if(i > 0
 	     && (x - measuredX[i-1])*(x - measuredX[i-1]) < hitTolerance*hitTolerance
 	     && (y - measuredY[i-1])*(y - measuredY[i-1]) < hitTolerance*hitTolerance
 	     && (z - measuredZ[i-1])*(z - measuredZ[i-1]) < hitTolerance*hitTolerance){
-
+	    // G4cout << "  Combining gamma hit at " << x << "  " << y << "  " << z
+	    // 	   << " with the prior hit at the same position. (This should be rare.)"
+	    // 	   << G4endl;
+	    
 	    measuredEdep[NMeasured-1] += en; 
 	    processed = true;
 
 	  } else {
+	    // G4cout << "Initializing an IP at " << x << "  " << y << "  " << z
+	    // 	   << " trackID = " << (*gammaCollection)[i]->GetTrackID()
+	    // 	   << " in det " << (*gammaCollection)[i]->GetDetNumb()
+	    // 	   << ", seg " << (*gammaCollection)[i]->GetSegNumb()
+	    // 	   << G4endl;
 
 	    trackID[NMeasured]      = (*gammaCollection)[i]->GetTrackID();
 	    detNum[NMeasured]       = (*gammaCollection)[i]->GetDetNumb();
@@ -232,6 +243,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	    Y0[NMeasured] = (*gammaCollection)[i]->GetPos().getY()/mm;
 	    Z0[NMeasured] = (*gammaCollection)[i]->GetPos().getZ()/mm;
 
+	    globalTime[NMeasured] = (*gammaCollection)[i]->GetGlobalTime()*1.e3;
+	    
 	    NCons[NMeasured] = 1;
 	    NMeasured++;
 	    processed = true;
@@ -262,13 +275,31 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 		&& (y0 - Y0[j])*(y0 - Y0[j]) < hitTolerance*hitTolerance
 		&& (z0 - Z0[j])*(z0 - Z0[j]) < hitTolerance*hitTolerance // correct interaction point
 		&& (*gammaCollection)[i]->GetDetNumb() == detNum[j]){        // same crystal
+	      // G4cout << "  Consolidating hit at " << x << "  " << y << "  " << z
+	      // 	     << " trackID = " << (*gammaCollection)[i]->GetTrackID()
+	      // 	     << " in det " << (*gammaCollection)[i]->GetDetNumb()
+	      // 	     << ", seg " << (*gammaCollection)[i]->GetSegNumb()
+	      // 	     << " with IP at " << measuredX[j] << "  " << measuredY[j] << "  " << measuredZ[j] 
+	      // 	     << G4endl;
 
 	      // Energy-weighted average position (barycenter)
-	      measuredX[j] = (measuredEdep[j]*measuredX[j] + en*x)/(measuredEdep[j] + en);
-	      measuredY[j] = (measuredEdep[j]*measuredY[j] + en*y)/(measuredEdep[j] + en);
-	      measuredZ[j] = (measuredEdep[j]*measuredZ[j] + en*z)/(measuredEdep[j] + en);
-	      measuredEdep[j] += en;
+	      if(measuredEdep[j] == 0 && en == 0){
+		// G4cout << "    Both energies are zero. Taking the average." << G4endl;
+		measuredX[j]  = (measuredX[j] + x)/2.;
+		measuredY[j]  = (measuredY[j] + y)/2.;
+		measuredZ[j]  = (measuredZ[j] + z)/2.;
+		
+		globalTime[j] = (globalTime[j] + gt)/2.;
+	      } else {
+		// G4cout << "    Calculating a weighted average." << G4endl;
+		measuredX[j] = (measuredEdep[j]*measuredX[j] + en*x)/(measuredEdep[j] + en);
+		measuredY[j] = (measuredEdep[j]*measuredY[j] + en*y)/(measuredEdep[j] + en);
+		measuredZ[j] = (measuredEdep[j]*measuredZ[j] + en*z)/(measuredEdep[j] + en);
+		measuredEdep[j] += en;
 
+		globalTime[j] = (measuredEdep[j]*globalTime[j] + en*gt)/(measuredEdep[j] + en);
+	      }
+	      
 	      NCons[j]++;
 	      processed = true;
 	      
@@ -284,6 +315,12 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	// We'll initialize a new interaction point and treat it as a 
 	// gamma-ray interaction.
 	if(!processed){
+	  // G4cout << "** Unconsolidated non-gamma hit! **" << G4endl;
+	  // G4cout << "Initializing an IP at " << x << "  " << y << "  " << z
+	  // 	 << " trackID = " << (*gammaCollection)[i]->GetTrackID()
+	  // 	 << " in det " << (*gammaCollection)[i]->GetDetNumb()
+	  // 	 << ", seg " << (*gammaCollection)[i]->GetSegNumb()
+	  // 	 << G4endl;
 
 	  trackID[NMeasured]      = (*gammaCollection)[i]->GetTrackID();
 	  detNum[NMeasured]       = (*gammaCollection)[i]->GetDetNumb();
@@ -299,6 +336,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	  X0[NMeasured] = (*gammaCollection)[i]->GetTrackOrigin().getX()/mm;
 	  Y0[NMeasured] = (*gammaCollection)[i]->GetTrackOrigin().getY()/mm;
 	  Z0[NMeasured] = (*gammaCollection)[i]->GetTrackOrigin().getZ()/mm;
+
+	  globalTime[NMeasured] = (*gammaCollection)[i]->GetGlobalTime()*1.e3;
 
 	  NCons[NMeasured] = 1;
 	  NMeasured++;
@@ -335,11 +374,20 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	      &&  (NCons[i] > 0 && NCons[j] > 0) ){  // not already consolidated
 
 	    // Energy-weighted average
-	    measuredX[i] = (measuredEdep[i]*measuredX[i] + measuredEdep[j]*measuredX[j])/(measuredEdep[i]+measuredEdep[j]);
-	    measuredY[i] = (measuredEdep[i]*measuredY[i] + measuredEdep[j]*measuredY[j])/(measuredEdep[i]+measuredEdep[j]);
-	    measuredZ[i] = (measuredEdep[i]*measuredZ[i] + measuredEdep[j]*measuredZ[j])/(measuredEdep[i]+measuredEdep[j]);
-	    measuredEdep[i] += measuredEdep[j];
+	    if(measuredEdep[i] == 0 && measuredEdep[j] == 0){
+	      measuredX[i]  = (measuredX[i] + measuredX[j])/2.;
+	      measuredY[i]  = (measuredY[i] + measuredY[j])/2.;
+	      measuredZ[i]  = (measuredZ[i] + measuredZ[j])/2.;
+		
+	      globalTime[i] = (globalTime[i] + globalTime[j])/2.;
+	    } else {
+	      measuredX[i] = (measuredEdep[i]*measuredX[i] + measuredEdep[j]*measuredX[j])/(measuredEdep[i]+measuredEdep[j]);
+	      measuredY[i] = (measuredEdep[i]*measuredY[i] + measuredEdep[j]*measuredY[j])/(measuredEdep[i]+measuredEdep[j]);
+	      measuredZ[i] = (measuredEdep[i]*measuredZ[i] + measuredEdep[j]*measuredZ[j])/(measuredEdep[i]+measuredEdep[j]);
+	      measuredEdep[i] += measuredEdep[j];
 
+	      globalTime[i] = (measuredEdep[i]*globalTime[i] + measuredEdep[j]*globalTime[j])/(measuredEdep[i]+measuredEdep[j]);
+	    }
 	    NCons[j] = -1;
 	    NGammaHits--;
 
@@ -393,6 +441,9 @@ void EventAction::EndOfEventAction(const G4Event* ev)
       for(int i=0; i<NMeasured; i++) {
 
 	if(NCons[i] > 0){
+
+	  //	  G4cout << detNum[i] << ", " << segNum[i] << ", "
+	  //		 << measuredEdep[i] << ", " << globalTime[i] << G4endl;
 
 	  G4double x, y, z;
 	  if(gretinaCoords){

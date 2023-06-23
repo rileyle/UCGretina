@@ -84,17 +84,30 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   G4String processName
     = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
   //  G4cout << " &&& particleType = " << particleType 
-  //	 << ", particleName = " << particleName << G4endl;
-  
+  //  	 << ", particleName = " << particleName
+  //  	 << ", processName = " << processName
+  //	 << ", edep = " << edep*1000.
+  //	 << G4endl;
+   
   // Pulse height defect for (n,n')
   // Joa Ljungvall and Johan Nyberg, NPA546, 553–573 (2005), Figure 3
   if( ( particleType == "nucleus" && processName == "ionIoni" ) ||
       ( particleName == "neutron" && processName == "hadElastic" ) )
     edep = phdA*pow(edep, phdB);
 
-  // Keep the gamma parent of pair-production tracks for hit processing.
+  // Keep gamma parent that deposits no energy to mark interaction points
+  // (to preserve time ordering of hits when interaction points are built
+  //  in the EventAction).
+  //
+  // With standard EM physics, gamma interactions typically deposit small
+  // amounts (hundredths to tenths of keV), but with polarized EM physics
+  // there are gamma interactions with zero energy deposition. In both
+  // cases, secondary tracks do most of the energy deposition.
+  //
+  // Transportation to the detector is the only creator process we do not
+  // want to potentially generate an IP. 
   if(edep<0.001*eV
-     && processName != "conv") 
+     && processName == "Transportation") 
     return false;
 
   G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();
@@ -194,7 +207,8 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   newHit->SetPos        (position);
   newHit->SetPosCrys    (posSol);
   newHit->SetTrackOrigin(aStep->GetTrack()->GetVertexPosition());
-
+  newHit->SetGlobalTime(aStep->GetPostStepPoint()->GetGlobalTime());
+  
   gammaCollection->insert( newHit );
   newHit->Draw();
   //  getc(stdin);
@@ -219,7 +233,7 @@ void TrackerGammaSD::EndOfEvent(G4HCofThisEvent* HCE)
 	    G4cout << "\n--------> event " << runManager->GetCurrentEvent()->GetEventID() << ", "
 		   << NbHits << " hits for gamma tracking: " << G4endl;
 	    G4cout << "                            parent    creator" << G4endl;
-	    G4cout << "trackID   PID     process   track     process      det seg     Edep      KE         X         Y         Z         Xo        Yo        Zo" << G4endl;
+	    G4cout << "trackID   PID     process   track     process      det seg     Edep      KE         X         Y         Z         Xo        Yo        Zo    T (ps)" << G4endl;
 	    G4double totE = 0;
 	    for (i=0;i<NbHits;i++){
 	      (*gammaCollection)[i]->Print();
