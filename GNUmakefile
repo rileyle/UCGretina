@@ -13,30 +13,36 @@ ifdef NEUTRONS
   CPPFLAGS += -DNEUTRONS
 endif
 ifdef LHTARGET
-ifdef AD
-  name := UCGretina_LH_AD
+ifdef POL
+  name := UCGretina_LH_Pol
   CPPFLAGS += -DLHTARGET
-  CPPFLAGS += -DAD
+  CPPFLAGS += -DPOL
 else
   name := UCGretina_LH
   CPPFLAGS += -DLHTARGET
 endif
-else
+else # end LHTARGET / begin SCANNING
 ifdef SCANNING
+ifdef POL
+  name := UCGretina_Scan_Pol
+  CPPFLAGS  += -DSCANNING
+  CPPFLAGS += -DPOL
+else
   name := UCGretina_Scan
   CPPFLAGS  += -DSCANNING
+endif
+else # end SCANNING / begin UCGretina
+ifdef POL
+  name := UCGretina_Pol
+  CPPFLAGS += -DPOL
 else
   name := UCGretina
+endif
 endif
 endif
 
 ifdef HIGHMULT
   CPPFLAGS  += -DHIGHMULT
-endif
-
-ifdef POL
-  name := UCGretina_Pol
-  CPPFLAGS  += -DPOL
 endif
 
 ############################################
