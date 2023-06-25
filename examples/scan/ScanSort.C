@@ -431,12 +431,10 @@ void ScanSort(TString simFile){
   loadGretina("ScanSort.inp");
 
   TString rootFile = simFile.Copy();
-  //  rootFile.Replace(rootFile.Index(".out",4,0,0),4,".root",5);
   rootFile.Replace(rootFile.Index(".out",4),4,".root",5);
   TFile *rF = new TFile(rootFile,"recreate");
 
   TString sourceType = simFile.Copy();
-  //  sourceType.Replace(sourceType.Index(".out",4,0,0),4,"",0);
   sourceType.Replace(sourceType.Index(".out",4),4,"",0);
 
   cout << "... sorting events in " << simFile << " ...\n" << endl;

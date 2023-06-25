@@ -10,7 +10,9 @@ all: s44_1329_histos.root \
 	UCGretina $*.mac 2>&1 | tee $*.log
 
 %_histos.root : %.dat
-	grutinizer gvalues.val -qH $*.dat -o /dev/null --hist-output $*_histos.root 2>&1 | tee $*_grut.log
+	grutinizer gvalues.val -qH $*.dat -o /dev/null \
+	${GRUTSYS}/lib/libMakeHistosInBeam.so \
+	--hist-output $*_histos.root 2>&1 | tee $*_grut.log
 	rm $*.dat
 
 s44_spectrum.root : makeSpec.C \

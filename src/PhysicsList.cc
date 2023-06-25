@@ -45,14 +45,9 @@
 #include "G4EmStandardPhysicsGS.hh"
 #include "G4EmStandardPhysicsWVI.hh"
 #include "G4EmLivermorePhysics.hh"
+#include "G4EmLivermorePolarizedPhysics.hh"
 #include "G4EmPenelopePhysics.hh"
 #include "G4EmLowEPPhysics.hh"
-
-#ifdef POL
-#include "G4PolarizedPhotoElectricEffect.hh"
-#include "G4PolarizedCompton.hh"
-#include "G4PolarizedGammaConversion.hh"
-#endif
 
 #include "DetectorConstruction.hh"
 
@@ -100,9 +95,7 @@ PhysicsList::PhysicsList(DetectorConstruction* det)
 
   BeamOut = NULL;
 
-#ifdef POL
   usePolar = false;
-#endif
 
 #ifdef NEUTRONS
   // From LBE for neutrons
@@ -169,28 +162,32 @@ void PhysicsList::ConstructProcess()
   
   // Electromagnetic physics list
   //
-  fEmPhysicsList->ConstructProcess();
-  
-#ifdef POL
   if(usePolar){
-    G4ProcessManager *gpMan = G4Gamma::Gamma()->GetProcessManager();
-    G4ProcessVector* pv = gpMan->GetProcessList();
-    for(unsigned int i=0;i<pv->entries();i++){
-      if((*pv)[i]->GetProcessName()=="phot"){
-	gpMan->RemoveProcess((*pv)[i]);
-	gpMan->AddDiscreteProcess(new G4PolarizedPhotoElectricEffect);
-      }
-      if((*pv)[i]->GetProcessName()=="compt"){
-	gpMan->RemoveProcess((*pv)[i]);
-	gpMan->AddDiscreteProcess(new G4PolarizedCompton());
-      }
-      if((*pv)[i]->GetProcessName()=="conv"){
-	gpMan->RemoveProcess((*pv)[i]);
-	gpMan->AddDiscreteProcess(new G4PolarizedGammaConversion);
-      }
-    }
+    AddPhysicsList("emlivermorepolarized");
   }
-#endif
+
+  fEmPhysicsList->ConstructProcess();
+
+  // Prior to using G4EmLivermorePolarizedPhysics
+  //
+  // if(usePolar){
+  //   G4ProcessManager *gpMan = G4Gamma::Gamma()->GetProcessManager();
+  //   G4ProcessVector* pv = gpMan->GetProcessList();
+  //   for(unsigned int i=0;i<pv->entries();i++){
+  //     if((*pv)[i]->GetProcessName()=="phot"){
+  // 	gpMan->RemoveProcess((*pv)[i]);
+  // 	gpMan->AddDiscreteProcess(new G4PolarizedPhotoElectricEffect);
+  //     }
+  //     if((*pv)[i]->GetProcessName()=="compt"){
+  // 	gpMan->RemoveProcess((*pv)[i]);
+  // 	gpMan->AddDiscreteProcess(new G4PolarizedCompton());
+  //     }
+  //     if((*pv)[i]->GetProcessName()=="conv"){
+  // 	gpMan->RemoveProcess((*pv)[i]);
+  // 	gpMan->AddDiscreteProcess(new G4PolarizedGammaConversion);
+  //     }
+  //   }
+  // }
   
   // Beam Reaction
   AddReaction();
@@ -270,6 +267,11 @@ void PhysicsList::AddPhysicsList(const G4String& name)
     delete fEmPhysicsList;
     fEmPhysicsList = new G4EmLivermorePhysics();
 
+  } else if (name == "emlivermorepolarized") {
+    fEmName = name;
+    delete fEmPhysicsList;
+    fEmPhysicsList = new G4EmLivermorePolarizedPhysics();
+
   } else if (name == "empenelope") {
     fEmName = name;
     delete fEmPhysicsList;
@@ -306,7 +308,7 @@ void PhysicsList::AddReaction()
     G4ParticleDefinition* particle = particleIterator->value();
     G4String particleName = particle->GetParticleName();
     G4String particleType = particle->GetParticleType();
-    if ( particleType == "nucleus" )
+    if ( particleType == "nucleus" || particleName == "proton" )
       ph->RegisterProcess(react, particle);    
     ph->RegisterProcess(new G4StepLimiter, particle);
   }
@@ -425,11 +427,10 @@ void PhysicsList::SetGammaAngularCorrelations(bool val){
   G4cout<<"Set correlated gamma "<<val<<G4endl;
 }
 
-#ifdef POL
 void PhysicsList::SetUsePolarizedPhysics(bool use){
   usePolar=use;
 }
-#endif
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

@@ -45,6 +45,11 @@ void angCorr(){
   misoDelta->SetLineColor(kBlue);
   misoDelta->Draw("SAME");
 
+  TLegend* mDeltaLegend = new TLegend(0.3, 0.7, 0.7, 0.85);
+  mDeltaLegend->AddEntry(mDelta,"With Angular Correlations");
+  mDeltaLegend->AddEntry(misoDelta,"Isotropic");
+  mDeltaLegend->Draw();
+  
   c1->cd(3);
   mDelta->Sumw2();
   misoDelta->Sumw2();
@@ -71,6 +76,12 @@ void angCorr(){
   delta->Draw();
   isoDelta->SetLineColor(kBlue);
   isoDelta->Draw("SAME");
+
+  TLegend* deltaLegend = new TLegend(0.3, 0.7, 0.7, 0.85);
+  deltaLegend->AddEntry(delta,"With Angular Correlations");
+  deltaLegend->AddEntry(isoDelta,"Isotropic");
+  deltaLegend->Draw();
+
   
   c1->cd(4);
   deltamDelta->Draw("col");

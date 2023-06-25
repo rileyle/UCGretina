@@ -81,9 +81,7 @@ public:
 
   void SetGammaAngularCorrelations(bool);
 
-#ifdef POL
   void SetUsePolarizedPhysics(bool);
-#endif
 
 private:    
   G4VPhysicsConstructor* fEmPhysicsList;
@@ -94,9 +92,7 @@ private:
   Outgoing_Beam* BeamOut;
 
   PhysicsList_Messenger* theMessenger;
-#ifdef POL
   bool usePolar;
-#endif
 
 #ifdef NEUTRONS
     // From LBE for neutrons

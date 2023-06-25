@@ -117,14 +117,14 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
   // (by de-exciting the nucleus)
 
   if( def->GetParticleType() == "nucleus" &&
-      aTrack->GetParticleDefinition()->GetParticleName().contains('[') )
+      G4StrUtil::contains(aTrack->GetParticleDefinition()->GetParticleName(), '[') )
     eventInfo->AddBeta(aTrack->GetStep()->GetPostStepPoint()->GetBeta(),
 		       aTrack->GetTrackID());
 
   
   // if( def->GetParticleType() == "nucleus" &&
   //     aTrack->GetParentID() > 0 &&
-  //     aTrack->GetParticleDefinition()->GetParticleName().contains('[') )
+  //     G4StrUtil::contains(aTrack->GetParticleDefinition()->GetParticleName(), '[') )
   //   eventInfo->AddBeta(aTrack->GetStep()->GetPostStepPoint()->GetBeta(),
   // 		       aTrack->GetTrackID());
 

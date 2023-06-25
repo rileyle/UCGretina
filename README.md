@@ -4,14 +4,16 @@ Cite: [L.A.Riley, D.Weisshaar, H.L.Crawford et al., UCGretina GEANT4 simulation 
 
 ## Compile and install ##
 
-Install version [Geant4.11.0.p02 of the Geant4 libraries](https://geant4.web.cern.ch/geant4/support/download.shtml). You will need the data files for low energy electromagnetic processes, photon evaporation, and radioactive decay.
+***This branch has not been extensively tested. The code compiles, and the examples run with geant4.11.1.2.***
+
+Install version [Geant4.11.1.2 of the Geant4 libraries](https://geant4.web.cern.ch/download/all). You will need the data files for low energy electromagnetic processes, photon evaporation, and radioactive decay.
 
 The model of the GRETINA scanning table uses version 2.0.3 of the external [CADMesh](https://github.com/christopherpoole/cadmesh) package. 
 
 Set up your environment (consider adding this to your `.bashrc`):
 
     $ source <Path to Geant4>/bin/geant4.sh
-    $ source <Path to Geant4>/share/Geant4-11.0.2/geant4make/geant4make.sh
+    $ source <Path to Geant4>/share/Geant4-10.7.4/geant4make/geant4make.sh
 
 Compile:
 
@@ -29,10 +31,11 @@ To use the liquid hydrogen target:
 
 (produces the binary UCGretina_LH)
 
-To include EM and nuclear polarization in the physics list:
+To include nuclear polarization (alignment) of the reaction product in the `Reaction` class:
 
     $ make POL=1
 
+(produces the binary `UCGretina_Pol`)
 Implementation and validation of this capability is described here: [C. Morse, H. L. Crawford, A. O. Macchiavelli et al., The polarization sensitivity of GRETINA, Nucl. Instr. Meth. A1025, 166155 (2022)](https://doi.org/10.1016/j.nima.2021.166155)
 
 To activate neutron-related processes in the physics list (required for the `neutron` source type:
@@ -54,7 +57,7 @@ illustrations of fitting simulations to measured source and in-beam
 spectra. Makefiles are provided in the examples for sorting simulated
 mode 2 output with the
 [GRUTinizer](https://github.com/pcbend/GRUTinizer) and
-[GrROOT](http://nucl.phys.s.u-tokyo.ac.jp/wimmer/software.php)
+[GrROOT](https://github.com/wimmer-k/GrROOT)
 packages.
 
 ## Selected Macro File Commands ##
@@ -146,6 +149,7 @@ Optional command to include a model of the S800 quadrupole and gate valve:
 Gamma-ray angular correlations are built into the `G4PhotonEvaporation/G4GammaTransition` classes (starting with geant4.10.4). This functionality is disabled by default but can be enabled with: 
 
     /PhysicsList/AngularCorrelations true
+    /PhysicsList/SetGammaPolarization true
 
 The `./examples/sources/co60` example includes a simulation of the angular correlations in the 4 -> 2 -> 0 cascade in <SUP>60</SUP>Ni and also shows how to simulate isotropic distributions for comparison with correlated ones.
 
@@ -279,20 +283,20 @@ Optional commands related to the outgoing reaction product:
 
 > Turns off the Reaction process. This is required for simulations of stationary sources (with the /BeamOut/Source command) in which the `G4RadioactiveDecay` process manages gamma-ray emission. This can also be used for simulations of the beam passing through the target without reacting.
 
-### Gamma-Ray Angular Distributions (see also ./examples/inbeam/angdist) ###
+### Nuclear Alignment (Polarization) and Gamma-Ray Angular Distributions (see also ./examples/inbeam/angdist) ###
 
-The alignment of the excited reaction product can be specified in in-beam simulations, leading to a net polarization of emitted gamma rays and a corresponding non-isotropic gamma-ray angular distribution. This functionality is disabled by default but can be enabled by compiling with the POL= flag and using the commands:
+The alignment of the excited reaction product can be specified in in-beam simulations, leading to a net polarization of emitted gamma rays and a corresponding non-isotropic gamma-ray angular distribution. This functionality can be enabled by compiling with the `POL=1` flag (producing an executable named `UCGretina_Pol`).
 
-    /PhysicsList/AngularCorrelations true
-    /PhysicsList/SetGammaPolarization true
-
-(issued prior to the `/run/initialize` command)
-
-The alignment of the reaction product is specified (after the `/run/initialize` command) in terms of the population parameters P(m) of the magnetic substates, set using:
+The alignment of the reaction product must be specified (after the `/run/initialize` command) in terms of the population parameters P(m) of the magnetic substates, set using:
 
     /reaction/population <2m> <P(m)>
 
 where m = -J, -J+1, ..., J-1, J and the P(m) sum to 1. 
+
+It is also important to and include the commands (prior to the `/run/initialize` command):
+
+    /PhysicsList/AngularCorrelations true
+    /PhysicsList/SetGammaPolarization true
 
 ### Source Simulations (see also ./examples/eu152/eu152_gammas.mac) ###
 

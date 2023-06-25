@@ -101,8 +101,8 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
       = aStep->GetPostStepPoint()->GetTouchableHandle()->GetVolume();
 
     // Record S800 data as the reaction product leaves the target
-    if(   volume1->GetName().contains("Target")
-       && volume2->GetName() == "expHall" ){
+    if(   G4StrUtil::contains(volume1->GetName(), "Target")
+       && G4StrUtil::contains(volume2->GetName(), "expHall") ){
 
       G4ThreeVector pDir = aStep->GetTrack()->GetMomentumDirection();
 
@@ -127,16 +127,16 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
     }
     // Kill a reaction product once it hits the chamber or beamline
     // as long it has already emitted its gamma(s)
-    else if( ( volume1->GetName().contains("BeamTube")
-	       || volume1->GetName().contains("BeamTee")
-	       || volume1->GetName().contains("Cell")
-	       || volume1->GetName().contains("Bar")
-	       || volume1->GetName().contains("Chamber")
-	       || volume1->GetName().contains("sled")
-	       || volume1->GetName().contains("Frame")
-	       || volume1->GetName().contains("Tape")
-	       || volume1->GetName().contains("Ring") )
-	     && !aStep->GetTrack()->GetParticleDefinition()->GetParticleName().contains('[') ){
+    else if( ( G4StrUtil::contains(volume1->GetName(), "BeamTube")
+	       || G4StrUtil::contains(volume1->GetName(), "BeamTee")
+	       || G4StrUtil::contains(volume1->GetName(), "Cell")
+	       || G4StrUtil::contains(volume1->GetName(), "Bar")
+	       || G4StrUtil::contains(volume1->GetName(), "Chamber")
+	       || G4StrUtil::contains(volume1->GetName(), "sled")
+	       || G4StrUtil::contains(volume1->GetName(), "Frame")
+	       || G4StrUtil::contains(volume1->GetName(), "Tape")
+	       || G4StrUtil::contains(volume1->GetName(), "Ring") )
+	     && !G4StrUtil::contains(aStep->GetTrack()->GetParticleDefinition()->GetParticleName(), '[') ){
 
            // G4cout << "************************* SteppingAction: terminating track in "
       	   //   << volume1->GetName()
