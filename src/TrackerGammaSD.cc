@@ -95,19 +95,30 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
       ( particleName == "neutron" && processName == "hadElastic" ) )
     edep = phdA*pow(edep, phdB);
 
-  // Keep gamma parent that deposits no energy to mark interaction points
-  // (to preserve time ordering of hits when interaction points are built
-  //  in the EventAction).
+  // Keep gamma parent that deposits no energy to initialize interaction
+  // points. This preserves the time ordering of hits when interaction points
+  // are built from gamma hit collections from geant4 tracking in 
+  // the EventAction::EndOfEventAction() method. The gamma processes that
+  // lead to energy deposition are compt (Compton scattering), phot
+  // (Photoelectric effect), and conv (pair production). With the current
+  // physics lists, pair production is the only one of these that deposits
+  // no energy. 
   //
-  // With standard EM physics, gamma interactions typically deposit small
-  // amounts (hundredths to tenths of keV), but with polarized EM physics
-  // there are gamma interactions with zero energy deposition. In both
-  // cases, secondary tracks do most of the energy deposition.
+  // Transportation (transportation to the detector), annihil (e- e+
+  // annhilation), and Rayl (Rayleigh scattering) have zero energy deposition
+  // and also no proximal secondary tracks to consolidate with them. Keeping
+  // these in the mix can lead to zero-energy IPs in the output.
   //
-  // Transportation to the detector is the only creator process we do not
-  // want to potentially generate an IP. 
+  // msc (e-/e+ multiple scattering), eBrem (e-/e+ Bremsstrahlung),
+  // Radioactivation (accompanies pair production in an interaction with a
+  // nucleus, not clear why), and ionIoni (ionization of atoms in material)
+  // can safely be ignored in building IPs, because they are accomanied by
+  // lots of other proximal hits in secondary e-/e+ tracks.
   if(edep<0.001*eV
-     && processName == "Transportation") 
+     && (processName == "Transportation" || processName == "msc" ||
+	 processName == "eBrem" || processName == "Rayl" ||
+	 processName == "Radioactivation" || processName == "ionIoni" ||
+	 processName == "annihil"))
     return false;
 
   G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();

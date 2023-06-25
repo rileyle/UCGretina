@@ -45,12 +45,9 @@
 #include "G4EmStandardPhysicsGS.hh"
 #include "G4EmStandardPhysicsWVI.hh"
 #include "G4EmLivermorePhysics.hh"
+#include "G4EmLivermorePolarizedPhysics.hh"
 #include "G4EmPenelopePhysics.hh"
 #include "G4EmLowEPPhysics.hh"
-
-#include "G4PolarizedPhotoElectricEffect.hh"
-#include "G4PolarizedCompton.hh"
-#include "G4PolarizedGammaConversion.hh"
 
 #include "DetectorConstruction.hh"
 
@@ -165,26 +162,32 @@ void PhysicsList::ConstructProcess()
   
   // Electromagnetic physics list
   //
-  fEmPhysicsList->ConstructProcess();
-  
   if(usePolar){
-    G4ProcessManager *gpMan = G4Gamma::Gamma()->GetProcessManager();
-    G4ProcessVector* pv = gpMan->GetProcessList();
-    for(unsigned int i=0;i<pv->entries();i++){
-      if((*pv)[i]->GetProcessName()=="phot"){
-	gpMan->RemoveProcess((*pv)[i]);
-	gpMan->AddDiscreteProcess(new G4PolarizedPhotoElectricEffect);
-      }
-      if((*pv)[i]->GetProcessName()=="compt"){
-	gpMan->RemoveProcess((*pv)[i]);
-	gpMan->AddDiscreteProcess(new G4PolarizedCompton());
-      }
-      if((*pv)[i]->GetProcessName()=="conv"){
-	gpMan->RemoveProcess((*pv)[i]);
-	gpMan->AddDiscreteProcess(new G4PolarizedGammaConversion);
-      }
-    }
+    AddPhysicsList("emlivermorepolarized");
   }
+
+  fEmPhysicsList->ConstructProcess();
+
+  // Prior to using G4EmLivermorePolarizedPhysics
+  //
+  // if(usePolar){
+  //   G4ProcessManager *gpMan = G4Gamma::Gamma()->GetProcessManager();
+  //   G4ProcessVector* pv = gpMan->GetProcessList();
+  //   for(unsigned int i=0;i<pv->entries();i++){
+  //     if((*pv)[i]->GetProcessName()=="phot"){
+  // 	gpMan->RemoveProcess((*pv)[i]);
+  // 	gpMan->AddDiscreteProcess(new G4PolarizedPhotoElectricEffect);
+  //     }
+  //     if((*pv)[i]->GetProcessName()=="compt"){
+  // 	gpMan->RemoveProcess((*pv)[i]);
+  // 	gpMan->AddDiscreteProcess(new G4PolarizedCompton());
+  //     }
+  //     if((*pv)[i]->GetProcessName()=="conv"){
+  // 	gpMan->RemoveProcess((*pv)[i]);
+  // 	gpMan->AddDiscreteProcess(new G4PolarizedGammaConversion);
+  //     }
+  //   }
+  // }
   
   // Beam Reaction
   AddReaction();
@@ -263,6 +266,11 @@ void PhysicsList::AddPhysicsList(const G4String& name)
     fEmName = name;
     delete fEmPhysicsList;
     fEmPhysicsList = new G4EmLivermorePhysics();
+
+  } else if (name == "emlivermorepolarized") {
+    fEmName = name;
+    delete fEmPhysicsList;
+    fEmPhysicsList = new G4EmLivermorePolarizedPhysics();
 
   } else if (name == "empenelope") {
     fEmName = name;
