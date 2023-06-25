@@ -686,6 +686,15 @@ void EventAction::writeDecomp(long long int ts,
     }
   }
 
+  for(G4int i = 0; i < Ndecomp; i++)
+    if(crys_ips[i].num > MAX_INTPTS){
+      G4cout << "Warning: " << crys_ips[i].num << " interaction points."
+	     << "         only " << MAX_INTPTS << " can be written."
+	     << G4endl;
+      crys_ips[i].num = MAX_INTPTS;
+    }
+
+  
   if(mode2Out){
     //Construct GEB header for decomp event(s)
     gd.type = GEB_TYPE_DECOMP;
@@ -693,14 +702,6 @@ void EventAction::writeDecomp(long long int ts,
     gd.length = sizeof(CRYS_IPS);
 
     for(G4int i = 0; i < Ndecomp; i++){
-
-      if(crys_ips[i].num > MAX_INTPTS){
-	G4cout << "Warning: " << crys_ips[i].num << " interaction points."
-	       << "         only " << MAX_INTPTS << " can be written."
-	       << G4endl;
-	crys_ips[i].num = MAX_INTPTS;
-
-      }
 
       //Write GEB header for decomp event
       writeGEBHeader(&gd);
