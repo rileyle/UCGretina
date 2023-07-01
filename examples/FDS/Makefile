@@ -7,7 +7,9 @@ all:  eff1MeV_histos.root
 	UCGretina $*.mac | tee $*.log
 
 %_histos.root : %.dat
-	grutinizer -qH $*.dat -o /dev/null --hist-output $*_histos.root | tee $*_grut.log
+	grutinizer -qH $*.dat -o /dev/null \
+	${GRUTSYS}/lib/libMakeHistosSourcesSim.so \
+	--hist-output $*_histos.root | tee $*_grut.log
 	rm $*.dat
 
 clean:
