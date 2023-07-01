@@ -11,7 +11,7 @@ PhysicsList_Messenger::PhysicsList_Messenger(PhysicsList* pl):aPhysicsList(pl){
   CorrCmd->SetGuidance("Turn gamma-ray angular correlations on/off");
   CorrCmd->SetParameterName("choice",false);
   CorrCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-  
+
   PolCmd = new G4UIcmdWithABool("/PhysicsList/SetGammaPolarization",this);
   PolCmd->SetGuidance("Enable/disable polarized gamma-ray physics");
   PolCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
@@ -32,8 +32,10 @@ PhysicsList_Messenger::~PhysicsList_Messenger(){
 void PhysicsList_Messenger::SetNewValue(G4UIcommand* command, G4String newValue){
   if( command == CorrCmd)
     aPhysicsList->SetGammaAngularCorrelations(CorrCmd->GetNewBoolValue(newValue));
+
   if( command == PolCmd)
     aPhysicsList->SetUsePolarizedPhysics(PolCmd->GetNewBoolValue(newValue));
+
   if( command == AddCmd)
     aPhysicsList->AddPhysicsList(newValue);
 }

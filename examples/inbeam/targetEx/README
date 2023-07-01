@@ -4,9 +4,14 @@ Target Excitation Example
                    of the gold target.
 
 
+
 Important note: The lifetimes of excited states of the target must be
                 set to zero in order for the states to undergo gamma
                 decay before the beam particles leave the world
                 volume. Otherwise, gamma rays will be lost.
 		
-                
+
+Also included: simple_279.mac
+
+    Using a simple gamma-ray source to emit 279 keV gamma rays from
+    the center of the target

@@ -2575,8 +2575,6 @@ facet normal -0.000000 -1.000000 0.000000
       vertex -193.010391 673.099976 19.323381
     endloop
   endfacet
-solid Mesh
-    
   facet normal -0.000000 -1.000000 0.000000
     outer loop
       vertex -180.188751 673.099976 245.261246
@@ -2870,7 +2868,7 @@ solid Mesh
       vertex -158.929260 673.099976 0.265761
       vertex -193.966370 673.099976 17.015457
     endloop
-  endfacethighlight many line
+  endfacet
   facet normal 0.000000 -1.000000 0.000000
     outer loop
       vertex -159.994659 673.099976 -3.710354
@@ -42169,7 +42167,6 @@ facet normal 0.130529 -0.000000 0.991444
       vertex 175.476425 683.798462 -243.089737
     endloop
   endfacet
-solid Mesh
   facet normal 0.097503 0.664735 -0.740689
     outer loop
       vertex 177.800003 681.796936 -244.271805
@@ -46958,3 +46955,4 @@ solid Mesh
       vertex -177.800003 681.796936 -244.271805
     endloop
   endfacet
+endsolid Mesh

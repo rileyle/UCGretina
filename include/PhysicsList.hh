@@ -80,8 +80,9 @@ public:
   void GetRange(G4double);
 
   void SetGammaAngularCorrelations(bool);
+
   void SetUsePolarizedPhysics(bool);
-      
+
 private:    
   G4VPhysicsConstructor* fEmPhysicsList;
   G4String               fEmName;

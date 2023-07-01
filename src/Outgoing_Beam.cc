@@ -75,7 +75,7 @@ void Outgoing_Beam::setDecayProperties()
 
   for(size_t j = 0; j < DA.size(); j++){
     ionGS.push_back(ionTable->GetIon(Zin+DZ[j],Ain+DA[j],0.));
-    if(DA[j] == 0){
+    if(DA[j] == 0 && DZ[j] == 0){
       tarOutGS.push_back(tarIn);
     } else if(TarA-DA[j] == 1 && TarZ-DZ[j] ==1){
       tarOutGS.push_back(particleTable->FindParticle("proton"));
@@ -235,7 +235,9 @@ G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
   }
 
   // Relativistic kinematics ===================================================
-  //       Baldin et al, Kinematics of Nuclear Reactions, Pergamon (1961)
+  // R. E. Phillips and S. T. Thornton,
+  // A FORTRAN PROGRAM FOR RELATIVISTIC KINEMATIC CALCULATIONS IN TWO-BODY
+  // NUCLEAR REACTIONS, ORNL-4179, UC-34-Physics (1967)
 
   G4double E3Lab = 1/(ET*ET - p1*p1*cos(theta3)*cos(theta3))// Beam-like product
     *( ET*( m2*(KEIn + m1) + (m1*m1+m2*m2+m3*m3-m4*m4)/2. )

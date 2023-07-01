@@ -1,13 +1,15 @@
-all: au197_548_histos.root
+all: au197_548_histos.root    simple_279_histos.root
 	echo "Geant4 simulations done."
 
 # Pattern rules for running Geant4 simulations and sorting the output
 # into Root histograms
 %.dat : %.mac
-	UCGretina $*.mac | tee $*.log
+	UCGretina $*.mac 2>&1 | tee $*.log
 
 %_histos.root : %.dat
-	grutinizer gvalues.val -qH $*.dat -o /dev/null --hist-output $*_histos.root | tee $*_grut.log
+	grutinizer gvalues.val -qH $*.dat -o /dev/null \
+	${GRUTSYS}/lib/libMakeHistosInBeam.so \
+	--hist-output $*_histos.root 2>&1 | tee $*_grut.log
 	rm $*.dat
 
 clean:

@@ -83,6 +83,7 @@ G4VParticleChange* Reaction::PostStepDoIt(
 
 	BeamOut->SetReactionFlag(1);
 
+#ifdef POL
 	if(theProduct){
 	  //This is a bit heavy, but lets me get the excitation energy
 	  G4int Z = theProduct->GetParticleDefinition()->GetAtomicNumber();
@@ -95,6 +96,13 @@ G4VParticleChange* Reaction::PostStepDoIt(
 	  size_t index = 0;
 	  index = lman->NearestLevelIndex(Ex,index);
 	  G4int twoJ = lman->SpinTwo(index);
+	  if(substates.size() != (size_t)twoJ+1){
+	    G4cerr << "Error: Reaction population parameter count != 2J+1."
+		   << "\n  Use /reaction/population macro-file commands."
+		   << "\n  (required when UCGretina is compiled with POL=1)"
+		   << G4endl;
+	    exit(EXIT_FAILURE);
+	  }
 	  std::vector<std::vector<G4complex>> polV;
 	  polV.resize(twoJ+1);
 	  G4double cosTheta = aTrack.GetMomentumDirection().cosTheta();
@@ -113,6 +121,7 @@ G4VParticleChange* Reaction::PostStepDoIt(
 	  auto pol = nucPstore->FindOrBuild(frag.GetZ_asInt(),frag.GetA_asInt(),frag.GetExcitationEnergy());
 	  pol->SetPolarization(polV);
 	}
+#endif
 
       }
 

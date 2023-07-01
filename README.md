@@ -1,15 +1,17 @@
 # UCGretina #
 
+Cite: [L.A.Riley, D.Weisshaar, H.L.Crawford et al., UCGretina GEANT4 simulation of the GRETINA Gamma-Ray Energy Tracking Array, Nucl. Instr. Meth. A1003, 165305 (2021)](https://doi.org/10.1016/j.nima.2021.165305)
+
 ## Compile and install ##
 
-Install version [4.10.06.p01 of the Geant4 libraries](https://geant4.web.cern.ch/geant4/support/download.shtml). You will need the data files for low energy electromagnetic processes, photon evaporation, and radioactive decay.
+Install version [Geant4-10.7.4 of the Geant4 libraries](https://geant4.web.cern.ch/download/all). You will need the data files for low energy electromagnetic processes, photon evaporation, and radioactive decay.
 
-Simulating the LBL scanning table requires the external [CADMesh](https://github.com/christopherpoole/cadmesh) package. Paths to the CADMesh `include` and `lib` directories must be set in the GNUMakefile.
+The model of the GRETINA scanning table uses version 2.0.3 of the external [CADMesh](https://github.com/christopherpoole/cadmesh) package. 
 
 Set up your environment (consider adding this to your `.bashrc`):
 
     $ source <Path to Geant4>/bin/geant4.sh
-    $ source <Path to Geant4>/share/Geant4-10.6.1/geant4make/geant4make.sh
+    $ source <Path to Geant4>/share/Geant4-10.7.4/geant4make/geant4make.sh
 
 Compile:
 
@@ -26,6 +28,13 @@ To use the liquid hydrogen target:
     $ make LHTARGET=1
 
 (produces the binary UCGretina_LH)
+
+To include nuclear polarization (alignment) of the reaction product in the `Reaction` class:
+
+    $ make POL=1
+
+(produces the binary `UCGretina_Pol`)
+Implementation and validation of this capability is described here: [C. Morse, H. L. Crawford, A. O. Macchiavelli et al., The polarization sensitivity of GRETINA, Nucl. Instr. Meth. A1025, 166155 (2022)](https://doi.org/10.1016/j.nima.2021.166155)
 
 To activate neutron-related processes in the physics list (required for the `neutron` source type:
 
@@ -46,7 +55,7 @@ illustrations of fitting simulations to measured source and in-beam
 spectra. Makefiles are provided in the examples for sorting simulated
 mode 2 output with the
 [GRUTinizer](https://github.com/pcbend/GRUTinizer) and
-[GrROOT](http://nucl.phys.s.u-tokyo.ac.jp/wimmer/software.php)
+[GrROOT](https://github.com/wimmer-k/GrROOT)
 packages.
 
 ## Selected Macro File Commands ##
@@ -138,6 +147,7 @@ Optional command to include a model of the S800 quadrupole and gate valve:
 Gamma-ray angular correlations are built into the `G4PhotonEvaporation/G4GammaTransition` classes (starting with geant4.10.4). This functionality is disabled by default but can be enabled with: 
 
     /PhysicsList/AngularCorrelations true
+    /PhysicsList/SetGammaPolarization true
 
 The `./examples/sources/co60` example includes a simulation of the angular correlations in the 4 -> 2 -> 0 cascade in <SUP>60</SUP>Ni and also shows how to simulate isotropic distributions for comparison with correlated ones.
 
@@ -271,20 +281,20 @@ Optional commands related to the outgoing reaction product:
 
 > Turns off the Reaction process. This is required for simulations of stationary sources (with the /BeamOut/Source command) in which the `G4RadioactiveDecay` process manages gamma-ray emission. This can also be used for simulations of the beam passing through the target without reacting.
 
-### Gamma-Ray Angular Distributions (see also ./examples/inbeam/angdist) ###
+### Nuclear Alignment (Polarization) and Gamma-Ray Angular Distributions (see also ./examples/inbeam/angdist) ###
 
-The alignment of the excited reaction product can be specified in in-beam simulations, leading to a net polarization of emitted gamma rays and a corresponding non-isotropic gamma-ray angular distribution. This functionality is disabled by default but can be enabled with:
+The alignment of the excited reaction product can be specified in in-beam simulations, leading to a net polarization of emitted gamma rays and a corresponding non-isotropic gamma-ray angular distribution. This functionality can be enabled by compiling with the `POL=1` flag (producing an executable named `UCGretina_Pol`).
 
-    /PhysicsList/AngularCorrelations true
-    /PhysicsList/SetGammaPolarization true
-
-(issued prior to the `/run/initialize` command)
-
-The alignment of the reation product is specified (after the `/run/initialize` command) in terms of the population parameters P(m) of the magnetic substates, set using:
+The alignment of the reaction product must be specified (after the `/run/initialize` command) in terms of the population parameters P(m) of the magnetic substates, set using:
 
     /reaction/population <2m> <P(m)>
 
 where m = -J, -J+1, ..., J-1, J and the P(m) sum to 1. 
+
+It is also important to and include the commands (prior to the `/run/initialize` command):
+
+    /PhysicsList/AngularCorrelations true
+    /PhysicsList/SetGammaPolarization true
 
 ### Source Simulations (see also ./examples/eu152/eu152_gammas.mac) ###
 
@@ -300,7 +310,7 @@ Mandatory commands
 
 > The white source type emits gamma rays in a uniform energy distribution set with the `/Experiment/Source/setWhiteLowE` and `/Experiment/Source/setWhiteHighE` commands. The multiplicity of the white source is set with the `/Experiment/Source/setMultiplicity` command.
 
-> `eu152_peaks`, `co56_peaks`, and `photopeaks` sources produce selected gamma-rays from <SUP>152</SUP>Eu, <SUP>56</SUP>Co, and both, respectively. The gamma rays are emitted in equal quantities to facilitiate determining photopeak efficiencies by fitting the photopeaks directly.
+> `eu152_peaks`, `co56_peaks`, and `photopeaks` sources produce selected gamma-rays from <SUP>152</SUP>Eu, <SUP>56</SUP>Co, and both, respectively. The gamma rays are emitted in equal quantities to facilitate determining photopeak efficiencies by fitting the photopeaks directly.
 
 > _Note: The `eu152`, `co56`, `co60`, and `ra226` source types reproduce empirically-observed relative intensities. However, the total number of gamma rays simulated does not correspond to the number of decays of the source, because these simulated sources emit a single gamma-ray per event, while some gamma rays from these sources are emitted in cascades._
 
@@ -606,6 +616,6 @@ Run the macro file `vis/vis.mac` an interactive session:
 
 This generates a VRML 2 file named `g4_XX.wrl` which can be viewed with a VRML viewer (like view3dscene, FreeWRL, or mayavi2). Macro files are included for visualizing GRETA, the LBL scanning table, and the liquid-hydrogen target setups. These scripts must be run in a directory with soft links (`aclust`, `euler`, `aslice`, `asolid`, `awalls`) to the appropriate GRETINA geometry files.
 
-The macro file `./vis/trajectories.mac` illustrates how to add particle trajectories to visulatizations.
+The macro file `./vis/trajectories.mac` illustrates how to add particle trajectories to visualizations.
 
 Within mayavi2, the python scripts `./vis/mlab.animate.py` and `./vis/mlab.movie.py` can be run (File -> Run Python Script). The former animates the scene, and the latter saves the animation frames as a series of .png files which can be stitched together into an animated png or gif.

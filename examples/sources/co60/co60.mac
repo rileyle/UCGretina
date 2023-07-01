@@ -8,6 +8,7 @@
 
 # Gamma-ray angular correlation / polarization flags ===========================
 /PhysicsList/AngularCorrelations true
+/PhysicsList/SetGammaPolarization true
 
 # Initialize run manager =======================================================
 /run/initialize

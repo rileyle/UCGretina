@@ -9,8 +9,8 @@
 /BeamTube/Construct
 
 # Gamma-ray angular correlation / polarization flags ===========================
-/PhysicsList/AngularCorrelations false
-/PhysicsList/SetGammaPolarization false
+/PhysicsList/AngularCorrelations true
+/PhysicsList/SetGammaPolarization true
 
 # Initialize run manager =======================================================
 /run/initialize
@@ -32,6 +32,13 @@
 /BeamOut/AngDistSigmaA 0.006 rad
 /BeamOut/AngDistSigmaB 0.006 rad
 /BeamOut/Update
+
+# No alignment =================================================================
+/reaction/population 4   0.2
+/reaction/population 2   0.2
+/reaction/population 0   0.2
+/reaction/population -2  0.2
+/reaction/population -4  0.2
 
 # Print simulation parameters to stdout ========================================
 /Target/Report

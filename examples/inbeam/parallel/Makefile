@@ -5,10 +5,12 @@ all: parallel_histos.root
 # into Root histograms
 
 %.dat : %.mac
-	UCGretina $*.mac | tee $*.log
+	UCGretina $*.mac 2>&1 | tee $*.log
 
 %_histos.root : %.dat
-	grutinizer gvalues.val -qH $*.dat -o /dev/null --hist-output $*_histos.root | tee $*_grut.log
+	grutinizer gvalues.val -qH $*.dat -o /dev/null \
+	${GRUTSYS}/lib/libMakeHistosInBeam.so \
+	--hist-output $*_histos.root 2>&1 | tee $*_grut.log
 	rm $*.dat
 
 clean:

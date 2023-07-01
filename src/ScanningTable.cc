@@ -21,11 +21,9 @@ ScanningTable::ScanningTable()
   controllerY  = 0.0*mm;                   // geant4  z
   controllerZ  = 0.0*mm;                   // geant4  y
   controllerOffsetX = 0.0*mm;              // geant4 -x
-  //  controllerOffsetY = -44.45*mm + 16.5*mm; // geant4  z
   controllerOffsetY = -44.45*mm;           // geant4  z
   
   cloverZ = 0.0*mm;
-  //  cloverOffset = 343.88*mm; / Shield y position
   cloverOffset = 336.10*mm; // Mounts without shields
 
   collimatorRadius = 1.0*mm;
@@ -167,11 +165,12 @@ void ScanningTable::Construct(G4LogicalVolume* experimentalHall_log)
 	CADFileName += CartPart[i];
 	CADFileName += ".stl";
 
-	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
-				    (char*)"STL");
+	G4cout << "   " << CADFileName << G4endl;
+	auto mesh
+	  = CADMesh::TessellatedMesh::FromSTL((char*)CADFileName.data());
 	mesh->SetScale(mm);
 	mesh->SetOffset(G4ThreeVector(0., 0., 0.));
-	G4VSolid *Cart = mesh->TessellatedMesh();
+	G4VSolid *Cart = mesh->GetSolid();
 	Cart_log = new G4LogicalVolume(Cart, CartMaterial[i], 
 				       CartPart[i], 0, 0, 0);
 	if(i<37) {
@@ -217,12 +216,13 @@ void ScanningTable::Construct(G4LogicalVolume* experimentalHall_log)
 	CADFileName = CADModelPath + "/";
 	CADFileName += CartTopPart[i];
 	CADFileName += ".stl";
-	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
-				    (char*)"STL");
+	G4cout << "   " << CADFileName << G4endl;
+	auto mesh
+	  = CADMesh::TessellatedMesh::FromSTL((char*)CADFileName.data());
 	mesh->SetScale(mm);
 	mesh->SetOffset(G4ThreeVector(0., 0., 0.));
      
-	G4VSolid *CartTop = mesh->TessellatedMesh();
+	G4VSolid *CartTop = mesh->GetSolid();
 	
 	CartTop_log = new G4LogicalVolume(CartTop,
 					  CartTopMaterial[i], 
@@ -299,12 +299,13 @@ void ScanningTable::Construct(G4LogicalVolume* experimentalHall_log)
 	CADFileName = CADModelPath + "/";
 	CADFileName += ZSlitPart[i];
 	CADFileName += ".stl";
-	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
-				    (char*)"STL");
+	G4cout << "   " << CADFileName << G4endl;
+	auto mesh
+	  = CADMesh::TessellatedMesh::FromSTL((char*)CADFileName.data());
 	mesh->SetScale(mm);
 	mesh->SetOffset(G4ThreeVector(0., controllerZ, 0.));
      
-	G4VSolid *Slits = mesh->TessellatedMesh();
+	G4VSolid *Slits = mesh->GetSolid();
 	ZSlit_log = new G4LogicalVolume(Slits, ZSlitMaterial[i], 
 					ZSlitPart[i], 0, 0, 0);
 	if(i == 4 || i == 5)
@@ -424,8 +425,9 @@ void ScanningTable::Construct(G4LogicalVolume* experimentalHall_log)
 	CADFileName = CADModelPath + "/";
 	CADFileName += SlitZAssemblyPart[i];
 	CADFileName += ".stl";
-	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
-				    (char*)"STL");
+	G4cout << "   " << CADFileName << G4endl;
+	auto mesh
+	  = CADMesh::TessellatedMesh::FromSTL((char*)CADFileName.data());
 
         // Parts that translate
 	if((i != 0) && (   i < 5  || i == 5  || i == 7 || i == 8 
@@ -437,7 +439,7 @@ void ScanningTable::Construct(G4LogicalVolume* experimentalHall_log)
 	  mesh->SetOffset(G4ThreeVector(0., 0., 0.));
 	}
      
-	G4VSolid *SlitAssembly = mesh->TessellatedMesh();
+	G4VSolid *SlitAssembly = mesh->GetSolid();
 	SlitZAssembly_log = new G4LogicalVolume(SlitAssembly, 
 						SlitZAssemblyMaterial[i], 
 						SlitZAssemblyPart[i], 
@@ -724,8 +726,9 @@ void ScanningTable::Construct(G4LogicalVolume* experimentalHall_log)
 	CADFileName = CADModelPath + "/";
 	CADFileName += CollMountPart[i];
 	CADFileName += ".stl";
-	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
-				    (char*)"STL");
+	G4cout << "   " << CADFileName << G4endl;
+	auto mesh
+	  = CADMesh::TessellatedMesh::FromSTL((char*)CADFileName.data());
 	mesh->SetScale(mm);
 	if(i < 4)
 	  mesh->SetOffset(G4ThreeVector(-controllerX - controllerOffsetX,
@@ -737,7 +740,7 @@ void ScanningTable::Construct(G4LogicalVolume* experimentalHall_log)
 	else if (i > 14)
 	  mesh->SetOffset(G4ThreeVector(0., 0., 0.));
 
-	G4VSolid *CollMount = mesh->TessellatedMesh();
+	G4VSolid *CollMount = mesh->GetSolid();
 	CollMount_log = new G4LogicalVolume(CollMount, CollMountMaterial[i], 
 					    CollMountPart[i], 0, 0, 0);
 
@@ -842,12 +845,13 @@ void ScanningTable::Construct(G4LogicalVolume* experimentalHall_log)
 	CADFileName = CADModelPath + "/";
 	CADFileName += CloverElevatorPart[i];
 	CADFileName += ".stl";
-	CADMesh *mesh = new CADMesh((char*)CADFileName.data(),
-				    (char*)"STL");
+	G4cout << "   " << CADFileName << G4endl;
+	auto mesh
+	  = CADMesh::TessellatedMesh::FromSTL((char*)CADFileName.data());
 	mesh->SetScale(mm);
 	mesh->SetOffset(G4ThreeVector(0., cloverZ, 0.));
      
-	G4VSolid *CloverElevator = mesh->TessellatedMesh();
+	G4VSolid *CloverElevator = mesh->GetSolid();
 
 	CloverElevator_log = new G4LogicalVolume(CloverElevator,
 						 CloverElevatorMaterial[i], 
@@ -987,12 +991,13 @@ void ScanningTable::Construct(G4LogicalVolume* experimentalHall_log)
     VisShield->SetForceWireframe(true);
 
     CADFileName = CADModelPath + "/Shield-Right.stl";
-    CADMesh *meshCloverRightShield = new CADMesh((char*)CADFileName.data(), 
-						 (char*)"STL");
+    G4cout << "   " << CADFileName << G4endl;
+    auto meshCloverRightShield
+	  = CADMesh::TessellatedMesh::FromSTL((char*)CADFileName.data());
     meshCloverRightShield->SetScale(mm);
     meshCloverRightShield->SetOffset(G4ThreeVector(0., controllerZ, 0.));
 
-    G4VSolid *CloverRightShield = meshCloverRightShield->TessellatedMesh();
+    G4VSolid *CloverRightShield = meshCloverRightShield->GetSolid();
     CloverRightShield_log = new G4LogicalVolume(CloverRightShield, 
 						materialCloverShield, 
 						"CloverRightShield_log", 
@@ -1020,12 +1025,13 @@ void ScanningTable::Construct(G4LogicalVolume* experimentalHall_log)
     // 	   << G4endl;
 
     CADFileName = CADModelPath + "/Shield-Left.stl";
-    CADMesh *meshCloverLeftShield = new CADMesh((char*)CADFileName.data(), 
-						(char*)"STL");
+    G4cout << "   " << CADFileName << G4endl;
+    auto meshCloverLeftShield
+	  = CADMesh::TessellatedMesh::FromSTL((char*)CADFileName.data());
     meshCloverLeftShield->SetScale(mm);
     meshCloverLeftShield->SetOffset(G4ThreeVector(0., controllerZ, 0.));
 
-    G4VSolid *CloverLeftShield = meshCloverLeftShield->TessellatedMesh();
+    G4VSolid *CloverLeftShield = meshCloverLeftShield->GetSolid();
     CloverLeftShield_log = new G4LogicalVolume(CloverLeftShield, 
 					       materialCloverShield, 
 					       "CloverLeftShield_log", 

@@ -1,3 +1,4 @@
+#ifdef POL
 //
 // ********************************************************************
 // * License and Disclaimer                                           *
@@ -432,3 +433,4 @@ void G4ITDecay::DumpNuclearInfo()
          << "% and Q value " << transitionQ << G4endl;
 }
 
+#endif

@@ -134,8 +134,10 @@ void TrackerIonSD::EndOfEvent(G4HCofThisEvent* HCE)
        std::ios init(NULL);
        init.copyfmt(G4cout);
 
+       G4RunManager* runManager = G4RunManager::GetRunManager();
+
        G4cout<<G4endl;
-       G4cout << "-------->Hits Collection: in this event there are "
+       G4cout << "--------> event " << runManager->GetCurrentEvent()->GetEventID() << ", "
 	      << NbHits
 	      << " hits for ion tracking: " << G4endl;
 

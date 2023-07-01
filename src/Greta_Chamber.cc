@@ -3,6 +3,7 @@
 
 Greta_Chamber::Greta_Chamber()
 {
+
   Rmin = 178.5*mm;
   Rmax = 180.0*mm;
 
@@ -13,6 +14,7 @@ Greta_Chamber::Greta_Chamber()
   ChamberMaterial = G4Material::GetMaterial("Al");
 
   Cutaway = false;
+
 }
 
 Greta_Chamber::~Greta_Chamber()

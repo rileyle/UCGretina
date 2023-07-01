@@ -1021,6 +1021,9 @@ void Gretina_Array::ConstructGeCrystals()
     
     pPg->pDetVA  = new G4VisAttributes( G4Color(pPg->colx, pPg->coly, pPg->colz) );
 
+    //pPg->pDetVA  = new G4VisAttributes( G4Color(1, 1, 1) );   // to see passive layers
+    //pPg->pDetVA->SetForceWireframe(true);                     // to see passive layers
+    
     G4double zFace1 = pPg->zFace1;
     
     pPg->pDetL1 = NULL;
@@ -1570,10 +1573,16 @@ void Gretina_Array::ConstructTheWalls()
       else
 	pPg->pDetL  = new G4LogicalVolume( pPg->pPoly, matBackWalls, G4String(sName), 0, 0, 0 );
 
-      //      pPg->pDetVA = new G4VisAttributes( G4Colour(0.5, 0.5, 0.5) );
       pPg->pDetVA = new G4VisAttributes( G4Colour(1, 1, 1) );
-      pPg->pDetVA->SetForceWireframe(true);
-      pPg->pDetL->SetVisAttributes( pPg->pDetVA );
+      if(nPg >=18 && matBackWallsName == "G4_Galactic"){
+	G4VisAttributes* invis
+	  = new G4VisAttributes( G4Color(1, 1, 1) );
+	invis->SetVisibility(false);
+	pPg->pDetL->SetVisAttributes( invis );
+      } else {
+	pPg->pDetVA->SetForceWireframe(true);
+	pPg->pDetL->SetVisAttributes( pPg->pDetVA );
+      }
 
       ngen++;
     }

@@ -13,7 +13,6 @@
 #include <TLine.h>
 
 #include "TGretina.h"
-#include "TBank29.h"
 #include "TS800.h"
 #include "TS800Sim.h"
 #include "TGretSim.h"
@@ -65,8 +64,7 @@ extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
   InitMap();
   TGretina *gretina = obj.GetDetector<TGretina>();
-  TBank29  *bank29  = obj.GetDetector<TBank29>();
-  TS800    *s800    = obj.GetDetector<TS800>();
+  //  TS800    *s800    = obj.GetDetector<TS800>();
   TS800Sim *s800Sim = obj.GetDetector<TS800Sim>();
   TGretSim *gretSim = obj.GetDetector<TGretSim>();
 
@@ -78,7 +76,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   Double_t energyUlim = 8192.;
 
   if(gretSim){
-    for(int x=0; x<gretSim->Size(); x++){
+    for(unsigned int x=0; x<gretSim->Size(); x++){
       TGretSimHit hit = gretSim->GetGretinaSimHit(x);
       obj.FillHistogram("sim","emitted_energy",
 			energyNChannels, energyLlim, energyUlim,
@@ -186,7 +184,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   Double_t calorimeterEnergy_gaus = 0.;
   std::vector<TGretinaHit> hits;
   
-  for(int x=0; x<gretina->Size(); x++){
+  for(unsigned int x=0; x<gretina->Size(); x++){
 
     TGretinaHit hit = gretina->GetGretinaHit(x);
 
@@ -223,11 +221,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
     for(int i=0; i<nBetas; i++){
 
       // Symmetrized gamma-gamma
-      Double_t e1 = hit.GetDoppler_2(betas[i])*gRandom->Gaus(1,1./1000.);
-      for(int y=x+1; y<gretina->Size(); y++){
+      Double_t e1 = hit.GetDoppler(betas[i])*gRandom->Gaus(1,1./1000.);
+      for(unsigned int y=x+1; y<gretina->Size(); y++){
 
 	TGretinaHit hit2 = gretina->GetGretinaHit(y);
-	Double_t e2 = hit2.GetDoppler_2(betas[i])*gRandom->Gaus(1,1./1000.);
+	Double_t e2 = hit2.GetDoppler(betas[i])*gRandom->Gaus(1,1./1000.);
       
 	obj.FillHistogram("energy",
 			  Form("gamma_gamma_dop_%.0f_gaus", betas[i]*10000),
@@ -242,23 +240,23 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogram("energy",
 			Form("dop_%.0f", betas[i]*10000),
 			energyNChannels, energyLlim, energyUlim,
-			hit.GetDoppler_2(betas[i]));
+			hit.GetDoppler(betas[i]));
 
       obj.FillHistogram("energy",
 			Form("dop_%.0f_gaus", betas[i]*10000),
 			energyNChannels, energyLlim, energyUlim,
-			hit.GetDoppler_2(betas[i])*gRandom->Gaus(1,1./1000.));
+			hit.GetDoppler(betas[i])*gRandom->Gaus(1,1./1000.));
 
       if(hit.GetHoleNumber() < 10){
 	obj.FillHistogram("energy",
 			  Form("dop_fw_%.0f_gaus", betas[i]*10000),
 			  energyNChannels, energyLlim, energyUlim,
-			  hit.GetDoppler_2(betas[i])*gRandom->Gaus(1,1./1000.));
+			  hit.GetDoppler(betas[i])*gRandom->Gaus(1,1./1000.));
       } else {
 	obj.FillHistogram("energy",
 			  Form("dop_bw_%.0f_gaus", betas[i]*10000),
 			  energyNChannels, energyLlim, energyUlim,
-			  hit.GetDoppler_2(betas[i])*gRandom->Gaus(1,1./1000.));
+			  hit.GetDoppler(betas[i])*gRandom->Gaus(1,1./1000.));
       }
     }
     
@@ -302,10 +300,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
     // CAUTION: This clustering includes neighbors of neighbors!
     std::vector<TGretinaHit> cluster;
     cluster.push_back(currentHit);
-    int lastClusterSize = 0;
+    unsigned int lastClusterSize = 0;
     while(lastClusterSize < cluster.size()){
-      for(int i = 0; i < cluster.size(); i++){
-	for(int j = 0; j < hits.size(); j++){
+      for(unsigned int i = 0; i < cluster.size(); i++){
+	for(unsigned int j = 0; j < hits.size(); j++){
 	  TVector3 distance = cluster[i].GetCrystalPosition()
 	                       - hits[j].GetCrystalPosition();
 
@@ -328,23 +326,24 @@ void MakeHistograms(TRuntimeObjects& obj) {
     Double_t addbackEnergy = 0.;
     Double_t addbackEnergy_gaus = 0.;
     TVector3 firstHitPos;
-    Int_t firstHitHoleNum;
+    Int_t firstHitHoleNum = -1;
     Double_t firstHitEnergy = 0;
-    for(int i = 0; i < cluster.size(); i++){
+    for(unsigned int i = 0; i < cluster.size(); i++){
       addbackEnergy += cluster[i].GetCoreEnergy();
       addbackEnergy_gaus +=
 	cluster[i].GetCoreEnergy()*gRandom->Gaus(1,1./1000.);
 
       // Find the largest IP in the cluster and save its position
       // for Doppler correction.
-      if(cluster[i].GetSegmentEng(cluster[i].GetFirstIntPoint())
-	 > firstHitEnergy){
+      //      if(cluster[i].GetSegmentEng(cluster[i].GetFirstIntPoint())
+      //	 > firstHitEnergy){
+      if(cluster[i].GetIntAssignEng(0) > firstHitEnergy){
 	firstHitHoleNum = cluster[i].GetHoleNumber();
-	firstHitPos = cluster[i].GetInteractionPosition(cluster[i].GetFirstIntPoint()) - targetOffset;
-	firstHitEnergy = cluster[i].GetSegmentEng(cluster[i].GetFirstIntPoint());
+	firstHitPos = cluster[i].GetIntPosition(0) - targetOffset;
+	firstHitEnergy = cluster[i].GetIntAssignEng(0);
       }
       
-      for(int j = i+1; j < cluster.size(); j++){
+      for(unsigned int j = i+1; j < cluster.size(); j++){
 	TVector3 distance =   cluster[i].GetCrystalPosition()
 	                    - cluster[j].GetCrystalPosition();
 	if(distance.Mag() < 80.) neighbors++;

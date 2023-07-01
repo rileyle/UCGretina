@@ -372,13 +372,21 @@ void EventAction::EndOfEventAction(const G4Event* ev)
       // is deposited in a single crystal
       // (only evaluated for emitted multiplicity = 1 events).
       if( eventInfo->GetNEmittedGammas() == 1 ){
-	if( singleDetector &&
-	    (totalEdep - eventInfo->GetEmittedGammaEnergy(0))
-	    *(totalEdep - eventInfo->GetEmittedGammaEnergy(0)) 
-	    < 0.001*keV*0.001*keV )
+
+	G4double delta = totalEdep - eventInfo->GetEmittedGammaEnergy(0);
+
+	// Threshold due to discrepancies in energy deposited by recoiling
+	// Ge nuclei in pair-production events. (There are also tiny
+	// discrepancies that can be positive or negative which may be
+	// due to roundoff or some other error somewhere in geant4 tracking.
+	// The upper bound of 0.0001 keV covers those.)
+	G4double delta_th = 6.318E-5*eventInfo->GetEmittedGammaEnergy(0) + .074;
+
+	if( singleDetector && delta > -delta_th && delta < 0.0001 )
 	  eventInfo->SetFullEnergy(1);
 	else
 	  eventInfo->SetFullEnergy(0);
+
       }
 
       // Coordinate transformations
@@ -627,6 +635,15 @@ void EventAction::writeDecomp(long long int ts,
     }
   }
 
+  for(G4int i = 0; i < Ndecomp; i++)
+    if(crys_ips[i].num > MAX_INTPTS){
+      G4cout << "Warning: " << crys_ips[i].num << " interaction points."
+	     << "         only " << MAX_INTPTS << " can be written."
+	     << G4endl;
+      crys_ips[i].num = MAX_INTPTS;
+    }
+
+  
   if(mode2Out){
     //Construct GEB header for decomp event(s)
     gd.type = GEB_TYPE_DECOMP;
@@ -634,14 +651,6 @@ void EventAction::writeDecomp(long long int ts,
     gd.length = sizeof(CRYS_IPS);
 
     for(G4int i = 0; i < Ndecomp; i++){
-
-      if(crys_ips[i].num > MAX_INTPTS){
-	G4cout << "Warning: " << crys_ips[i].num << " interaction points."
-	       << "         only " << MAX_INTPTS << " can be written."
-	       << G4endl;
-	crys_ips[i].num = MAX_INTPTS;
-
-      }
 
       //Write GEB header for decomp event
       writeGEBHeader(&gd);
