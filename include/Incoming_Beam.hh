@@ -25,6 +25,7 @@ public:
   void setKE(G4double);
   void setKEu(G4double); 
   void setDTAFile(G4String);
+  void setMomentumDistribution(G4String d){momDist=d;}
   void setfcX(G4double);
   void setfcDX(G4double);
   void setfcY(G4double);
@@ -56,6 +57,7 @@ private:
   G4double KEu;
   G4String dtaFileName;
   G4double dta[1000];
+  G4String momDist;
   G4int Ndta;
   G4double dtaMin;
   G4double dtaMax;

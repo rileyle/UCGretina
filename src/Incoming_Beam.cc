@@ -11,6 +11,7 @@ Incoming_Beam::Incoming_Beam()
   KEu=0;
   KE=KEu*A;
   dtaFileName = "";
+  momDist = "flat";
   Ndta = 0;
   dtaMin = 0.;
   dtaMax = 0.;
@@ -46,6 +47,7 @@ void Incoming_Beam::Report()
     G4cout<<"----> KE per nucleon of the incoming beam set to "<<
       G4BestUnit(KEu,"Energy")<<G4endl;
   G4cout<<"----> momentum acceptance for the incoming beam set to  "<<Dpp<< G4endl;
+  G4cout<<"----> momentum distribution set to "<<momDist<< G4endl;
   G4cout<<"----> focal point X position for the incoming beam set to  "<<G4BestUnit(fcX,"Length")<< G4endl;
   G4cout<<"----> focal point DX size for the incoming beam set to  "<<G4BestUnit(fcDX,"Length")<< G4endl;
   G4cout<<"----> focal point Y position for the incoming beam set to  "<<G4BestUnit(fcY,"Length")<< G4endl;
@@ -248,8 +250,17 @@ G4double Incoming_Beam::getKE(G4ParticleDefinition *ion)
 
   dynamic=G4DynamicParticle(ion,momentum_vector,ke);
   momentum=dynamic.GetTotalMomentum();
-  rand=G4UniformRand()-0.5;
-  momentum*=(1+rand*Dpp);
+
+  if(momDist == "flat"){
+    rand=G4UniformRand()-0.5;
+    momentum*=(1+rand*Dpp);
+  } else if(momDist == "Gaussian") {
+     momentum = CLHEP::RandGauss::shoot(momentum, momentum*Dpp);
+  } else {
+    G4cerr << "Momentum distribution set to something other than flat or Gaussian." << G4endl;
+    exit(EXIT_FAILURE);
+  }
+  
   momentum_vector.setMag(momentum);
   //  dynamic.SetMomentum(momentum); //LR (Change to CLHEP library Hep3Vector)
   dynamic.SetMomentum(momentum_vector);

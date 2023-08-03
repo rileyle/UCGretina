@@ -41,6 +41,11 @@ Incoming_Beam_Messenger::Incoming_Beam_Messenger(Incoming_Beam* BI)
   dtaCmd->SetParameterName("choice",false);
   dtaCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  pdCmd = new G4UIcmdWithAString("/BeamIn/momentumDistribution",this);
+  pdCmd->SetGuidance("Set the distribution type for momentum of the incoming beam (flat or Gaussian).");
+  pdCmd->SetParameterName("choice",false);
+  pdCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   fcXCmd = new G4UIcmdWithADoubleAndUnit("/BeamIn/Focus/X",this);
   fcXCmd->SetGuidance("Set focal point X position for the incoming beam.");
   fcXCmd->SetParameterName("choice",false);
@@ -114,6 +119,7 @@ Incoming_Beam_Messenger::~Incoming_Beam_Messenger()
   delete KEuCmd;
   delete KECmd;
   delete dtaCmd;
+  delete pdCmd;
   delete RepCmd;
   delete ZCmd;
   delete ACmd;
@@ -138,6 +144,8 @@ void Incoming_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamIn->setKEu(KEuCmd->GetNewDoubleValue(newValue));}
   if( command == dtaCmd )
     { BeamIn->setDTAFile(newValue);}
+  if( command == pdCmd )
+    { BeamIn->setMomentumDistribution(newValue);}
   if( command == DppCmd )
     { BeamIn->setDpp(DppCmd->GetNewDoubleValue(newValue));}
   if( command == fcXCmd )

@@ -179,6 +179,10 @@ Optional commands related to the incoming beam:
 
 > Momentum acceptance (dp/p) for the incoming beam. (Set this to 0 if you are providing the dta spectrum of the incoming beam using the `/BeamIn/dtaFile` command.)
 
+    /BeamIn/momentumDistribution <type>
+
+> Type of momentum distribution for the incoming beam (`flat` or `Gaussian`). With the `flat` type, the Dpp parameter sets the full width of the distribution. With the `Gaussian` type, the value of Dpp sets the sigma parameter of the distribution.
+
     /BeamIn/dtaFile <filename>
 
 > file name for the dta spectrum of the incoming beam. This is a text file with format: 
