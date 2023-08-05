@@ -12,6 +12,7 @@ Incoming_Beam::Incoming_Beam()
   KE=KEu*A;
   dtaFileName = "";
   momDist = "flat";
+  posDist = "flat";
   Ndta = 0;
   dtaMin = 0.;
   dtaMax = 0.;
@@ -47,12 +48,13 @@ void Incoming_Beam::Report()
     G4cout<<"----> KE per nucleon of the incoming beam set to "<<
       G4BestUnit(KEu,"Energy")<<G4endl;
   G4cout<<"----> momentum acceptance for the incoming beam set to  "<<Dpp<< G4endl;
-  G4cout<<"----> momentum distribution set to "<<momDist<< G4endl;
+  G4cout<<"----> momentum distribution type set to "<<momDist<< G4endl;
   G4cout<<"----> focal point X position for the incoming beam set to  "<<G4BestUnit(fcX,"Length")<< G4endl;
   G4cout<<"----> focal point DX size for the incoming beam set to  "<<G4BestUnit(fcDX,"Length")<< G4endl;
   G4cout<<"----> focal point Y position for the incoming beam set to  "<<G4BestUnit(fcY,"Length")<< G4endl;
   G4cout<<"----> focal point DY size for the incoming beam set to  "<<G4BestUnit(fcDY,"Length")<< G4endl;
   G4cout<<"----> focal point Z position for the incoming beam set to  "<<G4BestUnit(fcZ,"Length")<< G4endl;
+  G4cout<<"----> position distribution type set to "<<posDist<< G4endl;
   G4cout<<"----> dispersive direction angular divergence for the incoming beam set to  "<<maxAta/mrad<<" mrad = "<<maxAta/deg<<" deg"<< G4endl;
   G4cout<<"----> non dispersive direction angular divergence for the incoming beam set to  "<<maxBta/mrad<<" mrad = "<<maxBta/deg<<" deg"<< G4endl;
 }
@@ -217,9 +219,17 @@ G4ThreeVector Incoming_Beam::getPosition()
   r=G4UniformRand()+G4UniformRand();
   if(r>=1) r=-(r-2.);
 
-  x=fcX+r*cos(phi)*fcDX/2.;
-  y=fcY+r*sin(phi)*fcDY/2.;
-
+  if(posDist == "flat"){
+    x=fcX+r*cos(phi)*fcDX/2.;
+    y=fcY+r*sin(phi)*fcDY/2.;
+  } else if(posDist == "Gaussian") {
+    x=CLHEP::RandGauss::shoot(fcX+r*cos(phi), fcDX);
+    y=CLHEP::RandGauss::shoot(fcY+r*sin(phi), fcDY);
+  } else {
+    G4cerr << "Position distribution set to something other than flat or Gaussian." << G4endl;
+    exit(EXIT_FAILURE);
+  }
+  
   //At emission point!!! (Macro file command names are misleading.)
   position.setX(x);
   position.setY(y);

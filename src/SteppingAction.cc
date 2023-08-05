@@ -120,9 +120,9 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
 			  - eventAction->GetS800KE())
 			  / eventAction->GetS800KE() ); 
 
-      // YTA is horizontal position on target (meters), 
+      // YTA is horizontal position on target (mm), 
       // South is + in NSCL coords = -x in Geant4 coords
-      eventInfo->SetYTA( -aStep->GetTrack()->GetStep()->GetPreStepPoint()->GetPosition().getX()/meter );
+      eventInfo->SetYTA( -aStep->GetTrack()->GetStep()->GetPreStepPoint()->GetPosition().getX()*mm );
 
     }
     // Kill a reaction product once it hits the chamber or beamline
