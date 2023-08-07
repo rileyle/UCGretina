@@ -180,6 +180,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       G4double depth;
     
       //Reactions in the target
+#ifdef LHTARGET
       TC = myDetector->GetTargetPos()->getZ(); // Z position of the target center
 
       // Intersection of the beam trajectory with the central plane of the target
@@ -189,12 +190,31 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       // Distance along current trajectory in the target volume
       TT = myDetector->GetTarget()->DistanceToOut(mid, direction)
 	+ myDetector->GetTarget()->DistanceToOut(mid, -direction);
+#else
+      // This works in general ...
+      TT = myDetector->GetTarget()->DistanceToIn(position, direction);
+      TT = myDetector->GetTarget()->DistanceToOut(position+TT*direction, 
+						  direction);
+      TT *= direction.getZ();
+
+      // ... but this may be faster, and approximately correct for 
+      // a flat target.
+      //	  TT= myDetector->GetTargetThickness();
+
+      TC=myDetector->GetTargetPos()->getZ();
+      depth=TC+TT*(G4UniformRand()-0.5);
+#endif
 
       // Z position of the reaction point
       depth=TC+TT*(G4UniformRand()-0.5);
-
       myDetector->setTargetReactionDepth(depth);
 
+      // G4cout << "**** center = " << TC
+      // 	     << ", direction = " << direction
+      // 	     << ", thickness along trajectory = " << TT
+      // 	     << ", depth = " << depth
+      // 	     << G4endl;
+      
     }
 
   //  G4cout<<" +++++ Generating an event "<<G4endl;
