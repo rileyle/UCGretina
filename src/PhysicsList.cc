@@ -46,8 +46,15 @@
 #include "G4EmStandardPhysicsWVI.hh"
 #include "G4EmLivermorePhysics.hh"
 #include "G4EmLivermorePolarizedPhysics.hh"
+#include "G4LivermorePolarizedPhotoElectricModel.hh"
+#include "G4LivermorePolarizedComptonModel.hh"
+#include "G4LivermorePolarizedGammaConversionModel.hh"
+#include "G4LivermorePolarizedRayleighModel.hh"
+#include "G4LivermorePhotoElectricModel.hh"
+#include "G4PhotoElectricAngularGeneratorPolarized.hh"
 #include "G4EmPenelopePhysics.hh"
 #include "G4EmLowEPPhysics.hh"
+#include "G4EmConfigurator.hh"
 
 #include "DetectorConstruction.hh"
 
@@ -168,6 +175,29 @@ void PhysicsList::ConstructProcess()
 
   fEmPhysicsList->ConstructProcess();
 
+  if(usePolar){
+    G4LossTableManager* man = G4LossTableManager::Instance();
+    G4EmConfigurator* em_config = man->EmConfigurator();
+    G4double livEnergyLimit = 1*GeV;
+
+    // Add Livermore EM Processes
+    G4VEmModel* mod = new G4LivermorePhotoElectricModel();
+    mod->SetAngularDistribution(new G4PhotoElectricAngularGeneratorPolarized());
+    em_config->SetExtraEmModel("gamma", "phot", mod);
+
+    G4VEmModel* comptLiv = new G4LivermorePolarizedComptonModel();
+    comptLiv->SetHighEnergyLimit(livEnergyLimit);
+    em_config->SetExtraEmModel("gamma", "compt", comptLiv);
+
+    G4VEmModel* convLiv = new G4LivermorePolarizedGammaConversionModel();
+    convLiv->SetHighEnergyLimit(livEnergyLimit);
+    em_config->SetExtraEmModel("gamma", "conv", convLiv);
+
+    G4VEmModel* theRay = new G4LivermorePolarizedRayleighModel();
+    em_config->SetExtraEmModel("gamma", "Rayl", theRay);
+    
+  }
+  
   // Prior to using G4EmLivermorePolarizedPhysics
   //
   // if(usePolar){
