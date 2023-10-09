@@ -165,6 +165,7 @@ void EventAction::EndOfEventAction(const G4Event* ev)
       G4double X0[100*MAX_INTPTS];
       G4double Y0[100*MAX_INTPTS];
       G4double Z0[100*MAX_INTPTS];
+      G4double globalTime[100*MAX_INTPTS];
       G4int NCons[100*MAX_INTPTS];
       G4double packingRes2 = packingRes*packingRes;
 
@@ -193,6 +194,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	G4double en  = (*gammaCollection)[i]->GetEdep()/keV;
 	totalEdep += en;
 
+	G4double gt  = (*gammaCollection)[i]->GetGlobalTime()*1.e3;
+	
 	NCons[i] = -1;
 	G4bool processed = false;	
 
@@ -232,6 +235,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	    Y0[NMeasured] = (*gammaCollection)[i]->GetPos().getY()/mm;
 	    Z0[NMeasured] = (*gammaCollection)[i]->GetPos().getZ()/mm;
 
+	    globalTime[NMeasured] = (*gammaCollection)[i]->GetGlobalTime()*1.e3;
+	    
 	    NCons[NMeasured] = 1;
 	    NMeasured++;
 	    processed = true;
@@ -264,11 +269,23 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 		&& (*gammaCollection)[i]->GetDetNumb() == detNum[j]){        // same crystal
 
 	      // Energy-weighted average position (barycenter)
-	      measuredX[j] = (measuredEdep[j]*measuredX[j] + en*x)/(measuredEdep[j] + en);
-	      measuredY[j] = (measuredEdep[j]*measuredY[j] + en*y)/(measuredEdep[j] + en);
-	      measuredZ[j] = (measuredEdep[j]*measuredZ[j] + en*z)/(measuredEdep[j] + en);
-	      measuredEdep[j] += en;
+	      if(measuredEdep[j] == 0 && en == 0){
+		// G4cout << "    Both energies are zero. Taking the average." << G4endl;
+		measuredX[j]  = (measuredX[j] + x)/2.;
+		measuredY[j]  = (measuredY[j] + y)/2.;
+		measuredZ[j]  = (measuredZ[j] + z)/2.;
+		
+		globalTime[j] = (globalTime[j] + gt)/2.;
+	      } else {
+		// G4cout << "    Calculating a weighted average." << G4endl;
+		measuredX[j] = (measuredEdep[j]*measuredX[j] + en*x)/(measuredEdep[j] + en);
+		measuredY[j] = (measuredEdep[j]*measuredY[j] + en*y)/(measuredEdep[j] + en);
+		measuredZ[j] = (measuredEdep[j]*measuredZ[j] + en*z)/(measuredEdep[j] + en);
+		measuredEdep[j] += en;
 
+		globalTime[j] = (measuredEdep[j]*globalTime[j] + en*gt)/(measuredEdep[j] + en);
+	      }
+	      
 	      NCons[j]++;
 	      processed = true;
 	      
@@ -299,6 +316,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	  X0[NMeasured] = (*gammaCollection)[i]->GetTrackOrigin().getX()/mm;
 	  Y0[NMeasured] = (*gammaCollection)[i]->GetTrackOrigin().getY()/mm;
 	  Z0[NMeasured] = (*gammaCollection)[i]->GetTrackOrigin().getZ()/mm;
+
+	  globalTime[NMeasured] = (*gammaCollection)[i]->GetGlobalTime()*1.e3;
 
 	  NCons[NMeasured] = 1;
 	  NMeasured++;
@@ -335,11 +354,20 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	      &&  (NCons[i] > 0 && NCons[j] > 0) ){  // not already consolidated
 
 	    // Energy-weighted average
-	    measuredX[i] = (measuredEdep[i]*measuredX[i] + measuredEdep[j]*measuredX[j])/(measuredEdep[i]+measuredEdep[j]);
-	    measuredY[i] = (measuredEdep[i]*measuredY[i] + measuredEdep[j]*measuredY[j])/(measuredEdep[i]+measuredEdep[j]);
-	    measuredZ[i] = (measuredEdep[i]*measuredZ[i] + measuredEdep[j]*measuredZ[j])/(measuredEdep[i]+measuredEdep[j]);
-	    measuredEdep[i] += measuredEdep[j];
+	    if(measuredEdep[i] == 0 && measuredEdep[j] == 0){
+	      measuredX[i]  = (measuredX[i] + measuredX[j])/2.;
+	      measuredY[i]  = (measuredY[i] + measuredY[j])/2.;
+	      measuredZ[i]  = (measuredZ[i] + measuredZ[j])/2.;
+		
+	      globalTime[i] = (globalTime[i] + globalTime[j])/2.;
+	    } else {
+	      measuredX[i] = (measuredEdep[i]*measuredX[i] + measuredEdep[j]*measuredX[j])/(measuredEdep[i]+measuredEdep[j]);
+	      measuredY[i] = (measuredEdep[i]*measuredY[i] + measuredEdep[j]*measuredY[j])/(measuredEdep[i]+measuredEdep[j]);
+	      measuredZ[i] = (measuredEdep[i]*measuredZ[i] + measuredEdep[j]*measuredZ[j])/(measuredEdep[i]+measuredEdep[j]);
+	      measuredEdep[i] += measuredEdep[j];
 
+	      globalTime[i] = (measuredEdep[i]*globalTime[i] + measuredEdep[j]*globalTime[j])/(measuredEdep[i]+measuredEdep[j]);
+	    }
 	    NCons[j] = -1;
 	    NGammaHits--;
 
