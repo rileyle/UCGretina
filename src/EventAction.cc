@@ -486,7 +486,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 		  NMeasured, 
 		  detNum, segNum, NCons, 
 		  measuredX, measuredY, measuredZ, 
-		  measuredEdep, segmentEdep);
+		  measuredEdep, segmentEdep,
+		  globalTime);
       
     } else {
       // Write S800 event to the output file with no detected gammas
@@ -591,12 +592,13 @@ void EventAction::writeDecomp(long long int ts,
 			      G4int NMeasured, 
 			      G4int detNum[], G4int segNum[], G4int NCons[],
 			      G4double x[], G4double y[], G4double z[], 
-			      G4double e[], G4double se[])
+			      G4double e[], G4double se[], G4double gt[])
 {
   G4int siz;
   GEBDATA gd;
   CRYS_IPS crys_ips[100*MAX_INTPTS];
-
+  G4double crys_gts[100*MAX_INTPTS][MAX_INTPTS];
+  
   G4int Ndecomp = 0;
   G4bool Processed[100*MAX_INTPTS];
   for(G4int i = 0; i < NMeasured; i++)
@@ -629,6 +631,7 @@ void EventAction::writeDecomp(long long int ts,
       crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].e = e[i];
       crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].seg = segNum[i];
       crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].seg_ener = se[i];
+      crys_gts[Ndecomp][ crys_ips[Ndecomp].num-1 ] = gt[i];
       Processed[i] = true;
 
       for(G4int j = i+1; j < MAX_INTPTS; j++){ // Clear the interaction points
@@ -654,6 +657,7 @@ void EventAction::writeDecomp(long long int ts,
 	    crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].e = e[j];
 	    crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].seg = segNum[j];
 	    crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].seg_ener = se[j];
+	    crys_gts[Ndecomp][ crys_ips[Ndecomp].num ] = gt[j];
 	  }
 	  crys_ips[Ndecomp].num++; // Check for overflow below, and warn.
 	  Processed[j] = true;
@@ -709,7 +713,8 @@ void EventAction::writeDecomp(long long int ts,
 	       << crys_ips[i].ips[j].e << std::setw(12) 
 	       << crys_ips[i].ips[j].x << std::setw(12) 
 	       << crys_ips[i].ips[j].y << std::setw(12) 
-	       << crys_ips[i].ips[j].z
+	       << crys_ips[i].ips[j].z << std::setw(12)
+	       << crys_gts[i][j]
 	       << G4endl;
       }
     }

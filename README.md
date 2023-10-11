@@ -535,12 +535,15 @@ If energy was deposited in GRETINA in the event, S800 data and decomposed gamma-
     S   <ATA>   <BTA>   <DTA>   <YTA>   <Event #>
     D   <# of decomposed gamma events>   <Event #>
     C   <Crystal ID>   <# of interaction points>
-        <Segment ID>   <Energy>   <X>   <Y>   <Z>
-        <Segment ID>   <Energy>   <X>   <Y>   <Z>
-    C   <Crystal ID>   <# of interaction points>
-        <Segment ID>   <Energy>   <X>   <Y>   <Z>
-        <Segment ID>   <Energy>   <X>   <Y>   <Z>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>   <Time>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>   <Time>
     ...
+    C   <Crystal ID>   <# of interaction points>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>   <Time>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>   <Time>
+    ...
+
+where `<Time>` values of the interaction points are lab-frame times relative to the start of the event.
 
 The energy, emission position, emission direction, and the velocity of the projectile are written for each gamma ray emitted in every event:
 
