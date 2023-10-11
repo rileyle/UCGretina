@@ -404,8 +404,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 
       G4bool singleDetector = true;
       for(G4int i = 0; i < NMeasured; i++){
-	G4cout << "i = " << i << ", NCons[i] = " << NCons[i] << ", globalTime[i] = "
-	       << globalTime[i] << G4endl;
+	// G4cout << "i = " << i << ", NCons[i] = " << NCons[i] << ", globalTime[i] = "
+	//        << globalTime[i] << G4endl;
 	for(G4int j = i+1; j < NMeasured; j++){
 	  if(NCons[i] > 0 && NCons[j] > 0
 	     && detNum[i] == detNum[j]    // same crystal
