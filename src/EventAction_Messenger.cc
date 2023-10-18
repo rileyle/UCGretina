@@ -46,6 +46,9 @@ EventAction_Messenger::EventAction_Messenger(EventAction* EA):theEventAction(EA)
   allS800Cmd = new G4UIcmdWithoutParameter("/Mode2/AllS800",this);
   allS800Cmd->SetGuidance("Write S800 data for all events.");
 
+  TimeSortCmd = new G4UIcmdWithoutParameter("/Mode2/TimeSort",this);
+  TimeSortCmd->SetGuidance("Sort interaction points in each crystal by time.");
+
   printCmd = new G4UIcmdWithoutParameter("/Mode2/Print",this);
   printCmd->SetGuidance("Write mode 2 event information to stdout.");
 
@@ -71,6 +74,7 @@ EventAction_Messenger::~EventAction_Messenger()
   delete PackResCmd;
   delete S800KECmd;
   delete allS800Cmd;
+  delete TimeSortCmd;
   delete printCmd;
 
 }
@@ -104,6 +108,8 @@ void EventAction_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
     {theEventAction->SetS800KE(S800KECmd->GetNewDoubleValue(newValue));}
   if( command == allS800Cmd )
     {theEventAction->SetAllS800();}
+  if( command == TimeSortCmd )
+    {theEventAction->SetTimeSort();}
   if( command == printCmd )
     {theEventAction->SetPrint();}
 

@@ -56,6 +56,7 @@ class EventAction : public G4UserEventAction
     void SetAllS800() { allS800 = true; }
     G4bool AllS800() { return allS800; }
     const G4Event* GetEvent() { return evt; }
+    void SetTimeSort(){ timeSort = true; }
     void SetPrint(){ print = true; }
 
     void SetInBeam(G4bool flag){fisInBeam = flag;}
@@ -92,6 +93,7 @@ class EventAction : public G4UserEventAction
     const G4Event* evt;
     G4bool print;
     G4bool fisInBeam;
+    G4bool timeSort;
     G4int NTotalEvents;
     G4double posRes;
     G4double threshE;
