@@ -31,6 +31,7 @@ class EventAction_Messenger: public G4UImessenger
     G4UIcmdWithADoubleAndUnit* ThreshDECmd;
     G4UIdirectory*             Mode2Dir;
     G4UIcmdWithAString*        Mode2FileCmd;
+    G4UIcmdWithoutParameter*   TimeSortCmd;
     G4UIcmdWithAString*        crmatCmd;
     G4UIcmdWithoutParameter*   crysCmd;
     G4UIcmdWithoutParameter*   coordsCmd;

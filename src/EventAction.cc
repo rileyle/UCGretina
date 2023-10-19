@@ -23,6 +23,7 @@ EventAction::EventAction()
   print = false;
   evt = NULL;
   fisInBeam = false;
+  timeSort = false;
   Timerintern.Start();
   timerCount = 0;
   eventsPerSecond = 0;
@@ -692,13 +693,70 @@ void EventAction::writeDecomp(long long int ts,
     }
   }
 
-  for(G4int i = 0; i < Ndecomp; i++)
+  for(G4int i = 0; i < Ndecomp; i++){
+
+    if(timeSort){
+      // Store unsorted interaction points.
+      IP ips[MAX_INTPTS];
+      G4double gts[MAX_INTPTS];
+      std::vector<G4int> idx; // for sorted indices
+      for(G4int j = 0; j < crys_ips[i].num; j++){
+	idx.push_back(j);
+	ips[j].x        = crys_ips[i].ips[j].x;
+	ips[j].y        = crys_ips[i].ips[j].y;
+	ips[j].z        = crys_ips[i].ips[j].z;
+	ips[j].e        = crys_ips[i].ips[j].e;
+	ips[j].seg      = crys_ips[i].ips[j].seg;
+	ips[j].seg_ener = crys_ips[i].ips[j].seg_ener;
+	gts[j]          = crys_gts[i][j];
+      }
+    
+      // G4cout << "=========================" << G4endl;
+      // G4cout << "Before:" << G4endl;
+      // for(G4int j = 0; j < crys_ips[i].num; j++){
+      //   G4cout << crys_gts[i][j] << ", " << crys_ips[i].ips[j].x
+      // 	     << ", " << crys_ips[i].ips[j].y
+      // 	     << ", " << crys_ips[i].ips[j].z
+      // 	     << ", " << crys_ips[i].ips[j].e
+      // 	     << ", " << crys_ips[i].ips[j].seg
+      // 	     << ", " << crys_ips[i].ips[j].seg_ener
+      // 	     << G4endl;
+      // }
+    
+      // Time-sort the indices of the interaction points
+      // (credit: https://stackoverflow.com/a/40183830)
+      std::sort(idx.begin(), idx.end(), [&](int k,int l){return crys_gts[i][k] < crys_gts[i][l];} );
+
+      // Use the time-sorted indices to re-order the interaction points.
+      for(G4int j = 0; j < crys_ips[i].num; j++){
+	crys_ips[i].ips[j].x        = ips[idx[j]].x;
+	crys_ips[i].ips[j].y        = ips[idx[j]].y;
+	crys_ips[i].ips[j].z        = ips[idx[j]].z;
+	crys_ips[i].ips[j].e        = ips[idx[j]].e;
+	crys_ips[i].ips[j].seg      = ips[idx[j]].seg;
+	crys_ips[i].ips[j].seg_ener = ips[idx[j]].seg_ener;
+	crys_gts[i][j]              = gts[idx[j]];
+      }
+
+      // G4cout << "After:" << G4endl;
+      // for(G4int j = 0; j < crys_ips[i].num; j++)
+      //   G4cout << crys_gts[i][j] << ", " << crys_ips[i].ips[j].x
+      // 	     << ", " << crys_ips[i].ips[j].y
+      // 	     << ", " << crys_ips[i].ips[j].z
+      // 	     << ", " << crys_ips[i].ips[j].e
+      // 	     << ", " << crys_ips[i].ips[j].seg
+      // 	     << ", " << crys_ips[i].ips[j].seg_ener
+      // 	     << G4endl;
+
+    }
+    
     if(crys_ips[i].num > MAX_INTPTS){
       G4cout << "Warning: " << crys_ips[i].num << " interaction points."
 	     << "         only " << MAX_INTPTS << " can be written."
 	     << G4endl;
       crys_ips[i].num = MAX_INTPTS;
     }
+  }
 
   
   if(mode2Out){
