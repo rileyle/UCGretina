@@ -92,9 +92,9 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
       ( particleName == "neutron" && processName == "hadElastic" ) )
     edep = phdA*pow(edep, phdB);
 
-  // Keep the gamma parent of pair-production tracks for hit processing.
+  // Keep the gamma parent of pair-production and polarized Compton tracks for hit processing.
   if(edep<0.001*eV
-     && processName != "conv") 
+     && processName != "conv" && processName != "pol-compt" && processName != "pol-conv") 
     return false;
 
   G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();

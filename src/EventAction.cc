@@ -276,7 +276,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 		measuredY[j]  = (measuredY[j] + y)/2.;
 		measuredZ[j]  = (measuredZ[j] + z)/2.;
 		
-		globalTime[j] = (globalTime[j] + gt)/2.;
+		// Assign the earliest global time of the first raw hit in this IP
+		globalTime[j] = std::min(gt, globalTime[j]);
 	      } else {
 		// G4cout << "    Calculating a weighted average." << G4endl;
 		measuredX[j] = (measuredEdep[j]*measuredX[j] + en*x)/(measuredEdep[j] + en);
@@ -284,7 +285,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 		measuredZ[j] = (measuredEdep[j]*measuredZ[j] + en*z)/(measuredEdep[j] + en);
 		measuredEdep[j] += en;
 
-		globalTime[j] = (measuredEdep[j]*globalTime[j] + en*gt)/(measuredEdep[j] + en);
+		// Assign the earliest global time of the first raw hit in this IP
+		globalTime[j] = std::min(gt, globalTime[j]);
 	      }
 	      
 	      NCons[j]++;
@@ -359,15 +361,17 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	      measuredX[i]  = (measuredX[i] + measuredX[j])/2.;
 	      measuredY[i]  = (measuredY[i] + measuredY[j])/2.;
 	      measuredZ[i]  = (measuredZ[i] + measuredZ[j])/2.;
-		
-	      globalTime[i] = (globalTime[i] + globalTime[j])/2.;
+
+	      // Assign the earliest global time of the first raw hit in this IP
+	      globalTime[i] = std::min(globalTime[i], globalTime[j]);
 	    } else {
 	      measuredX[i] = (measuredEdep[i]*measuredX[i] + measuredEdep[j]*measuredX[j])/(measuredEdep[i]+measuredEdep[j]);
 	      measuredY[i] = (measuredEdep[i]*measuredY[i] + measuredEdep[j]*measuredY[j])/(measuredEdep[i]+measuredEdep[j]);
 	      measuredZ[i] = (measuredEdep[i]*measuredZ[i] + measuredEdep[j]*measuredZ[j])/(measuredEdep[i]+measuredEdep[j]);
 	      measuredEdep[i] += measuredEdep[j];
 
-	      globalTime[i] = (measuredEdep[i]*globalTime[i] + measuredEdep[j]*globalTime[j])/(measuredEdep[i]+measuredEdep[j]);
+	      // Assign the earliest global time of the first raw hit in this IP
+	      globalTime[i] = std::min(globalTime[i], globalTime[j]);
 	    }
 	    NCons[j] = -1;
 	    NGammaHits--;
@@ -728,6 +732,7 @@ void EventAction::writeDecomp(long long int ts,
     if(crys_ips[i].num > MAX_INTPTS){
       G4cout << "Warning: " << crys_ips[i].num << " interaction points."
 	     << "         only " << MAX_INTPTS << " can be written."
+	     << " (event " << ts/10000 << ")"
 	     << G4endl;
       crys_ips[i].num = MAX_INTPTS;
     }
