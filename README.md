@@ -598,6 +598,10 @@ Energies are expressed in keV, and positions are expressed in mm.
 
 > All S800 events are written, even in the absence of detected gamma rays.
 
+    /Mode2/TimeSort
+
+> With this optional command, interaction points within each crystal are sorted by time.
+
     /Mode2/Print
 
 > This command triggers printing of information on Mode 2 data to stdout. 
