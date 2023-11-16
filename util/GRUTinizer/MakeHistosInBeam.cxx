@@ -265,6 +265,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
       }
     }
     
+    obj.FillHistogram("position", "theta",
+		      180, 0., 180.,
+		      hit.GetTheta()*TMath::RadToDeg());
+
+    obj.FillHistogram("position", "phi",
+		      360, 0., 360.,
+		      hit.GetPhi()*TMath::RadToDeg());
+
     obj.FillHistogram("position", "theta_vs_phi",
 		      360, 0., 360.,
 		      hit.GetPhi()*TMath::RadToDeg(),

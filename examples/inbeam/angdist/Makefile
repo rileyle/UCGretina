@@ -1,4 +1,5 @@
-all: s44_1329_histos.root   s44_1329_iso_histos.root
+all: s44_1329_histos.root s44_1329_iso_histos.root \
+     s44_1329_nopol_histos.root
 	echo "Geant4 simulations done."
 
 # Pattern rules for running Geant4 simulations and sorting the output

@@ -55,4 +55,4 @@
 /Mode2/S800KE 3.798 GeV
 #/Mode2/Print
 /Mode2/Filename s44_1329.dat
-/run/beamOn 100000
+/run/beamOn 1000000
