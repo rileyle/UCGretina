@@ -159,6 +159,8 @@ After issuing the above commands as needed to pre-configure the simulation, the 
 
 ### In-beam Simulations ###
 
+*A note about coordinates: x and y positions here are in geant4 coordinates (y up, z along the beam axis), so the y axis is aligned with the dispersive direction of the S800.*
+
 Mandatory command after all `/BeamOut/` and `/BeamIn/` commands:
 
     /BeamOut/Update
