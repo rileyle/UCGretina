@@ -68,11 +68,13 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 {
   evt = ev;
 
-  ios::fmtflags f( G4cout.flags() );
-
   G4int event_id=evt->GetEventID();
 
   if(event_id%everyNevents == 0 && event_id > 0) {
+
+    std::ios::fmtflags f( G4cout.flags() );
+    G4int prec = G4cout.precision();
+
     Timerintern.Stop();
     timerCount++;
     eventsPerSecond += 
@@ -107,6 +109,10 @@ void EventAction::EndOfEventAction(const G4Event* ev)
     G4cout << " remaining       "
 	   << "\r"<<std::flush;
     Timerintern.Start();
+
+    G4cout.setf( f );
+    G4cout.precision( prec );
+
   }
   
   EventInformation* eventInfo = (EventInformation*)evt->GetUserInformation();
@@ -119,6 +125,10 @@ void EventAction::EndOfEventAction(const G4Event* ev)
   long long int timestamp = (long long int)10000*event_id;
 
   if(print){
+    
+    std::ios::fmtflags f( G4cout.flags() );
+    G4int prec = G4cout.precision();
+
     G4cout << "-------->Mode2 data, event " << event_id << G4endl;
     if(fisInBeam)
       G4cout << std::fixed << std::setprecision(4) 
@@ -140,6 +150,10 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	     << ", " << eventInfo->GetEmittedGammaTheta(i)
 	     << " beta = " << eventInfo->GetBeta(i)
 	     << G4endl;
+
+    G4cout.setf( f );
+    G4cout.precision( prec );
+
   }
 
   // Analyze hits and write event information to the output file.
@@ -510,8 +524,6 @@ void EventAction::EndOfEventAction(const G4Event* ev)
   // the output file.
 
   writeSim(timestamp, eventInfo);
-
-  G4cout.flags( f );
 
 }
 // --------------------------------------------------

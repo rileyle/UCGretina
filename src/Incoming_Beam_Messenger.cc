@@ -71,10 +71,10 @@ Incoming_Beam_Messenger::Incoming_Beam_Messenger(Incoming_Beam* BI)
   fcDYCmd->SetParameterName("choice",false);
   fcDYCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  fcZCmd = new G4UIcmdWithADoubleAndUnit("/BeamIn/Focus/Z",this);
-  fcZCmd->SetGuidance("Set focal point Z position for the incoming beam.");
-  fcZCmd->SetParameterName("choice",false);
-  fcZCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  Z0Cmd = new G4UIcmdWithADoubleAndUnit("/BeamIn/Focus/Z0",this);
+  Z0Cmd->SetGuidance("Set initial Z position for the incoming beam. (default=-50 cm; must be upstream of the target)");
+  Z0Cmd->SetParameterName("choice",false);
+  Z0Cmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
 
   maxACmd = new G4UIcmdWithADoubleAndUnit("/BeamIn/Focus/maxAta",this);
@@ -117,7 +117,7 @@ Incoming_Beam_Messenger::~Incoming_Beam_Messenger()
   delete maxBCmd;
   delete fcXCmd;
   delete fcYCmd;
-  delete fcZCmd;
+  delete Z0Cmd;
   delete fcDXCmd;
   delete fcDYCmd;
   delete DppCmd;
@@ -164,8 +164,8 @@ void Incoming_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamIn->setfcY(fcYCmd->GetNewDoubleValue(newValue));}
   if( command == fcDYCmd )
     { BeamIn->setfcDY(fcDYCmd->GetNewDoubleValue(newValue));}
-  if( command == fcZCmd )
-    { BeamIn->setfcZ(fcZCmd->GetNewDoubleValue(newValue));}
+  if( command == Z0Cmd )
+    { BeamIn->setZ0(Z0Cmd->GetNewDoubleValue(newValue));}
   if( command == maxACmd )
     { BeamIn->setmaxAta(maxACmd->GetNewDoubleValue(newValue));}
   if( command == maxBCmd )

@@ -166,11 +166,19 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       ion =  ionTable->GetIon(BeamIn->getZ(),BeamIn->getA(),BeamIn->getEx());
       particleGun->SetParticleDefinition(ion);
       
-      position=BeamIn->getPosition();
-      particleGun->SetParticlePosition(position);
-      
       direction=BeamIn->getDirection();
       particleGun->SetParticleMomentumDirection(direction);
+
+      position=BeamIn->getPosition(direction);
+
+      // Include target offset (if any).
+      G4ThreeVector offset;
+      offset.setX(myDetector->GetTargetPos()->x());
+      offset.setY(myDetector->GetTargetPos()->y());
+      offset.setZ(myDetector->GetTargetPos()->z());
+      position += offset;
+
+      particleGun->SetParticlePosition(position);
       
       KE=BeamIn->getKE(ion);
       particleGun->SetParticleEnergy(KE);

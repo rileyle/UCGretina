@@ -31,7 +31,7 @@ public:
   void setfcDX(G4double);
   void setfcY(G4double);
   void setfcDY(G4double);
-  void setfcZ(G4double);
+  void setZ0(G4double);
   void setDpp(G4double);
   void setmaxAta(G4double);
   void setmaxBta(G4double);
@@ -47,8 +47,9 @@ public:
   G4double getKEu(){return KEu;}
   G4double getAta0(){return ata0;}
   G4double getBta0(){return bta0;}
-  G4ThreeVector getPosition();
+  G4ThreeVector getPosition(G4ThreeVector);
   G4ThreeVector getDirection();
+
 private:
   
   G4int A;
@@ -69,7 +70,7 @@ private:
   G4double fcDX;
   G4double fcY;
   G4double fcDY;
-  G4double fcZ;
+  G4double Z0;
   G4double maxAta;
   G4double maxBta;
   G4double ata0;

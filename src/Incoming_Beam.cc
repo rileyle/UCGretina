@@ -22,7 +22,8 @@ Incoming_Beam::Incoming_Beam()
   fcDX=0.;
   fcY=0.;
   fcDY=0.;
-  fcZ=-50.*cm;
+  //  fcZ=-50.*cm;
+  Z0=-50.*cm;
   maxAta=0*mrad;
   maxBta=0*mrad;
   ata0=0.*mrad;
@@ -53,7 +54,7 @@ void Incoming_Beam::Report()
   G4cout<<"----> focal point DX size for the incoming beam set to  "<<G4BestUnit(fcDX,"Length")<< G4endl;
   G4cout<<"----> focal point Y position for the incoming beam set to  "<<G4BestUnit(fcY,"Length")<< G4endl;
   G4cout<<"----> focal point DY size for the incoming beam set to  "<<G4BestUnit(fcDY,"Length")<< G4endl;
-  G4cout<<"----> focal point Z position for the incoming beam set to  "<<G4BestUnit(fcZ,"Length")<< G4endl;
+  G4cout<<"----> initial Z position for the incoming beam set to  "<<G4BestUnit(Z0,"Length")<< G4endl;
   G4cout<<"----> position distribution type set to "<<posDist<< G4endl;
   G4cout<<"----> dispersive direction angular divergence for the incoming beam set to  "<<maxAta/mrad<<" mrad = "<<maxAta/deg<<" deg"<< G4endl;
   G4cout<<"----> non dispersive direction angular divergence for the incoming beam set to  "<<maxBta/mrad<<" mrad = "<<maxBta/deg<<" deg"<< G4endl;
@@ -110,11 +111,11 @@ void Incoming_Beam::setfcY(G4double d)
   //  G4cout<<"----> focal point Y position for the incoming beam set to  "<<G4BestUnit(fcY,"Length")<< G4endl;
 }
 //---------------------------------------------------------
-void Incoming_Beam::setfcZ(G4double d)
+void Incoming_Beam::setZ0(G4double d)
 {
 
-  fcZ=d;
-  //  G4cout<<"----> focal point Z position for the incoming beam set to  "<<G4BestUnit(fcZ,"Length")<< G4endl;
+  Z0=d;
+  //  G4cout<<"----> initial Z position for the incoming beam set to  "<<G4BestUnit(Z0,"Length")<< G4endl;
 }
 //---------------------------------------------------------
 void Incoming_Beam::setmaxAta(G4double d)
@@ -209,12 +210,12 @@ G4ThreeVector Incoming_Beam::getDirection()
   
 }
 //---------------------------------------------------------
-G4ThreeVector Incoming_Beam::getPosition()
+G4ThreeVector Incoming_Beam::getPosition(G4ThreeVector direction)
 {
   G4ThreeVector position;
   G4double x,y;
   G4double r,phi;
-  
+
   phi=G4UniformRand()*8.*atan(1.);
   r=G4UniformRand()+G4UniformRand();
   if(r>=1) r=-(r-2.);
@@ -230,10 +231,14 @@ G4ThreeVector Incoming_Beam::getPosition()
     exit(EXIT_FAILURE);
   }
   
-  //At emission point!!! (Macro file command names are misleading.)
+  // Extrapolate back from the target to the initial beam position.
+  x += direction.x()/direction.z()*Z0;
+  y += direction.y()/direction.z()*Z0;
+  
   position.setX(x);
   position.setY(y);
-  position.setZ(fcZ);
+  position.setZ(Z0);
+  
   return position;
   
 }

@@ -201,13 +201,17 @@ Optional commands related to the incoming beam:
     
     /BeamIn/Focus/Y <double> <unit>
 
-> Offsets of the emission point of the incoming beam. (Z defaults to -50 cm. If you change this, make sure it is upstream of the target!)
+> Position of the beam spot on target
 
     /BeamIn/Focus/DX <double> <unit>
     
     /BeamIn/Focus/DY <double> <unit>
 
-> Horizontal and vertical widths of the beam spot at the emission point (not on target)
+> Horizontal and vertical widths of the beam spot on target
+
+    /BeamIn/Focus/Z0 <double> <unit>
+
+>  Initial Z position of the beam (Z0 defaults to -50 cm. If you change this, make sure it is upstream of the target!)
 
     /BeamIn/Focus/Ata0 <double> <unit>
     
@@ -227,17 +231,17 @@ Optional commands related to the incoming beam:
 
 Mandatory commands related to the outgoing beam:
 
-    /BeamOut/DA <int> 
-    
-    /BeamOut/DZ <int>
-
-> Changes in mass number and atomic number of the reaction. The incoming beam has (A,Z) and the outgoing reaction product has (A+DA, Z+DZ)
-
     /BeamOut/TargetA <int>
     
     /BeamOut/TargetZ <int>
 
 > Mass number and charge number of the target nucleus.
+
+    /BeamOut/DA <int> 
+    
+    /BeamOut/DZ <int>
+
+> Changes in mass number and atomic number of the reaction. The incoming beam has (A,Z) and the outgoing reaction product has (A+DA, Z+DZ). Beam and target (A, Z) and (DA, DZ) are used in 2-body kinematics calculations.
 
     /BeamOut/ProjectileExcitation <double> <unit>
 
