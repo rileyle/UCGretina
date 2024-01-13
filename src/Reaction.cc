@@ -48,40 +48,33 @@ G4VParticleChange* Reaction::PostStepDoIt(
 
   aParticleChange.Initialize(aTrack);
 
-  if(reaction_here)
-    {
-      reaction_here=false;
+  if(reaction_here){
+    reaction_here=false;
 
-      // Kill the track if we've already reacted and wandered back
-      if(BeamOut->GetReactionFlag() == 1){
+    // Kill the track if we've already reacted and wandered back
+    if(BeamOut->GetReactionFlag() == 1){
 
-	aParticleChange.ProposeTrackStatus(fStopAndKill);
+      aParticleChange.ProposeTrackStatus(fStopAndKill);
 
-	// G4cout << "************************* PostStepDoIt: terminating track in "
-	//        << aStep.GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetName()
-	//        << " at reaction depth"
-	//        << G4endl;
-       
-      } 
-      // React!
-      else {
+      // G4cout << "************************* PostStepDoIt: terminating track in "
+      //        << aStep.GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetName()
+      //        << " at reaction depth"
+      //        << G4endl;
+      
+    } 
+    // React!
+    else {
 
-	//	G4cout << "*** PostStepDoIt: I'm reacting." << G4endl;
+      //	G4cout << "*** PostStepDoIt: I'm reacting." << G4endl;
 	
-	BeamOut->ScanInitialConditions(aTrack);
+      BeamOut->ScanInitialConditions(aTrack);
 
-	aParticleChange.ProposeTrackStatus(fStopAndKill);
+      aParticleChange.ProposeTrackStatus(fStopAndKill);
 
-	G4DynamicParticle *theProduct = NULL;
-	if(BeamOut->AboveThreshold()){
-	  aParticleChange.SetNumberOfSecondaries(1);
-	  theProduct = BeamOut->ReactionProduct();
-	  aParticleChange.AddSecondary(theProduct,
-				       BeamOut->ReactionPosition(),
-				       true);
-	}
-
-	BeamOut->SetReactionFlag(1);
+      G4DynamicParticle *theProduct = NULL;
+      if(BeamOut->AboveThreshold()){
+	aParticleChange.SetNumberOfSecondaries(1);
+	theProduct = BeamOut->ReactionProduct();
 
 #ifdef POL
 	if(theProduct){
@@ -92,40 +85,64 @@ G4VParticleChange* Reaction::PostStepDoIt(
 	  G4double Ex = frag.GetExcitationEnergy();
 	  //Based on my reading of the source code, this should never return an
 	  //invalid pointer...
-	  const G4LevelManager *lman = G4NuclearLevelData::GetInstance()->GetLevelManager(Z,A);
+	  const G4LevelManager *lman
+	    = G4NuclearLevelData::GetInstance()->GetLevelManager(Z,A);
 	  size_t index = 0;
 	  index = lman->NearestLevelIndex(Ex,index);
 	  G4int twoJ = lman->SpinTwo(index);
+	
 	  if(substates.size() != (size_t)twoJ+1){
-	    G4cerr << "Error: Reaction population parameter count != 2J+1."
+	    //G4cerr << "Error: Reaction population parameter count != 2J+1."
+	  
+	    // Very rarely an event appears with in incorrect 2J. This seems
+	    // to be due to a bug in geant4. For now, we'll just kill these
+	    // tracks. 
+	    G4cerr << "Warning: Reaction population parameter count != 2J+1."
 		   << "\n  Use /reaction/population macro-file commands."
 		   << "\n  (required when UCGretina is compiled with POL=1)"
 		   << G4endl;
-	    exit(EXIT_FAILURE);
-	  }
-	  std::vector<std::vector<G4complex>> polV;
-	  polV.resize(twoJ+1);
-	  G4double cosTheta = aTrack.GetMomentumDirection().cosTheta();
-	  for(size_t k=0;k<polV.size();k++){
-	    G4double PkKappa;
-	    G4double Pk0_z = 0.;//First calculate along z-axis
-	    for(int twoM=-twoJ;twoM<=twoJ;twoM+=2)
-	      Pk0_z+=G4Clebsch::ClebschGordanCoeff(twoJ,twoM,twoJ,-twoM,2*k)/G4Clebsch::ClebschGordanCoeff(twoJ,twoM,twoJ,-twoM,0)/sqrt(2*k+1)*substates[twoM];
-	    //Now rotate into particle frame
-	    for(size_t kappa=0;kappa<k+1;kappa++){
-	      PkKappa = Pk0_z*G4Clebsch::WignerLittleD(2*k,2*kappa,0,cosTheta);
-	      polV[k].push_back(G4complex(PkKappa,0.0));
+	    //exit(EXIT_FAILURE);
+	    aParticleChange.ProposeTrackStatus(fStopAndKill);
+	  } else {
+
+	    aParticleChange.AddSecondary(theProduct,
+					 BeamOut->ReactionPosition(),
+					 true);	
+
+	    std::vector<std::vector<G4complex>> polV;
+	    polV.resize(twoJ+1);
+	    G4double cosTheta = aTrack.GetMomentumDirection().cosTheta();
+	    for(size_t k=0;k<polV.size();k++){
+	      G4double PkKappa;
+	      G4double Pk0_z = 0.;//First calculate along z-axis
+	      for(int twoM=-twoJ;twoM<=twoJ;twoM+=2)
+		Pk0_z+=G4Clebsch::ClebschGordanCoeff(twoJ,twoM,twoJ,-twoM,2*k)/G4Clebsch::ClebschGordanCoeff(twoJ,twoM,twoJ,-twoM,0)/sqrt(2*k+1)*substates[twoM];
+	      //Now rotate into particle frame
+	      for(size_t kappa=0;kappa<k+1;kappa++){
+		PkKappa = Pk0_z*G4Clebsch::WignerLittleD(2*k,2*kappa,0,cosTheta);
+		polV[k].push_back(G4complex(PkKappa,0.0));
+	      }
 	    }
+
+	    auto nucPstore = G4NuclearPolarizationStore::GetInstance();
+	    auto pol = nucPstore->FindOrBuild(frag.GetZ_asInt(),frag.GetA_asInt(),frag.GetExcitationEnergy());
+	    pol->SetPolarization(polV);
+	    
 	  }
-	  auto nucPstore = G4NuclearPolarizationStore::GetInstance();
-	  auto pol = nucPstore->FindOrBuild(frag.GetZ_asInt(),frag.GetA_asInt(),frag.GetExcitationEnergy());
-	  pol->SetPolarization(polV);
 	}
+#else
+	aParticleChange.AddSecondary(theProduct,
+				     BeamOut->ReactionPosition(),
+				     true);	
 #endif
 
       }
 
+      BeamOut->SetReactionFlag(1);
+
     }
+
+  }
 
   // Stop and kill the reaction product in its ground state.
   if(ground_state){
