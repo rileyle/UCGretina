@@ -187,6 +187,17 @@ void EventAction::EndOfEventAction(const G4Event* ev)
       G4int NMeasured = 0;
       G4double totalEdep = 0;
 
+      // Prevent seg fault in events with very large hit collections.
+      // This arises rarely in high-energy muon (and likely other
+      // high-energy charged particle) events.
+      if( Nhits > 3000 ){
+	G4cerr << "Warning: hit collection with " << Nhits
+	       << " entries. Processing the first 3000."
+	       << " (event " << event_id << ")"
+	       << G4endl;
+	Nhits = 3000;
+      }
+      
       for(G4int i = 0; i < Nhits; i++){
 
 	G4double x, y, z;
@@ -343,7 +354,7 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	}
 
 	if(!processed)
-	  G4cout << "Warning: Could not find a home for hit " << i
+	  G4cerr << "Warning: Could not find a home for hit " << i
 		 << " of event " << event_id 
 		 << G4endl;
 
@@ -742,7 +753,7 @@ void EventAction::writeDecomp(long long int ts,
     }
     
     if(crys_ips[i].num > MAX_INTPTS){
-      G4cout << "Warning: " << crys_ips[i].num << " interaction points."
+      G4cerr << "Warning: " << crys_ips[i].num << " interaction points."
 	     << "         only " << MAX_INTPTS << " can be written."
 	     << " (event " << ts/10000 << ")"
 	     << G4endl;

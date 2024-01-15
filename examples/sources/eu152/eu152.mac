@@ -22,7 +22,7 @@
 /BeamIn/KEu 0. keV      
 
 # Source position and dimensions
-/BeamIn/Focus/Z  0. mm
+/BeamIn/Focus/Z0  0. mm
 /BeamIn/Focus/X  0. mm
 /BeamIn/Focus/Y  0. mm
 /BeamIn/Focus/DX 0. mm
