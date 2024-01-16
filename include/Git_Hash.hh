@@ -1,5 +1,5 @@
 #ifndef Git_Hash_h
 #define Git_Hash_h
-#define GIT_HASH "5244f6aa2b325503526dd3b658134249ad33ab73"
+#define GIT_HASH "5ae279d984bb235b26b98e37dd8ad5f6f4216a37"
 #define GIT_BRANCH "geant4.10"
 #endif
