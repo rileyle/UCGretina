@@ -9,3 +9,4 @@ DEVNOTES
 *.wrl
 tmp*
 *.dat
+git_hash
