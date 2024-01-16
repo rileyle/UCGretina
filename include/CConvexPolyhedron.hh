@@ -35,11 +35,9 @@
 #include "G4Plane3D.hh"
 #include "G4Normal3D.hh"
 
-#ifndef G4V10
+#if !defined G4V10 && !defined G4V11
 #include "G4Point3DVector.hh"
 #include "G4BoundingBox3D.hh"
-//#else
-//#include "G4Point3DList.hh"
 #endif
 
 class CConvexPolyhedron : public G4CSGSolid
@@ -54,7 +52,7 @@ class CConvexPolyhedron : public G4CSGSolid
     /////////////////////////////////////////////////////////////////
     /// Constructor for MarsView: 2 faces of n/2 points connected by quadrangles
     /////////////////////////////////////////////////////////////////
-#ifndef G4V10
+#if !defined G4V10 && !defined G4V11
     CConvexPolyhedron(const G4String& pName, const G4Point3DVector& pVec);
 #else
     CConvexPolyhedron(const G4String& pName, const std::vector<G4Point3D>& pVec);
@@ -62,7 +60,7 @@ class CConvexPolyhedron : public G4CSGSolid
     /////////////////////////////////////////////////////////////////
     /// Generic Constructor: points and descriptors of faces
     /////////////////////////////////////////////////////////////////
-#ifndef G4V10
+#if !defined G4V10 && !defined G4V11
     CConvexPolyhedron(const G4String& pName, const G4Point3DVector& pVec, 
                              const G4int nFaces, const std::vector<G4int>& theFaces);
 #else
@@ -81,7 +79,8 @@ class CConvexPolyhedron : public G4CSGSolid
     G4Point3D  *fPoints;            //> the points as G4Point3D
     G4Point3D  *cCenter;            //> the center of the convex polyhedron (average of fPoints)
 
-#ifndef G4V10
+
+#if !defined G4V10 && !defined G4V11
   private:
     G4BoundingBox3D* bbox;          //> used for a fast test in Inside()
 #endif
@@ -135,7 +134,7 @@ class CConvexPolyhedron : public G4CSGSolid
   public:
     void          DescribeYourselfTo ( G4VGraphicsScene& scene  ) const;
     G4Polyhedron* CreatePolyhedron   () const;
-#ifndef G4V10
+#if !defined G4V10 && !defined G4V11
     G4NURBS*      CreateNURBS        () const;
 #endif
 

@@ -39,7 +39,6 @@
 #include "G4DynamicParticle.hh"
 #include "G4DecayProducts.hh"
 #include "G4PhotonEvaporation.hh"
-#include "G4RadioactiveDecay.hh"
 #include "G4VAtomDeexcitation.hh"
 #include "G4AtomicShells.hh"
 #include "G4Electron.hh"
@@ -51,68 +50,66 @@
 #include "G4Clebsch.hh"
 #include "G4NuclearPolarizationStore.hh"
 
+G4ITDecay::G4ITDecay(G4PhotonEvaporation* ptr)
+  : G4NuclearDecay("IT decay", IT, 0.0, noFloat), photonEvaporation(ptr)
+{}
 
 G4ITDecay::G4ITDecay(const G4ParticleDefinition* theParentNucleus,
-                     const G4double& branch, const G4double& Qvalue,
-                     const G4double& excitationE, G4PhotonEvaporation* aPhotoEvap)
- : G4NuclearDecay("IT decay", IT, excitationE, noFloat), transitionQ(Qvalue), 
-   applyARM(true), photonEvaporation(aPhotoEvap)
+                     const G4double& branch, const G4double&,
+                     const G4double& excitationE)
+  : G4NuclearDecay("IT decay", IT, excitationE, noFloat)
 {
   SetParent(theParentNucleus);  // Store name of parent nucleus, delete G4MT_parent 
   SetBR(branch);
-
-  parentZ = theParentNucleus->GetAtomicNumber();
-  parentA = theParentNucleus->GetAtomicMass(); 
-
   SetNumberOfDaughters(1);
-  G4IonTable* theIonTable =
-    (G4IonTable*)(G4ParticleTable::GetParticleTable()->GetIonTable());
-  SetDaughter(0, theIonTable->GetIon(parentZ, parentA, excitationE, noFloat) );
+  SetDaughter(0, theParentNucleus);
+
+  SetupDecay(theParentNucleus);
 }
 
-
-G4ITDecay::~G4ITDecay()
-{}
-
+void G4ITDecay::SetupDecay(const G4ParticleDefinition* theParentNucleus)
+{
+  theParent = theParentNucleus;
+  parentZ = theParentNucleus->GetAtomicNumber();
+  parentA = theParentNucleus->GetAtomicMass();
+}
 
 G4DecayProducts* G4ITDecay::DecayIt(G4double)
 {
-  // Fill G4MT_parent with theParentNucleus (stored by SetParent in ctor)  
-  CheckAndFillParent();
-
   // Set up final state
   // parentParticle is set at rest here because boost with correct momentum 
   // is done later
-  G4LorentzVector atRest(G4MT_parent->GetPDGMass(),
-                         G4ThreeVector(0.,0.,0.) );
-  G4DynamicParticle parentParticle(G4MT_parent, atRest);
+  G4LorentzVector atRest(theParent->GetPDGMass(), G4ThreeVector(0.,0.,0.) );
+  G4DynamicParticle parentParticle(theParent, atRest);
   G4DecayProducts* products = new G4DecayProducts(parentParticle);
 
   // Let G4PhotonEvaporation do the decay
   G4Fragment parentNucleus(parentA, parentZ, atRest);
+
   G4double predecayEnergy = parentNucleus.GetExcitationEnergy();
 
   //Get the polarization of the initial state before it is updated by decay
   std::vector<std::vector<G4complex>> parentPol
     = G4NuclearPolarizationStore::GetInstance()->FindOrBuild(parentNucleus.GetZ_asInt(),parentNucleus.GetA_asInt(),parentNucleus.GetExcitationEnergy())->GetPolarization();
-  //parentNucleus.GetNuclearPolarization()->GetPolarization();
-
+  
+  // one emission, parent nucleaus become less excited
   G4Fragment* eOrGamma = photonEvaporation->EmittedFragment(&parentNucleus);
+
   // Modified nuclide is returned as dynDaughter
-  G4IonTable* theIonTable =
-    (G4IonTable*)(G4ParticleTable::GetParticleTable()->GetIonTable() );
+  auto theIonTable = G4ParticleTable::GetParticleTable()->GetIonTable();
   G4ParticleDefinition* daughterIon =
     theIonTable->GetIon(parentZ, parentA, parentNucleus.GetExcitationEnergy(), 
                         G4Ions::FloatLevelBase(parentNucleus.GetFloatingLevelNumber()));
   G4DynamicParticle* dynDaughter = new G4DynamicParticle(daughterIon,
                                                          parentNucleus.GetMomentum());
 
-  if (eOrGamma) {
+  if (nullptr != eOrGamma) {
     G4DynamicParticle* eOrGammaDyn =
       new G4DynamicParticle(eOrGamma->GetParticleDefinition(),
                             eOrGamma->GetMomentum() );
     eOrGammaDyn->SetProperTime(eOrGamma->GetCreationTime() );
-    //If daughter is gamma, calculate its Stokes vector and set it.
+
+        //If daughter is gamma, calculate its Stokes vector and set it.
     //We don't handle the case of electrons right now.
     if(eOrGamma->GetParticleDefinition()->GetParticleName()==G4String("gamma")){
       G4ThreeVector gammaDir = eOrGammaDyn->GetMomentumDirection();
@@ -128,8 +125,8 @@ G4DecayProducts* G4ITDecay::DecayIt(G4double)
 	if(level->FinalExcitationIndex(tIndex) == dIndex) break;
       //      G4double mpRatio = level->MultipolarityRatio(dIndex);
       G4double mpRatio = level->MultipolarityRatio(tIndex);
-      G4int JP1=lman->SpinTwo(pIndex);
-      G4int JP2=lman->SpinTwo(dIndex);
+      G4int JP1=std::abs(lman->TwoSpinParity(pIndex));
+      G4int JP2=std::abs(lman->TwoSpinParity(dIndex));
       //      G4int MP = level->TransitionType(dIndex);
       G4int MP = level->TransitionType(tIndex);
       int Lbar;
@@ -271,84 +268,8 @@ G4DecayProducts* G4ITDecay::DecayIt(G4double)
       P2/=(((MP>99?MP/100:MP)%2?1:-1)*norm);
       P3/=norm;
       eOrGammaDyn->SetPolarization(P1,P2,P3);
-      //G4cout<<eOrGammaDyn->GetPolarization()<<" ---> "<<P1*P1+P2*P2+P3*P3<<G4endl;
-      //--------------------------------------------
-      // The old, broken algorithm
-      // G4complex tauplusplus(0,0),tauplusminus(0,0),
-      // 	tauminusplus(0,0),tauminusminus(0,0);
-      // const G4LevelManager *lman = G4NuclearLevelData::GetInstance()->GetLevelManager(parentZ,parentA);
-      // size_t pIndex = lman->NearestLevelIndex(predecayEnergy);
-      // size_t dIndex = lman->NearestLevelIndex(parentNucleus.GetExcitationEnergy()-eOrGamma->GetMomentum().getT());
-      // const G4NucLevel *level = lman->GetLevel(pIndex);
-      // G4double mpRatio = level->MultipolarityRatio(dIndex);
-      // G4int JP1=lman->SpinTwo(pIndex);
-      // G4int JP2=lman->SpinTwo(dIndex);
-      // G4int MP = level->TransitionType(dIndex);
-      // for(size_t k=0;k<parentPol.size();k++){
-      // 	G4complex tpp(0,0),tpm(0,0),tmp(0,0),tmm(0,0);//just for kappa bit
-      // 	for(size_t kappa=0;kappa<parentPol[k].size();kappa++){
-      // 	  if(parentPol[k][kappa]==0.) continue;
-      // 	  tpp+=parentPol[k][kappa]*G4Clebsch::WignerLittleD(2*k,2*kappa,0,gammaDir.cosTheta());
-      // 	  tpm+=parentPol[k][kappa]*G4Clebsch::WignerLittleD(2*k,2*kappa,4,gammaDir.cosTheta())*G4complex(cos(2*gammaDir.phi()),sin(2*gammaDir.phi()));
-      // 	  tmp+=parentPol[k][kappa]*G4Clebsch::WignerLittleD(2*k,2*kappa,-4,gammaDir.cosTheta())*G4complex(cos(2*gammaDir.phi()),-sin(2*gammaDir.phi()));
-      // 	  tmm+=parentPol[k][kappa]*G4Clebsch::WignerLittleD(2*k,2*kappa,0,gammaDir.cosTheta());
-      // 	}
-      // 	G4PolarizationTransition polT;
-      // 	double mixfactor,samefactor;
-      // 	if(MP<99){//Not mixed transition
-      // 	  int Lbar=MP/2;
-      // 	  mixfactor = (k%2?-1:1)*sqrt(2*k+1)*(MP%2?-1:1)*G4Clebsch::ClebschGordanCoeff(2*Lbar,2,2*Lbar,2,2*k)/G4Clebsch::ClebschGordanCoeff(2*Lbar,2,2*Lbar,-2,2*k)*polT.FCoefficient(k,Lbar,Lbar,JP2,JP1);
-      // 	  samefactor = sqrt(2*k+1)*(polT.FCoefficient(k,Lbar,Lbar,JP2,JP1));
-      // 	}
-      // 	else{
-      // 	  int Lbar=MP/200;
-      // 	  mixfactor = (k%2?-1:1)*sqrt(2*k+1)*(MP%2?-1:1)*
-      // 	    (
-      // 	     G4Clebsch::ClebschGordanCoeff(2*Lbar,2,2*Lbar,2,2*k)/G4Clebsch::ClebschGordanCoeff(2*Lbar,2,2*Lbar,-2,2*k)*polT.FCoefficient(k,Lbar,Lbar,JP2,JP1)
-      // 	     -mpRatio*(1-(k%2?-1:1))*G4Clebsch::ClebschGordanCoeff(2*Lbar,2,2*(Lbar+1),2,2*k)/G4Clebsch::ClebschGordanCoeff(2*Lbar,2,2*(Lbar+1),-2,2*k)*polT.FCoefficient(k,Lbar,Lbar+1,JP2,JP1)
-      // 	     +mpRatio*mpRatio*G4Clebsch::ClebschGordanCoeff(2*(Lbar+1),2,2*(Lbar+1),2,2*k)/G4Clebsch::ClebschGordanCoeff(2*(Lbar+1),2,2*(Lbar+1),-2,2*k)*polT.FCoefficient(k,Lbar+1,Lbar+1,JP2,JP1)
-      // 	     );
-      // 	  samefactor = sqrt(2*k+1)*
-      // 	    (
-      // 	     polT.FCoefficient(k,Lbar,Lbar,JP2,JP1)
-      // 	     +2*mpRatio*polT.FCoefficient(k,Lbar,Lbar+1,JP2,JP1)
-      // 	     +mpRatio*mpRatio*polT.FCoefficient(k,Lbar+1,Lbar+1,JP2,JP1)
-      // 	     );
-      // 	}
-      // 	tauplusplus+=(k%2?-1:1)*samefactor*tpp;
-      // 	tauplusminus+=mixfactor*tpm;
-      // 	tauminusplus+=mixfactor*tmp;
-      // 	tauminusminus+=samefactor*tmm;
-      // }
-      // printf("\n[+][+](%lf,%lf)\n",tauplusplus.real(),tauplusplus.imag());
-      // printf("[+][-](%lf,%lf)\n",tauplusminus.real(),tauplusminus.imag());
-      // printf("[-][+](%lf,%lf)\n",tauminusplus.real(),tauminusplus.imag());
-      // printf("[-][-](%lf,%lf)\n",tauminusminus.real(),tauminusminus.imag());
-      // G4ThreeVector Stokes;
-      // if((tauplusplus.imag()+tauminusminus.imag())!=0.){
-      // 	G4cout<<"Complex normalization of Stokes parameters!"<<G4endl;
-      // }
-      // G4double norm = tauplusplus.real()+tauminusminus.real();
-      // printf("norm:(%lf,%lf)\n",tauplusplus.real()+tauminusminus.real(),tauplusplus.imag()+tauminusminus.imag());
-      // if((tauplusminus.imag()+tauminusplus.imag())!=0.){
-      // 	G4cout<<"Stokes parameter 1 is complex!"<<G4endl;
-      // }
-      // Stokes.setX(-(tauplusminus.real()+tauminusplus.real())/norm);
-      // printf("P1:(%lf,%lf)\n",-tauplusminus.real()-tauminusplus.real(),-tauplusminus.imag()-tauminusplus.imag());
-      // if((tauminusplus.real()-tauplusminus.real())!=0.){
-      // 	G4cout<<"Stokes parameter 2 is complex!"<<G4endl;
-      // }
-      // Stokes.setY((tauplusminus.imag()-tauminusplus.imag())/norm);
-      // printf("P2:(%lf,%lf)\n",tauplusminus.imag()-tauminusplus.imag(),tauminusplus.real()-tauplusminus.real());
-      // if((tauplusplus.imag()-tauminusminus.imag())!=0.){
-      // 	G4cout<<"Stokes parameter 3 is complex!"<<G4endl;
-      // }
-      // Stokes.setZ((tauplusplus.real()-tauminusminus.real())/norm);
-      // printf("P3:(%lf,%lf)\n",tauplusplus.real()-tauminusminus.real(),tauplusplus.imag()-tauminusminus.imag());
-      // eOrGammaDyn->SetPolarization(Stokes.x(),Stokes.y(),Stokes.z());
-      //G4cout<<Stokes<<G4endl;
-      //--------------------------------------------
     }
+    
     products->PushProducts(eOrGammaDyn);
     delete eOrGamma;
 
@@ -358,7 +279,7 @@ G4DecayProducts* G4ITDecay::DecayIt(G4double)
       if (shellIndex > -1) {
         G4VAtomDeexcitation* atomDeex =
           G4LossTableManager::Instance()->AtomDeexcitation();
-        if (atomDeex->IsFluoActive() && parentZ > 5 && parentZ < 100) {
+        if (atomDeex->IsFluoActive() && parentZ > 5 && parentZ < 105) {
           G4int nShells = G4AtomicShells::GetNumberOfShells(parentZ);
           if (shellIndex >= nShells) shellIndex = nShells;
           G4AtomicShellEnumerator as = G4AtomicShellEnumerator(shellIndex);
@@ -392,10 +313,10 @@ G4DecayProducts* G4ITDecay::DecayIt(G4double)
             armProducts.push_back(extra);
           } 
 
-          G4int nArm = armProducts.size();
+          std::size_t nArm = armProducts.size();
           if (nArm > 0) {
             G4ThreeVector bst = dynDaughter->Get4Momentum().boostVector();
-            for (G4int i = 0; i < nArm; ++i) {
+            for (std::size_t i = 0; i < nArm; ++i) {
               G4DynamicParticle* dp = armProducts[i];
               G4LorentzVector lv = dp->Get4Momentum().boost(bst);
               dp->Set4Momentum(lv);
@@ -427,10 +348,9 @@ G4DecayProducts* G4ITDecay::DecayIt(G4double)
 
 void G4ITDecay::DumpNuclearInfo()
 {
-  G4cout << " G4ITDecay for parent nucleus " << GetParentName() << G4endl;
-  G4cout << " decays to " << GetDaughterName(0)
-         << " + gammas (or electrons), with branching ratio " << GetBR()
-         << "% and Q value " << transitionQ << G4endl;
+  if (theParent != nullptr) {
+    G4cout << " G4ITDecay for parent nucleus " << theParent->GetParticleName() << G4endl;
+  }
 }
 
 #endif

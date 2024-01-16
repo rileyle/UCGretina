@@ -4,9 +4,9 @@ Cite: [L.A.Riley, D.Weisshaar, H.L.Crawford et al., UCGretina GEANT4 simulation 
 
 ## Compile and install ##
 
-***This branch has not been extensively tested. The code compiles, and the examples run with geant4.11.1.2.***
+***This branch has not been extensively tested. The code compiles with geant4-v11.2.0 and runs the examples with the exception of UCGretina_Pol. The polarized electromagnetic physics does not appear to be functional.***
 
-Install version [Geant4.11.1.2 of the Geant4 libraries](https://geant4.web.cern.ch/download/all). You will need the data files for low energy electromagnetic processes, photon evaporation, and radioactive decay.
+Install version [Geant4.11.2.0 of the Geant4 libraries](https://geant4.web.cern.ch/download/all). You will need the data files for low energy electromagnetic processes, photon evaporation, and radioactive decay.
 
 The model of the GRETINA scanning table uses version 2.0.3 of the external [CADMesh](https://github.com/christopherpoole/cadmesh) package. 
 
@@ -161,6 +161,8 @@ After issuing the above commands as needed to pre-configure the simulation, the 
 
 ### In-beam Simulations ###
 
+*A note about coordinates: x and y positions here are in geant4 coordinates (y up, z along the beam axis), so the y axis is aligned with the dispersive direction of the S800.*
+
 Mandatory command after all `/BeamOut/` and `/BeamIn/` commands:
 
     /BeamOut/Update
@@ -181,6 +183,10 @@ Optional commands related to the incoming beam:
 
 > Momentum acceptance (dp/p) for the incoming beam. (Set this to 0 if you are providing the dta spectrum of the incoming beam using the `/BeamIn/dtaFile` command.)
 
+    /BeamIn/momentumDistribution <type>
+
+> Type of momentum distribution for the incoming beam (`flat` or `Gaussian`). With the `flat` type, the Dpp parameter sets the full width of the distribution. With the `Gaussian` type, the value of Dpp sets the sigma parameter of the distribution.
+
     /BeamIn/dtaFile <filename>
 
 > file name for the dta spectrum of the incoming beam. This is a text file with format: 
@@ -197,13 +203,17 @@ Optional commands related to the incoming beam:
     
     /BeamIn/Focus/Y <double> <unit>
 
-> Offsets of the emission point of the incoming beam. (Z defaults to -50 cm. If you change this, make sure it is upstream of the target!)
+> Position of the beam spot on target
 
     /BeamIn/Focus/DX <double> <unit>
     
     /BeamIn/Focus/DY <double> <unit>
 
-> Horizontal and vertical widths of the beam spot at the emission point (not on target)
+> Horizontal and vertical widths of the beam spot on target
+
+    /BeamIn/Focus/Z0 <double> <unit>
+
+>  Initial Z position of the beam (Z0 defaults to -50 cm. If you change this, make sure it is upstream of the target!)
 
     /BeamIn/Focus/Ata0 <double> <unit>
     
@@ -223,17 +233,17 @@ Optional commands related to the incoming beam:
 
 Mandatory commands related to the outgoing beam:
 
-    /BeamOut/DA <int> 
-    
-    /BeamOut/DZ <int>
-
-> Changes in mass number and atomic number of the reaction. The incoming beam has (A,Z) and the outgoing reaction product has (A+DA, Z+DZ)
-
     /BeamOut/TargetA <int>
     
     /BeamOut/TargetZ <int>
 
 > Mass number and charge number of the target nucleus.
+
+    /BeamOut/DA <int> 
+    
+    /BeamOut/DZ <int>
+
+> Changes in mass number and atomic number of the reaction. The incoming beam has (A,Z) and the outgoing reaction product has (A+DA, Z+DZ). Beam and target (A, Z) and (DA, DZ) are used in 2-body kinematics calculations.
 
     /BeamOut/ProjectileExcitation <double> <unit>
 
@@ -533,18 +543,21 @@ If energy was deposited in GRETINA in the event, S800 data and decomposed gamma-
     S   <ATA>   <BTA>   <DTA>   <YTA>   <Event #>
     D   <# of decomposed gamma events>   <Event #>
     C   <Crystal ID>   <# of interaction points>
-        <Segment ID>   <Energy>   <X>   <Y>   <Z>
-        <Segment ID>   <Energy>   <X>   <Y>   <Z>
-    C   <Crystal ID>   <# of interaction points>
-        <Segment ID>   <Energy>   <X>   <Y>   <Z>
-        <Segment ID>   <Energy>   <X>   <Y>   <Z>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>   <Time>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>   <Time>
     ...
+    C   <Crystal ID>   <# of interaction points>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>   <Time>
+        <Segment ID>   <Energy>   <X>   <Y>   <Z>   <Time>
+    ...
+
+where `<Time>` values of the interaction points are lab-frame times relative to the start of the event.
 
 The energy, emission position, emission direction, and the velocity of the projectile are written for each gamma ray emitted in every event:
 
     E   <# of emitted gamma rays>    <Full Energy>     <Event #>
-        <Energy>   <X>   <Y>   <Z>   <theta>   <phi>   <beta>
-        <Energy>   <X>   <Y>   <Z>   <theta>   <phi>   <beta>
+        <Energy>   <X>   <Y>   <Z>   <phi>   <theta>   <beta>
+        <Energy>   <X>   <Y>   <Z>   <phi>   <theta>   <beta>
         ...
 
 `<Full Energy> = 1` if a single gamma ray is emitted and its full energy is deposited in a single crystal. `<Full Energy> = 0` if a single gamma ray is emitted and only part of its energy is deposited in any one crystal. `<Full Energy> = -1` otherwise.
@@ -592,6 +605,10 @@ Energies are expressed in keV, and positions are expressed in mm.
     /Mode2/AllS800
 
 > All S800 events are written, even in the absence of detected gamma rays.
+
+    /Mode2/TimeSort
+
+> With this optional command, interaction points within each crystal are sorted by time.
 
     /Mode2/Print
 

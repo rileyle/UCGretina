@@ -97,25 +97,23 @@ void Target::setNStep(G4int n)
 void Target::Report()
 {
   G4cout<<"----> Target material set to  "<<Target_log->GetMaterial()->GetName()<< G4endl;   
-  G4cout<<"----> Target density:         "<<Target_log->GetMaterial()->GetDensity()<< G4endl;   
+  G4cout<<"----> Target density:         "<<Target_log->GetMaterial()->GetDensity()<< G4endl;
+  G4cout<<"----> Scaling target density by     "<< Target_density_scale << G4endl;
   G4cout<<"----> Target side X is set to "<<G4BestUnit(2.*aTarget->GetXHalfLength(),"Length")<<G4endl;
   G4cout<<"----> Target side Y is set to "<<G4BestUnit(2.*aTarget->GetYHalfLength(),"Length")<<G4endl;  
   G4cout<<"----> Target thickness is set to "<<G4BestUnit(2.*aTarget->GetZHalfLength(),"Length")<<G4endl;
+  G4cout<<"----> Target position is set to ("<<Pos->x()<<", "<<Pos->y()<<", "<<Pos->z()<<") mm"<<G4endl;
   G4cout<<"----> Number of simulation steps in the target is set to "<<NStep<<G4endl;
 }
 //---------------------------------------------------------------------
 void Target::setMaterial(G4String materialName)
 {
-
   TargetMaterialName = materialName;
-  G4cout<<"----> Target material set to     "<<materialName<< G4endl;
-         
 }
 //-------------------------------------------------------------------
 void Target::setDensityScale(G4double scale)
 {
   Target_density_scale = scale;
-  G4cout<<"----> Scaling target density by     "<< scale << G4endl;
 }
 //-------------------------------------------------------------------
 void Target::setTargetReactionDepth(G4double depth)
@@ -129,12 +127,6 @@ void Target::setPosition(G4double x, G4double y, G4double z)
   Pos->setX(x);
   Pos->setY(y);
   Pos->setZ(z);
-
-  G4cout <<"----> Target position is set to "
-	 << G4BestUnit(x,"Length") << ", "
-    	 << G4BestUnit(y,"Length") << ", "
-	 << G4BestUnit(z,"Length") << ", "
-	 << G4endl;
 }
 //---------------------------------------------------------------------
 void Target::setSourceFrame(G4String sF)

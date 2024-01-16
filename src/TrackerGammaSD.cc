@@ -92,9 +92,9 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
       ( particleName == "neutron" && processName == "hadElastic" ) )
     edep = phdA*pow(edep, phdB);
 
-  // Keep the gamma parent of pair-production tracks for hit processing.
+  // Keep the gamma parent of pair-production and polarized Compton tracks for hit processing.
   if(edep<0.001*eV
-     && processName != "conv") 
+     && processName != "conv" && processName != "pol-compt" && processName != "pol-conv") 
     return false;
 
   G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();
@@ -194,7 +194,8 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   newHit->SetPos        (position);
   newHit->SetPosCrys    (posSol);
   newHit->SetTrackOrigin(aStep->GetTrack()->GetVertexPosition());
-
+  newHit->SetGlobalTime(aStep->GetPostStepPoint()->GetGlobalTime());
+  
   gammaCollection->insert( newHit );
   newHit->Draw();
   //  getc(stdin);
@@ -219,7 +220,7 @@ void TrackerGammaSD::EndOfEvent(G4HCofThisEvent* HCE)
 	    G4cout << "\n--------> event " << runManager->GetCurrentEvent()->GetEventID() << ", "
 		   << NbHits << " hits for gamma tracking: " << G4endl;
 	    G4cout << "                            parent    creator" << G4endl;
-	    G4cout << "trackID   PID     process   track     process      det seg     Edep      KE         X         Y         Z         Xo        Yo        Zo" << G4endl;
+	    G4cout << "trackID   PID     process   track     process      det seg     Edep      KE         X         Y         Z         Xo        Yo        Zo    T (ps)" << G4endl;
 	    G4double totE = 0;
 	    for (i=0;i<NbHits;i++){
 	      (*gammaCollection)[i]->Print();

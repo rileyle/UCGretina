@@ -25,11 +25,13 @@ public:
   void setKE(G4double);
   void setKEu(G4double); 
   void setDTAFile(G4String);
+  void setMomentumDistribution(G4String d){momDist=d;}
+  void setPositionDistribution(G4String d){posDist=d;}
   void setfcX(G4double);
   void setfcDX(G4double);
   void setfcY(G4double);
   void setfcDY(G4double);
-  void setfcZ(G4double);
+  void setZ0(G4double);
   void setDpp(G4double);
   void setmaxAta(G4double);
   void setmaxBta(G4double);
@@ -45,8 +47,9 @@ public:
   G4double getKEu(){return KEu;}
   G4double getAta0(){return ata0;}
   G4double getBta0(){return bta0;}
-  G4ThreeVector getPosition();
+  G4ThreeVector getPosition(G4ThreeVector);
   G4ThreeVector getDirection();
+
 private:
   
   G4int A;
@@ -56,6 +59,8 @@ private:
   G4double KEu;
   G4String dtaFileName;
   G4double dta[1000];
+  G4String momDist;
+  G4String posDist;
   G4int Ndta;
   G4double dtaMin;
   G4double dtaMax;
@@ -65,7 +70,7 @@ private:
   G4double fcDX;
   G4double fcY;
   G4double fcDY;
-  G4double fcZ;
+  G4double Z0;
   G4double maxAta;
   G4double maxBta;
   G4double ata0;

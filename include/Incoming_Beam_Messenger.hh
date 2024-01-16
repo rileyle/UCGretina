@@ -30,11 +30,13 @@ class Incoming_Beam_Messenger: public G4UImessenger
     G4UIcmdWithADoubleAndUnit* KECmd;
     G4UIcmdWithADoubleAndUnit* KEuCmd;
     G4UIcmdWithAString*        dtaCmd;
+    G4UIcmdWithAString*        pdCmd;
+    G4UIcmdWithAString*        posdCmd;
     G4UIcmdWithADoubleAndUnit* fcXCmd;
     G4UIcmdWithADoubleAndUnit* fcDXCmd;
     G4UIcmdWithADoubleAndUnit* fcYCmd;
     G4UIcmdWithADoubleAndUnit* fcDYCmd;
-    G4UIcmdWithADoubleAndUnit* fcZCmd;
+    G4UIcmdWithADoubleAndUnit* Z0Cmd;
     G4UIcmdWithADoubleAndUnit* maxACmd;
     G4UIcmdWithADoubleAndUnit* maxBCmd;
     G4UIcmdWithADoubleAndUnit* Ata0Cmd;

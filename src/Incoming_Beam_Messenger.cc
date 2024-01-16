@@ -41,6 +41,16 @@ Incoming_Beam_Messenger::Incoming_Beam_Messenger(Incoming_Beam* BI)
   dtaCmd->SetParameterName("choice",false);
   dtaCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  pdCmd = new G4UIcmdWithAString("/BeamIn/momentumDistribution",this);
+  pdCmd->SetGuidance("Set the distribution type for the momentum of the incoming beam (flat or Gaussian).");
+  pdCmd->SetParameterName("choice",false);
+  pdCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  posdCmd = new G4UIcmdWithAString("/BeamIn/positionDistribution",this);
+  posdCmd->SetGuidance("Set the distribution type for the position of the incoming beam (flat or Gaussian).");
+  posdCmd->SetParameterName("choice",false);
+  posdCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
   fcXCmd = new G4UIcmdWithADoubleAndUnit("/BeamIn/Focus/X",this);
   fcXCmd->SetGuidance("Set focal point X position for the incoming beam.");
   fcXCmd->SetParameterName("choice",false);
@@ -61,10 +71,10 @@ Incoming_Beam_Messenger::Incoming_Beam_Messenger(Incoming_Beam* BI)
   fcDYCmd->SetParameterName("choice",false);
   fcDYCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  fcZCmd = new G4UIcmdWithADoubleAndUnit("/BeamIn/Focus/Z",this);
-  fcZCmd->SetGuidance("Set focal point Z position for the incoming beam.");
-  fcZCmd->SetParameterName("choice",false);
-  fcZCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  Z0Cmd = new G4UIcmdWithADoubleAndUnit("/BeamIn/Focus/Z0",this);
+  Z0Cmd->SetGuidance("Set initial Z position for the incoming beam. (default=-50 cm; must be upstream of the target)");
+  Z0Cmd->SetParameterName("choice",false);
+  Z0Cmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
 
   maxACmd = new G4UIcmdWithADoubleAndUnit("/BeamIn/Focus/maxAta",this);
@@ -107,13 +117,15 @@ Incoming_Beam_Messenger::~Incoming_Beam_Messenger()
   delete maxBCmd;
   delete fcXCmd;
   delete fcYCmd;
-  delete fcZCmd;
+  delete Z0Cmd;
   delete fcDXCmd;
   delete fcDYCmd;
   delete DppCmd;
   delete KEuCmd;
   delete KECmd;
   delete dtaCmd;
+  delete pdCmd;
+  delete posdCmd;
   delete RepCmd;
   delete ZCmd;
   delete ACmd;
@@ -138,6 +150,10 @@ void Incoming_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamIn->setKEu(KEuCmd->GetNewDoubleValue(newValue));}
   if( command == dtaCmd )
     { BeamIn->setDTAFile(newValue);}
+  if( command == pdCmd )
+    { BeamIn->setMomentumDistribution(newValue);}
+  if( command == posdCmd )
+    { BeamIn->setPositionDistribution(newValue);}
   if( command == DppCmd )
     { BeamIn->setDpp(DppCmd->GetNewDoubleValue(newValue));}
   if( command == fcXCmd )
@@ -148,8 +164,8 @@ void Incoming_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamIn->setfcY(fcYCmd->GetNewDoubleValue(newValue));}
   if( command == fcDYCmd )
     { BeamIn->setfcDY(fcDYCmd->GetNewDoubleValue(newValue));}
-  if( command == fcZCmd )
-    { BeamIn->setfcZ(fcZCmd->GetNewDoubleValue(newValue));}
+  if( command == Z0Cmd )
+    { BeamIn->setZ0(Z0Cmd->GetNewDoubleValue(newValue));}
   if( command == maxACmd )
     { BeamIn->setmaxAta(maxACmd->GetNewDoubleValue(newValue));}
   if( command == maxBCmd )

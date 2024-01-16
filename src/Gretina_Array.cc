@@ -1715,7 +1715,7 @@ G4int Gretina_Array::CalculateSegments(G4int iPg)
   G4int nsegs    = nsides * nslices;
    
   // vertices of inner and outer face of crystal
-#ifdef G4V10
+#if defined G4V10 || G4V11
   G4Point3D* vertexF1;
   G4Point3D* vertexF2;
   vertexF1= new G4Point3D[nsides];

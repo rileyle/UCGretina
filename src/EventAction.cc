@@ -23,6 +23,7 @@ EventAction::EventAction()
   print = false;
   evt = NULL;
   fisInBeam = false;
+  timeSort = false;
   Timerintern.Start();
   timerCount = 0;
   eventsPerSecond = 0;
@@ -67,11 +68,13 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 {
   evt = ev;
 
-  ios::fmtflags f( G4cout.flags() );
-
   G4int event_id=evt->GetEventID();
 
   if(event_id%everyNevents == 0 && event_id > 0) {
+
+    std::ios::fmtflags f( G4cout.flags() );
+    G4int prec = G4cout.precision();
+
     Timerintern.Stop();
     timerCount++;
     eventsPerSecond += 
@@ -106,6 +109,10 @@ void EventAction::EndOfEventAction(const G4Event* ev)
     G4cout << " remaining       "
 	   << "\r"<<std::flush;
     Timerintern.Start();
+
+    G4cout.setf( f );
+    G4cout.precision( prec );
+
   }
   
   EventInformation* eventInfo = (EventInformation*)evt->GetUserInformation();
@@ -118,6 +125,10 @@ void EventAction::EndOfEventAction(const G4Event* ev)
   long long int timestamp = (long long int)10000*event_id;
 
   if(print){
+    
+    std::ios::fmtflags f( G4cout.flags() );
+    G4int prec = G4cout.precision();
+
     G4cout << "-------->Mode2 data, event " << event_id << G4endl;
     if(fisInBeam)
       G4cout << std::fixed << std::setprecision(4) 
@@ -139,6 +150,10 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	     << ", " << eventInfo->GetEmittedGammaTheta(i)
 	     << " beta = " << eventInfo->GetBeta(i)
 	     << G4endl;
+
+    G4cout.setf( f );
+    G4cout.precision( prec );
+
   }
 
   // Analyze hits and write event information to the output file.
@@ -165,12 +180,24 @@ void EventAction::EndOfEventAction(const G4Event* ev)
       G4double X0[100*MAX_INTPTS];
       G4double Y0[100*MAX_INTPTS];
       G4double Z0[100*MAX_INTPTS];
+      G4double globalTime[100*MAX_INTPTS];
       G4int NCons[100*MAX_INTPTS];
       G4double packingRes2 = packingRes*packingRes;
 
       G4int NMeasured = 0;
       G4double totalEdep = 0;
 
+      // Prevent seg fault in events with very large hit collections.
+      // This arises rarely in high-energy muon (and likely other
+      // high-energy charged particle) events.
+      if( Nhits > 3000 ){
+	G4cerr << "Warning: hit collection with " << Nhits
+	       << " entries. Processing the first 3000."
+	       << " (event " << event_id << ")"
+	       << G4endl;
+	Nhits = 3000;
+      }
+      
       for(G4int i = 0; i < Nhits; i++){
 
 	G4double x, y, z;
@@ -193,6 +220,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	G4double en  = (*gammaCollection)[i]->GetEdep()/keV;
 	totalEdep += en;
 
+	G4double gt  = (*gammaCollection)[i]->GetGlobalTime()*1.e3;
+	
 	NCons[i] = -1;
 	G4bool processed = false;	
 
@@ -232,6 +261,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	    Y0[NMeasured] = (*gammaCollection)[i]->GetPos().getY()/mm;
 	    Z0[NMeasured] = (*gammaCollection)[i]->GetPos().getZ()/mm;
 
+	    globalTime[NMeasured] = (*gammaCollection)[i]->GetGlobalTime()*1.e3;
+	    
 	    NCons[NMeasured] = 1;
 	    NMeasured++;
 	    processed = true;
@@ -264,11 +295,25 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 		&& (*gammaCollection)[i]->GetDetNumb() == detNum[j]){        // same crystal
 
 	      // Energy-weighted average position (barycenter)
-	      measuredX[j] = (measuredEdep[j]*measuredX[j] + en*x)/(measuredEdep[j] + en);
-	      measuredY[j] = (measuredEdep[j]*measuredY[j] + en*y)/(measuredEdep[j] + en);
-	      measuredZ[j] = (measuredEdep[j]*measuredZ[j] + en*z)/(measuredEdep[j] + en);
-	      measuredEdep[j] += en;
+	      if(measuredEdep[j] == 0 && en == 0){
+		// G4cout << "    Both energies are zero. Taking the average." << G4endl;
+		measuredX[j]  = (measuredX[j] + x)/2.;
+		measuredY[j]  = (measuredY[j] + y)/2.;
+		measuredZ[j]  = (measuredZ[j] + z)/2.;
+		
+		// Assign the earliest global time of the first raw hit in this IP
+		globalTime[j] = std::min(gt, globalTime[j]);
+	      } else {
+		// G4cout << "    Calculating a weighted average." << G4endl;
+		measuredX[j] = (measuredEdep[j]*measuredX[j] + en*x)/(measuredEdep[j] + en);
+		measuredY[j] = (measuredEdep[j]*measuredY[j] + en*y)/(measuredEdep[j] + en);
+		measuredZ[j] = (measuredEdep[j]*measuredZ[j] + en*z)/(measuredEdep[j] + en);
+		measuredEdep[j] += en;
 
+		// Assign the earliest global time of the first raw hit in this IP
+		globalTime[j] = std::min(gt, globalTime[j]);
+	      }
+	      
 	      NCons[j]++;
 	      processed = true;
 	      
@@ -300,6 +345,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	  Y0[NMeasured] = (*gammaCollection)[i]->GetTrackOrigin().getY()/mm;
 	  Z0[NMeasured] = (*gammaCollection)[i]->GetTrackOrigin().getZ()/mm;
 
+	  globalTime[NMeasured] = (*gammaCollection)[i]->GetGlobalTime()*1.e3;
+
 	  NCons[NMeasured] = 1;
 	  NMeasured++;
 	  processed = true;
@@ -307,7 +354,7 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	}
 
 	if(!processed)
-	  G4cout << "Warning: Could not find a home for hit " << i
+	  G4cerr << "Warning: Could not find a home for hit " << i
 		 << " of event " << event_id 
 		 << G4endl;
 
@@ -335,11 +382,22 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	      &&  (NCons[i] > 0 && NCons[j] > 0) ){  // not already consolidated
 
 	    // Energy-weighted average
-	    measuredX[i] = (measuredEdep[i]*measuredX[i] + measuredEdep[j]*measuredX[j])/(measuredEdep[i]+measuredEdep[j]);
-	    measuredY[i] = (measuredEdep[i]*measuredY[i] + measuredEdep[j]*measuredY[j])/(measuredEdep[i]+measuredEdep[j]);
-	    measuredZ[i] = (measuredEdep[i]*measuredZ[i] + measuredEdep[j]*measuredZ[j])/(measuredEdep[i]+measuredEdep[j]);
-	    measuredEdep[i] += measuredEdep[j];
+	    if(measuredEdep[i] == 0 && measuredEdep[j] == 0){
+	      measuredX[i]  = (measuredX[i] + measuredX[j])/2.;
+	      measuredY[i]  = (measuredY[i] + measuredY[j])/2.;
+	      measuredZ[i]  = (measuredZ[i] + measuredZ[j])/2.;
 
+	      // Assign the earliest global time of the first raw hit in this IP
+	      globalTime[i] = std::min(globalTime[i], globalTime[j]);
+	    } else {
+	      measuredX[i] = (measuredEdep[i]*measuredX[i] + measuredEdep[j]*measuredX[j])/(measuredEdep[i]+measuredEdep[j]);
+	      measuredY[i] = (measuredEdep[i]*measuredY[i] + measuredEdep[j]*measuredY[j])/(measuredEdep[i]+measuredEdep[j]);
+	      measuredZ[i] = (measuredEdep[i]*measuredZ[i] + measuredEdep[j]*measuredZ[j])/(measuredEdep[i]+measuredEdep[j]);
+	      measuredEdep[i] += measuredEdep[j];
+
+	      // Assign the earliest global time of the first raw hit in this IP
+	      globalTime[i] = std::min(globalTime[i], globalTime[j]);
+	    }
 	    NCons[j] = -1;
 	    NGammaHits--;
 
@@ -458,7 +516,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 		  NMeasured, 
 		  detNum, segNum, NCons, 
 		  measuredX, measuredY, measuredZ, 
-		  measuredEdep, segmentEdep);
+		  measuredEdep, segmentEdep,
+		  globalTime);
       
     } else {
       // Write S800 event to the output file with no detected gammas
@@ -476,8 +535,6 @@ void EventAction::EndOfEventAction(const G4Event* ev)
   // the output file.
 
   writeSim(timestamp, eventInfo);
-
-  G4cout.flags( f );
 
 }
 // --------------------------------------------------
@@ -563,12 +620,13 @@ void EventAction::writeDecomp(long long int ts,
 			      G4int NMeasured, 
 			      G4int detNum[], G4int segNum[], G4int NCons[],
 			      G4double x[], G4double y[], G4double z[], 
-			      G4double e[], G4double se[])
+			      G4double e[], G4double se[], G4double gt[])
 {
   G4int siz;
   GEBDATA gd;
   CRYS_IPS crys_ips[100*MAX_INTPTS];
-
+  G4double crys_gts[100*MAX_INTPTS][MAX_INTPTS];
+  
   G4int Ndecomp = 0;
   G4bool Processed[100*MAX_INTPTS];
   for(G4int i = 0; i < NMeasured; i++)
@@ -601,6 +659,7 @@ void EventAction::writeDecomp(long long int ts,
       crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].e = e[i];
       crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].seg = segNum[i];
       crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].seg_ener = se[i];
+      crys_gts[Ndecomp][ crys_ips[Ndecomp].num-1 ] = gt[i];
       Processed[i] = true;
 
       for(G4int j = i+1; j < MAX_INTPTS; j++){ // Clear the interaction points
@@ -626,6 +685,7 @@ void EventAction::writeDecomp(long long int ts,
 	    crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].e = e[j];
 	    crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].seg = segNum[j];
 	    crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].seg_ener = se[j];
+	    crys_gts[Ndecomp][ crys_ips[Ndecomp].num ] = gt[j];
 	  }
 	  crys_ips[Ndecomp].num++; // Check for overflow below, and warn.
 	  Processed[j] = true;
@@ -635,13 +695,71 @@ void EventAction::writeDecomp(long long int ts,
     }
   }
 
-  for(G4int i = 0; i < Ndecomp; i++)
+  for(G4int i = 0; i < Ndecomp; i++){
+
+    if(timeSort){
+      // Store unsorted interaction points.
+      IP ips[MAX_INTPTS];
+      G4double gts[MAX_INTPTS];
+      std::vector<G4int> idx; // for sorted indices
+      for(G4int j = 0; j < crys_ips[i].num; j++){
+	idx.push_back(j);
+	ips[j].x        = crys_ips[i].ips[j].x;
+	ips[j].y        = crys_ips[i].ips[j].y;
+	ips[j].z        = crys_ips[i].ips[j].z;
+	ips[j].e        = crys_ips[i].ips[j].e;
+	ips[j].seg      = crys_ips[i].ips[j].seg;
+	ips[j].seg_ener = crys_ips[i].ips[j].seg_ener;
+	gts[j]          = crys_gts[i][j];
+      }
+    
+      // G4cout << "=========================" << G4endl;
+      // G4cout << "Before:" << G4endl;
+      // for(G4int j = 0; j < crys_ips[i].num; j++){
+      //   G4cout << crys_gts[i][j] << ", " << crys_ips[i].ips[j].x
+      // 	     << ", " << crys_ips[i].ips[j].y
+      // 	     << ", " << crys_ips[i].ips[j].z
+      // 	     << ", " << crys_ips[i].ips[j].e
+      // 	     << ", " << crys_ips[i].ips[j].seg
+      // 	     << ", " << crys_ips[i].ips[j].seg_ener
+      // 	     << G4endl;
+      // }
+    
+      // Time-sort the indices of the interaction points
+      // (credit: https://stackoverflow.com/a/40183830)
+      std::sort(idx.begin(), idx.end(), [&](int k,int l){return crys_gts[i][k] < crys_gts[i][l];} );
+
+      // Use the time-sorted indices to re-order the interaction points.
+      for(G4int j = 0; j < crys_ips[i].num; j++){
+	crys_ips[i].ips[j].x        = ips[idx[j]].x;
+	crys_ips[i].ips[j].y        = ips[idx[j]].y;
+	crys_ips[i].ips[j].z        = ips[idx[j]].z;
+	crys_ips[i].ips[j].e        = ips[idx[j]].e;
+	crys_ips[i].ips[j].seg      = ips[idx[j]].seg;
+	crys_ips[i].ips[j].seg_ener = ips[idx[j]].seg_ener;
+	crys_gts[i][j]              = gts[idx[j]];
+      }
+
+      // G4cout << "After:" << G4endl;
+      // for(G4int j = 0; j < crys_ips[i].num; j++)
+      //   G4cout << crys_gts[i][j] << ", " << crys_ips[i].ips[j].x
+      // 	     << ", " << crys_ips[i].ips[j].y
+      // 	     << ", " << crys_ips[i].ips[j].z
+      // 	     << ", " << crys_ips[i].ips[j].e
+      // 	     << ", " << crys_ips[i].ips[j].seg
+      // 	     << ", " << crys_ips[i].ips[j].seg_ener
+      // 	     << G4endl;
+
+    }
+    
     if(crys_ips[i].num > MAX_INTPTS){
-      G4cout << "Warning: " << crys_ips[i].num << " interaction points."
+      G4cerr << "Warning: " << crys_ips[i].num << " interaction points."
 	     << "         only " << MAX_INTPTS << " can be written."
+	     << " (event " << ts/10000 << ")"
 	     << G4endl;
       crys_ips[i].num = MAX_INTPTS;
     }
+  }
 
   
   if(mode2Out){
@@ -681,7 +799,8 @@ void EventAction::writeDecomp(long long int ts,
 	       << crys_ips[i].ips[j].e << std::setw(12) 
 	       << crys_ips[i].ips[j].x << std::setw(12) 
 	       << crys_ips[i].ips[j].y << std::setw(12) 
-	       << crys_ips[i].ips[j].z
+	       << crys_ips[i].ips[j].z << std::setw(12)
+	       << crys_gts[i][j]
 	       << G4endl;
       }
     }

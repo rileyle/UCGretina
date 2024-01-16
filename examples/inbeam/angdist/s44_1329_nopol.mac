@@ -10,7 +10,7 @@
 
 # Gamma-ray angular correlation / polarization flags ===========================
 /PhysicsList/AngularCorrelations true
-/PhysicsList/SetGammaPolarization true
+#/PhysicsList/SetGammaPolarization true
 
 # Initialize run manager =======================================================
 /run/initialize
@@ -33,12 +33,12 @@
 /BeamOut/AngDistSigmaB 0.006 rad
 /BeamOut/Update
 
-# No alignment =================================================================
-/reaction/population 4   0.2
-/reaction/population 2   0.2
-/reaction/population 0   0.2
-/reaction/population -2  0.2
-/reaction/population -4  0.2
+# 100% oblate alignment ========================================================
+/reaction/population 4   0.5
+/reaction/population 2   0.0
+/reaction/population 0   0.0
+/reaction/population -2  0.0
+/reaction/population -4  0.5
 
 # Print simulation parameters to stdout ========================================
 /Target/Report
@@ -54,5 +54,5 @@
 /Mode2/GretinaCoords
 /Mode2/S800KE 3.798 GeV
 #/Mode2/Print
-/Mode2/Filename s44_1329_iso.dat
+/Mode2/Filename s44_1329_nopol.dat
 /run/beamOn 1000000

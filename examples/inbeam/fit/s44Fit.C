@@ -95,7 +95,7 @@ void s44Fit(Int_t rebin){
   f1->SetParLimits(2, 0, 100);
   f1->SetParLimits(3, -0.005, 0);
   
-  spectrum->GetXaxis()->SetRangeUser(0., fitMaxE);
+  spectrum->GetXaxis()->SetRangeUser(fitMinE, fitMaxE);
   GH1D *diff    = (GH1D*)spectrum->Clone("diff");
   GH1D * sqrtup = (GH1D*)spectrum->Clone("Error+");
   GH1D * sqrtdn = (GH1D*)spectrum->Clone("Error-");

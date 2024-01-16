@@ -48,6 +48,14 @@
 #include "G4EmLivermorePolarizedPhysics.hh"
 #include "G4EmPenelopePhysics.hh"
 #include "G4EmLowEPPhysics.hh"
+#include "PhysListEmPolarized.hh"
+
+#include "G4PolarizedAnnihilation.hh"
+#include "G4PolarizedBremsstrahlung.hh"
+#include "G4PolarizedCompton.hh"
+#include "G4PolarizedGammaConversion.hh"
+#include "G4PolarizedIonisation.hh"
+#include "G4PolarizedPhotoElectric.hh"
 
 #include "DetectorConstruction.hh"
 
@@ -161,30 +169,31 @@ void PhysicsList::ConstructProcess()
 #endif
   
   // Electromagnetic physics list
-  //
+  
   if(usePolar){
-    AddPhysicsList("emlivermorepolarized");
+    //AddPhysicsList("emlivermorepolarized");
+    AddPhysicsList("empolarized");
   }
 
   fEmPhysicsList->ConstructProcess();
 
-  // Prior to using G4EmLivermorePolarizedPhysics
-  //
+  // // Replace selected processes in the existing physics list.
   // if(usePolar){
   //   G4ProcessManager *gpMan = G4Gamma::Gamma()->GetProcessManager();
   //   G4ProcessVector* pv = gpMan->GetProcessList();
   //   for(unsigned int i=0;i<pv->entries();i++){
-  //     if((*pv)[i]->GetProcessName()=="phot"){
-  // 	gpMan->RemoveProcess((*pv)[i]);
-  // 	gpMan->AddDiscreteProcess(new G4PolarizedPhotoElectricEffect);
-  //     }
+  //     // For now, polarized Photoeffect can't handle enough secondaries?
+  //     //      if((*pv)[i]->GetProcessName()=="phot"){
+  //     //   	gpMan->RemoveProcess((*pv)[i]);
+  //     //   	gpMan->AddDiscreteProcess(new G4PolarizedPhotoElectric());
+  //     //      }
   //     if((*pv)[i]->GetProcessName()=="compt"){
-  // 	gpMan->RemoveProcess((*pv)[i]);
-  // 	gpMan->AddDiscreteProcess(new G4PolarizedCompton());
+  //  	gpMan->RemoveProcess((*pv)[i]);
+  //  	gpMan->AddDiscreteProcess(new G4PolarizedCompton());
   //     }
   //     if((*pv)[i]->GetProcessName()=="conv"){
-  // 	gpMan->RemoveProcess((*pv)[i]);
-  // 	gpMan->AddDiscreteProcess(new G4PolarizedGammaConversion);
+  //  	gpMan->RemoveProcess((*pv)[i]);
+  //  	gpMan->AddDiscreteProcess(new G4PolarizedGammaConversion());
   //     }
   //   }
   // }
@@ -271,6 +280,11 @@ void PhysicsList::AddPhysicsList(const G4String& name)
     fEmName = name;
     delete fEmPhysicsList;
     fEmPhysicsList = new G4EmLivermorePolarizedPhysics();
+
+  } else if (name == "empolarized") {
+    fEmName = name;
+    delete fEmPhysicsList;
+    fEmPhysicsList = new PhysListEmPolarized();
 
   } else if (name == "empenelope") {
     fEmName = name;

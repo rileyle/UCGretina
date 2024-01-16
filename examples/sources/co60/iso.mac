@@ -8,7 +8,7 @@
 
 # Gamma-ray angular correlation / polarization flags ===========================
 /PhysicsList/AngularCorrelations false
-/PhysicsList/SetGammaPolarization true
+/PhysicsList/SetGammaPolarization false
 
 # Initialize run manager =======================================================
 /run/initialize
@@ -19,13 +19,15 @@
 /process/inactivate Reaction
 
 # Stationary 60Co source
+# Set a very high time threshold to allow all decays to happen
+/process/had/rdm/thresholdForVeryLongDecayTime 1.0e+60 year
 /BeamOut/Source
 /BeamIn/A 60
 /BeamIn/Z 27
 /BeamIn/KEu 0. keV      
 
 # Source position and dimensions
-/BeamIn/Focus/Z  0. mm
+/BeamIn/Focus/Z0 0. mm
 /BeamIn/Focus/X  0. mm
 /BeamIn/Focus/Y  0. mm
 /BeamIn/Focus/DX 0. mm
