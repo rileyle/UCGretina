@@ -89,7 +89,7 @@ endif
 .PHONY: all
 all: include/Git_Hash.hh lib bin
 
-include/Git_Hash.hh:
+include/Git_Hash.hh: FORCE
 ifneq ($(PREV_GIT_HASH),$(GIT_HASH))
 	echo $(GIT_HASH) > git_hash
 	echo "#ifndef Git_Hash_h" > include/Git_Hash.hh
@@ -98,5 +98,7 @@ ifneq ($(PREV_GIT_HASH),$(GIT_HASH))
 	echo "#define GIT_BRANCH \"$(GIT_BRANCH)\"" >> include/Git_Hash.hh
 	echo "#endif" >> include/Git_Hash.hh
 endif
+
+FORCE:
 
 include $(G4INSTALL)/config/binmake.gmk
