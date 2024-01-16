@@ -253,7 +253,7 @@ Mandatory commands related to the outgoing beam:
 
     /BeamOut/LevelDataFile <filename>
 
-> The level data file describes the discrete levels and transitions of the outgoing (beam-like or target-like) reaction product. The file format is based on that of the PhotonEvaporationX.X data files (described in detail in the file $G4LEVELGAMMADATA/README-LevelGammaData). 
+> The level data file describes the discrete levels and transitions of the outgoing (beam-like or target-like) reaction product. The file format is based on that of the PhotonEvaporationX.X data files (described in detail in the file $G4LEVELGAMMADATA/README-LevelGammaData). In the absense of this command, the file provided in $G4LEVELGAMMADATA is used.
 > 
 > _Note: If the mass number of the outgoing nucleus lies outside of the A range specified in NuclearLevelData.cc by the AMIN[] and AMAX[] arrays, you will need to increase the range to include it so that your level data can be loaded._
 

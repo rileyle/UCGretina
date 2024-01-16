@@ -115,8 +115,8 @@ void Outgoing_Beam::setDecayProperties()
   
   // Load the particle table with excited states
   if(lvlDataFileNames.size() == 0){
-    G4cerr << "Error: level data file name not set." << G4endl;
-    exit(EXIT_FAILURE);
+    G4cerr << "Warning: Level data file not specified with the /BeamOut/LevelDataFile command." << G4endl;
+    G4cerr << "         Using the PhotonEvaporation data file." << G4endl;
   }
   for(size_t j = 0; j < lvlDataFileNames.size(); j++){
 
