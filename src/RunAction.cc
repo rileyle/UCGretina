@@ -5,7 +5,7 @@ extern G4Timer Timer;
 
 RunAction::RunAction(DetectorConstruction* detector, Incoming_Beam* BI,EventAction* ev): myDetector(detector), BeamIn(BI), evaction(ev)
 {
-  
+
 }
 
 

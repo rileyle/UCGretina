@@ -78,6 +78,20 @@ ifndef G4INSTALL
 endif
 
 .PHONY: all
-all: lib bin
+all: include/Git_Hash.hh lib bin
+
+# Collect the git branch and commit hash.
+#PREV_GIT_HASH := $(shell cat git_hash || echo “”)
+GIT_HASH := $(shell git rev-parse HEAD)
+GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+include/Git_Hash.hh: git_hash
+	echo "#ifndef Git_Hash_h" > include/Git_Hash.hh
+	echo "#define Git_Hash_h" >> include/Git_Hash.hh
+	echo "#define GIT_HASH \"$(GIT_HASH)\"" >> include/Git_Hash.hh
+	echo "#define GIT_BRANCH \"$(GIT_BRANCH)\"" >> include/Git_Hash.hh
+	echo "#endif" >> include/Git_Hash.hh
+
+git_hash:
+	echo $(GIT_HASH) > git_hash
 
 include $(G4INSTALL)/config/binmake.gmk
