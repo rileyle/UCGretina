@@ -33,12 +33,12 @@
 /BeamOut/AngDistSigmaB 0.006 rad
 /BeamOut/Update
 
-# 100% oblate alignment ========================================================
-/reaction/population 4   0.5
+# 100% prolate alignment =======================================================
+/reaction/population 4   0.0
 /reaction/population 2   0.0
-/reaction/population 0   0.0
+/reaction/population 0   1.0
 /reaction/population -2  0.0
-/reaction/population -4  0.5
+/reaction/population -4  0.0
 
 # Print simulation parameters to stdout ========================================
 /Target/Report
