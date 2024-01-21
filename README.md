@@ -144,6 +144,14 @@ Optional command to include a model of the S800 quadrupole and gate valve:
 
     /Gretina/S800
 
+### Electromagnetic Physics List
+
+The electromagnetic physics list can be specified with:
+
+    /PhysicsList/SelectEmPhysics <physics list name>
+
+Available electromagnetic physics lists are `emstandard_opt0`, `emstandard_opt1`, `emstandard_opt2`, `emstandard_opt3`, **`emstandard_opt4` (default)**, `emlivermore`, `empenelope`, `emstandardGS`, `emlowenergy`, `emstandardWVI`, and `emstandardSS`. They are described [in the Geant4 Physics List Guide](https://geant4-userdoc.web.cern.ch/UsersGuides/PhysicsListGuide/BackupVersions/V10.7/html/electromagnetic/index.html). In addition, `emstandard_opt4_Atima` in a modified version of `emstandard_opt4` that uses ATIMA stopping powers for beam particles. 
+
 ### Gamma-Ray Angular Correlations (see also /examples/sources/co60) ###
 
 Gamma-ray angular correlations are built into the `G4PhotonEvaporation/G4GammaTransition` classes (starting with geant4.10.4). This functionality is disabled by default but can be enabled with: 
@@ -257,7 +265,7 @@ Optional commands related to the outgoing reaction product:
 
     /BeamOut/LevelDataFile <filename>
 
-> The level data file describes the discrete levels and transitions of the outgoing (beam-like or target-like) reaction product. The file format is based on that of the PhotonEvaporationX.X data files (described in detail in the file $G4LEVELGAMMADATA/README-LevelGammaData). In the absense of this command, the file provided in $G4LEVELGAMMADATA is used.
+> The level data file describes the discrete levels and transitions of the outgoing (beam-like or target-like) reaction product. The file format is based on that of the PhotonEvaporationX.X data files (described in detail in the file $G4LEVELGAMMADATA/README-LevelGammaData). In the absence of this command, the file provided in $G4LEVELGAMMADATA is used.
 > 
 > _Note: If the mass number of the outgoing nucleus lies outside of the A range specified in NuclearLevelData.cc by the AMIN[] and AMAX[] arrays, you will need to increase the range to include it so that your level data can be loaded._
 

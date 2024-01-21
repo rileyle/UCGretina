@@ -16,16 +16,16 @@ PhysicsList_Messenger::PhysicsList_Messenger(PhysicsList* pl):aPhysicsList(pl){
   PolCmd->SetGuidance("Enable/disable polarized gamma-ray physics");
   PolCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  AddCmd = new G4UIcmdWithAString("/PhysicsList/SelectPhysics",this);
-  AddCmd->SetGuidance("Select the physics list to use");
-  AddCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  EmCmd = new G4UIcmdWithAString("/PhysicsList/SelectEmPhysics",this);
+  EmCmd->SetGuidance("Select the electromagnetic physics list to use");
+  EmCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
 }
 
 PhysicsList_Messenger::~PhysicsList_Messenger(){
   delete CorrCmd;
   delete PolCmd;
-  delete AddCmd;
+  delete EmCmd;
   delete physDir;
 }
 
@@ -36,6 +36,6 @@ void PhysicsList_Messenger::SetNewValue(G4UIcommand* command, G4String newValue)
   if( command == PolCmd)
     aPhysicsList->SetUsePolarizedPhysics(PolCmd->GetNewBoolValue(newValue));
 
-  if( command == AddCmd)
-    aPhysicsList->AddPhysicsList(newValue);
+  if( command == EmCmd)
+    aPhysicsList->EmPhysicsList(newValue);
 }

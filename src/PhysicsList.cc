@@ -33,14 +33,13 @@
 
 #include "PhysicsList.hh"
 #include "PhysicsList_Messenger.hh"
- 
-//#include "PhysListEmStandard.hh"
 
 #include "G4EmStandardPhysics.hh"
 #include "G4EmStandardPhysics_option1.hh"
 #include "G4EmStandardPhysics_option2.hh"
 #include "G4EmStandardPhysics_option3.hh"
 #include "G4EmStandardPhysics_option4.hh"
+#include "EmStandardPhysics_option4_Atima.hh"
 #include "G4EmStandardPhysicsSS.hh"
 #include "G4EmStandardPhysicsGS.hh"
 #include "G4EmStandardPhysicsWVI.hh"
@@ -91,10 +90,13 @@ PhysicsList::PhysicsList(DetectorConstruction* det)
   theMessenger = new PhysicsList_Messenger(this);
   SetVerboseLevel(1);
 
-  // EM physics
-  //  fEmName = G4String("emstandard_opt4_mod");
+  // Default EM physics
   fEmName = G4String("emstandard_opt4");
   fEmPhysicsList = new G4EmStandardPhysics_option4();
+
+  // Use ATIMA Stopping Powers
+  //  fEmName = G4String("emstandard_opt4_Atima");
+  //  fEmPhysicsList = new EmStandardPhysics_option4_Atima();
   
   G4LossTableManager::Instance();
   // fix lower limit for cut
@@ -172,7 +174,7 @@ void PhysicsList::ConstructProcess()
   
   if(usePolar){
     //AddPhysicsList("emlivermorepolarized");
-    AddPhysicsList("empolarized");
+    EmPhysicsList("empolarized");
   }
 
   fEmPhysicsList->ConstructProcess();
@@ -216,20 +218,13 @@ void PhysicsList::ConstructProcess()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void PhysicsList::AddPhysicsList(const G4String& name)
+void PhysicsList::EmPhysicsList(const G4String& name)
 {
   if (verboseLevel>1) {
-    G4cout << "PhysicsList::AddPhysicsList: <" << name << ">" << G4endl;
+    G4cout << "PhysicsList::EmPhysicsList: <" << name << ">" << G4endl;
   }
   
   if (name == fEmName) return;
-
-  //if (name == "local") {
-  //  fEmName = name;
-  //  delete fEmPhysicsList;
-  //  fEmPhysicsList = new PhysListEmStandard(name);
-    
-  // } else 
 
   if (name == "emstandard_opt0") {
     fEmName = name;
@@ -255,6 +250,11 @@ void PhysicsList::AddPhysicsList(const G4String& name)
     fEmName = name;
     delete fEmPhysicsList;
     fEmPhysicsList = new G4EmStandardPhysics_option4();
+        
+  } else if (name == "emstandard_opt4_Atima") {
+    fEmName = name;
+    delete fEmPhysicsList;
+    fEmPhysicsList = new EmStandardPhysics_option4_Atima();
         
   } else if (name == "emstandardSS") {
     fEmName = name;

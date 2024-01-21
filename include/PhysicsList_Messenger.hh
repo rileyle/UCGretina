@@ -23,7 +23,7 @@ private:
 
   G4UIcmdWithABool* CorrCmd;
   G4UIcmdWithABool* PolCmd;
-  G4UIcmdWithAString* AddCmd;
+  G4UIcmdWithAString* EmCmd;
 };
 
 #endif//PHYSICSLIST_MESSENGER_H
