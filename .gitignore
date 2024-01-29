@@ -9,4 +9,5 @@ DEVNOTES
 *.wrl
 tmp*
 *.dat
+.vscode
 git_hash
