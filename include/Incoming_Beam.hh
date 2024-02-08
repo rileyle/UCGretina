@@ -27,6 +27,7 @@ public:
   void setDTAFile(G4String);
   void setMomentumDistribution(G4String d){momDist=d;}
   void setPositionDistribution(G4String d){posDist=d;}
+  void setAngularDistribution(G4String d){angDist=d;}
   void setfcX(G4double);
   void setfcDX(G4double);
   void setfcY(G4double);
@@ -37,7 +38,8 @@ public:
   void setmaxBta(G4double);
   void setAta0(G4double a){ata0=a;}
   void setBta0(G4double b){bta0=b;}
-
+  void setSigmaAta(G4double sig){sigma_a=sig;}
+  void setSigmaBta(G4double sig){sigma_b=sig;}
 
   G4int getA()    {return A;}
   G4int getZ()    {return Z;}
@@ -47,6 +49,8 @@ public:
   G4double getKEu(){return KEu;}
   G4double getAta0(){return ata0;}
   G4double getBta0(){return bta0;}
+  G4double GetSigmaAta(){return sigma_a;}
+  G4double GetSigmaBta(){return sigma_b;}
   G4ThreeVector getPosition(G4ThreeVector);
   G4ThreeVector getDirection();
 
@@ -61,6 +65,7 @@ private:
   G4double dta[1000];
   G4String momDist;
   G4String posDist;
+  G4String angDist;
   G4int Ndta;
   G4double dtaMin;
   G4double dtaMax;
@@ -75,6 +80,8 @@ private:
   G4double maxBta;
   G4double ata0;
   G4double bta0;
+  G4double sigma_a;
+  G4double sigma_b;
 
 };
 

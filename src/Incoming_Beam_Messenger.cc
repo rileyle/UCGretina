@@ -76,7 +76,6 @@ Incoming_Beam_Messenger::Incoming_Beam_Messenger(Incoming_Beam* BI)
   Z0Cmd->SetParameterName("choice",false);
   Z0Cmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-
   maxACmd = new G4UIcmdWithADoubleAndUnit("/BeamIn/Focus/maxAta",this);
   maxACmd->SetGuidance("Set dispersive direction angular divergence for the incoming beam.");
   maxACmd->SetParameterName("choice",false);
@@ -87,7 +86,20 @@ Incoming_Beam_Messenger::Incoming_Beam_Messenger(Incoming_Beam* BI)
   maxBCmd->SetParameterName("choice",false);
   maxBCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  angdCmd = new G4UIcmdWithAString("/BeamIn/angularDistribution",this);
+  angdCmd->SetGuidance("Set the type of angular distribution of the incoming beam (flat or Gaussian).");
+  angdCmd->SetParameterName("choice",false);
+  angdCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
+  DistSigACmd = new G4UIcmdWithADoubleAndUnit("/BeamIn/AngDistSigmaA",this);
+  DistSigACmd->SetGuidance("Set sigma coefficient for Gaussian dispersive angular distribution of the incoming beam");
+  DistSigACmd->SetParameterName("choice",false);
+  DistSigACmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  DistSigBCmd = new G4UIcmdWithADoubleAndUnit("/BeamIn/AngDistSigmaB",this);
+  DistSigBCmd->SetGuidance("Set sigma coefficient for Gaussian nondispersive angular distribution of the incoming beam");
+  DistSigBCmd->SetParameterName("choice",false);
+  DistSigBCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   DppCmd = new G4UIcmdWithADouble("/BeamIn/Dpp",this);
   DppCmd->SetGuidance("Set momentum acceptance for the incoming beam.");
@@ -115,6 +127,9 @@ Incoming_Beam_Messenger::~Incoming_Beam_Messenger()
 {
   delete maxACmd;
   delete maxBCmd;
+  delete angdCmd;
+  delete DistSigACmd;
+  delete DistSigBCmd;
   delete fcXCmd;
   delete fcYCmd;
   delete Z0Cmd;
@@ -156,6 +171,8 @@ void Incoming_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamIn->setPositionDistribution(newValue);}
   if( command == DppCmd )
     { BeamIn->setDpp(DppCmd->GetNewDoubleValue(newValue));}
+  if( command == angdCmd )
+    { BeamIn->setAngularDistribution(newValue);}
   if( command == fcXCmd )
     { BeamIn->setfcX(fcXCmd->GetNewDoubleValue(newValue));}
   if( command == fcDXCmd )
@@ -174,6 +191,10 @@ void Incoming_Beam_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     { BeamIn->setAta0(Ata0Cmd->GetNewDoubleValue(newValue));}
   if( command == Bta0Cmd )
     { BeamIn->setBta0(Bta0Cmd->GetNewDoubleValue(newValue));}
+  if( command == DistSigACmd )
+    { BeamIn->setSigmaAta(DistSigACmd->GetNewDoubleValue(newValue));}
+  if( command == DistSigBCmd )
+    { BeamIn->setSigmaBta(DistSigBCmd->GetNewDoubleValue(newValue));}
   if( command == RepCmd )
     { BeamIn->Report();}
 

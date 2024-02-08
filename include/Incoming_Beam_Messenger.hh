@@ -32,6 +32,7 @@ class Incoming_Beam_Messenger: public G4UImessenger
     G4UIcmdWithAString*        dtaCmd;
     G4UIcmdWithAString*        pdCmd;
     G4UIcmdWithAString*        posdCmd;
+    G4UIcmdWithAString*        angdCmd;
     G4UIcmdWithADoubleAndUnit* fcXCmd;
     G4UIcmdWithADoubleAndUnit* fcDXCmd;
     G4UIcmdWithADoubleAndUnit* fcYCmd;
@@ -41,10 +42,11 @@ class Incoming_Beam_Messenger: public G4UImessenger
     G4UIcmdWithADoubleAndUnit* maxBCmd;
     G4UIcmdWithADoubleAndUnit* Ata0Cmd;
     G4UIcmdWithADoubleAndUnit* Bta0Cmd;
+    G4UIcmdWithADoubleAndUnit* DistSigACmd;
+    G4UIcmdWithADoubleAndUnit* DistSigBCmd;
     G4UIcmdWithADouble*        DppCmd;
     G4UIcmdWithoutParameter*   RepCmd;
   
-
 };
 
 

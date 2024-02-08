@@ -262,7 +262,7 @@ G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
   // Set the magnitude of the outgoing momentum ================================
 
   ppOut = pIn;
-  if( ppOut.mag() > 0)
+  if( ppOut.mag() > 0 )
       ppOut.setMag( pLab );
 
   // Set the direction of the outgoing momentum ================================
@@ -271,7 +271,7 @@ G4ThreeVector Outgoing_Beam::GetOutgoingMomentum()
   if (pIn.mag2() == 0.) {
     return ppOut;
   }
-  ax.rotate(pIn,G4UniformRand()*twopi);
+  ax.rotate(pIn, G4UniformRand()*twopi);
   
   if (ax.mag2() == 0.) {
     return ppOut;
@@ -355,10 +355,15 @@ void Outgoing_Beam::Report()
 	 << ionGS[0]->GetPDGMass() <<" MeV" << G4endl;
   G4cout << "----> Mass of the outgoing target-like reaction product is "
 	 << tarOutGS[0]->GetPDGMass() << " MeV" << G4endl;
-  G4cout << "----> Sigma for ata distribution set to "
-	 << sigma_a << G4endl;
-  G4cout << "----> Sigma for bta distribution set to "
-	 << sigma_b << G4endl;
+  if(xsectFileName != ""){
+    G4cout << "----> Outgoing scattering-angle distribution read from "
+	   << xsectFileName << G4endl;
+  } else {
+    G4cout << "----> Sigma for ata distribution set to "
+	   << sigma_a << G4endl;
+    G4cout << "----> Sigma for bta distribution set to "
+	   << sigma_b << G4endl;
+  }
 
   G4IonTable::GetIonTable()->DumpTable();
 }

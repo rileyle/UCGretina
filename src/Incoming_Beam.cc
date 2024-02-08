@@ -13,6 +13,7 @@ Incoming_Beam::Incoming_Beam()
   dtaFileName = "";
   momDist = "flat";
   posDist = "flat";
+  angDist = "flat";
   Ndta = 0;
   dtaMin = 0.;
   dtaMax = 0.;
@@ -24,10 +25,12 @@ Incoming_Beam::Incoming_Beam()
   fcDY=0.;
   //  fcZ=-50.*cm;
   Z0=-50.*cm;
-  maxAta=0*mrad;
-  maxBta=0*mrad;
-  ata0=0.*mrad;
-  bta0=0.*mrad;
+  maxAta=0;
+  maxBta=0;
+  ata0=0;
+  bta0=0;
+  sigma_a=0;
+  sigma_b=0;
 }
 
 Incoming_Beam::~Incoming_Beam()
@@ -56,8 +59,14 @@ void Incoming_Beam::Report()
   G4cout<<"----> focal point DY size for the incoming beam set to  "<<G4BestUnit(fcDY,"Length")<< G4endl;
   G4cout<<"----> initial Z position for the incoming beam set to  "<<G4BestUnit(Z0,"Length")<< G4endl;
   G4cout<<"----> position distribution type set to "<<posDist<< G4endl;
-  G4cout<<"----> dispersive direction angular divergence for the incoming beam set to  "<<maxAta/mrad<<" mrad = "<<maxAta/deg<<" deg"<< G4endl;
-  G4cout<<"----> non dispersive direction angular divergence for the incoming beam set to  "<<maxBta/mrad<<" mrad = "<<maxBta/deg<<" deg"<< G4endl;
+  G4cout<<"----> angular distribution type set to "<<angDist<< G4endl;
+  if(angDist == "flat"){
+    G4cout<<"----> width of the angular distribution of the incoming beam in the dispersive direction set to  "<<maxAta/mrad<<" mrad "<< G4endl;
+    G4cout<<"----> width of the angular distribution of the incoming beam in the non dispersive direction set to  "<<maxBta/mrad<<" mrad" << G4endl;
+  } else if(angDist == "Gaussian"){
+    G4cout<<"----> sigma of the angular distribution of the incoming beam in the dispersive direction set to  "<<sigma_a/mrad<<" mrad "<< G4endl;
+    G4cout<<"----> sigma of the angular distribution of the incoming beam in the non dispersive direction set to  "<<sigma_b/mrad<<" mrad" << G4endl;
+  }
 }
 //---------------------------------------------------------
 void Incoming_Beam::setA(G4int Ain)
@@ -192,12 +201,20 @@ G4ThreeVector Incoming_Beam::getDirection()
   //   x=sqrt(1-z*z)*sin(2*pi*r2);
   //   y=sqrt(1-z*z)*cos(2*pi*r2);
 
-  phi=G4UniformRand()*8.*atan(1.);
-  r=G4UniformRand()+G4UniformRand();
-  if(r>=1) r=-(r-2.);
-
-  a=r*cos(phi)*maxAta;
-  b=r*sin(phi)*maxBta; 
+  if(angDist == "flat"){
+    phi=G4UniformRand()*8.*atan(1.);
+    r=G4UniformRand()+G4UniformRand();
+    if(r>=1) r=-(r-2.);
+    a=r*cos(phi)*maxAta;
+    b=r*sin(phi)*maxBta; 
+  } else if (angDist == "Gaussian") {
+    a = CLHEP::RandGauss::shoot(0, sigma_a);
+    b = CLHEP::RandGauss::shoot(0, sigma_b);
+  } else {
+    G4cerr<<"Error: angular distribution type must be flat or Gaussian."
+	  <<G4endl;
+    exit(EXIT_FAILURE);
+  }
   z=1./sqrt(1.+tan(a)*tan(a)+tan(b)*tan(b));
   y=z*tan(b);
   x=z*tan(a);
