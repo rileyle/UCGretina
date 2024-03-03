@@ -15,8 +15,7 @@ endif
 ifdef LHTARGET
 ifdef POL
   name := UCGretina_LH_Pol
-  CPPFLAGS += -DLHTARGET
-  CPPFLAGS += -DPOL
+  CPPFLAGS += -DLHTARGET -DPOL
 else
   name := UCGretina_LH
   CPPFLAGS += -DLHTARGET
@@ -25,8 +24,7 @@ else # end LHTARGET / begin SCANNING
 ifdef SCANNING
 ifdef POL
   name := UCGretina_Scan_Pol
-  CPPFLAGS  += -DSCANNING
-  CPPFLAGS += -DPOL
+  CPPFLAGS  += -DSCANNING -DPOL
 else
   name := UCGretina_Scan
   CPPFLAGS  += -DSCANNING
