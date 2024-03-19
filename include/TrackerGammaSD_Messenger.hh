@@ -28,7 +28,8 @@ class TrackerGammaSD_Messenger: public G4UImessenger
     G4UIcmdWithoutParameter*   PrtGUCmd;
     G4UIcmdWithADouble*        PhdACmd;
     G4UIcmdWithADouble*        PhdBCmd;
-
+    G4UIcmdWithADouble*        PosResCmd;
+    G4UIcmdWithADouble*        PosResOldCmd;
 };
 
 

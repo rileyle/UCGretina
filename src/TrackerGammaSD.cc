@@ -22,7 +22,7 @@ TrackerGammaSD::TrackerGammaSD(G4String name)
   print = false;
   phdA = 0.21;
   phdB = 1.099;
-
+  posRes = 0.;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -58,6 +58,7 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
 
   G4int detCode = -1;
   G4int detNum = -1;
+  G4VSolid* solid = theTouchable->GetSolid(0);
   if(name == "LaBr"){
     detCode = 0;
     detNum  = 132;
@@ -68,8 +69,10 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   }
   else { // GRETINA
     detCode = theTouchable->GetReplicaNumber(0);
-    if(detCode == 0)
+    if(detCode == 0){
       detCode = theTouchable->GetReplicaNumber(depth);
+      solid = theTouchable->GetSolid(depth);
+    }
     detNum = detCode%1000;
   }
 
@@ -98,7 +101,7 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
     return false;
 
   G4ThreeVector position = aStep->GetPostStepPoint()->GetPosition();
-
+  
   G4VPhysicalVolume* topVolume;
   if( detNum < 124 ) // GRETINA
     topVolume = theTouchable->GetVolume(depth);
@@ -118,6 +121,34 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   G4ThreeVector posSol = frameRot( position );
   posSol += frameRot( frameTrans );
 
+  // "Measured" position, with simulated position resolution
+  // WARNING: this "smears" positions across the boundaries of
+  //          the active volume, which doesn't correspond to
+  //          the behavior of signal decomposition.
+  G4ThreeVector positionM = position;
+  if(posRes > 0){
+    positionM.setX(position.getX() + CLHEP::RandGauss::shoot(0, posRes));
+    positionM.setY(position.getY() + CLHEP::RandGauss::shoot(0, posRes));
+    positionM.setZ(position.getZ() + CLHEP::RandGauss::shoot(0, posRes));
+    G4ThreeVector posSolM = frameRot( positionM );
+    posSolM += frameRot( frameTrans );
+    if(solid->Inside(posSolM) == kOutside){
+      // Displacement in Solid (Crystal-frame) coordinates
+      G4ThreeVector deltaSol = posSolM-posSol;
+      // Distance to the surface along the displacement vector.
+      G4double dr = solid->DistanceToOut(posSol, deltaSol/deltaSol.mag());
+      // Displacement in world coordinates
+      G4ThreeVector delta = positionM - position;
+      // Corrected "smeared" position (at surface)
+      positionM = position + delta/delta.mag()*dr;
+      //      posSolM = frameRot( positionM );
+      //      posSolM += frameRot( frameTrans );
+      //      G4cout <<"new insideM = " << solid->Inside(posSolM) << G4endl;
+    }
+  } else
+    positionM.setX(1.0e12); // Block processing/printing of smeared positions 
+                            // if the position resolution is set to 0.
+  
   // Segment number
   G4int segCode = 0;
   G4RunManager* runManager = G4RunManager::GetRunManager();
@@ -192,6 +223,7 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   newHit->SetEdep       (edep);
   newHit->SetKE         (aStep->GetTrack()->GetKineticEnergy());
   newHit->SetPos        (position);
+  newHit->SetPosM       (positionM);
   newHit->SetPosCrys    (posSol);
   newHit->SetTrackOrigin(aStep->GetTrack()->GetVertexPosition());
   newHit->SetGlobalTime(aStep->GetPostStepPoint()->GetGlobalTime());

@@ -30,6 +30,7 @@ TrackerGammaHit::TrackerGammaHit(const TrackerGammaHit& right)
   edep           = right.edep;
   ke             = right.ke;
   pos            = right.pos;
+  posM           = right.posM;
   trackOrigin    = right.trackOrigin;
   globalTime     = right.globalTime;
 }
@@ -48,6 +49,7 @@ const TrackerGammaHit& TrackerGammaHit::operator=(const TrackerGammaHit& right)
   edep           = right.edep;
   ke             = right.ke;
   pos            = right.pos;
+  posM           = right.posM;
   trackOrigin    = right.trackOrigin;
   globalTime     = right.globalTime;
   return *this;
@@ -108,7 +110,14 @@ void TrackerGammaHit::Print()
 	 << std::setw(10) << std::right
          << globalTime*1000.0
          << G4endl;
-
+  if(posM.getX()/mm < 1.0e12)
+    G4cout << std::setw(87) << std::right
+	   << posM.getX()/mm
+	   << std::setw(10) << std::right
+	   << posM.getY()/mm
+	   << std::setw(10) << std::right
+	   << posM.getZ()/mm
+	   << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

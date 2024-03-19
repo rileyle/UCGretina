@@ -20,6 +20,12 @@ TrackerGammaSD_Messenger::TrackerGammaSD_Messenger(TrackerGammaSD* TGSD)
   PhdBCmd = new G4UIcmdWithADouble("/Mode2/PHDB",this);
   PhdBCmd->SetGuidance("Set pulse height defect parameter B.");
 
+  PosResCmd = new G4UIcmdWithADouble("/Mode2/PositionResolution",this);
+  PosResCmd->SetGuidance("Set the Gaussian sigma for simulated Gretina position resolution.");
+
+  PosResOldCmd = new G4UIcmdWithADouble("/Gretina/detector/PositionResolution",this);
+  PosResOldCmd->SetGuidance("Set the Gaussian sigma for simulated Gretina position resolution.");
+
 }
 
 
@@ -33,6 +39,8 @@ TrackerGammaSD_Messenger::~TrackerGammaSD_Messenger()
   delete PrtGUCmd;
   delete PhdACmd;
   delete PhdBCmd;
+  delete PosResCmd;
+  delete PosResOldCmd;
 
 }
 
@@ -53,6 +61,12 @@ void TrackerGammaSD_Messenger::SetNewValue(G4UIcommand* command,
   
   if( command == PhdBCmd )
     { tracker->SetPHDB( PhdBCmd->GetNewDoubleValue(newValue) ); }
+
+  if( command == PosResCmd )
+    { tracker->SetPosRes( PosResCmd->GetNewDoubleValue(newValue) ); }
+
+  if( command == PosResOldCmd )
+    { tracker->SetPosRes( PosResOldCmd->GetNewDoubleValue(newValue) ); }
 
 }
 
