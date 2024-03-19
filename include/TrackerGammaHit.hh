@@ -41,6 +41,7 @@ class TrackerGammaHit : public G4VHit
       void SetPos      (G4ThreeVector xyz){ pos = xyz; };
       void SetPosM     (G4ThreeVector xyz){ posM = xyz; };
       void SetPosCrys  (G4ThreeVector xyz){ posCrys = xyz; };
+      void SetPosCrysM (G4ThreeVector xyz){ posCrysM = xyz; };
       void SetTrackOrigin(G4ThreeVector xyz){ trackOrigin = xyz; };
       void SetGlobalTime(G4double t)       { globalTime = t; };
 
@@ -56,6 +57,7 @@ class TrackerGammaHit : public G4VHit
       G4ThreeVector GetPos()         { return pos; };
       G4ThreeVector GetPosM()        { return posM; };
       G4ThreeVector GetPosCrys()     { return posCrys; };
+      G4ThreeVector GetPosCrysM()    { return posCrysM; };
       G4ThreeVector GetTrackOrigin() { return trackOrigin; };
       G4double GetGlobalTime()       { return globalTime; };
       
@@ -73,6 +75,7 @@ class TrackerGammaHit : public G4VHit
       G4ThreeVector pos;
       G4ThreeVector posM;
       G4ThreeVector posCrys;
+      G4ThreeVector posCrysM;
       G4ThreeVector trackOrigin;
       G4double      globalTime;
 };

@@ -58,6 +58,11 @@ void EventAction::BeginOfEventAction(const G4Event* ev)
   // For event filter
   eventInfo->SetWriteEvent(false);
   
+  if(crmatFileName != "" && crystalXforms) {
+    G4cerr << "Error: Both /Mode2/crystalXforms and /Mode2/crmatFile commands are present." << G4endl;
+    exit(EXIT_FAILURE);
+  }
+  
   // G4cout<<"+++++ Begin of event "<<evt->GetEventID()<<G4endl;
 
 }
@@ -171,11 +176,14 @@ void EventAction::EndOfEventAction(const G4Event* ev)
       G4int trackID[100*MAX_INTPTS];
       G4int detNum[100*MAX_INTPTS];
       G4int segNum[100*MAX_INTPTS];
-      G4double measuredEdep[100*MAX_INTPTS];
+      G4double ipEdep[100*MAX_INTPTS];
       G4double segmentEdep[100*MAX_INTPTS];
-      G4double measuredX[100*MAX_INTPTS];
-      G4double measuredY[100*MAX_INTPTS];
-      G4double measuredZ[100*MAX_INTPTS];
+      G4double ipX[100*MAX_INTPTS];
+      G4double ipY[100*MAX_INTPTS];
+      G4double ipZ[100*MAX_INTPTS];
+      G4double ipMX[100*MAX_INTPTS]; // "smeared" IP positions
+      G4double ipMY[100*MAX_INTPTS]; // if posRes > 0
+      G4double ipMZ[100*MAX_INTPTS]; // (M = "measured")
       G4double X0[100*MAX_INTPTS];
       G4double Y0[100*MAX_INTPTS];
       G4double Z0[100*MAX_INTPTS];
@@ -183,7 +191,7 @@ void EventAction::EndOfEventAction(const G4Event* ev)
       G4int NCons[100*MAX_INTPTS];
       G4double packingRes2 = packingRes*packingRes;
 
-      G4int NMeasured = 0;
+      G4int NIP = 0;
       G4double totalEdep = 0;
 
       // Prevent seg fault in events with very large hit collections.
@@ -199,22 +207,41 @@ void EventAction::EndOfEventAction(const G4Event* ev)
       
       for(G4int i = 0; i < Nhits; i++){
 
-	G4double x, y, z;
-	if(crystalXforms){
-	  G4double xx, yy;
-	  xx = (*gammaCollection)[i]->GetPosCrys().getX()/mm;
-	  yy = (*gammaCollection)[i]->GetPosCrys().getY()/mm;
-	  z = (*gammaCollection)[i]->GetPosCrys().getZ()/mm;
-	  G4double ph = -122.93*3.14159/180.;              // Type A
+	G4double x, y, z, xM, yM, zM;
+	if(crystalXforms){ // Using crystal-frame coordinates
+	  G4double xx, yy, xxM, yyM;
+	  xx  = (*gammaCollection)[i]->GetPosCrys().getX()/mm;
+	  yy  = (*gammaCollection)[i]->GetPosCrys().getY()/mm;
+	  z   = (*gammaCollection)[i]->GetPosCrys().getZ()/mm;
+	  xxM = (*gammaCollection)[i]->GetPosCrysM().getX()/mm;
+	  if(xxM < 1.0e12){ // TrackerGammaSD sets xM = 1e12 if posRes=0.
+	    yyM = (*gammaCollection)[i]->GetPosCrysM().getY()/mm;
+	    zM  = (*gammaCollection)[i]->GetPosCrysM().getZ()/mm;
+	  } else {
+	    xxM = xx;
+	    yyM = yy;
+	    zM  = z;
+	  }
+	  G4double ph = -122.93*3.14159/180.;            // Type A
 	  if((*gammaCollection)[i]->GetDetNumb()%2 == 0) // Type B
 	    ph = -208.25*3.14159/180.;
-	  x = xx*cos(ph) - yy*sin(ph);
-	  y = xx*sin(ph) + yy*cos(ph);
-
-	} else {
-	  x = (*gammaCollection)[i]->GetPos().getX()/mm;
-	  y = (*gammaCollection)[i]->GetPos().getY()/mm;
-	  z = (*gammaCollection)[i]->GetPos().getZ()/mm;
+	  x  = xx*cos(ph) - yy*sin(ph);
+	  y  = xx*sin(ph) + yy*cos(ph);
+	  xM = xxM*cos(ph) - yyM*sin(ph);
+	  yM = xxM*sin(ph) + yyM*cos(ph);
+	} else { // Using world coordinates
+	  x  = (*gammaCollection)[i]->GetPos().getX()/mm;
+	  y  = (*gammaCollection)[i]->GetPos().getY()/mm;
+	  z  = (*gammaCollection)[i]->GetPos().getZ()/mm;
+	  xM = (*gammaCollection)[i]->GetPosM().getX()/mm;
+	  if(xM < 1.0e12){ // TrackerGammaSD sets xM = 1e12 if posRes=0.
+	    yM = (*gammaCollection)[i]->GetPosM().getY()/mm;
+	    zM = (*gammaCollection)[i]->GetPosM().getZ()/mm;
+	  } else {
+	    xM = x;
+	    yM = y;
+	    zM = z;
+	  }
 	}
 	G4double en  = (*gammaCollection)[i]->GetEdep()/keV;
 	totalEdep += en;
@@ -230,48 +257,51 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	  // Combine multiple gamma hits at the same position.
 	  // (This is rare, but it happens.)
 	  if(i > 0 
-	     && (x - measuredX[i-1])*(x - measuredX[i-1]) < hitTolerance*hitTolerance
-	     && (y - measuredY[i-1])*(y - measuredY[i-1]) < hitTolerance*hitTolerance
-	     && (z - measuredZ[i-1])*(z - measuredZ[i-1]) < hitTolerance*hitTolerance){
+	     && (x - ipX[i-1])*(x - ipX[i-1]) < hitTolerance*hitTolerance
+	     && (y - ipY[i-1])*(y - ipY[i-1]) < hitTolerance*hitTolerance
+	     && (z - ipZ[i-1])*(z - ipZ[i-1]) < hitTolerance*hitTolerance){
 
-	    measuredEdep[NMeasured-1] += en; 
+	    ipEdep[NIP-1] += en; 
 	    processed = true;
 
 	  } else {
 
-	    trackID[NMeasured]      = (*gammaCollection)[i]->GetTrackID();
-	    detNum[NMeasured]       = (*gammaCollection)[i]->GetDetNumb();
-	    segNum[NMeasured]       = (*gammaCollection)[i]->GetSegNumb();
+	    trackID[NIP]      = (*gammaCollection)[i]->GetTrackID();
+	    detNum[NIP]       = (*gammaCollection)[i]->GetDetNumb();
+	    segNum[NIP]       = (*gammaCollection)[i]->GetSegNumb();
 
 	    // This becomes the total energy deposit associated with this 
 	    // interaction.
-	    measuredEdep[NMeasured] = en; 
+	    ipEdep[NIP] = en; 
 
 	    // This becomes the barycenter of all energy depositions associated
 	    // with this interaction.
-	    measuredX[NMeasured]    = x;
-	    measuredY[NMeasured]    = y;
-	    measuredZ[NMeasured]    = z;
-	    trackID[NMeasured]      = (*gammaCollection)[i]->GetTrackID();
+	    ipX[NIP]    = x;
+	    ipY[NIP]    = y;
+	    ipZ[NIP]    = z;
+	    ipMX[NIP]   = xM;
+	    ipMY[NIP]   = yM;
+	    ipMZ[NIP]   = zM;
+	    trackID[NIP]      = (*gammaCollection)[i]->GetTrackID();
 
 	    // Position of the initial interaction. We use position to identify
 	    // the tracks produced by this interaction.
-	    X0[NMeasured] = (*gammaCollection)[i]->GetPos().getX()/mm;
-	    Y0[NMeasured] = (*gammaCollection)[i]->GetPos().getY()/mm;
-	    Z0[NMeasured] = (*gammaCollection)[i]->GetPos().getZ()/mm;
+	    X0[NIP] = (*gammaCollection)[i]->GetPos().getX()/mm;
+	    Y0[NIP] = (*gammaCollection)[i]->GetPos().getY()/mm;
+	    Z0[NIP] = (*gammaCollection)[i]->GetPos().getZ()/mm;
 
-	    globalTime[NMeasured] = (*gammaCollection)[i]->GetGlobalTime()*1.e3;
+	    globalTime[NIP] = (*gammaCollection)[i]->GetGlobalTime()*1.e3;
 	    
-	    NCons[NMeasured] = 1;
-	    NMeasured++;
+	    NCons[NIP] = 1;
+	    NIP++;
 	    processed = true;
 	  }
 
 	// Combine secondary-particle hits with their parent interaction points.
 	} else {
 
-	  // Compare hit i with existing "measured" interaction points.
-	  for(G4int j = 0; j < NMeasured; j++){
+	  // Compare hit i with existing interaction points.
+	  for(G4int j = 0; j < NIP; j++){
 
 	    G4double x0 = (*gammaCollection)[i]->GetTrackOrigin().getX()/mm;
 	    G4double y0 = (*gammaCollection)[i]->GetTrackOrigin().getY()/mm;
@@ -291,23 +321,29 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 		&& (x0 - X0[j])*(x0 - X0[j]) < hitTolerance*hitTolerance
 		&& (y0 - Y0[j])*(y0 - Y0[j]) < hitTolerance*hitTolerance
 		&& (z0 - Z0[j])*(z0 - Z0[j]) < hitTolerance*hitTolerance // correct interaction point
-		&& (*gammaCollection)[i]->GetDetNumb() == detNum[j]){        // same crystal
+		&& (*gammaCollection)[i]->GetDetNumb() == detNum[j]){    // same crystal
 
 	      // Energy-weighted average position (barycenter)
-	      if(measuredEdep[j] == 0 && en == 0){
+	      if(ipEdep[j] == 0 && en == 0){
 		// G4cout << "    Both energies are zero. Taking the average." << G4endl;
-		measuredX[j]  = (measuredX[j] + x)/2.;
-		measuredY[j]  = (measuredY[j] + y)/2.;
-		measuredZ[j]  = (measuredZ[j] + z)/2.;
+		ipX[j]  = (ipX[j] + x)/2.;
+		ipY[j]  = (ipY[j] + y)/2.;
+		ipZ[j]  = (ipZ[j] + z)/2.;
+		ipMX[j] = (ipMX[j] + xM)/2.;
+		ipMY[j] = (ipMY[j] + yM)/2.;
+		ipMZ[j] = (ipMZ[j] + zM)/2.;
 		
 		// Assign the earliest global time of the first raw hit in this IP
 		globalTime[j] = std::min(gt, globalTime[j]);
 	      } else {
 		// G4cout << "    Calculating a weighted average." << G4endl;
-		measuredX[j] = (measuredEdep[j]*measuredX[j] + en*x)/(measuredEdep[j] + en);
-		measuredY[j] = (measuredEdep[j]*measuredY[j] + en*y)/(measuredEdep[j] + en);
-		measuredZ[j] = (measuredEdep[j]*measuredZ[j] + en*z)/(measuredEdep[j] + en);
-		measuredEdep[j] += en;
+		ipX[j] = (ipEdep[j]*ipX[j] + en*x)/(ipEdep[j] + en);
+		ipY[j] = (ipEdep[j]*ipY[j] + en*y)/(ipEdep[j] + en);
+		ipZ[j] = (ipEdep[j]*ipZ[j] + en*z)/(ipEdep[j] + en);
+		ipMX[j] = (ipEdep[j]*ipMX[j] + en*xM)/(ipEdep[j] + en);
+		ipMY[j] = (ipEdep[j]*ipMY[j] + en*yM)/(ipEdep[j] + en);
+		ipMZ[j] = (ipEdep[j]*ipMZ[j] + en*zM)/(ipEdep[j] + en);
+		ipEdep[j] += en;
 
 		// Assign the earliest global time of the first raw hit in this IP
 		globalTime[j] = std::min(gt, globalTime[j]);
@@ -329,25 +365,28 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	// gamma-ray interaction.
 	if(!processed){
 
-	  trackID[NMeasured]      = (*gammaCollection)[i]->GetTrackID();
-	  detNum[NMeasured]       = (*gammaCollection)[i]->GetDetNumb();
-	  segNum[NMeasured]       = (*gammaCollection)[i]->GetSegNumb();
-	  measuredEdep[NMeasured] = en;
-	  measuredX[NMeasured]    = x;
-	  measuredY[NMeasured]    = y;
-	  measuredZ[NMeasured]    = z;
+	  trackID[NIP] = (*gammaCollection)[i]->GetTrackID();
+	  detNum[NIP]  = (*gammaCollection)[i]->GetDetNumb();
+	  segNum[NIP]  = (*gammaCollection)[i]->GetSegNumb();
+	  ipEdep[NIP]  = en;
+	  ipX[NIP]     = x;
+	  ipY[NIP]     = y;
+	  ipZ[NIP]     = z;
+	  ipMX[NIP]    = xM;
+	  ipMY[NIP]    = yM;
+	  ipMZ[NIP]    = zM;
 
 	  // This is not a gamma ray. We need to trick its siblings into 
 	  // treating it as the parent gamma.
-	  trackID[NMeasured]      = (*gammaCollection)[i]->GetParentTrackID();
-	  X0[NMeasured] = (*gammaCollection)[i]->GetTrackOrigin().getX()/mm;
-	  Y0[NMeasured] = (*gammaCollection)[i]->GetTrackOrigin().getY()/mm;
-	  Z0[NMeasured] = (*gammaCollection)[i]->GetTrackOrigin().getZ()/mm;
+	  trackID[NIP]      = (*gammaCollection)[i]->GetParentTrackID();
+	  X0[NIP] = (*gammaCollection)[i]->GetTrackOrigin().getX()/mm;
+	  Y0[NIP] = (*gammaCollection)[i]->GetTrackOrigin().getY()/mm;
+	  Z0[NIP] = (*gammaCollection)[i]->GetTrackOrigin().getZ()/mm;
 
-	  globalTime[NMeasured] = (*gammaCollection)[i]->GetGlobalTime()*1.e3;
+	  globalTime[NIP] = (*gammaCollection)[i]->GetGlobalTime()*1.e3;
 
-	  NCons[NMeasured] = 1;
-	  NMeasured++;
+	  NCons[NIP] = 1;
+	  NIP++;
 	  processed = true;
 
 	}
@@ -357,7 +396,7 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 		 << " of event " << event_id 
 		 << G4endl;
 
-	if(NMeasured >= 100*MAX_INTPTS){
+	if(NIP >= 100*MAX_INTPTS){
 	  G4cout << "Error: too many decomposed hits. Increase hit processing array dimension."
 		 << G4endl;
 	  exit(EXIT_FAILURE);
@@ -365,39 +404,44 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 	
       }
 
-      // Packing: Consolidate the "measured" gamma-ray interaction points
-      // within a single segment that are closer than the PackingRes 
-      // parameter.
-      G4int NGammaHits = NMeasured;
-      for(G4int i = 0; i < NMeasured; i++){
-	for(G4int j = i+1; j < NMeasured; j++){
+      // Packing: Consolidate gamma-ray interaction points within a single
+      // segment that are closer than the PackingRes parameter.
+      G4int NGammaHits = NIP;
+      for(G4int i = 0; i < NIP; i++){
+	for(G4int j = i+1; j < NIP; j++){
 
-	  if( ( (measuredX[i] - measuredX[j])*(measuredX[i] - measuredX[j])
-		   + (measuredY[i] - measuredY[j])*(measuredY[i] - measuredY[j])
-		   + (measuredZ[i] - measuredZ[j])*(measuredZ[i] - measuredZ[j])
-		   < packingRes2 )                                  // proximal
-	      && detNum[i] == detNum[j]                          // same crystal
-	      && segNum[i] == segNum[j]                          // same segment
-	      &&  (NCons[i] > 0 && NCons[j] > 0) ){  // not already consolidated
+	  if( ( (ipX[i] - ipX[j])*(ipX[i] - ipX[j])
+		+ (ipY[i] - ipY[j])*(ipY[i] - ipY[j])
+		+ (ipZ[i] - ipZ[j])*(ipZ[i] - ipZ[j])
+		< packingRes2 )                      // proximal
+	      && detNum[i] == detNum[j]              // same crystal
+	      && segNum[i] == segNum[j]              // same segment
+	      && (NCons[i] > 0 && NCons[j] > 0) ){   // not already consolidated
 
 	    // Energy-weighted average
-	    if(measuredEdep[i] == 0 && measuredEdep[j] == 0){
-	      measuredX[i]  = (measuredX[i] + measuredX[j])/2.;
-	      measuredY[i]  = (measuredY[i] + measuredY[j])/2.;
-	      measuredZ[i]  = (measuredZ[i] + measuredZ[j])/2.;
+	    if(ipEdep[i] == 0 && ipEdep[j] == 0){
+	      ipX[i]  = (ipX[i] + ipX[j])/2.;
+	      ipY[i]  = (ipY[i] + ipY[j])/2.;
+	      ipZ[i]  = (ipZ[i] + ipZ[j])/2.;
+	      ipMX[i] = (ipMX[i] + ipMX[j])/2.;
+	      ipMY[i] = (ipMY[i] + ipMY[j])/2.;
+	      ipMZ[i] = (ipMZ[i] + ipMZ[j])/2.;
 
 	      // Assign the earliest global time of the first raw hit in this IP
 	      globalTime[i] = std::min(globalTime[i], globalTime[j]);
 	    } else {
-	      measuredX[i] = (measuredEdep[i]*measuredX[i] + measuredEdep[j]*measuredX[j])/(measuredEdep[i]+measuredEdep[j]);
-	      measuredY[i] = (measuredEdep[i]*measuredY[i] + measuredEdep[j]*measuredY[j])/(measuredEdep[i]+measuredEdep[j]);
-	      measuredZ[i] = (measuredEdep[i]*measuredZ[i] + measuredEdep[j]*measuredZ[j])/(measuredEdep[i]+measuredEdep[j]);
-	      measuredEdep[i] += measuredEdep[j];
+	      ipX[i]  = (ipEdep[i]*ipX[i] + ipEdep[j]*ipX[j])/(ipEdep[i]+ipEdep[j]);
+	      ipY[i]  = (ipEdep[i]*ipY[i] + ipEdep[j]*ipY[j])/(ipEdep[i]+ipEdep[j]);
+	      ipZ[i]  = (ipEdep[i]*ipZ[i] + ipEdep[j]*ipZ[j])/(ipEdep[i]+ipEdep[j]);
+	      ipMX[i] = (ipEdep[i]*ipMX[i] + ipEdep[j]*ipMX[j])/(ipEdep[i]+ipEdep[j]);
+	      ipMY[i] = (ipEdep[i]*ipMY[i] + ipEdep[j]*ipMY[j])/(ipEdep[i]+ipEdep[j]);
+	      ipMZ[i] = (ipEdep[i]*ipMZ[i] + ipEdep[j]*ipMZ[j])/(ipEdep[i]+ipEdep[j]);
+	      ipEdep[i] += ipEdep[j];
 
 	      // Assign the earliest global time of the first raw hit in this IP
 	      globalTime[i] = std::min(globalTime[i], globalTime[j]);
 	    }
-	    NCons[j] = -1;
+	    NCons[j] = -1; // IP j remains in the arrays but will be ignored.
 	    NGammaHits--;
 
 	  }
@@ -407,18 +451,18 @@ void EventAction::EndOfEventAction(const G4Event* ev)
       }
 
       // Calculate the total energy deposited in each segment.
-      for(G4int i = 0; i < NMeasured; i++) // initialize
+      for(G4int i = 0; i < NIP; i++) // initialize
 	if(NCons[i] > 0)
-	  segmentEdep[i] = measuredEdep[i];
+	  segmentEdep[i] = ipEdep[i];
 
       G4bool singleDetector = true;
-      for(G4int i = 0; i < NMeasured; i++){
-	for(G4int j = i+1; j < NMeasured; j++){
+      for(G4int i = 0; i < NIP; i++){
+	for(G4int j = i+1; j < NIP; j++){
 	  if(NCons[i] > 0 && NCons[j] > 0
 	     && detNum[i] == detNum[j]    // same crystal
 	     && segNum[i] == segNum[j]){ // same segment
-	    segmentEdep[i] += measuredEdep[j];
-	    segmentEdep[j] += measuredEdep[i];
+	    segmentEdep[i] += ipEdep[j];
+	    segmentEdep[j] += ipEdep[i];
 	  }
 	  if( detNum[i] != detNum[j] )
 	    singleDetector = false;
@@ -447,43 +491,62 @@ void EventAction::EndOfEventAction(const G4Event* ev)
       }
 
       // Coordinate transformations
-      for(int i=0; i<NMeasured; i++) {
+      for(int i=0; i<NIP; i++) {
 
 	if(NCons[i] > 0){
 
-	  G4double x, y, z;
+	  G4double x, y, z, xM, yM, zM;
 	  if(gretinaCoords){
-	    x = -measuredY[i];      // If the user specified GRETINA 
-	    y = measuredX[i];       // coordinates, rotate pi/2 about z.
-	    measuredX[i] = x;
-	    measuredY[i] = y;
+	    x       = -ipY[i];      // If the user specified GRETINA 
+	    y       = ipX[i];       // coordinates, rotate pi/2 about z.
+	    ipX[i]  = x;
+	    ipY[i]  = y;
+	    xM      = -ipMY[i];
+	    yM      = ipMX[i];
+	    ipMX[i] = xM;
+	    ipMY[i] = yM;
 	  } else {
-	    x = measuredX[i];
-	    y = measuredY[i];
+	    x  = ipX[i];
+	    y  = ipY[i];
+	    xM = ipMX[i];
+	    yM = ipMY[i];
 	  }
-	  z = measuredZ[i];
+	  z  = ipZ[i];
+	  zM = ipMZ[i];
 
 	  // If the user supplied a crmat (crystal -> world coords), 
 	  // invert the transformation (world -> crystal).
-	  if(crmatFileName != "") {
+	  if(crmatFileName != "" && !crystalXforms) {
 	    G4int h = (G4int)detNum[i]/4;  // (Hole-1)
 	    G4int c = detNum[i]%4;         // Crystal
 
 	    // Reverse transformation: first subtract the translation ...
 	    // (I-Yang's crmat file: translations in cm, hole indices +1.)
-	    x -= crmat[h+1][c][0][3]*cm;
-	    y -= crmat[h+1][c][1][3]*cm;
-	    z -= crmat[h+1][c][2][3]*cm;
+	    x  -= crmat[h+1][c][0][3]*cm;
+	    y  -= crmat[h+1][c][1][3]*cm;
+	    z  -= crmat[h+1][c][2][3]*cm;
+	    xM -= crmat[h+1][c][0][3]*cm;
+	    yM -= crmat[h+1][c][1][3]*cm;
+	    zM -= crmat[h+1][c][2][3]*cm;
 	    // ... then apply the inverse (transpose) rotation matrix.
-	    measuredX[i] = x*crmat[h+1][c][0][0] 
-	                 + y*crmat[h+1][c][1][0]
-                         + z*crmat[h+1][c][2][0];
-	    measuredY[i] = x*crmat[h+1][c][0][1] 
-	                 + y*crmat[h+1][c][1][1]
-                         + z*crmat[h+1][c][2][1];
-	    measuredZ[i] = x*crmat[h+1][c][0][2] 
-	                 + y*crmat[h+1][c][1][2]
-                         + z*crmat[h+1][c][2][2];
+	    ipX[i]  = x*crmat[h+1][c][0][0] 
+	            + y*crmat[h+1][c][1][0]
+                    + z*crmat[h+1][c][2][0];
+	    ipY[i]  = x*crmat[h+1][c][0][1] 
+	            + y*crmat[h+1][c][1][1]
+                    + z*crmat[h+1][c][2][1];
+	    ipZ[i]  = x*crmat[h+1][c][0][2] 
+	            + y*crmat[h+1][c][1][2]
+                    + z*crmat[h+1][c][2][2];
+	    ipMX[i] = xM*crmat[h+1][c][0][0] 
+	            + yM*crmat[h+1][c][1][0]
+                    + zM*crmat[h+1][c][2][0];
+	    ipMY[i] = xM*crmat[h+1][c][0][1] 
+	            + yM*crmat[h+1][c][1][1]
+                    + zM*crmat[h+1][c][2][1];
+	    ipMZ[i] = xM*crmat[h+1][c][0][2] 
+	            + yM*crmat[h+1][c][1][2]
+                    + zM*crmat[h+1][c][2][2];
 	  }
 
 	}
@@ -500,10 +563,10 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 
       // Write decomposed gamma event(s) to the output file
       writeDecomp(timestamp, 
-		  NMeasured, 
+		  NIP, 
 		  detNum, segNum, NCons, 
-		  measuredX, measuredY, measuredZ, 
-		  measuredEdep, segmentEdep,
+		  ipMX, ipMY, ipMZ, 
+		  ipEdep, segmentEdep,
 		  globalTime);
       
     } else {
@@ -604,7 +667,7 @@ void EventAction::writeS800(long long int ts, G4double a, G4double b,
 }
 // --------------------------------------------------
 void EventAction::writeDecomp(long long int ts, 
-			      G4int NMeasured, 
+			      G4int NIP, 
 			      G4int detNum[], G4int segNum[], G4int NCons[],
 			      G4double x[], G4double y[], G4double z[], 
 			      G4double e[], G4double se[], G4double gt[])
@@ -616,10 +679,10 @@ void EventAction::writeDecomp(long long int ts,
   
   G4int Ndecomp = 0;
   G4bool Processed[100*MAX_INTPTS];
-  for(G4int i = 0; i < NMeasured; i++)
+  for(G4int i = 0; i < NIP; i++)
     Processed[i] = false;
 
-  for(G4int i = 0; i < NMeasured; i++){
+  for(G4int i = 0; i < NIP; i++){
     if( NCons[i] > 0 && Processed[i] == false ){
 
       crys_ips[Ndecomp].type = 0xABCD5678;
@@ -659,7 +722,7 @@ void EventAction::writeDecomp(long long int ts,
       }
 
       // Get other interactions with this crystal
-      for(G4int j = i+1; j < NMeasured; j++){ 
+      for(G4int j = i+1; j < NIP; j++){ 
 	if(NCons[j] > 0 && 
 	   Processed[j] == false &&
 	   detNum[j]+4 == crys_ips[Ndecomp].crystal_id){

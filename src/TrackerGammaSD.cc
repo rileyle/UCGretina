@@ -121,6 +121,8 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   G4ThreeVector posSol = frameRot( position );
   posSol += frameRot( frameTrans );
 
+  G4ThreeVector posSolM;
+  
   // "Measured" position, with simulated position resolution
   // WARNING: this "smears" positions across the boundaries of
   //          the active volume, which doesn't correspond to
@@ -130,7 +132,7 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
     positionM.setX(position.getX() + CLHEP::RandGauss::shoot(0, posRes));
     positionM.setY(position.getY() + CLHEP::RandGauss::shoot(0, posRes));
     positionM.setZ(position.getZ() + CLHEP::RandGauss::shoot(0, posRes));
-    G4ThreeVector posSolM = frameRot( positionM );
+    posSolM = frameRot( positionM );
     posSolM += frameRot( frameTrans );
     if(solid->Inside(posSolM) == kOutside){
       // Displacement in Solid (Crystal-frame) coordinates
@@ -141,13 +143,15 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
       G4ThreeVector delta = positionM - position;
       // Corrected "smeared" position (at surface)
       positionM = position + delta/delta.mag()*dr;
-      //      posSolM = frameRot( positionM );
-      //      posSolM += frameRot( frameTrans );
+      posSolM = frameRot( positionM );
+      posSolM += frameRot( frameTrans );
       //      G4cout <<"new insideM = " << solid->Inside(posSolM) << G4endl;
     }
-  } else
+  } else {
     positionM.setX(1.0e12); // Block processing/printing of smeared positions 
                             // if the position resolution is set to 0.
+    posSolM.setX(1.0e12);
+  }
   
   // Segment number
   G4int segCode = 0;
@@ -225,6 +229,7 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
   newHit->SetPos        (position);
   newHit->SetPosM       (positionM);
   newHit->SetPosCrys    (posSol);
+  newHit->SetPosCrysM   (posSolM);
   newHit->SetTrackOrigin(aStep->GetTrack()->GetVertexPosition());
   newHit->SetGlobalTime(aStep->GetPostStepPoint()->GetGlobalTime());
   

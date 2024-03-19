@@ -49,7 +49,9 @@ const TrackerGammaHit& TrackerGammaHit::operator=(const TrackerGammaHit& right)
   edep           = right.edep;
   ke             = right.ke;
   pos            = right.pos;
+  posCrys        = right.posCrys;
   posM           = right.posM;
+  posCrysM       = right.posCrysM;
   trackOrigin    = right.trackOrigin;
   globalTime     = right.globalTime;
   return *this;
