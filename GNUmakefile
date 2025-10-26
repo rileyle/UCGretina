@@ -43,6 +43,10 @@ ifdef HIGHMULT
   CPPFLAGS  += -DHIGHMULT
 endif
 
+ifdef CACHETEXT
+  CPPFLAGS += -DCACHETEXT
+endif
+
 ############################################
 ## uncomment for geant v. 4.7.1 and above
 ###########################################

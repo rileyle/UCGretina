@@ -33,19 +33,20 @@ void TrackerIonSD::Initialize(G4HCofThisEvent*)
 G4bool TrackerIonSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
 {
 
- G4StepPoint*   vi;
- G4StepPoint*   vf;
+  G4StepPoint*   vi;
+  G4StepPoint*   vf;
 
- const G4DynamicParticle* aParticle= aStep->GetTrack()->GetDynamicParticle();
- const G4String type =  aParticle->GetDefinition()->GetParticleType();
- const G4int    trackID = aStep->GetTrack()->GetTrackID(); 
- const G4String name =  aParticle->GetDefinition()->GetParticleName();
- const G4double len=aStep->GetStepLength();
+  const G4DynamicParticle* aParticle= aStep->GetTrack()->GetDynamicParticle();
+  const G4String type =  aParticle->GetDefinition()->GetParticleType();
+  const G4int    trackID = aStep->GetTrack()->GetTrackID(); 
+  const G4String name =  aParticle->GetDefinition()->GetParticleName();
+  const G4double len=aStep->GetStepLength();
 
   if(type=="nucleus")
    {     
 
-     vi=aStep->GetPreStepPoint();    
+     vi=aStep->GetPreStepPoint();
+     vf=aStep->GetPostStepPoint();    
      G4String vname=vi->GetPhysicalVolume()->GetName();
      if(len>0.)
      {
@@ -56,6 +57,7 @@ G4bool TrackerIonSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
 	 newIonHitI->SetTheta(vi->GetMomentumDirection().theta());
 	 newIonHitI->SetPhi(vi->GetMomentumDirection().phi());
 	 newIonHitI->SetTime(vi->GetProperTime());
+	 newIonHitI->SetDeltaTime(vf->GetProperTime()-vi->GetProperTime());
 	 newIonHitI->SetLabTime(vi->GetLocalTime());
 	 newIonHitI->SetGlobTime(vi->GetGlobalTime());
 	 newIonHitI->SetKE(vi->GetKineticEnergy());
@@ -87,6 +89,7 @@ G4bool TrackerIonSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
 	 newIonHitF->SetTheta(vf->GetMomentumDirection().theta());
 	 newIonHitF->SetPhi(vf->GetMomentumDirection().phi());
 	 newIonHitF->SetTime(vf->GetProperTime());
+	 newIonHitF->SetDeltaTime(vf->GetProperTime()-vi->GetProperTime());
 	 newIonHitF->SetLabTime(vf->GetLocalTime());
 	 newIonHitF->SetGlobTime(vf->GetGlobalTime());
 	 newIonHitF->SetKE(vf->GetKineticEnergy());

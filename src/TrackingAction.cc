@@ -27,9 +27,9 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
   // 	   << aTrack->GetCreatorProcess()->GetProcessName() << G4endl;
   // G4cout << ">      ----------------------------" << G4endl;
 
-  eventInfo 
-    = (EventInformation*)eventAction->GetEvent()->GetUserInformation();
-
+  primaryVertexInfo
+    = (PrimaryVertexInformation*)eventAction->GetEvent()->GetPrimaryVertex()->GetUserInformation();
+  
   // Emitted gamma
   if( ( aTrack->GetParticleDefinition()->GetParticleName() == "gamma" ||
 	aTrack->GetParticleDefinition()->GetParticleName() == "neutron" ||
@@ -53,22 +53,22 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
     // 	   << "   parent = " << aTrack->GetParentID()
     // 	   << G4endl;
 
-    eventInfo->AddEmittedGamma(aTrack->GetKineticEnergy(), 
-			       &pos, &dir,
-			       aTrack->GetParentID());
+    primaryVertexInfo->AddEmittedGamma(aTrack->GetKineticEnergy(), 
+				       &pos, &dir,
+				       aTrack->GetParentID());
 
   }
 
   // Event filter code goes here.
-  eventInfo->SetWriteEvent(true); // Unfiltered
+  primaryVertexInfo->SetWriteEvent(true); // Unfiltered
   
 }
 
 void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
 {
 
-  eventInfo 
-    = (EventInformation*)eventAction->GetEvent()->GetUserInformation();
+  primaryVertexInfo
+    = (PrimaryVertexInformation*)eventAction->GetEvent()->GetPrimaryVertex()->GetUserInformation();
 
   // G4cout << std::fixed << std::setprecision(4) << std::setw(12)
   // 	 << "> PostUserTrackingAction" << G4endl;
@@ -118,14 +118,13 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
 
   if( def->GetParticleType() == "nucleus" &&
       aTrack->GetParticleDefinition()->GetParticleName().contains('[') )
-    eventInfo->AddBeta(aTrack->GetStep()->GetPostStepPoint()->GetBeta(),
-		       aTrack->GetTrackID());
-
+    primaryVertexInfo->AddBeta(aTrack->GetStep()->GetPostStepPoint()->GetBeta(),
+			       aTrack->GetTrackID());
   
   // if( def->GetParticleType() == "nucleus" &&
   //     aTrack->GetParentID() > 0 &&
   //     aTrack->GetParticleDefinition()->GetParticleName().contains('[') )
-  //   eventInfo->AddBeta(aTrack->GetStep()->GetPostStepPoint()->GetBeta(),
+  //   primaryVertexInfo->AddBeta(aTrack->GetStep()->GetPostStepPoint()->GetBeta(),
   // 		       aTrack->GetTrackID());
 
 

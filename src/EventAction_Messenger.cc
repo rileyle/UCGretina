@@ -25,6 +25,30 @@ EventAction_Messenger::EventAction_Messenger(EventAction* EA):theEventAction(EA)
   Mode2FileCmd = new G4UIcmdWithAString("/Mode2/Filename",this);
   Mode2FileCmd->SetGuidance("Mode 2 output file name");
 
+  cacheDir = new G4UIdirectory("/Cache/");
+  cacheOutputFileCmd = new G4UIcmdWithAString("/Cache/Output",this);
+  cacheOutputFileCmd -> SetGuidance("sets the EventAction Cache Ouput file");
+  
+  cacheInputFileCmd = new G4UIcmdWithAString("/Cache/Input",this);
+  cacheInputFileCmd -> SetGuidance("sets the EventAction Cache Input file");
+  
+  cacheHalfLifeCmd = new G4UIcmdWithADoubleAndUnit("/Cache/HalfLife",this);
+  cacheHalfLifeCmd -> SetGuidance("sets the Half-Life for the particles in the cache simulation");
+  cacheGammaEnergyCmd = new G4UIcmdWithADoubleAndUnit("/Cache/GammaEnergy",this);
+  cacheGammaEnergyCmd -> SetGuidance("sets the Gamma Energy for the particles in the cache simulation");
+  cacheZOffsetCmd = new G4UIcmdWithADoubleAndUnit("/Cache/ZOffset",this);
+  cacheZOffsetCmd -> SetGuidance("sets the Z-Offset for the target in the cache simulation");
+
+  CacheAngDistDir = new G4UIdirectory("/Cache/AngularDistribution/");
+  CacheAngDistA0Cmd = new G4UIcmdWithADouble("/Cache/AngularDistribution/a0",this);
+  CacheAngDistA0Cmd->SetGuidance("a0 parameter of the gamma-ray angular distribution for cached events.");
+
+  CacheAngDistA2Cmd = new G4UIcmdWithADouble("/Cache/AngularDistribution/a2",this);
+  CacheAngDistA2Cmd->SetGuidance("a2 parameter of the gamma-ray angular distribution for cached events.");
+
+  CacheAngDistA4Cmd = new G4UIcmdWithADouble("/Cache/AngularDistribution/a4",this);
+  CacheAngDistA4Cmd->SetGuidance("a4 parameter of the gamma-ray angular distribution for cached events.");
+
   crmatCmd = new G4UIcmdWithAString("/Mode2/crmatFile",this);
   crmatCmd->SetGuidance("Use the crystal-frame to world-frame transformations in the specified file for Mode2 data (expected in crystal coordinates).");
 
@@ -64,6 +88,15 @@ EventAction_Messenger::~EventAction_Messenger()
   delete ThreshDECmd;
   delete Mode2Dir;
   delete Mode2FileCmd;
+  delete cacheOutputFileCmd;
+  delete cacheInputFileCmd;
+  delete cacheHalfLifeCmd;
+  delete cacheGammaEnergyCmd;
+  delete cacheZOffsetCmd;
+  delete CacheAngDistDir;
+  delete CacheAngDistA0Cmd;
+  delete CacheAngDistA2Cmd;
+  delete CacheAngDistA4Cmd;
   delete crmatCmd;
   delete crysCmd;
   delete coordsCmd;
@@ -90,6 +123,22 @@ void EventAction_Messenger::SetNewValue(G4UIcommand* command,G4String newValue)
     {theEventAction->SetThreshDE(ThreshDECmd->GetNewDoubleValue(newValue));}
   if( command == Mode2FileCmd )
     {theEventAction->SetMode2File(newValue);}
+  if( command ==  cacheOutputFileCmd )
+    {theEventAction->openCacheOutputFile(newValue);}
+  if( command == cacheInputFileCmd )
+    {theEventAction->openCacheInputFile(newValue);}
+  if( command == cacheHalfLifeCmd )
+    {theEventAction->SetCacheHalfLife(cacheHalfLifeCmd->GetNewDoubleValue(newValue));}
+  if( command == cacheGammaEnergyCmd )
+    {theEventAction->SetCacheGammaEnergy(cacheGammaEnergyCmd->GetNewDoubleValue(newValue));}
+  if( command == cacheZOffsetCmd )
+    {theEventAction->SetCacheZOffset( cacheZOffsetCmd->GetNewDoubleValue(newValue));}
+  if( command == CacheAngDistA0Cmd )
+    {theEventAction->SetCacheAngDistA0(CacheAngDistA0Cmd->GetNewDoubleValue(newValue));}
+  if( command == CacheAngDistA2Cmd )
+    {theEventAction->SetCacheAngDistA2(CacheAngDistA2Cmd->GetNewDoubleValue(newValue));}
+  if( command == CacheAngDistA4Cmd )
+    {theEventAction->SetCacheAngDistA4(CacheAngDistA4Cmd->GetNewDoubleValue(newValue));}
   if( command == crmatCmd )
     {theEventAction->SetCrmatFile(newValue);}
   if( command == crysCmd )

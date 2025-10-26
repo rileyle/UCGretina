@@ -12,6 +12,14 @@ EventAction::EventAction()
   packingRes = 0.*mm;
   S800KE = 1.0;
   allS800 = false;
+  cacheOutputFileName = "";
+  cacheOut = false;
+  cacheInputFileName = "";
+  cacheIn = false;
+  cacheGammaEnergy = 0;
+  cacheZOffset = 0;
+  cacheHalfLife = 0;
+  cacheAngDist = NULL;
   outFileName = "";
   outDetsOnly = false;
   evOut = false;
@@ -42,10 +50,8 @@ void EventAction::BeginOfEventAction(const G4Event* ev)
 {
   evt = ev;
 
-  // Add a G4UserEventInformation object to store event info
-  EventInformation* eventInfo = new EventInformation;
-  G4EventManager::
-    GetEventManager()->SetUserInformation(eventInfo);
+  PrimaryVertexInformation* primaryVertexInfo
+    = (PrimaryVertexInformation*)evt->GetPrimaryVertex()->GetUserInformation();
 
   G4SDManager * SDman = G4SDManager::GetSDMpointer();
 
@@ -56,7 +62,7 @@ void EventAction::BeginOfEventAction(const G4Event* ev)
     }
 
   // For event filter
-  eventInfo->SetWriteEvent(false);
+  primaryVertexInfo->SetWriteEvent(false);
   
   if(crmatFileName != "" && crystalXforms) {
     G4cerr << "Error: Both /Mode2/crystalXforms and /Mode2/crmatFile commands are present." << G4endl;
@@ -119,10 +125,11 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 
   }
   
-  EventInformation* eventInfo = (EventInformation*)evt->GetUserInformation();
+  PrimaryVertexInformation* primaryVertexInfo
+    = (PrimaryVertexInformation*)evt->GetPrimaryVertex()->GetUserInformation();
 
   // Event filter
-  if(!eventInfo->WriteEvent())
+  if(!primaryVertexInfo->WriteEvent())
     return;
   
   // All Mode 2 output from this event gets this timestamp.
@@ -137,22 +144,22 @@ void EventAction::EndOfEventAction(const G4Event* ev)
     if(fisInBeam)
       G4cout << std::fixed << std::setprecision(4) 
 	     << std::setw(12) << std::right
-	     << " ata = " << eventInfo->GetATA()
-	     << " bta = " << eventInfo->GetBTA()
-	     << " dta = " << eventInfo->GetDTA()
-	     << " yta = " << eventInfo->GetYTA()
+	     << " ata = " << primaryVertexInfo->GetATA()
+	     << " bta = " << primaryVertexInfo->GetBTA()
+	     << " dta = " << primaryVertexInfo->GetDTA()
+	     << " yta = " << primaryVertexInfo->GetYTA()
 	     << G4endl;
-    G4cout << eventInfo->GetNEmittedGammas() << " emitted gamma(s)" << G4endl;
-    for(G4int i = 0; i< eventInfo->GetNEmittedGammas(); i++)
+    G4cout << primaryVertexInfo->GetNEmittedGammas() << " emitted gamma(s)" << G4endl;
+    for(G4int i = 0; i< primaryVertexInfo->GetNEmittedGammas(); i++)
       G4cout << std::fixed << std::setprecision(4) 
 	     << std::setw(12) << std::right
-	     << "energy = " << eventInfo->GetEmittedGammaEnergy(i)
-	     << " pos = " << eventInfo->GetEmittedGammaPosX(i)
-	     << ", " << eventInfo->GetEmittedGammaPosY(i)
-	     << ", " << eventInfo->GetEmittedGammaPosZ(i)
-	     << " direction = " << eventInfo->GetEmittedGammaPhi(i)
-	     << ", " << eventInfo->GetEmittedGammaTheta(i)
-	     << " beta = " << eventInfo->GetBeta(i)
+	     << "energy = " << primaryVertexInfo->GetEmittedGammaEnergy(i)
+	     << " pos = " << primaryVertexInfo->GetEmittedGammaPosX(i)
+	     << ", " << primaryVertexInfo->GetEmittedGammaPosY(i)
+	     << ", " << primaryVertexInfo->GetEmittedGammaPosZ(i)
+	     << " direction = " << primaryVertexInfo->GetEmittedGammaPhi(i)
+	     << ", " << primaryVertexInfo->GetEmittedGammaTheta(i)
+	     << " beta = " << primaryVertexInfo->GetBeta(i)
 	     << G4endl;
 
     G4cout.setf( f );
@@ -472,21 +479,21 @@ void EventAction::EndOfEventAction(const G4Event* ev)
       // Identify events in which the full emitted gamma-ray energy
       // is deposited in a single crystal
       // (only evaluated for emitted multiplicity = 1 events).
-      if( eventInfo->GetNEmittedGammas() == 1 ){
+      if( primaryVertexInfo->GetNEmittedGammas() == 1 ){
 
-	G4double delta = totalEdep - eventInfo->GetEmittedGammaEnergy(0);
+	G4double delta = totalEdep - primaryVertexInfo->GetEmittedGammaEnergy(0);
 
 	// Threshold due to discrepancies in energy deposited by recoiling
 	// Ge nuclei in pair-production events. (There are also tiny
 	// discrepancies that can be positive or negative which may be
 	// due to roundoff or some other error somewhere in geant4 tracking.
 	// The upper bound of 0.0001 keV covers those.)
-	G4double delta_th = 6.318E-5*eventInfo->GetEmittedGammaEnergy(0) + .074;
+	G4double delta_th = 6.318E-5*primaryVertexInfo->GetEmittedGammaEnergy(0) + .074;
 
 	if( singleDetector && delta > -delta_th && delta < 0.0001 )
-	  eventInfo->SetFullEnergy(1);
+	  primaryVertexInfo->SetFullEnergy(1);
 	else
-	  eventInfo->SetFullEnergy(0);
+	  primaryVertexInfo->SetFullEnergy(0);
 
       }
 
@@ -554,12 +561,12 @@ void EventAction::EndOfEventAction(const G4Event* ev)
       }
 
       // Write S800 event to the output file
-      if(fisInBeam)
+      if(fisInBeam || cacheIn)
 	writeS800(timestamp, 
-		  eventInfo->GetATA(), 
-		  eventInfo->GetBTA(), 
-		  eventInfo->GetDTA(), 
-		  eventInfo->GetYTA());
+		  primaryVertexInfo->GetATA(), 
+		  primaryVertexInfo->GetBTA(), 
+		  primaryVertexInfo->GetDTA(), 
+		  primaryVertexInfo->GetYTA());
 
       // Write decomposed gamma event(s) to the output file
       writeDecomp(timestamp, 
@@ -572,19 +579,25 @@ void EventAction::EndOfEventAction(const G4Event* ev)
     } else {
       // Write S800 event to the output file with no detected gammas
       // if the allS800 flag is set.
-      if(allS800 && fisInBeam)
+      if(allS800 && (fisInBeam || cacheIn))
 	writeS800(timestamp, 
-		  eventInfo->GetATA(), 
-		  eventInfo->GetBTA(), 
-		  eventInfo->GetDTA(), 
-		  eventInfo->GetYTA());
+		  primaryVertexInfo->GetATA(), 
+		  primaryVertexInfo->GetBTA(), 
+		  primaryVertexInfo->GetDTA(), 
+		  primaryVertexInfo->GetYTA());
     }
   }
   
   // Write emitted gamma information from this event to 
   // the output file.
 
-  writeSim(timestamp, eventInfo);
+  writeSim(timestamp, primaryVertexInfo);
+
+  if(cacheOut){
+    TrackerIonHitsCollection* ionCollection 
+      = (TrackerIonHitsCollection*)(HCE->GetHC(ionCollectionID));
+    writeCache(ionCollection);
+  }
 
 }
 // --------------------------------------------------
@@ -855,10 +868,9 @@ void EventAction::writeDecomp(long long int ts,
       }
     }
   }
-
 }
 // --------------------------------------------------
-void EventAction::writeSim(long long int ts, EventInformation* eventInfo)
+void EventAction::writeSim(long long int ts, PrimaryVertexInformation* primaryVertexInfo)
 {
   if(mode2Out){
     G4int siz;
@@ -872,17 +884,17 @@ void EventAction::writeSim(long long int ts, EventInformation* eventInfo)
 
     //Construct GEB payload for G4SIM event
     g4sim_egs.type = 0xABCD1234;
-    g4sim_egs.num = eventInfo->GetNEmittedGammas();
-    g4sim_egs.full = eventInfo->GetFullEnergy();
+    g4sim_egs.num = primaryVertexInfo->GetNEmittedGammas();
+    g4sim_egs.full = primaryVertexInfo->GetFullEnergy();
 
     for(G4int i = 0; i < g4sim_egs.num; i++){
-      g4sim_egs.gammas[i].e     = eventInfo->GetEmittedGammaEnergy(i);
-      g4sim_egs.gammas[i].x     = eventInfo->GetEmittedGammaPosX(i);
-      g4sim_egs.gammas[i].y     = eventInfo->GetEmittedGammaPosY(i);
-      g4sim_egs.gammas[i].z     = eventInfo->GetEmittedGammaPosZ(i);
-      g4sim_egs.gammas[i].phi   = eventInfo->GetEmittedGammaPhi(i);
-      g4sim_egs.gammas[i].theta = eventInfo->GetEmittedGammaTheta(i);
-      g4sim_egs.gammas[i].beta  = eventInfo->GetBeta(i);
+      g4sim_egs.gammas[i].e     = primaryVertexInfo->GetEmittedGammaEnergy(i);
+      g4sim_egs.gammas[i].x     = primaryVertexInfo->GetEmittedGammaPosX(i);
+      g4sim_egs.gammas[i].y     = primaryVertexInfo->GetEmittedGammaPosY(i);
+      g4sim_egs.gammas[i].z     = primaryVertexInfo->GetEmittedGammaPosZ(i);
+      g4sim_egs.gammas[i].phi   = primaryVertexInfo->GetEmittedGammaPhi(i);
+      g4sim_egs.gammas[i].theta = primaryVertexInfo->GetEmittedGammaTheta(i);
+      g4sim_egs.gammas[i].beta  = primaryVertexInfo->GetBeta(i);
     }
 
     //Write GEB header for G4SIM event
@@ -899,29 +911,29 @@ void EventAction::writeSim(long long int ts, EventInformation* eventInfo)
   }
 
   if(evOut && !outDetsOnly){
-    evfile << "E" << std::setw(4) << eventInfo->GetNEmittedGammas()  
-	   << std::setw(4) << eventInfo->GetFullEnergy()  
+    evfile << "E" << std::setw(4) << primaryVertexInfo->GetNEmittedGammas()  
+	   << std::setw(4) << primaryVertexInfo->GetFullEnergy()  
 	   << std::setw(12) << ts/10000 << G4endl;
-    for(G4int i = 0; i < eventInfo->GetNEmittedGammas(); i++){
+    for(G4int i = 0; i < primaryVertexInfo->GetNEmittedGammas(); i++){
       evfile << "     "
 	     << std::fixed << std::setprecision(4) 
 	     << std::right << std::setw(12) 
-	     << eventInfo->GetEmittedGammaEnergy(i)
+	     << primaryVertexInfo->GetEmittedGammaEnergy(i)
 	     << std::setw(12) 
-	     << eventInfo->GetEmittedGammaPosX(i)
+	     << primaryVertexInfo->GetEmittedGammaPosX(i)
 	     << std::setw(12) 
-	     << eventInfo->GetEmittedGammaPosY(i)
+	     << primaryVertexInfo->GetEmittedGammaPosY(i)
 	     << std::setw(12) 
-	     << eventInfo->GetEmittedGammaPosZ(i)
+	     << primaryVertexInfo->GetEmittedGammaPosZ(i)
 	     << std::setw(12) 
-	     << eventInfo->GetEmittedGammaPhi(i)
+	     << primaryVertexInfo->GetEmittedGammaPhi(i)
 	     << std::setw(12) 
-	     << eventInfo->GetEmittedGammaTheta(i)
+	     << primaryVertexInfo->GetEmittedGammaTheta(i)
 	     << std::setw(12)
-	     << eventInfo->GetBeta(i) << G4endl;
+	     << primaryVertexInfo->GetBeta(i) << G4endl;
     }
   }
- 
+
 }
 // --------------------------------------------------TB
 void EventAction::openEvfile()
@@ -1051,5 +1063,251 @@ void EventAction::SetCrystalXforms(){
   G4cout << "Using internal transformations from the world frame to the crystal frames for Mode 2 output." << G4endl;
 
   return;
+}
+//---------------------------------------------------
+void EventAction::openCacheOutputFile(G4String FileName)
+{
+  cacheOutputFileName = FileName;
+#ifdef CACHETEXT
+  if (!cacheOutputFile.is_open())
+    cacheOutputFile.open(cacheOutputFileName.c_str());
+  if (!cacheOutputFile.is_open()){
+    G4cerr << "Error opening cache output file." << G4endl;
+    exit(EXIT_FAILURE);
+  } else {
+    G4cout << "\nOpened cache output file: " << cacheOutputFileName
+	   << G4endl;
+    cacheOut = true;
+    allS800 = true;
+  }
+#else
+  cacheOutputFile = fopen(cacheOutputFileName.c_str(), "wb");
+  if (cacheOutputFile == NULL) {
+    G4cerr << "Error opening cache output file." << G4endl;
+    exit(EXIT_FAILURE);
+  } else {
+    G4cout << "\nOpened cache output file: " << cacheOutputFileName
+	   << G4endl;
+    cacheOut = true;
+    allS800 = true;
+  }
+#endif
+  return;
+}
+//-----------------------------------------------------
+void EventAction::closeCacheOutputFile()
+{
+#ifdef CACHETEXT
+  cacheOutputFile.close();
+#else
+  fclose(cacheOutputFile);
+#endif
+  return;
+}
+//----------------------------------------------------
+void EventAction::openCacheInputFile(G4String FileName)
+{
+  cacheInputFileName = FileName;
+#ifdef CACHETEXT
+  if (!cacheInputFile.is_open())
+    cacheInputFile.open(cacheInputFileName.c_str());
+  if (!cacheInputFile.is_open()){
+    G4cerr<< "Error opening cache input file." << G4endl;
+    exit(EXIT_FAILURE);
+  } else {
+    G4cout << "\nOpened cache input file: " << cacheInputFileName
+	   << G4endl;
+    cacheIn = true;
+  }
+#else
+  cacheInputFile = fopen(cacheInputFileName.c_str(), "rb");
+  if (cacheInputFile == NULL) {
+    G4cerr << "Error opening cache input file." << G4endl;
+    exit(EXIT_FAILURE);
+  } else {
+    G4cout << "\nOpened cache input file: " << cacheInputFileName
+	   << G4endl;
+    cacheIn = true;
+  }
+#endif
+  return;
+}
+//-----------------------------------------------------
+void EventAction::closeCacheInputFile()
+{
+#ifdef CACHETEXT
+  cacheInputFile.close();
+#else
+  fclose(cacheInputFile);
+#endif
+  return;
+}
+//---------------------------------------------------
+void EventAction::writeCache(TrackerIonHitsCollection* ionCollection){
+
+  PrimaryVertexInformation* primaryVertexInfo
+    = (PrimaryVertexInformation*)evt->GetPrimaryVertex()->GetUserInformation();
+
+  // If the reaction product doesn't exit the target, the S800 information
+  // will all be nan, and we reject this event.
+  if(std::isnan(primaryVertexInfo->GetATA())){
+    G4cerr << "Warning: an event did not generate an entry in the cache file."
+	   << G4endl
+	   << "         The reaction product did not exit the target."
+	   << G4endl;
+    return;
+  }
+    
+  // Process reaction-product tracking points
+  G4int Npoints = ionCollection->entries();
+  G4bool reactionOccurence = false;
+  G4bool emissionOccurence = false;
+  G4double timeOffset = 0;
+  
+  G4double x[1000];
+  G4double y[1000];
+  G4double z[1000];
+  G4double bx[1000];
+  G4double by[1000];
+  G4double bz[1000];
+  G4double t[1000];
+
+  // Store steps in the target starting at the reaction point.
+  G4int Nwrite = 0;
+  for(G4int i = 0; i < Npoints; i++){
+    // Find the reaction step.
+    if( (*ionCollection)[i]->GetParticleID().contains("[")
+	&& !reactionOccurence) {
+      reactionOccurence = true;
+    }
+    // We need to add in a time offset for any steps in the target after
+    // a gamma-ray is emitted.
+    // (The proper time clock resets with each particle change.)
+    if( !(*ionCollection)[i]->GetParticleID().contains("[")
+	&& reactionOccurence &&!emissionOccurence) {
+      emissionOccurence = true;
+      timeOffset = (*ionCollection)[i-1]->GetTime();
+      continue; // This is a particle change step, at the same position
+                // as the next one. We don't write this one.
+    }
+    // Either the reaction has happened, or it happens as the last
+    // step in the target.
+    if(reactionOccurence || (Nwrite == 0 && i == Npoints-1) ) {
+      G4ThreeVector betaVector = G4ThreeVector(0,0,1);
+      betaVector.setMag((*ionCollection)[i]->GetBeta());
+      betaVector.setTheta((*ionCollection)[i]->GetTheta());
+      betaVector.setPhi((*ionCollection)[i]->GetPhi());
+      x[Nwrite]  = (*ionCollection)[i]->GetPos().getX();
+      y[Nwrite]  = (*ionCollection)[i]->GetPos().getY();
+      z[Nwrite]  = (*ionCollection)[i]->GetPos().getZ();
+      bx[Nwrite] = betaVector.getX();
+      by[Nwrite] = betaVector.getY();
+      bz[Nwrite] = betaVector.getZ();
+      // If the reaction happens in the last step in the target,
+      // the proper-time "clock" should start there.
+      if(Nwrite == 0 && i == Npoints-1)
+	timeOffset = -(*ionCollection)[i]->GetTime();
+      t[Nwrite]  = ((*ionCollection)[i]->GetTime()+timeOffset)/ps;
+      Nwrite++;
+    }
+  }
+  if(Nwrite > 0){
+    // Store the trajectory point as the ion exits the target.
+    G4ThreeVector betaVector = G4ThreeVector(0,0,1);
+    betaVector.setMag(primaryVertexInfo->GetExitBeta());
+    betaVector.setTheta(primaryVertexInfo->GetExitTheta());
+    betaVector.setPhi(primaryVertexInfo->GetExitPhi());
+    x[Nwrite]  = primaryVertexInfo->GetExitPos()->getX();
+    y[Nwrite]  = primaryVertexInfo->GetExitPos()->getY();
+    z[Nwrite]  = primaryVertexInfo->GetExitPos()->getZ();
+    bx[Nwrite] = betaVector.getX();
+    by[Nwrite] = betaVector.getY();
+    bz[Nwrite] = betaVector.getZ();
+    t[Nwrite]  = (primaryVertexInfo->GetExitTime()+timeOffset)/ps;
+    Nwrite++;
+  }
+
+  // Write this event to the cache file.
+  if(Nwrite > 0){
+    // Write the event header.
+#ifdef CACHETEXT
+    cacheOutputFile << Nwrite << G4endl;
+#else
+    fwrite(&Nwrite, sizeof(G4int), 1, cacheOutputFile);
+#endif
+    // Write the reaction-product tracking points.
+    for(G4int i = 0; i < Nwrite; i++){
+      // Write this ion trajectory point.
+#ifdef CACHETEXT
+      cacheOutputFile << std::fixed << std::setprecision(4) 
+		      << std::right << std::setw(12)
+		      << x[i] << std::setw(12)
+		      << y[i] << std::setw(12)
+		      << z[i]
+		      << std::setprecision(6) << std::setw(12)
+		      << bx[i] << std::setw(12)
+		      << by[i] << std::setw(12)
+		      << bz[i]
+		      << std::setprecision(4) << std::setw(12)
+		      << t[i]
+		      << G4endl;
+#else
+      CTP tp;
+      tp.x = x[i];
+      tp.y = y[i];
+      tp.z = z[i];
+      tp.bx = bx[i];
+      tp.by = by[i];
+      tp.bz = bz[i];
+      tp.t = t[i];
+      fwrite(&tp, sizeof(tp), 1, cacheOutputFile);
+#endif
+    }
+#ifdef CACHETEXT
+    //Write the S800 data.
+    cacheOutputFile << std::fixed << std::setprecision(15)
+		    << std::right << std::setw(20)
+		    << primaryVertexInfo->GetATA() << std::setw(20)
+		    << primaryVertexInfo->GetBTA() << std::setw(20)
+		    << primaryVertexInfo->GetDTA() << std::setw(20)
+		    << primaryVertexInfo->GetYTA() << std::setw(20) << G4endl;
+#else
+    CS s8;
+    s8.ata = primaryVertexInfo->GetATA();
+    s8.bta = primaryVertexInfo->GetBTA();
+    s8.dta = primaryVertexInfo->GetDTA();
+    s8.yta = primaryVertexInfo->GetYTA();
+    fwrite(&s8, sizeof(s8), 1, cacheOutputFile);
+#endif
+  }
+  else {
+    // This should never happen, since the hit collection should be empty.
+    // Right?
+    G4cerr << "Warning: an event did not generate an entry in the cache file."
+	   << G4endl
+	   << "         There were no tracking points in the target."
+	   << G4endl;
+  }
+}
+//---------------------------------------------------
+void EventAction::SetCacheAngDistA0(G4double a0){
+  if(cacheAngDist == NULL){
+    cacheAngDist = new AngularDistribution();
+  }
+  cacheAngDist->SetCoeff(0, a0);
+}
+//---------------------------------------------------
+void EventAction::SetCacheAngDistA2(G4double a2){
+  if(cacheAngDist == NULL){
+    cacheAngDist = new AngularDistribution();
+  }
+  cacheAngDist->SetCoeff(2, a2);
+}
+//---------------------------------------------------
+void EventAction::SetCacheAngDistA4(G4double a4){
+  if(cacheAngDist == NULL){
+    cacheAngDist = new AngularDistribution();
+  }
+  cacheAngDist->SetCoeff(4, a4);
 }
 //---------------------------------------------------

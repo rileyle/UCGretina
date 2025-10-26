@@ -15,6 +15,8 @@
 #include "G4RandomDirection.hh"
 #include <vector>
 #include "SourceData.hh"
+#include "PrimaryVertexInformation.hh"
+#include "cache.hh"
 
 using namespace std;
 
@@ -26,9 +28,10 @@ public:
   
 public:
   void GeneratePrimaries(G4Event* anEvent);
-  void SetSource(){source=true;inbeam=false;background=false;}
-  void SetInBeam(){source=false;inbeam=true;background=false;}
-  void SetBackground(){source=false;inbeam=false;background=true;}
+  void SetSource(){source=true;inbeam=false;background=false;cache=false;}
+  void SetInBeam(){source=false;inbeam=true;background=false;cache=false;}
+  void SetBackground(){source=false;inbeam=false;background=true;cache=false;}
+  void SetCache(){source=false;inbeam=false;background=false;cache=true;}
   void SetSourceX(G4double x){sourcePosition.setX(x);}
   void SetSourceY(G4double y){sourcePosition.setY(y);}
   void SetSourceZ(G4double z){sourcePosition.setZ(z);}
@@ -85,7 +88,7 @@ private:
   G4double frac;
   G4bool   fracOn;
   // source stuff
-  G4bool source, inbeam, background, isCollimated; 
+  G4bool source, inbeam, background, isCollimated, cache; 
   G4String sourceType;
   G4ThreeVector sourcePosition;
   G4double sourceRadius;

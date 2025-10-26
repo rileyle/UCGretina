@@ -3,7 +3,7 @@
 
 #include "G4UserTrackingAction.hh"
 #include "G4TrackingManager.hh"
-#include "EventInformation.hh"
+#include "PrimaryVertexInformation.hh"
 #include "G4Track.hh"
 #include "G4ios.hh"
 #include "GEB.hh"
@@ -23,7 +23,7 @@ public:
 private:
 
   EventAction* eventAction;
-  EventInformation* eventInfo;
+  PrimaryVertexInformation* primaryVertexInfo;
 };
  
 #endif //TRACKINGACTION_H

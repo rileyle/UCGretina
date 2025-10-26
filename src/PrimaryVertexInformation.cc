@@ -1,6 +1,6 @@
-#include "EventInformation.hh"
+#include "PrimaryVertexInformation.hh"
 
-EventInformation::EventInformation() { 
+PrimaryVertexInformation::PrimaryVertexInformation() { 
   fNEmittedGammas = 0;
   fNBetas         = 0;
   fFullEnergy     = -1;
@@ -8,14 +8,18 @@ EventInformation::EventInformation() {
   fbta            = sqrt(-1.0);
   fdta            = sqrt(-1.0);
   fyta            = sqrt(-1.0);
+  fExitPos        = G4ThreeVector(0, 0, 0);
+  fExitBeta       = sqrt(-1.0);
+  fExitTheta      = sqrt(-1.0);
+  fExitPhi        = sqrt(-1.0);
   ffiltercode     = 0;
   fwrite          = true;
 }
 
-void EventInformation::AddEmittedGamma(G4double e, 
-				       G4ThreeVector *pos, 
-				       G4ThreeVector *dir,
-				       G4int parentID){
+void PrimaryVertexInformation::AddEmittedGamma(G4double e, 
+					       G4ThreeVector *pos, 
+					       G4ThreeVector *dir,
+					       G4int parentID){
 
   //G4cout << "   fNEmittedGammas = " << fNEmittedGammas << G4endl;
 
@@ -37,7 +41,7 @@ void EventInformation::AddEmittedGamma(G4double e,
     }
   }
 
-  // Source/Background
+  // Source/Background/Cache
   if(fNBetas == 0){
       fEmittedGammaEnergies[fNEmittedGammas] = e/keV;
       fEmittedGammaPosX[fNEmittedGammas]     = pos->getX()/mm;
@@ -51,7 +55,7 @@ void EventInformation::AddEmittedGamma(G4double e,
     
 }
 
-void EventInformation::AddBeta(G4double b, G4int TID){
+void PrimaryVertexInformation::AddBeta(G4double b, G4int TID){
 
   // Beta values are stored first, so we keep track of the track ID 
   // of the ion to match it with the corresponding emitted gamma
@@ -61,4 +65,10 @@ void EventInformation::AddBeta(G4double b, G4int TID){
   fBetaTrackID[fNBetas] = TID;
   fNBetas++;
 
+}
+
+void PrimaryVertexInformation::SetExitPos(G4ThreeVector* p){
+  fExitPos.setX(p->x());
+  fExitPos.setY(p->y());
+  fExitPos.setZ(p->z());
 }

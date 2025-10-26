@@ -30,7 +30,6 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction *detector, I
   theta_max=180.*deg;
   theta_min=0.;
   theta_bin=0.;
-
 }
 
 PrimaryGeneratorAction::~PrimaryGeneratorAction()
@@ -40,11 +39,15 @@ PrimaryGeneratorAction::~PrimaryGeneratorAction()
 
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
-
+  EventAction* eventAction
+    = (EventAction*)G4RunManager::GetRunManager()->GetUserEventAction();
+  if(eventAction->CacheIn())
+    SetCache();
+  
   particleTable = G4ParticleTable::GetParticleTable();
   ionTable = G4IonTable::GetIonTable();
   BeamOut->SetReactionFlag(-1);
-
+  
   if(source)
     {
 
@@ -159,6 +162,11 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
       particleGun->SetParticleEnergy(GetSourceEnergy());
 
+      //  G4cout<<" +++++ Generating an event "<<G4endl;
+      particleGun->GeneratePrimaryVertex(anEvent);
+      PrimaryVertexInformation* primaryVertexInfo = new PrimaryVertexInformation;
+      anEvent->GetPrimaryVertex()->SetUserInformation(primaryVertexInfo);
+
     }
   else if(inbeam)
     {
@@ -211,12 +219,11 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       TT = myDetector->GetTarget()->DistanceToIn(position, direction);
       TT = myDetector->GetTarget()->DistanceToOut(position+TT*direction, 
 						  direction);
-      TT *= direction.getZ();
 
       TC=myDetector->GetTargetPos()->getZ();
-      depth=TC+TT*(G4UniformRand()-0.5);
 #endif
-
+      TT *= direction.getZ();
+      
       // Z position of the reaction point
       depth=TC+TT*(G4UniformRand()-0.5);
       myDetector->setTargetReactionDepth(depth);
@@ -226,11 +233,193 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       // 	     << ", thickness along trajectory = " << TT
       // 	     << ", depth = " << depth
       // 	     << G4endl;
-      
-    }
 
-  //  G4cout<<" +++++ Generating an event "<<G4endl;
-  particleGun->GeneratePrimaryVertex(anEvent);
+      //  G4cout<<" +++++ Generating an event "<<G4endl;
+      particleGun->GeneratePrimaryVertex(anEvent);
+      PrimaryVertexInformation* primaryVertexInfo
+	= new PrimaryVertexInformation;
+      anEvent->GetPrimaryVertex()->SetUserInformation(primaryVertexInfo);
+
+    }
+  else if(cache)
+    {
+      G4int Npoints;
+      G4double x[1000];
+      G4double y[1000];
+      G4double z[1000];
+      G4double bx[1000];
+      G4double by[1000];
+      G4double bz[1000];
+      G4double t[1000];
+      G4double ata, bta, dta, yta;
+
+      // Use the half life ( /Experiment/Cache/HalfLife ) to find the
+      // emission position.
+      G4bool emissionSet = false;
+      G4ThreeVector emissionPos;
+      G4ThreeVector emissionBeta;
+
+#ifdef CACHETEXT
+      char currentLine[1000];
+      std::ifstream& cacheFile = eventAction->getCacheInputFile();
+      cacheFile >> Npoints;
+      if(cacheFile.eof()) {
+	G4cerr << "Error reading trajectory header from cache file."
+	       << G4endl;
+	exit(EXIT_FAILURE);
+      }
+      //	G4cout << Npoints << G4endl;
+#else
+      std::FILE* cacheFile = eventAction->getCacheInputFile();
+      G4int size = fread(&Npoints, sizeof(G4int), 1, cacheFile);
+      if(size != 1) {
+	G4cerr << "Error reading trajectory header from cache file."
+	       << G4endl;
+	exit(EXIT_FAILURE);
+      }
+#endif
+      G4double halflife = eventAction->GetCacheHalfLife(); // ps
+      G4double lifetime = halflife/log(2)/ps;
+      G4double emissionTime = CLHEP::RandExponential::shoot(lifetime);
+      for(int i = 0; i < Npoints; i++) {
+#ifdef CACHETEXT
+	if(cacheFile.eof()) {
+	  G4cerr << "Error reading trajectory point from cache file."
+		 << G4endl;
+	  exit(EXIT_FAILURE);
+	}
+	cacheFile >> x[i] >> y[i] >> z[i] >> bx[i] >> by[i] >> bz[i] >> t[i];
+	// G4cout << x[i] << std::setw(12)
+	// 	 << y[i] << std::setw(12)
+	// 	 << z[i] << std::setw(12)
+	// 	 << bx[i] << std::setw(12)
+	// 	 << by[i] << std::setw(12)
+	// 	 << bz[i] << std::setw(12)
+	// 	 << t[i] << std::setw(12) << G4endl;
+	cacheFile.getline(currentLine,1000);
+#else
+	CTP inputPosData;
+	size = fread(&inputPosData, sizeof(inputPosData), 1, cacheFile);
+	if(size != 1) {
+	  G4cerr << "Error reading trajectory point from cache file."
+		 << G4endl;
+	  exit(EXIT_FAILURE);
+	}
+	x[i] = inputPosData.x;
+	y[i] = inputPosData.y;
+	z[i] = inputPosData.z;
+	bx[i] = inputPosData.bx;
+	by[i] = inputPosData.by;
+	bz[i] = inputPosData.bz;
+	t[i] = inputPosData.t;
+#endif
+	if(!emissionSet){
+	  if(lifetime > 0){
+	    // Inside the target, we interpolate.
+	    if(t[i] > emissionTime){
+	      G4ThreeVector x1 = G4ThreeVector(x[i-1], y[i-1], z[i-1]);
+	      G4ThreeVector x2 = G4ThreeVector(x[i],   y[i],   z[i]);
+	      emissionPos = (x1*(emissionTime-t[i-1])
+			     + x2*(t[i]-emissionTime))/(t[i] - t[i-1]);
+	      G4ThreeVector beta1 = G4ThreeVector(bx[i-1], by[i-1], bz[i-1]);
+	      G4ThreeVector beta2 = G4ThreeVector(bx[i],   by[i],   bz[i]);
+	      emissionBeta = (beta1*(emissionTime-t[i-1])
+			      + beta2*(t[i]-emissionTime))/(t[i] - t[i-1]);
+	      emissionSet = true;
+	    }
+	  } else {
+	    emissionPos = G4ThreeVector(x[0],   y[0],  z[0]);
+	    emissionBeta = G4ThreeVector(bx[0], by[0], bz[0]);
+	    emissionSet = true;
+	  }
+	}
+      }
+      // Downstream of the target, we extrapolate.
+      if(!emissionSet){
+	emissionBeta = G4ThreeVector(bx[Npoints-1], by[Npoints-1], bz[Npoints-1]);
+	G4double c = 0.299792458; // mm/ps
+	emissionPos = G4ThreeVector(x[Npoints-1], y[Npoints-1], z[Npoints-1])
+	  + emissionBeta*c*(emissionTime-t[Npoints-1]);
+	emissionSet = true;
+      }
+      
+      // Read S800 data.
+#ifdef CACHETEXT
+      if(cacheFile.eof()) {
+	G4cerr << "Error reading S800 data from cache file."
+	       << G4endl;
+	exit(EXIT_FAILURE);
+      }
+      cacheFile >> ata >> bta >> dta >> yta;
+      cacheFile.getline(currentLine,1000);
+      //	G4cout << ata << std::setw(12) << bta << std::setw(12) << dta << std::setw(12) << yta << std::setw(12) << G4endl;
+#else
+      CS inputS8Data;
+      size =  fread(&inputS8Data, sizeof(inputS8Data), 1, cacheFile);
+      if(size != 1) {
+	G4cerr << "Error reading S800 data from cache file."
+	       << G4endl;
+	exit(EXIT_FAILURE);
+      }
+      ata = inputS8Data.ata;
+      bta = inputS8Data.bta;
+      dta = inputS8Data.dta;
+      yta = inputS8Data.yta;
+#endif
+      //G4FourVector r = (ata, bta, dta, yta);
+      // Projectile-frame gamma-ray energy
+      G4double e = eventAction->GetCacheGammaEnergy();
+
+      // Projectile-frame gamma-ray momentum
+      G4ThreeVector p;
+      AngularDistribution* angDist = eventAction->GetCacheAngDist();
+      if(angDist == NULL){ // Isotropic
+	p = G4RandomDirection();
+      } else {             // User-specified a0, a2, a4
+	G4double theta = angDist->GetRandomAngle();
+	G4double cosTheta = std::cos(theta);
+	G4double sinTheta = std::sin(theta);
+	G4double phi = twopi * G4UniformRand();
+	p.set(sinTheta*std::cos(phi),
+	      sinTheta*std::sin(phi),
+	      cosTheta);
+      }
+      p.setMag(e);
+      
+      // Projectile-frame gamma-ray 4 momentum
+      G4LorentzVector pProj = G4LorentzVector(p, e);
+
+      // Boost the gamma-ray 4 momentum to the lab frame.
+      G4LorentzVector pLab = pProj.boost(emissionBeta);
+      
+      // Lab-frame gamma-ray emission direction
+      G4ThreeVector gDir = G4ThreeVector(0, 0, 1); 
+      gDir.setTheta(pLab.theta());
+      gDir.setPhi(pLab.phi());
+
+      //      G4cout << "emission Pos = " << emissionPos
+      //	     << ", emission Beta = " << emissionBeta
+      //	     << ", emission Time = " << emissionTime
+      //	     << ", gDir = " << gDir
+      //	     << ", pLab.e = " << pLab.e()
+      //	     << G4endl;
+      
+      // Set the particle gun parameters.
+      particleGun->SetParticleDefinition(particleTable->FindParticle("gamma"));
+      particleGun->SetParticleMomentumDirection(gDir);
+      particleGun->SetParticleEnergy(pLab.e());
+      particleGun->SetParticlePosition(emissionPos);
+      particleGun->GeneratePrimaryVertex(anEvent);
+
+      PrimaryVertexInformation* primaryVertexInfo = new PrimaryVertexInformation;
+      anEvent->GetPrimaryVertex()->SetUserInformation(primaryVertexInfo);
+      primaryVertexInfo->AddBeta(emissionBeta.mag(), 0);
+      primaryVertexInfo->SetATA(ata);
+      primaryVertexInfo->SetBTA(bta);
+      primaryVertexInfo->SetDTA(dta);
+      primaryVertexInfo->SetYTA(yta);
+  
+    }
 
   if(sourceMultiplicity > 1 &&
      (sourceType == "white" || sourceType == "bgwhite")){

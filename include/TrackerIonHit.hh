@@ -45,6 +45,7 @@ class TrackerIonHit : public G4VHit
       void SetTheta(G4double th){theta=th;};
       void SetPhi(G4double ph){phi=ph;};
       void SetTime(G4double pt){time=pt;};
+      void SetDeltaTime(G4double dt){deltat=dt;};
       void SetLabTime(G4double lt){labtime=lt;};
       void SetGlobTime(G4double gt){globaltime=gt;};
       void SetKE(G4double k){KE=k;};
@@ -64,6 +65,7 @@ class TrackerIonHit : public G4VHit
       G4double GetTheta(){return theta;};
       G4double GetPhi(){return phi;};
       G4double GetTime(){return time;};
+      G4double GetDeltaTime(){return deltat;};
       G4double GetLabTime(){return labtime;};
       G4double GetGlobTime(){return globaltime;};
       G4double GetKE(){return KE;};
@@ -80,6 +82,7 @@ class TrackerIonHit : public G4VHit
       G4double      theta;
       G4double      phi;
       G4double      time;
+      G4double      deltat;
       G4double      labtime;
       G4double      globaltime;
       G4double      KE;
