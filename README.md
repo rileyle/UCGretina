@@ -561,12 +561,12 @@ where `<Time>` values of the interaction points are lab-frame times relative to 
 
 The energy, emission position, emission direction, and the velocity of the projectile are written for each gamma ray emitted in every event:
 
-    E   <# of emitted gamma rays>    <Full Energy>     <Event #>
+    E   <# of emitted gamma rays>    <Full Energy>     <Pair Production>    <Event #>
         <Energy>   <X>   <Y>   <Z>   <phi>   <theta>   <beta>
         <Energy>   <X>   <Y>   <Z>   <phi>   <theta>   <beta>
         ...
 
-`<Full Energy> = 1` if a single gamma ray is emitted and its full energy is deposited in a single crystal. `<Full Energy> = 0` if a single gamma ray is emitted and only part of its energy is deposited in any one crystal. `<Full Energy> = -1` otherwise.
+`<Full Energy> = 1` if a single gamma ray is emitted and its full energy is deposited in a single crystal. `<Full Energy> = 0` if a single gamma ray is emitted and only part of its energy is deposited in any one crystal. `<Full Energy> = -1` otherwise. `<Pair Production> = 1` if an electron-positron pair is created in the active detector volume. `<Pair Production> = 0` otherwise.
 
 The optional command
 

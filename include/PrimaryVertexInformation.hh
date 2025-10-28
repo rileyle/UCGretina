@@ -18,6 +18,7 @@ public:
   void AddEmittedGamma(G4double, G4ThreeVector*, G4ThreeVector*, G4int);
   void AddBeta(G4double, G4int);
   void SetFullEnergy(G4int f){ fFullEnergy = f; }
+  void SetPairProduction(G4int p){ fPairProduction = p; }
   void SetATA(G4double a){fata = a;}
   void SetBTA(G4double b){fbta = b;}
   void SetDTA(G4double d){fdta = d;}
@@ -40,6 +41,7 @@ public:
   G4double GetBeta(G4int i){ return fBeta[i]; }
   G4int GetNBetas(){return fNBetas; }
   G4int GetFullEnergy(){ return fFullEnergy; }
+  G4int GetPairProduction(){ return fPairProduction; }
   G4double GetATA(){return fata;}
   G4double GetBTA(){return fbta;}
   G4double GetDTA(){return fdta;}
@@ -65,6 +67,7 @@ private:
   G4int    fBetaTrackID[MAX_SIM_GAMMAS];
   G4int    fNBetas;
   G4int    fFullEnergy;
+  G4int    fPairProduction;
   G4double fata;
   G4double fbta;
   G4double fdta;

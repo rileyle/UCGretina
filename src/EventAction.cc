@@ -913,6 +913,7 @@ void EventAction::writeSim(long long int ts, PrimaryVertexInformation* primaryVe
   if(evOut && !outDetsOnly){
     evfile << "E" << std::setw(4) << primaryVertexInfo->GetNEmittedGammas()  
 	   << std::setw(4) << primaryVertexInfo->GetFullEnergy()  
+	   << std::setw(4) << primaryVertexInfo->GetPairProduction()  
 	   << std::setw(12) << ts/10000 << G4endl;
     for(G4int i = 0; i < primaryVertexInfo->GetNEmittedGammas(); i++){
       evfile << "     "

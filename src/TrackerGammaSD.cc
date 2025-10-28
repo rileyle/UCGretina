@@ -1,6 +1,7 @@
 
 #include "TrackerGammaSD.hh"
 #include "G4RunManager.hh"
+#include "PrimaryVertexInformation.hh"
 #include "DetectorConstruction.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4Step.hh"
@@ -88,6 +89,13 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
     = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
   //  G4cout << " &&& particleType = " << particleType 
   //	 << ", particleName = " << particleName << G4endl;
+
+  if (processName == "conv" || processName == "pol-conv"){
+    G4Event* evt = (G4Event*)G4RunManager::GetRunManager()->GetCurrentEvent();
+    PrimaryVertexInformation* primaryVertexInfo
+      = (PrimaryVertexInformation*)evt->GetPrimaryVertex()->GetUserInformation();
+    primaryVertexInfo->SetPairProduction(1);
+  } 
   
   // Pulse height defect for (n,n')
   // Joa Ljungvall and Johan Nyberg, NPA546, 553–573 (2005), Figure 3
