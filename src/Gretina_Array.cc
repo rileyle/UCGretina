@@ -3612,73 +3612,87 @@ Gretina_Array_Messenger::Gretina_Array_Messenger(Gretina_Array* pTarget)
 
   commandName = directoryName + "enablePassive";
   aLine = commandName.c_str();
-  EnablePassiveCmd = new G4UIcmdWithABool(aLine, this);
+  //  EnablePassiveCmd = new G4UIcmdWithABool(aLine, this);
+  EnablePassiveCmd = new G4UIcmdWithoutParameter(aLine, this);
   EnablePassiveCmd->SetGuidance("Generate passive germanium parts");
   EnablePassiveCmd->SetGuidance("Required parameters: none.");
-  EnablePassiveCmd->SetParameterName("usePassive",true);
-  EnablePassiveCmd->SetDefaultValue(true);
+  //  EnablePassiveCmd->SetParameterName("usePassive",true);
+  //  EnablePassiveCmd->SetDefaultValue(true);
   EnablePassiveCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   commandName = directoryName + "disablePassive";
   aLine = commandName.c_str();
-  DisablePassiveCmd = new G4UIcmdWithABool(aLine, this);
+  //  DisablePassiveCmd = new G4UIcmdWithABool(aLine, this);
+  DisablePassiveCmd = new G4UIcmdWithoutParameter(aLine, this);
   DisablePassiveCmd->SetGuidance("Do not generate passive germanium parts");
   DisablePassiveCmd->SetGuidance("Required parameters: none.");
-  DisablePassiveCmd->SetParameterName("usePassive",true);
-  DisablePassiveCmd->SetDefaultValue(false);
+  //  DisablePassiveCmd->SetParameterName("usePassive",true);
+  //  DisablePassiveCmd->SetDefaultValue(false);
   DisablePassiveCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
   
   commandName = directoryName + "enableCapsules";
   aLine = commandName.c_str();
-  EnableCapsulesCmd = new G4UIcmdWithABool(aLine, this);
+  //  EnableCapsulesCmd = new G4UIcmdWithABool(aLine, this);
+  EnableCapsulesCmd = new G4UIcmdWithoutParameter(aLine, this);
   EnableCapsulesCmd->SetGuidance("Generate passive capsules.");
   EnableCapsulesCmd->SetGuidance("Required parameters: none.");
-  EnableCapsulesCmd->SetParameterName("makeCapsule",true);
-  EnableCapsulesCmd->SetDefaultValue(true);
+  //  EnableCapsulesCmd->SetParameterName("makeCapsule",true);
+  //  EnableCapsulesCmd->SetDefaultValue(true);
   EnableCapsulesCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   commandName = directoryName + "disableCapsules";
   aLine = commandName.c_str();
-  DisableCapsulesCmd = new G4UIcmdWithABool(aLine, this);
+  //  DisableCapsulesCmd = new G4UIcmdWithABool(aLine, this);
+  DisableCapsulesCmd = new G4UIcmdWithoutParameter(aLine, this);
   DisableCapsulesCmd->SetGuidance("Do not generate passive capsules.");
   DisableCapsulesCmd->SetGuidance("Required parameters: none.");
-  DisableCapsulesCmd->SetParameterName("makeCapsule",true);
-  DisableCapsulesCmd->SetDefaultValue(false);
+  //  DisableCapsulesCmd->SetParameterName("makeCapsule",true);
+  //  DisableCapsulesCmd->SetDefaultValue(false);
   DisableCapsulesCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
   
   commandName = directoryName + "enableCyl";
   aLine = commandName.c_str();
-  EnableCylCmd = new G4UIcmdWithABool(aLine, this);
+  //  EnableCylCmd = new G4UIcmdWithABool(aLine, this);
+  EnableCylCmd = new G4UIcmdWithoutParameter(aLine, this);
   EnableCylCmd->SetGuidance("Consider the intersection between a cylinder and a polyhedron.");
   EnableCylCmd->SetGuidance("Required parameters: none.");
-  EnableCylCmd->SetParameterName("useCylinder",true);
-  EnableCylCmd->SetDefaultValue(true);
+  //  EnableCylCmd->SetParameterName("useCylinder",true);
+  //  EnableCylCmd->SetDefaultValue(true);
   EnableCylCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   commandName = directoryName + "enableCryostats";
   aLine = commandName.c_str();
-  cryostatCmd = new G4UIcmdWithoutParameter(aLine, this);
-  cryostatCmd->SetGuidance("Include cryostats");
-  cryostatCmd->SetGuidance("Required parameters: none.");
-  cryostatCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  EnableCryostatsCmd = new G4UIcmdWithoutParameter(aLine, this);
+  EnableCryostatsCmd->SetGuidance("Include cryostats");
+  EnableCryostatsCmd->SetGuidance("Required parameters: none.");
+  EnableCryostatsCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  commandName = directoryName + "disableCryostats";
+  aLine = commandName.c_str();
+  DisableCryostatsCmd = new G4UIcmdWithoutParameter(aLine, this);
+  DisableCryostatsCmd->SetGuidance("Do not include cryostats");
+  DisableCryostatsCmd->SetGuidance("Required parameters: none.");
+  DisableCryostatsCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   commandName = directoryName + "drawReadOut";
   aLine = commandName.c_str();
-  DrawReadOutCmd = new G4UIcmdWithABool(aLine, this);
+  //  DrawReadOutCmd = new G4UIcmdWithABool(aLine, this);
+  DrawReadOutCmd = new G4UIcmdWithoutParameter(aLine, this);
   DrawReadOutCmd->SetGuidance("Generates the read out geometry as the actual geometry.");
   DrawReadOutCmd->SetGuidance("For geometry testing purposes only, DO NOT RUN!");
   DrawReadOutCmd->SetGuidance("Required parameters: none.");
-  DrawReadOutCmd->SetParameterName("drawReadOut",true);
-  DrawReadOutCmd->SetDefaultValue(true);
+  //  DrawReadOutCmd->SetParameterName("drawReadOut",true);
+  //  DrawReadOutCmd->SetDefaultValue(true);
   DrawReadOutCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   commandName = directoryName + "dontdrawReadOut";
   aLine = commandName.c_str();
-  DontDrawReadOutCmd = new G4UIcmdWithABool(aLine, this);
+  //  DontDrawReadOutCmd = new G4UIcmdWithABool(aLine, this);
+  DontDrawReadOutCmd = new G4UIcmdWithoutParameter(aLine, this);
   DontDrawReadOutCmd->SetGuidance("Disables the read out geometry as the actual geometry.");
   DontDrawReadOutCmd->SetGuidance("Required parameters: none.");
-  DontDrawReadOutCmd->SetParameterName("drawReadOut",true);
-  DontDrawReadOutCmd->SetDefaultValue(false);
+  //  DontDrawReadOutCmd->SetParameterName("drawReadOut",true);
+  //  DontDrawReadOutCmd->SetDefaultValue(false);
   DontDrawReadOutCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   commandName = directoryName + "step";
@@ -3768,19 +3782,23 @@ void Gretina_Array_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
     myTarget->SetPosShift(TraslateArrayCmd->GetNew3VectorValue(newValue));
   }
   if( command == EnableCylCmd ) {
-    myTarget->SetUseCylinder( EnableCylCmd->GetNewBoolValue(newValue) );
+    //    myTarget->SetUseCylinder( EnableCylCmd->GetNewBoolValue(newValue) );
+    myTarget->SetUseCylinder( true );
   }
   if( command == DisableCylCmd ) {
-    myTarget->SetUseCylinder( DisableCylCmd->GetNewBoolValue(newValue) );
+    //    myTarget->SetUseCylinder( DisableCylCmd->GetNewBoolValue(newValue) );
+    myTarget->SetUseCylinder( false );
   }
-  if( command == cryostatCmd ) {
-    myTarget->SetCryostats();
-  }
+  //  if( command == cryostatCmd ) {
+  //    myTarget->SetCryostats();
+  //  }
   if( command == EnablePassiveCmd ) {
-    myTarget->SetUsePassive( EnablePassiveCmd->GetNewBoolValue(newValue) );
+    //    myTarget->SetUsePassive( EnablePassiveCmd->GetNewBoolValue(newValue) );
+    myTarget->SetUsePassive( true );
   }
   if( command == DisablePassiveCmd ) {
-    myTarget->SetUsePassive( DisablePassiveCmd->GetNewBoolValue(newValue) );
+    //    myTarget->SetUsePassive( DisablePassiveCmd->GetNewBoolValue(newValue) );
+    myTarget->SetUsePassive( false );
   }
   if( command == WriteAnglesCmd ) {
     G4int length = newValue.length();
@@ -3801,16 +3819,26 @@ void Gretina_Array_Messenger::SetNewValue(G4UIcommand* command,G4String newValue
   }
 
   if( command == DrawReadOutCmd ) {
-    myTarget->SetDrawReadOut( DrawReadOutCmd->GetNewBoolValue(newValue) );
+    //    myTarget->SetDrawReadOut( DrawReadOutCmd->GetNewBoolValue(newValue) );
+    myTarget->SetDrawReadOut( true );
   }
   if( command == DontDrawReadOutCmd ) {
-    myTarget->SetDrawReadOut( DontDrawReadOutCmd->GetNewBoolValue(newValue) );
+    //    myTarget->SetDrawReadOut( DontDrawReadOutCmd->GetNewBoolValue(newValue) );
+    myTarget->SetDrawReadOut( false );
   }
   if( command == EnableCapsulesCmd ) {
-    myTarget->SetMakeCapsules( EnableCapsulesCmd->GetNewBoolValue(newValue) );
+    //    myTarget->SetMakeCapsules( EnableCapsulesCmd->GetNewBoolValue(newValue) );
+    myTarget->SetMakeCapsules( true );
   }
   if( command == DisableCapsulesCmd ) {
-    myTarget->SetMakeCapsules( DisableCapsulesCmd->GetNewBoolValue(newValue) );
+    //    myTarget->SetMakeCapsules( DisableCapsulesCmd->GetNewBoolValue(newValue) );
+    myTarget->SetMakeCapsules( false );
+  }
+  if( command == EnableCryostatsCmd ) {
+    myTarget->SetCryostats( true );
+  }
+  if( command == DisableCryostatsCmd ) {
+    myTarget->SetCryostats( false );
   }
 
   if( command == SetStepCmd ) {

@@ -173,7 +173,7 @@ class Gretina_Array
   /// Cryostats             
   //////////////////////////////////////////
   public:
-    void SetCryostats(){cryostatStatus = true;};
+    void SetCryostats(G4bool s){cryostatStatus = s;};
 
   private:
     G4ThreeVector               cryostatPos0;
@@ -379,15 +379,24 @@ class Gretina_Array_Messenger: public G4UImessenger
     G4UIcmdWith3Vector*        TraslateArrayCmd;
     G4UIcmdWithAString*        WriteAnglesCmd;
     G4UIcmdWithAString*        WriteCryAnglesCmd;
-    G4UIcmdWithABool*          EnableCylCmd;
-    G4UIcmdWithoutParameter*   cryostatCmd;
-    G4UIcmdWithABool*          DisableCylCmd;
-    G4UIcmdWithABool*          EnablePassiveCmd;
-    G4UIcmdWithABool*          DisablePassiveCmd;
-    G4UIcmdWithABool*          DontDrawReadOutCmd;
-    G4UIcmdWithABool*          DrawReadOutCmd;
-    G4UIcmdWithABool*          EnableCapsulesCmd;
-    G4UIcmdWithABool*          DisableCapsulesCmd;            
+    //    G4UIcmdWithABool*          EnableCylCmd;
+    G4UIcmdWithoutParameter*   EnableCylCmd;
+    //    G4UIcmdWithABool*          DisableCylCmd;
+    G4UIcmdWithoutParameter*   DisableCylCmd;
+    //    G4UIcmdWithABool*          EnablePassiveCmd;
+    G4UIcmdWithoutParameter*   EnablePassiveCmd;
+    //    G4UIcmdWithABool*          DisablePassiveCmd;
+    G4UIcmdWithoutParameter*   DisablePassiveCmd;
+    //    G4UIcmdWithABool*          DontDrawReadOutCmd;
+    G4UIcmdWithoutParameter*   DontDrawReadOutCmd;
+    //    G4UIcmdWithABool*          DrawReadOutCmd;
+    G4UIcmdWithoutParameter*   DrawReadOutCmd;
+    //    G4UIcmdWithABool*          EnableCapsulesCmd;
+    G4UIcmdWithoutParameter*   EnableCapsulesCmd;
+    //    G4UIcmdWithABool*          DisableCapsulesCmd;
+    G4UIcmdWithoutParameter*   DisableCapsulesCmd;
+    G4UIcmdWithoutParameter*   EnableCryostatsCmd;
+    G4UIcmdWithoutParameter*   DisableCryostatsCmd;
     G4UIcmdWithAnInteger*      SetStepCmd;
     G4UIcmdWithoutParameter*   printVolCmd;
 
