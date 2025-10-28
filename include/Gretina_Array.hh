@@ -173,7 +173,7 @@ class Gretina_Array
   /// Cryostats             
   //////////////////////////////////////////
   public:
-    void SetCryostats(G4bool s){cryostatStatus = s;};
+    void SetCryostats(G4bool stat){cryostatStatus = stat;};
 
   private:
     G4ThreeVector               cryostatPos0;

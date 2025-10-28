@@ -883,10 +883,12 @@ void EventAction::writeSim(long long int ts, PrimaryVertexInformation* primaryVe
     gd.length = sizeof(G4SIM_EGS);
 
     //Construct GEB payload for G4SIM event
-    g4sim_egs.type = 0xABCD1234;
+    g4sim_egs.type = 0xABCD1235;
     g4sim_egs.num = primaryVertexInfo->GetNEmittedGammas();
-    g4sim_egs.full = primaryVertexInfo->GetFullEnergy();
-
+    g4sim_egs.full = primaryVertexInfo->GetFullEnergy(); // bit 0
+    if( primaryVertexInfo->GetPairProduction() )
+      g4sim_egs.full = g4sim_egs.full | (1<<1);          // bit 1
+    
     for(G4int i = 0; i < g4sim_egs.num; i++){
       g4sim_egs.gammas[i].e     = primaryVertexInfo->GetEmittedGammaEnergy(i);
       g4sim_egs.gammas[i].x     = primaryVertexInfo->GetEmittedGammaPosX(i);

@@ -3,7 +3,7 @@
 PrimaryVertexInformation::PrimaryVertexInformation() { 
   fNEmittedGammas = 0;
   fNBetas         = 0;
-  fFullEnergy     = -1;
+  fFullEnergy     = 0;
   fPairProduction = 0;
   fata            = sqrt(-1.0);
   fbta            = sqrt(-1.0);

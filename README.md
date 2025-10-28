@@ -566,7 +566,7 @@ The energy, emission position, emission direction, and the velocity of the proje
         <Energy>   <X>   <Y>   <Z>   <phi>   <theta>   <beta>
         ...
 
-`<Full Energy> = 1` if a single gamma ray is emitted and its full energy is deposited in a single crystal. `<Full Energy> = 0` if a single gamma ray is emitted and only part of its energy is deposited in any one crystal. `<Full Energy> = -1` otherwise. `<Pair Production> = 1` if an electron-positron pair is created in the active detector volume. `<Pair Production> = 0` otherwise.
+`<Full Energy> = 1` if a single gamma ray is emitted and its full energy is deposited in a single crystal. `<Full Energy> = 0` otherwise. `<Pair Production> = 1` if an electron-positron pair is created in the active detector volume. `<Pair Production> = 0` otherwise.
 
 The optional command
 
@@ -576,7 +576,7 @@ writes detected gamma-ray information only. Simulated S800 and emitted gamma-ray
 
 ### Mode 2 Output ###
 
-Mode 2 output from in-beam simulations contains S800 tracking events (GEB type 9), decomposed gamma-ray events (GEB type 1), and emitted gamma-ray (GEB type 11). (Source simulations do not produce S800 tracking events.) S800 tracking events are only written for events in which gamma rays are detected. Emitted gamma-ray events are written for every event. They include the energies, emission positions, and emission directions of all gamma rays emitted in an event.
+Mode 2 output from in-beam simulations contains S800 tracking events (GEB type 9), decomposed gamma-ray events (GEB type 1), and emitted gamma-ray (GEB type 11). (Source simulations do not produce S800 tracking events.) S800 tracking events are only written for events in which gamma rays are detected. Emitted gamma-ray events are written for every event. They include the energies, emission positions, and emission directions of all gamma rays emitted in an event. The header includes an unsigned int with the full-energy flag in bit 0 and the pair-production flag in bit 1 (see GEB.hh).
 
 Energies are expressed in keV, and positions are expressed in mm.
 
