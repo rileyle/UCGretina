@@ -12,6 +12,7 @@
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
+#include "G4Threading.hh"
 #include "G4ThreeVector.hh"
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
@@ -97,22 +98,23 @@ class TrackerIonHit : public G4VHit
 
 typedef G4THitsCollection<TrackerIonHit> TrackerIonHitsCollection;
 
-extern G4Allocator<TrackerIonHit> TrackerIonHitAllocator;
+extern G4ThreadLocal G4Allocator<TrackerIonHit>* TrackerIonHitAllocator;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline void* TrackerIonHit::operator new(size_t)
 {
-  void *aHit;
-  aHit = (void *) TrackerIonHitAllocator.MallocSingle();
-  return aHit;
+  if (!TrackerIonHitAllocator) {
+    TrackerIonHitAllocator = new G4Allocator<TrackerIonHit>;
+  }
+  return (void*)TrackerIonHitAllocator->MallocSingle();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline void TrackerIonHit::operator delete(void *aHit)
 {
-  TrackerIonHitAllocator.FreeSingle((TrackerIonHit*) aHit);
+  TrackerIonHitAllocator->FreeSingle((TrackerIonHit*)aHit);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

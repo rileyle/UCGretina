@@ -1,7 +1,7 @@
 
 #include "TrackerIonHit.hh"
 
-G4Allocator<TrackerIonHit> TrackerIonHitAllocator;
+G4ThreadLocal G4Allocator<TrackerIonHit>* TrackerIonHitAllocator = nullptr;
 
 
 TrackerIonHit::TrackerIonHit() { flag=0;}
@@ -84,4 +84,3 @@ void TrackerIonHit::Print()
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
