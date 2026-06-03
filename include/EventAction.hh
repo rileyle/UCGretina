@@ -22,6 +22,9 @@
 #include <fstream>
 #include <string>
 #include <fcntl.h>
+#include <vector>
+
+#include "G4Threading.hh"
 
 class EventAction : public G4UserEventAction
 {
@@ -101,6 +104,14 @@ class EventAction : public G4UserEventAction
     void SetThreshDE(G4double de){threshDE = de;}
   
   private:
+    G4String threadSuffixedFileName(const G4String& baseName) const;
+
+    // Large writeDecomp scratch buffers live on the heap (per EventAction / per worker)
+    // to avoid overflowing the small per-thread stack on macOS.
+    std::vector<CRYS_IPS> fCrysIps;
+    std::vector<G4double> fCrysGts; // flattened [decomp*MAX_INTPTS + ip]
+    std::vector<G4int> fProcessed;
+
     G4int ionCollectionID;
     G4int gammaCollectionID;
     G4String outFileName;

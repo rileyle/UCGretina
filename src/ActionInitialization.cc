@@ -20,6 +20,7 @@ ActionInitialization::ActionInitialization(DetectorConstruction* detector,
 
 void ActionInitialization::BuildForMaster() const {
   // Master does not process events; keep it minimal.
+  G4cout << "Building Master" << G4endl;
   auto* eventAction = new EventAction();
   SetUserAction(new RunAction(fDetector, fBeamIn, eventAction));
 }

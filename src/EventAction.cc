@@ -1,6 +1,8 @@
 #include "EventAction.hh"
 #include "RunAction.hh"
 
+#include <string>
+
 #include "G4Timer.hh"
 extern G4Timer Timerintern;
 
@@ -38,12 +40,38 @@ EventAction::EventAction()
   everyNevents = 1000;
   threshE = 0.;
   threshDE = 0.001*keV;
+
+  // Pre-size large scratch buffers used by writeDecomp(). Keeping these off the
+  // stack avoids thread stack overflows (macOS worker threads have small stacks).
+  fCrysIps.resize(100*MAX_INTPTS);
+  fCrysGts.resize((100*MAX_INTPTS)*MAX_INTPTS);
+  fProcessed.resize(100*MAX_INTPTS);
 }
 
 
 EventAction::~EventAction()
 {
   ;
+}
+
+G4String EventAction::threadSuffixedFileName(const G4String& baseName) const {
+  if (baseName.empty()) return baseName;
+
+  // Geant4 MT worker id (typically 0..N-1). We use -1 for master.
+  const auto tid = G4Threading::G4GetThreadId();
+  const G4String suffix = "_t" + std::to_string(tid);
+
+  // Insert suffix before the last '.' in the basename.
+  const std::string s = baseName;
+  const auto slash = s.find_last_of("/\\");
+  const auto dot = s.find_last_of('.');
+  const bool hasExt = (dot != std::string::npos) && (slash == std::string::npos || dot > slash);
+
+  if (!hasExt) {
+    return baseName + suffix;
+  }
+
+  return s.substr(0, dot) + suffix + s.substr(dot);
 }
 
 void EventAction::BeginOfEventAction(const G4Event* ev)
@@ -696,16 +724,18 @@ void EventAction::writeDecomp(long long int ts,
 {
   G4int siz;
   GEBDATA gd;
-  CRYS_IPS crys_ips[100*MAX_INTPTS];
-  G4double crys_gts[100*MAX_INTPTS][MAX_INTPTS];
+  // NOTE: these scratch buffers are stored on EventAction (heap) to avoid
+  // overflowing the worker thread stack.
+  auto* crys_ips = fCrysIps.data();
+  auto* crys_gts = fCrysGts.data(); // flattened [decomp*MAX_INTPTS + ip]
   
   G4int Ndecomp = 0;
-  G4bool Processed[100*MAX_INTPTS];
+  auto* Processed = fProcessed.data();
   for(G4int i = 0; i < NIP; i++)
-    Processed[i] = false;
+    Processed[i] = 0;
 
   for(G4int i = 0; i < NIP; i++){
-    if( NCons[i] > 0 && Processed[i] == false ){
+    if( NCons[i] > 0 && Processed[i] == 0 ){
 
       crys_ips[Ndecomp].type = 0xABCD5678;
       crys_ips[Ndecomp].crystal_id = detNum[i]+4; // +4 to match measured data
@@ -731,8 +761,8 @@ void EventAction::writeDecomp(long long int ts,
       crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].e = e[i];
       crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].seg = segNum[i];
       crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num-1 ].seg_ener = se[i];
-      crys_gts[Ndecomp][ crys_ips[Ndecomp].num-1 ] = gt[i];
-      Processed[i] = true;
+      crys_gts[Ndecomp*MAX_INTPTS + (crys_ips[Ndecomp].num-1)] = gt[i];
+      Processed[i] = 1;
 
       for(G4int j = i+1; j < MAX_INTPTS; j++){ // Clear the interaction points
 	  crys_ips[Ndecomp].ips[j].x        = 0.;
@@ -746,7 +776,7 @@ void EventAction::writeDecomp(long long int ts,
       // Get other interactions with this crystal
       for(G4int j = i+1; j < NIP; j++){ 
 	if(NCons[j] > 0 && 
-	   Processed[j] == false &&
+	   Processed[j] == 0 &&
 	   detNum[j]+4 == crys_ips[Ndecomp].crystal_id){
 	  crys_ips[Ndecomp].tot_e += e[j];
 	  // Only MAX_INTPTS interaction points can be stored in a crys_ips.
@@ -757,10 +787,10 @@ void EventAction::writeDecomp(long long int ts,
 	    crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].e = e[j];
 	    crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].seg = segNum[j];
 	    crys_ips[Ndecomp].ips[ crys_ips[Ndecomp].num ].seg_ener = se[j];
-	    crys_gts[Ndecomp][ crys_ips[Ndecomp].num ] = gt[j];
+	    crys_gts[Ndecomp*MAX_INTPTS + crys_ips[Ndecomp].num] = gt[j];
 	  }
 	  crys_ips[Ndecomp].num++; // Check for overflow below, and warn.
-	  Processed[j] = true;
+	  Processed[j] = 1;
 	}
       }
       Ndecomp++;
@@ -779,10 +809,10 @@ void EventAction::writeDecomp(long long int ts,
 	ips[j].x        = crys_ips[i].ips[j].x;
 	ips[j].y        = crys_ips[i].ips[j].y;
 	ips[j].z        = crys_ips[i].ips[j].z;
-	ips[j].e        = crys_ips[i].ips[j].e;
-	ips[j].seg      = crys_ips[i].ips[j].seg;
-	ips[j].seg_ener = crys_ips[i].ips[j].seg_ener;
-	gts[j]          = crys_gts[i][j];
+	  ips[j].e        = crys_ips[i].ips[j].e;
+	  ips[j].seg      = crys_ips[i].ips[j].seg;
+	  ips[j].seg_ener = crys_ips[i].ips[j].seg_ener;
+	  gts[j]          = crys_gts[i*MAX_INTPTS + j];
       }
     
       // G4cout << "=========================" << G4endl;
@@ -799,7 +829,7 @@ void EventAction::writeDecomp(long long int ts,
     
       // Time-sort the indices of the interaction points
       // (credit: https://stackoverflow.com/a/40183830)
-      std::sort(idx.begin(), idx.end(), [&](int k,int l){return crys_gts[i][k] < crys_gts[i][l];} );
+      std::sort(idx.begin(), idx.end(), [&](int k,int l){return crys_gts[i*MAX_INTPTS + k] < crys_gts[i*MAX_INTPTS + l];} );
 
       // Use the time-sorted indices to re-order the interaction points.
       for(G4int j = 0; j < crys_ips[i].num; j++){
@@ -809,7 +839,7 @@ void EventAction::writeDecomp(long long int ts,
 	crys_ips[i].ips[j].e        = ips[idx[j]].e;
 	crys_ips[i].ips[j].seg      = ips[idx[j]].seg;
 	crys_ips[i].ips[j].seg_ener = ips[idx[j]].seg_ener;
-	crys_gts[i][j]              = gts[idx[j]];
+	crys_gts[i*MAX_INTPTS + j]  = gts[idx[j]];
       }
 
       // G4cout << "After:" << G4endl;
@@ -872,7 +902,7 @@ void EventAction::writeDecomp(long long int ts,
 	       << crys_ips[i].ips[j].x << std::setw(12) 
 	       << crys_ips[i].ips[j].y << std::setw(12) 
 	       << crys_ips[i].ips[j].z << std::setw(12)
-	       << crys_gts[i][j]
+	       << crys_gts[i*MAX_INTPTS + j]
 	       << G4endl;
       }
     }
@@ -950,12 +980,13 @@ void EventAction::writeSim(long long int ts, PrimaryVertexInformation* primaryVe
 // --------------------------------------------------TB
 void EventAction::openEvfile()
 {
-  if (!evfile.is_open()) evfile.open(outFileName.c_str());
+  const auto fname = threadSuffixedFileName(outFileName);
+  if (!evfile.is_open()) evfile.open(fname.c_str());
   if (!evfile.is_open()){
     G4cout<< "ERROR opening evfile." << G4endl;
     evOut = false;
   } else {
-    G4cout << "\nOpened output file: " << outFileName << G4endl;
+    G4cout << "\nOpened output file: " << fname << G4endl;
     evOut = true;
   }
   return;
@@ -977,13 +1008,14 @@ void EventAction::SetOutFile(G4String name)
 // --------------------------------------------------
 void EventAction::openMode2file()
 {
-  mode2file = open(mode2FileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 
+  const auto fname = threadSuffixedFileName(mode2FileName);
+  mode2file = open(fname.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 
 		   S_IRUSR | S_IWUSR | S_IRGRP |  S_IWGRP | S_IROTH);
   if(mode2file < 0){
     G4cout << "ERROR opening mode2file" << G4endl;
     mode2Out = false;
   } else {
-    G4cout << "\nOpened mode 2 Output file: " << mode2FileName << G4endl;
+    G4cout << "\nOpened mode 2 Output file: " << fname << G4endl;
     mode2Out = true;
   }
   return;
@@ -1080,25 +1112,26 @@ void EventAction::SetCrystalXforms(){
 void EventAction::openCacheOutputFile(G4String FileName)
 {
   cacheOutputFileName = FileName;
+  const auto fname = threadSuffixedFileName(cacheOutputFileName);
 #ifdef CACHETEXT
   if (!cacheOutputFile.is_open())
-    cacheOutputFile.open(cacheOutputFileName.c_str());
+    cacheOutputFile.open(fname.c_str());
   if (!cacheOutputFile.is_open()){
     G4cerr << "Error opening cache output file." << G4endl;
     exit(EXIT_FAILURE);
   } else {
-    G4cout << "\nOpened cache output file: " << cacheOutputFileName
+    G4cout << "\nOpened cache output file: " << fname
 	   << G4endl;
     cacheOut = true;
     allS800 = true;
   }
 #else
-  cacheOutputFile = fopen(cacheOutputFileName.c_str(), "wb");
+  cacheOutputFile = fopen(fname.c_str(), "wb");
   if (cacheOutputFile == NULL) {
     G4cerr << "Error opening cache output file." << G4endl;
     exit(EXIT_FAILURE);
   } else {
-    G4cout << "\nOpened cache output file: " << cacheOutputFileName
+    G4cout << "\nOpened cache output file: " << fname
 	   << G4endl;
     cacheOut = true;
     allS800 = true;
