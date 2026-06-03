@@ -6,6 +6,12 @@
 #include "G4Timer.hh"
 extern G4Timer Timerintern;
 
+#include "G4AutoLock.hh"
+
+namespace{
+  G4Mutex outputMutex = G4MUTEX_INITIALIZER;
+}
+
 EventAction::EventAction()
 { 
   ionCollectionID=-1;
@@ -54,7 +60,7 @@ EventAction::~EventAction()
   ;
 }
 
-G4String EventAction::threadSuffixedFileName(const G4String& baseName) const {
+G4String EventAction::threadSuffix(const G4String& baseName) const {
   if (baseName.empty()) return baseName;
 
   // Geant4 MT worker id (typically 0..N-1). We use -1 for master.
@@ -103,6 +109,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 
   if(event_id%everyNevents == 0 && event_id > 0) {
 
+    G4AutoLock lock(&outputMutex);
+    
     std::ios::fmtflags f( G4cout.flags() );
     G4int prec = G4cout.precision();
 
@@ -980,13 +988,13 @@ void EventAction::writeSim(long long int ts, PrimaryVertexInformation* primaryVe
 // --------------------------------------------------TB
 void EventAction::openEvfile()
 {
-  const auto fname = threadSuffixedFileName(outFileName);
-  if (!evfile.is_open()) evfile.open(fname.c_str());
+  
+  if (!evfile.is_open()) evfile.open(outFileName);
   if (!evfile.is_open()){
     G4cout<< "ERROR opening evfile." << G4endl;
     evOut = false;
   } else {
-    G4cout << "\nOpened output file: " << fname << G4endl;
+    G4cout << "\nOpened output file: " << outFileName << G4endl;
     evOut = true;
   }
   return;
@@ -1000,7 +1008,7 @@ void EventAction::closeEvfile()
 //----------------------------------------------------TB
 void EventAction::SetOutFile(G4String name)
 {
-  outFileName = name;
+  outFileName = threadSuffix(name);
   closeEvfile();
   openEvfile();
   return;
@@ -1008,14 +1016,13 @@ void EventAction::SetOutFile(G4String name)
 // --------------------------------------------------
 void EventAction::openMode2file()
 {
-  const auto fname = threadSuffixedFileName(mode2FileName);
-  mode2file = open(fname.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 
+  mode2file = open(mode2FileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 
 		   S_IRUSR | S_IWUSR | S_IRGRP |  S_IWGRP | S_IROTH);
   if(mode2file < 0){
     G4cout << "ERROR opening mode2file" << G4endl;
     mode2Out = false;
   } else {
-    G4cout << "\nOpened mode 2 Output file: " << fname << G4endl;
+    G4cout << "\nOpened mode 2 Output file: " << mode2FileName << G4endl;
     mode2Out = true;
   }
   return;
@@ -1029,7 +1036,7 @@ void EventAction::closeMode2file()
 //----------------------------------------------------
 void EventAction::SetMode2File(G4String name)
 {
-  mode2FileName = name;
+  mode2FileName = threadSuffix(name);
   openMode2file();
   return;
 }
@@ -1056,10 +1063,15 @@ void EventAction::SetCrmatFile(G4String name) {
 
   openCrmatFile();
 
+  const auto tid = G4Threading::G4GetThreadId();
+
+  if(tid == 0 ){ //only output on first worker thread
+  
   G4cout << "\nUsing crmat from file " << crmatFileName 
 	 << " to transform interaction points from world to crytsal frames."
 	 << G4endl;
-
+  }
+  
   int size;
   size = read(crmatFile, (char *) crmat, sizeof(crmat));
 
@@ -1070,8 +1082,12 @@ void EventAction::SetCrmatFile(G4String name) {
     exit(EXIT_FAILURE);
   }
 
+  if(tid == 0 ){
+  
   G4cout << "Read " << size << " bytes into crmat" << G4endl;
 
+  }
+  
   if(print){
     for(int i=0;i<MAXDETPOS;i++){
       for(int j=0;j<MAXCRYSTALNO;j++){
@@ -1094,44 +1110,55 @@ void EventAction::SetGretinaCoords(){
 
   gretinaCoords = true; 
 
+  const auto tid = G4Threading::G4GetThreadId();
+
+  if(tid == 0){ //only output on first worker thread
+
   G4cout << "Writing interaction points in the Gretina coordinate system (x = down, z = beam)." << G4endl;
 
+  }
+  
   return;
 }
 //---------------------------------------------------
  
 void EventAction::SetCrystalXforms(){ 
 
-  crystalXforms = true; 
+  crystalXforms = true;
+
+  const auto tid = G4Threading::G4GetThreadId();
+
+  if(tid == 0){ //only output on first worker thread
 
   G4cout << "Using internal transformations from the world frame to the crystal frames for Mode 2 output." << G4endl;
 
+  }
+  
   return;
 }
 //---------------------------------------------------
 void EventAction::openCacheOutputFile(G4String FileName)
 {
-  cacheOutputFileName = FileName;
-  const auto fname = threadSuffixedFileName(cacheOutputFileName);
+  cacheOutputFileName = threadSuffix(FileName);
 #ifdef CACHETEXT
   if (!cacheOutputFile.is_open())
-    cacheOutputFile.open(fname.c_str());
+    cacheOutputFile.open(cacheOutputFileName.c_str());
   if (!cacheOutputFile.is_open()){
     G4cerr << "Error opening cache output file." << G4endl;
     exit(EXIT_FAILURE);
   } else {
-    G4cout << "\nOpened cache output file: " << fname
+    G4cout << "\nOpened cache output file: " << cacheOutputFileName
 	   << G4endl;
     cacheOut = true;
     allS800 = true;
   }
 #else
-  cacheOutputFile = fopen(fname.c_str(), "wb");
+  cacheOutputFile = fopen(cacheOutputFileName.c_str(), "wb");
   if (cacheOutputFile == NULL) {
     G4cerr << "Error opening cache output file." << G4endl;
     exit(EXIT_FAILURE);
   } else {
-    G4cout << "\nOpened cache output file: " << fname
+    G4cout << "\nOpened cache output file: " << cacheOutputFileName
 	   << G4endl;
     cacheOut = true;
     allS800 = true;

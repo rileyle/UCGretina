@@ -104,7 +104,7 @@ class EventAction : public G4UserEventAction
     void SetThreshDE(G4double de){threshDE = de;}
   
   private:
-    G4String threadSuffixedFileName(const G4String& baseName) const;
+    G4String threadSuffix(const G4String& baseName) const;
 
     // Large writeDecomp scratch buffers live on the heap (per EventAction / per worker)
     // to avoid overflowing the small per-thread stack on macOS.
