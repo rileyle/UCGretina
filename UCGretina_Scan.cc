@@ -1,4 +1,5 @@
-#include "G4RunManager.hh"
+#include "G4MTRunManager.hh"
+#include "G4Threading.hh"
 #include "G4UImanager.hh"
 
 #include "G4UIterminal.hh"
@@ -10,13 +11,7 @@
 
 #include "DetectorConstruction.hh"
 #include "PhysicsList.hh"
-#include "PrimaryGeneratorAction.hh"
-#include "PrimaryGeneratorAction_Messenger.hh"
-#include "TrackingAction.hh"
-#include "SteppingAction.hh"
-#include "EventAction.hh"
-#include "EventAction_Messenger.hh"
-#include "RunAction.hh"
+#include "ActionInitialization.hh"
 #include "Incoming_Beam.hh"
 #include "Incoming_Beam_Messenger.hh"
 #include "Outgoing_Beam.hh"
@@ -36,7 +31,8 @@ int main(int argc,char** argv)
 {
   
   // Construct the default run manager
-  G4RunManager* runManager = new G4RunManager;
+  G4MTRunManager* runManager = new G4MTRunManager;
+  runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores());
 
   G4cout << "Git commit: " << GIT_HASH << G4endl;
   G4cout << "Git branch: " << GIT_BRANCH << G4endl;
@@ -60,24 +56,7 @@ int main(int argc,char** argv)
   physicsList->SetOutgoingBeam(BeamOut);
   Outgoing_Beam_Messenger* OutgoingBeamMessenger = new Outgoing_Beam_Messenger(BeamOut);
 
-  // set mandatory user action class
-  EventAction* eventAction = new EventAction();
-  EventAction_Messenger* eventActionMessenger = new EventAction_Messenger(eventAction);
-  runManager->SetUserAction(eventAction);
-
-  PrimaryGeneratorAction* generatorAction = new PrimaryGeneratorAction(detector,BeamIn,BeamOut);
-  PrimaryGeneratorAction_Messenger* generatorActionMessenger = new PrimaryGeneratorAction_Messenger(generatorAction);
-
-  runManager->SetUserAction(generatorAction);
-  RunAction* runAction = new RunAction(detector,BeamIn,eventAction);
-  runManager->SetUserAction(runAction);
-
-  TrackingAction* trackingAction = new TrackingAction(eventAction);
-  runManager->SetUserAction(trackingAction);
-
-  //  User Stepping Action only needed for in-beam simulations.
-  //  SteppingAction* steppingAction = new SteppingAction();
-  //  runManager->SetUserAction(steppingAction);
+  runManager->SetUserInitialization(new ActionInitialization(detector, BeamIn, BeamOut, /*enableStepping=*/false));
 
   G4UIsession* session=0;
 
@@ -143,10 +122,6 @@ int main(int argc,char** argv)
   delete BeamOut;
 
   delete OutgoingBeamMessenger;
-
-  delete eventActionMessenger;
-
-  delete generatorActionMessenger;
 
   return 0;
 }

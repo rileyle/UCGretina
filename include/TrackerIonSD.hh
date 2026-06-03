@@ -38,6 +38,7 @@ class TrackerIonSD : public G4VSensitiveDetector
       TrackerIonHitsCollection* ionCollection;
       G4bool print;
     
+    
 };
 
 
