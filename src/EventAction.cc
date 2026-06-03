@@ -53,13 +53,6 @@ void EventAction::BeginOfEventAction(const G4Event* ev)
   PrimaryVertexInformation* primaryVertexInfo
     = (PrimaryVertexInformation*)evt->GetPrimaryVertex()->GetUserInformation();
 
-  G4SDManager * SDman = G4SDManager::GetSDMpointer();
-
-  if(gammaCollectionID<0||ionCollectionID<0)
-    {
-      gammaCollectionID=SDman->GetCollectionID("gammaCollection");
-      ionCollectionID=SDman->GetCollectionID("ionCollection");
-    }
 
   // For event filter
   primaryVertexInfo->SetWriteEvent(false);
@@ -170,6 +163,13 @@ void EventAction::EndOfEventAction(const G4Event* ev)
   // Analyze hits and write event information to the output file.
   G4HCofThisEvent * HCE = evt->GetHCofThisEvent();
   if(HCE) {
+
+    G4SDManager * SDman = G4SDManager::GetSDMpointer();
+
+    if(gammaCollectionID<0)
+      gammaCollectionID=SDman->GetCollectionID("gammaCollection");
+    
+
 
     TrackerGammaHitsCollection* gammaCollection 
       = (TrackerGammaHitsCollection*)(HCE->GetHC(gammaCollectionID));
@@ -594,6 +594,15 @@ void EventAction::EndOfEventAction(const G4Event* ev)
   writeSim(timestamp, primaryVertexInfo);
 
   if(cacheOut){
+    
+    G4SDManager * SDman = G4SDManager::GetSDMpointer();
+
+    if(ionCollectionID<0)
+      ionCollectionID=SDman->GetCollectionID("ionCollection");
+
+    if(!ionCollectionID)
+      G4cout << "Couldn't find ionCollection" << G4endl;
+    
     TrackerIonHitsCollection* ionCollection 
       = (TrackerIonHitsCollection*)(HCE->GetHC(ionCollectionID));
     writeCache(ionCollection);

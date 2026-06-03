@@ -226,12 +226,16 @@ void DetectorConstruction::Placement()
 void DetectorConstruction::ConstructSDandField(){
   
   auto *sdMan = G4SDManager::GetSDMpointer();
+
   auto *TrackerIon = new TrackerIonSD("IonTracker");
   auto *TrackerIonSDMessenger = new TrackerIonSD_Messenger(TrackerIon);
-
+  sdMan->AddNewDetector(TrackerIon);
+  
   auto *TrackerGamma = new TrackerGammaSD("GammaTracker");
   auto *TrackerGammaSDMessenger = new TrackerGammaSD_Messenger(TrackerGamma);
-
+  sdMan->AddNewDetector(TrackerGamma);
+  
+  
   G4int depth;
   auto makeCapsule = the_Gretina_Array->GetMakeCapsule();
 

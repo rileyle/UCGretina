@@ -7,7 +7,8 @@ TrackerIonSD::TrackerIonSD(G4String name)
   G4String HCname;
   collectionName.insert(HCname="ionCollection");
   print=false; //LR (formerly not initialized)
- 
+
+  
 }
 
 //--------------------------------------------------------------------
@@ -19,12 +20,14 @@ TrackerIonSD::TrackerIonSD(G4String name)
 
 //--------------------------------------------------------------------
 
-void TrackerIonSD::Initialize(G4HCofThisEvent*)
+void TrackerIonSD::Initialize(G4HCofThisEvent* hce)
 { 
  
 
     ionCollection = new TrackerIonHitsCollection
-                          (SensitiveDetectorName,collectionName[0]);  
+                          (SensitiveDetectorName,collectionName[0]);
+
+    
   
 }
 //--------------------------------------------------------------------

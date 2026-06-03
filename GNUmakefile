@@ -5,7 +5,7 @@
 
 # Need this for writing output files larger than 2GB on 32-bit Linux
 # (untested on other systems)
-CPPFLAGS := -D_FILE_OFFSET_BITS=64
+CPPFLAGS := -D_FILE_OFFSET_BITS=64 -g
 
 # Use -D to define LHTARGET, AD, SCANNING, NEUTRONS macros
 # for the C preprocesssor
