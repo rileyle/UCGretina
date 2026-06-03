@@ -33,12 +33,14 @@ DetectorConstruction::DetectorConstruction()
 
   materials = new Materials();
 
-  TrackerIon = new TrackerIonSD("IonTracker");
-  TrackerIonSDMessenger = new TrackerIonSD_Messenger(TrackerIon);
+  ////////// Prepping for ConstructSDandField()
+  // TrackerIon = new TrackerIonSD("IonTracker");
+  // TrackerIonSDMessenger = new TrackerIonSD_Messenger(TrackerIon);
 
-  TrackerGamma = new TrackerGammaSD("GammaTracker");
-  TrackerGammaSDMessenger = new TrackerGammaSD_Messenger(TrackerGamma);
-
+  // TrackerGamma = new TrackerGammaSD("GammaTracker");
+  // TrackerGammaSDMessenger = new TrackerGammaSD_Messenger(TrackerGamma);
+  //////////////
+  
   ExperimentalHall = new Experimental_Hall();
   ExperimentalHallMessenger = new Experimental_Hall_Messenger(ExperimentalHall);
   
@@ -90,8 +92,12 @@ DetectorConstruction::~DetectorConstruction()
 {
   delete ExperimentalHallMessenger;
   delete TargetMessenger;
-  delete TrackerIonSDMessenger;
-  delete TrackerGammaSDMessenger;
+
+  ///// Prepping for ConstructSDandField()
+  // delete TrackerIonSDMessenger;
+  // delete TrackerGammaSDMessenger;
+  /////
+  
 #ifndef LHTARGET
 #ifndef SCANNING
   delete BeamTubeMessenger;
@@ -105,15 +111,17 @@ DetectorConstruction::~DetectorConstruction()
 G4VPhysicalVolume* DetectorConstruction::Construct()
 {
 
+  ////////// Prep for ConstructSDandField()
   // Tracker for ions in the target
 
-  G4SDManager* SDman = G4SDManager::GetSDMpointer();
-  SDman->AddNewDetector( TrackerIon );
+  // G4SDManager* SDman = G4SDManager::GetSDMpointer();
+  // SDman->AddNewDetector( TrackerIon );
 
   // Tracker for gammas in GRETINA
 
-  SDman->AddNewDetector( TrackerGamma );
-
+  //SDman->AddNewDetector( TrackerGamma );
+  /////////
+  
   // Experimental Hall
 
   ExpHall_phys = ExperimentalHall->Construct();
@@ -157,14 +165,12 @@ void DetectorConstruction::Placement()
     leftClover = new Clover_Detector(ExpHall_log, "left");
     leftClover->setY(scanningTable->GetCloverZ());
     leftClover->Construct();
-    leftClover->MakeSensitive(TrackerGamma);
   }
   if( cloverStatus == "right" || cloverStatus == "both" ){
     G4cout << "Constructing right clover detector." << G4endl;
     rightClover = new Clover_Detector(ExpHall_log, "right");
     rightClover->setY(scanningTable->GetCloverZ());
     rightClover->Construct();
-    rightClover->MakeSensitive(TrackerGamma);
   }
   
   // Position the source horizontally using scanning-table controller position
@@ -179,7 +185,6 @@ void DetectorConstruction::Placement()
   // Target
   if( targetStatus ){
     aTarget->Construct(ExpHall_log);
-    aTarget->GetTargetLog()->SetSensitiveDetector(TrackerIon);
   }
 
 #ifndef SCANNING
@@ -206,7 +211,6 @@ void DetectorConstruction::Placement()
   }
   if( laBrStatus ){
     the_LaBr->Construct(ExpHall_log);
-    the_LaBr->MakeSensitive(TrackerGamma);
   }
 #endif
 
@@ -217,6 +221,55 @@ void DetectorConstruction::Placement()
 #endif
     the_Gretina_Array->Placement();
   }
+}
+
+void DetectorConstruction::ConstructSDandField(){
+  
+  auto *sdMan = G4SDManager::GetSDMpointer();
+  auto *TrackerIon = new TrackerIonSD("IonTracker");
+  auto *TrackerIonSDMessenger = new TrackerIonSD_Messenger(TrackerIon);
+
+  auto *TrackerGamma = new TrackerGammaSD("GammaTracker");
+  auto *TrackerGammaSDMessenger = new TrackerGammaSD_Messenger(TrackerGamma);
+
+  G4int depth;
+  auto makeCapsule = the_Gretina_Array->GetMakeCapsule();
+
+  if(makeCapsule)
+    depth = 2;
+  else
+    depth = 1;
+
+  TrackerGamma->SetDepth(depth);
+
+  for(auto pPg: the_Gretina_Array->GetPgons() ){
+    pPg.pDetL->SetSensitiveDetector(TrackerGamma);
+  }
+  
+  if( targetStatus ){
+    aTarget->GetTargetLog()->SetSensitiveDetector(TrackerIon);
+  }
+
+
+#ifndef LHTARGET
+  #ifndef SCANNING
+  #else
+  if( cloverStatus == "left"  || cloverStatus == "both" ){
+    leftClover->MakeSensitive(TrackerGamma);
+  }
+  if( cloverStatus == "right" || cloverStatus == "both" ){
+    rightClover->MakeSensitive(TrackerGamma);
+  }
+  #endif
+#endif
+  
+
+#ifndef SCANNING
+  if( laBrStatus){
+    the_LaBr->MakeSensitive(TrackerGamma);
+  }
+#endif
+  
 }
 
 ///////////////////

@@ -50,9 +50,15 @@ public:
   DetectorConstruction();
   ~DetectorConstruction();
 
+  void ConstructSDandField() override;
+  
   G4VPhysicalVolume* Construct();
   Gretina_Array* GetGretina(){ return the_Gretina_Array;}
-  TrackerGammaSD* GetGammaSD(){ return TrackerGamma;}
+
+  ////// Prep for ConstructSDandField()
+  //TrackerGammaSD* GetGammaSD(){ return TrackerGamma;}
+  ///////
+  
 #ifdef LHTARGET
   G4UnionSolid* GetTarget(){return aTarget->GetTarget();}	
 #else
@@ -143,10 +149,11 @@ private:
   Experimental_Hall_Messenger* ExperimentalHallMessenger;
   Target_Messenger*    TargetMessenger;
   Background_Sphere_Messenger* BackgroundSphereMessenger;
-  TrackerGammaSD* TrackerGamma;
-  TrackerGammaSD_Messenger* TrackerGammaSDMessenger;
-  TrackerIonSD* TrackerIon;
-  TrackerIonSD_Messenger* TrackerIonSDMessenger;
+
+  // TrackerGammaSD* TrackerGamma;
+  // TrackerGammaSD_Messenger* TrackerGammaSDMessenger;
+  // TrackerIonSD* TrackerIon;
+  // TrackerIonSD_Messenger* TrackerIonSDMessenger;
 
   Gretina_Array_Messenger*  the_Gretina_Array_Messenger;
 #ifndef LHTARGET
