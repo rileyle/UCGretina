@@ -65,6 +65,10 @@ G4String EventAction::threadSuffix(const G4String& baseName) const {
 
   // Geant4 MT worker id (typically 0..N-1). We use -1 for master.
   const auto tid = G4Threading::G4GetThreadId();
+  
+  if(tid<0) //For non-MT builds
+    return baseName;
+  
   const G4String suffix = "_t" + std::to_string(tid);
 
   // Insert suffix before the last '.' in the basename.
