@@ -80,7 +80,7 @@ ifndef G4INSTALL
 endif
 
 # Collect the git branch and commit hash.
-GIT_HASH := $(shell git rev-parse HEAD)
+GIT_HASH := $(shell git describe --always --abbrev=6 --exclude '*')
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 ifneq ("$(wildcard git_hash)","")
 PREV_GIT_HASH := $(shell cat git_hash)

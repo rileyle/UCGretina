@@ -63,7 +63,7 @@ typedef struct g4sim_emitted_gamma{
 typedef struct g4sim_abcd1235 {
   int type;          /* defined as abcd1235 */
   int num;           /* # of emitted gammas */
-  unsigned int full; /* full energy (bits 1); pair production (bit 2) */
+  unsigned int full; /* full energy (bit 0); pair production (bit 1) */
   EG gammas[MAX_SIM_GAMMAS];
 } G4SIM_EGS;
 

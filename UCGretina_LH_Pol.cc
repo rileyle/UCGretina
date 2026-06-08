@@ -38,10 +38,11 @@ int main(int argc,char** argv)
   // Construct the default run manager
   G4RunManager* runManager = new G4RunManager;
 
+  G4cout << "Executable: " << argv[0] << G4endl;
   G4cout << "Git commit: " << GIT_HASH << G4endl;
   G4cout << "Git branch: " << GIT_BRANCH << G4endl;
   
-  cout << "Instantiating DetectorConstruction ..." << endl;
+  G4cout << "Instantiating DetectorConstruction ..." << G4endl;
   // set mandatory initialization classes
   DetectorConstruction* detector = new DetectorConstruction();
   runManager->SetUserInitialization(detector);
@@ -49,7 +50,7 @@ int main(int argc,char** argv)
   PhysicsList *physicsList = new PhysicsList(detector);
   runManager->SetUserInitialization(physicsList);
 
-  cout << "... Done" << endl;
+  G4cout << "... Done" << G4endl;
 
   // Construct incoming and outgoing beams
   Incoming_Beam* BeamIn = new Incoming_Beam();
@@ -90,10 +91,10 @@ int main(int argc,char** argv)
 
 #ifdef G4VIS_USE
       // visualization manager
-      cout << "Starting visualization...";
+      G4cout << "Starting visualization...";
       visManager = new VisManager; 
       visManager->Initialize();
-      cout << "Done!" << endl;
+      G4cout << "Done!" << G4endl;
 #endif
 
 // G4UIterminal is a (dumb) terminal.
@@ -106,10 +107,10 @@ int main(int argc,char** argv)
     }
 
   // Initialize G4 kernel
-  // cout << "*** Initializing runManager" << endl;
+  // G4cout << "*** Initializing runManager" << G4endl;
   // //  runManager->SetVerboseLevel(2);
   // runManager->Initialize();
-  // cout << "*** Initialized runManager" << endl;
+  // G4cout << "*** Initialized runManager" << G4endl;
 
   // get the pointer to the UI manager and set verbosities
   G4UImanager* UI = G4UImanager::GetUIpointer();
@@ -120,7 +121,7 @@ int main(int argc,char** argv)
       delete session;
     }
   else           // Batch mode
-    { 
+    {
       G4String command = "/control/execute ";
       G4String fileName = argv[1];
       UI->ApplyCommand(command+fileName);
