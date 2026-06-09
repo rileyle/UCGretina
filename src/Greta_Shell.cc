@@ -321,18 +321,44 @@ void Greta_Shell::HalfShell(G4String half)
           shell = new G4SubtractionSolid ("Shell",shell,modulePort,G4Transform3D(Rot,Pos));
 
   }
-
+  //G4double SPhi = 0*degree;
+  //G4double DPhi = 180*degree;
+  //G4double Theta0 = 0*degree;
+  //G4double DTheta = 180*degree;
+  //G4Sphere* deletion = new G4Sphere("deletion",Rmin,Rmax,SPhi, DPhi, Theta0, DTheta);
+  //G4SubtractionSolid* MountingSection = new G4SubtractionSolid("MountingSection",shell,deletion);
+std::vector<G4TwoVector> polygon(4);
+  G4double halfheight = 1300/2*mm;
+  G4double halfside = 2*halfheight*sin(60/2*degree);
+  polygon[0] = G4TwoVector(-halfside, -halfside);
+  polygon[1] = G4TwoVector(-halfside,  halfside);
+  polygon[2] = G4TwoVector( halfside,  halfside);
+  polygon[3] = G4TwoVector( halfside,  -halfside);
+  G4ExtrudedSolid* solidTarget = new G4ExtrudedSolid("solidTarget",  polygon, halfheight, G4TwoVector(0, 0), 0.00001, G4TwoVector(0, 0), 1);
+ 
   G4LogicalVolume* logicShell = new G4LogicalVolume(shell, matShell, "Shell_log", 0, 0, 0 );
-
+  //G4LogicalVolume* logicMount = new G4LogicalVolume(deletion, matShell, "Shell_log", 0, 0, 0 );
+  G4ThreeVector TarPos = G4ThreeVector(0, 0, halfheight);
+  TarPos.rotateZ(ModuleEuler[0][0]);
+  TarPos.rotateY(ModuleEuler[0][1]);
+  TarPos.rotateZ(ModuleEuler[0][2]);
+  G4RotationMatrix RotShell = G4RotationMatrix::IDENTITY;
+  RotShell.rotateY( TarPos.getTheta() );
+  RotShell.rotateZ( TarPos.getPhi() );
+  G4IntersectionSolid* combo = new G4IntersectionSolid("combo",shell, solidTarget, G4Transform3D(RotShell, TarPos));
+   G4LogicalVolume* logicCombo = new G4LogicalVolume(combo, matShell, "Shell_log", 0, 0, 0 );
   Pos = G4ThreeVector(0, 0, 0);
   if(half == "north" || half == "LH_north")
     Pos.setX(northOffset);
   else
     Pos.setX(-southOffset);
 
-  new G4PVPlacement(0, Pos, half+"MountingShell", logicShell, theDetector->HallPhys(), false, 0 );
+  // new G4PVPlacement(0, Pos, half+"MountingShell", logicShell, theDetector->HallPhys(), false, 0 );
+  //new G4PVPlacement(0, Pos, half+"MountingShell", logicMount, theDetector->HallPhys(), false, 0 );
+  new G4PVPlacement(0, G4ThreeVector(0,0,10*cm), half+"MountingShell", logicCombo, theDetector->HallPhys(), false, 0 );
 
   G4VisAttributes *pVA = new G4VisAttributes( G4Colour(0.0, 1.0, 1.0) );
   logicShell->SetVisAttributes( pVA );
+  //logicMount->SetVisAttributes( pVA );
 
 }
