@@ -47,6 +47,14 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   particleTable = G4ParticleTable::GetParticleTable();
   ionTable = G4IonTable::GetIonTable();
   BeamOut->SetReactionFlag(-1);
+
+#ifdef SCANNING
+  // Keep per-thread generator state in sync with the scan-table controller.
+  // Doing this here (instead of DetectorConstruction) avoids MT crashes where
+  // the generator action is not yet constructed during geometry setup.
+  sourcePosition.setX(-myDetector->GetScanningTableControllerX());
+  sourcePosition.setZ( myDetector->GetScanningTableControllerY());
+#endif
   
   if(source)
     {

@@ -166,19 +166,12 @@ void DetectorConstruction::Placement()
     leftClover->setY(scanningTable->GetCloverZ());
     leftClover->Construct();
   }
-  if( cloverStatus == "right" || cloverStatus == "both" ){
-    G4cout << "Constructing right clover detector." << G4endl;
-    rightClover = new Clover_Detector(ExpHall_log, "right");
-    rightClover->setY(scanningTable->GetCloverZ());
-    rightClover->Construct();
-  }
-  
-  // Position the source horizontally using scanning-table controller position
-  G4RunManager* runManager = G4RunManager::GetRunManager();
-  PrimaryGeneratorAction* generatorAction
-    = (PrimaryGeneratorAction*)runManager->GetUserPrimaryGeneratorAction();
-  generatorAction->SetSourceX(-scanningTable->GetControllerX());
-  generatorAction->SetSourceZ( scanningTable->GetControllerY());
+   if( cloverStatus == "right" || cloverStatus == "both" ){
+     G4cout << "Constructing right clover detector." << G4endl;
+     rightClover = new Clover_Detector(ExpHall_log, "right");
+     rightClover->setY(scanningTable->GetCloverZ());
+     rightClover->Construct();
+   }
 #endif
 #endif
 
@@ -222,6 +215,16 @@ void DetectorConstruction::Placement()
     the_Gretina_Array->Placement();
   }
 }
+
+#ifdef SCANNING
+G4double DetectorConstruction::GetScanningTableControllerX() const {
+  return scanningTable->GetControllerX();
+}
+
+G4double DetectorConstruction::GetScanningTableControllerY() const {
+  return scanningTable->GetControllerY();
+}
+#endif
 
 void DetectorConstruction::ConstructSDandField(){
   

@@ -100,6 +100,13 @@ public:
   
   void Placement();
 
+#ifdef SCANNING
+  // In MT, don't reach into PrimaryGeneratorAction from geometry construction.
+  // Workers can query these controller positions from their own generator action.
+  G4double GetScanningTableControllerX() const;
+  G4double GetScanningTableControllerY() const;
+#endif
+
 private:
   DetectorConstruction_Messenger *myMessenger;
 
