@@ -15,6 +15,8 @@ PrimaryVertexInformation::PrimaryVertexInformation() {
   fExitPhi        = sqrt(-1.0);
   ffiltercode     = 0;
   fwrite          = true;
+  fHasReactionDepthZ = false;
+  fReactionDepthZ = 0.0;
 }
 
 void PrimaryVertexInformation::AddEmittedGamma(G4double e, 

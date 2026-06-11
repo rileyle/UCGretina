@@ -43,8 +43,9 @@ class TrackerGammaSD : public G4VSensitiveDetector
       G4double      phdA;
       G4double      phdB;
       G4double      posRes;
+      // Per-detector-instance hit collection id (avoids shared static across threads).
+      G4int         fHCID;
 };
 
 
 #endif
-

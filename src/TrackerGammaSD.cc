@@ -24,6 +24,7 @@ TrackerGammaSD::TrackerGammaSD(G4String name)
   phdA = 0.21;
   phdB = 1.099;
   posRes = 0.;
+  fHCID = -1;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -279,12 +280,11 @@ void TrackerGammaSD::EndOfEvent(G4HCofThisEvent* HCE)
 	  }
 
 
-  static G4int HCID = -1;
-  if(HCID<0)
-  { HCID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]); }
-  HCE->AddHitsCollection( HCID, gammaCollection ); 
- }
+  if(fHCID < 0) {
+    fHCID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
+  }
+  HCE->AddHitsCollection(fHCID, gammaCollection);
+  }
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-

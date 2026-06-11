@@ -2,6 +2,20 @@
 #include "G4DecayTable.hh"
 #include "G4Decay.hh"
 #include "G4RadioactiveDecay.hh"
+
+// Thread-local transient reaction state (see Outgoing_Beam.hh).
+G4ThreadLocal G4int Outgoing_Beam::Ain = 0;
+G4ThreadLocal G4int Outgoing_Beam::Zin = 0;
+G4ThreadLocal G4ThreeVector Outgoing_Beam::dirIn;
+G4ThreadLocal G4ThreeVector Outgoing_Beam::posIn;
+G4ThreadLocal G4ThreeVector Outgoing_Beam::posOut;
+G4ThreadLocal G4ThreeVector Outgoing_Beam::pIn;
+G4ThreadLocal G4int Outgoing_Beam::ReactionFlag = -1;
+G4ThreadLocal G4int Outgoing_Beam::ThresholdFlag = 0;
+G4ThreadLocal G4double Outgoing_Beam::KEIn = 0.;
+G4ThreadLocal G4double Outgoing_Beam::ET = 0.;
+G4ThreadLocal G4double Outgoing_Beam::p1 = 0.;
+G4ThreadLocal G4double Outgoing_Beam::sin2theta3_max = 0.;
 #include "G4ProcessManager.hh"
 
 Outgoing_Beam::Outgoing_Beam()

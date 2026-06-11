@@ -226,7 +226,10 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       
       // Z position of the reaction point
       depth=TC+TT*(G4UniformRand()-0.5);
-      myDetector->setTargetReactionDepth(depth);
+      // Store per-event reaction depth on the primary vertex info.
+      // In MT runs, using a shared Target UserLimits here causes cross-thread
+      // races (one event's depth affects another).
+      const G4double reactionDepthZ = depth;
 
       // G4cout << "**** center = " << TC
       // 	     << ", direction = " << direction
@@ -239,6 +242,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       PrimaryVertexInformation* primaryVertexInfo
 	= new PrimaryVertexInformation;
       anEvent->GetPrimaryVertex()->SetUserInformation(primaryVertexInfo);
+      primaryVertexInfo->SetReactionDepthZ(reactionDepthZ);
 
     }
   else if(cache)

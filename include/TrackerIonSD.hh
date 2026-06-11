@@ -37,8 +37,10 @@ class TrackerIonSD : public G4VSensitiveDetector
   private:
       TrackerIonHitsCollection* ionCollection;
       G4bool print;
-    
-    
+      // Per-detector-instance hit collection id (avoids shared static across threads).
+      G4int fHCID;
+     
+     
 };
 
 

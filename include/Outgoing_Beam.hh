@@ -22,6 +22,8 @@ using namespace std;
 
 #include "G4IonTable.hh"
 
+#include "G4Threading.hh"
+
 #include "Randomize.hh"
 #include "Incoming_Beam.hh"
 
@@ -71,15 +73,18 @@ public:
   G4int    AboveThreshold(){return ThresholdFlag;}
 
 private:
-  G4int Ain;
-  G4int Zin;
-  G4ThreeVector dirIn;
-  G4ThreeVector posIn;
-  G4ThreeVector posOut;
-  G4ThreeVector pIn;
-  G4int  ReactionFlag;
-  G4int  ThresholdFlag;
-  G4double      KEIn;
+  // Per-thread transient reaction state.
+  // These were previously shared members and caused cross-thread interference
+  // (e.g. ReactionFlag set in one thread affecting other threads).
+  static G4ThreadLocal G4int Ain;
+  static G4ThreadLocal G4int Zin;
+  static G4ThreadLocal G4ThreeVector dirIn;
+  static G4ThreadLocal G4ThreeVector posIn;
+  static G4ThreadLocal G4ThreeVector posOut;
+  static G4ThreadLocal G4ThreeVector pIn;
+  static G4ThreadLocal G4int ReactionFlag;
+  static G4ThreadLocal G4int ThresholdFlag;
+  static G4ThreadLocal G4double KEIn;
 
   std::vector<G4int> DZ;
   std::vector<G4int> DA;
@@ -89,9 +94,9 @@ private:
   G4double m2;
   G4double m3;
   G4double m4;
-  G4double ET;
-  G4double p1;
-  G4double sin2theta3_max;
+  static G4ThreadLocal G4double ET;
+  static G4ThreadLocal G4double p1;
+  static G4ThreadLocal G4double sin2theta3_max;
 
   G4double Ex,TarEx;
   std::vector<G4String> lvlDataFileNames;
