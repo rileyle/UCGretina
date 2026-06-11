@@ -1183,7 +1183,7 @@ void EventAction::closeCacheOutputFile()
 //----------------------------------------------------
 void EventAction::openCacheInputFile(G4String FileName)
 {
-  cacheInputFileName = FileName;
+  cacheInputFileName = threadSuffix(FileName);
 #ifdef CACHETEXT
   if (!cacheInputFile.is_open())
     cacheInputFile.open(cacheInputFileName.c_str());
