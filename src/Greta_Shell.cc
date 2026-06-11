@@ -216,35 +216,56 @@ void Greta_Shell::Placement(G4String status)
     G4cout << "Shell status " << status << " is not defined." << G4endl;
     return;
   }
-
-  if(status == "Greta" || status == "Greta_North")
-    HalfShell("north");
-
-  if(status == "Greta" || status == "Greta_South")
-    HalfShell("south");
-
+  Test();
+  
+ 
+  /*
   if(status == "GretaLH" || status == "GretaLH_North")
     HalfShell("LH_north");
 
   if(status == "GretaLH" || status == "GretaLH_South")
     HalfShell("LH_south");
-  
-  G4cout << "Constructed the " << status << " shell." << G4endl;
-  G4cout << "  Shell radius: " << Rmin << " -- " << Rmax << G4endl;
-  G4cout << "  Shell material: " << matShell->GetName() << G4endl;
+  */
+   G4cout << "Constructed the " << status << " shell." << G4endl;
+   G4cout << "  Shell radius: " << Rmin << " -- " << Rmax << G4endl;
+   G4cout << "  Shell material: " << matShell->GetName() << G4endl;
 
 }
-
-void Greta_Shell::HalfShell(G4String half)
+//Forms and places a Greta Shell piece
+void Greta_Shell::Test()
+{
+   G4RunManager* runManager = G4RunManager::GetRunManager();
+   DetectorConstruction* theDetector = (DetectorConstruction*) runManager->GetUserDetectorConstruction();
+   G4SubtractionSolid* shell = Shell();
+   std::vector<G4TwoVector> polygon(4);
+   G4double halfheight = 1300/2*mm;
+   G4double halfside = 2*halfheight*sin(60/2*degree);
+   polygon[0] = G4TwoVector(-halfside, -halfside);
+   polygon[1] = G4TwoVector(-halfside,  halfside);
+   polygon[2] = G4TwoVector( halfside,  halfside);
+   polygon[3] = G4TwoVector( halfside,  -halfside);
+   G4ExtrudedSolid* solidTarget = new G4ExtrudedSolid("solidTarget",  polygon, halfheight, G4TwoVector(0, 0), 0.00001, G4TwoVector(0, 0), 1);
+ 
+   G4ThreeVector TarPos = G4ThreeVector(0, 0, halfheight);
+   TarPos.rotateZ(ModuleEuler[0][0]);
+   TarPos.rotateY(ModuleEuler[0][1]);
+   TarPos.rotateZ(ModuleEuler[0][2]);
+   G4RotationMatrix RotShell = G4RotationMatrix::IDENTITY;
+   RotShell.rotateY( TarPos.getTheta() );
+   RotShell.rotateZ( TarPos.getPhi() );
+   G4IntersectionSolid* combo = new G4IntersectionSolid("combo",shell, solidTarget, G4Transform3D(RotShell, TarPos));
+   G4LogicalVolume* logicCombo = new G4LogicalVolume(combo, matShell, "Shell_log", 0, 0, 0 );
+   new G4PVPlacement(0, G4ThreeVector(0,0,10*cm), "MountingShell", logicCombo, theDetector->HallPhys(), false, 0 );
+   
+}
+//Creates and returns the full Greta shell sphere
+G4SubtractionSolid* Greta_Shell::Shell()
 {
 
   Rot = G4RotationMatrix::IDENTITY;
 
-  if( FindMaterials() ) return;
+  if( FindMaterials() ) return NULL;
 
-  G4RunManager* runManager               = G4RunManager::GetRunManager();
-  DetectorConstruction* theDetector = (DetectorConstruction*) runManager->GetUserDetectorConstruction();
-  
   //////////////////////////////////////////////////
   // The GRETA mounting shell
   //////////////////////////////////////////////////
@@ -252,15 +273,6 @@ void Greta_Shell::HalfShell(G4String half)
   G4double Phi0 =   0.*deg;
   G4double dPhi = 360.*deg;
 
-  if ( half == "north" || half == "LH_north" ) {
-    Phi0 = -90.*deg;
-    dPhi = 180.*deg;
-  } else if ( half == "south" || half == "LH_south" ) {
-    Phi0 =  90.*deg;
-    dPhi = 180.*deg;
-  } else
-    G4Exception("Greta_Shell::HalfShell()", "Error", FatalException,
-		"half argument must be set to north, south, LH_north, or LH_south");
 
   G4Sphere* solidShell = new G4Sphere( "solidShell", Rmin, Rmax, Phi0, dPhi, 0., 180.*deg);
 
@@ -279,25 +291,19 @@ void Greta_Shell::HalfShell(G4String half)
     Rot = G4RotationMatrix::IDENTITY;
     Rot.rotateY( PosSP[i].getTheta() );
     Rot.rotateZ( PosSP[i].getPhi() );
-    if( ( ( half == "north" || half == "LH_north" )
-	  && SmallPortStatus[i] <= 0 ) ||
-        ( ( half == "south" || half == "LH_south" )
-	  && SmallPortStatus[i] >= 0 ) )
+    if( ( SmallPortStatus[i] <= 0 ) ||( SmallPortStatus[i] >= 0 ) ){
       shell = new G4SubtractionSolid ("Shell",shell,smallPort,G4Transform3D(Rot,PosSP[i]));
+    }
   }
 
   // Make space for the LH target
-  if( half == "LH_north" || half == "LH_south" ){
+  /*if( half == "LH_north" || half == "LH_south" ){
     G4Box* PortBox = new G4Box("PortBox", modulePortRadius, Rmax-Rmin, modulePortRadius);
 
     Rot = G4RotationMatrix::IDENTITY;
 
-    shell = new G4SubtractionSolid ("Shell",shell,PortBox,
-				    G4Transform3D(Rot,
-						  G4ThreeVector(0.,
-								(Rmax+Rmin)/2.,
-								0.0)));
-  }
+    shell = new G4SubtractionSolid ("Shell",shell,PortBox,G4Transform3D(Rot,G4ThreeVector(0.,(Rmax+Rmin)/2.,0.0)));
+    }*/
 
   // Subtract the module ports from the shell.
   G4Tubs* modulePort = new G4Tubs("modulePort", 0, modulePortRadius, 1.5*(Rmax-Rmin)/2., 0., 360.*deg);
@@ -314,51 +320,10 @@ void Greta_Shell::HalfShell(G4String half)
     Rot.rotateY( Pos.getTheta() );
     Rot.rotateZ( Pos.getPhi() );
 
-    if( ( ( half == "north" || half == "LH_north" )
-	  && ModulePortStatus[i] <= 0 ) ||
-        ( ( half == "south" || half == "LH_south" ) 
-	  && ModulePortStatus[i] >= 0 ) )
+    if( ( ModulePortStatus[i] <= 0 ) || ( ModulePortStatus[i] >= 0 ) ) {
           shell = new G4SubtractionSolid ("Shell",shell,modulePort,G4Transform3D(Rot,Pos));
-
+    }
   }
-  //G4double SPhi = 0*degree;
-  //G4double DPhi = 180*degree;
-  //G4double Theta0 = 0*degree;
-  //G4double DTheta = 180*degree;
-  //G4Sphere* deletion = new G4Sphere("deletion",Rmin,Rmax,SPhi, DPhi, Theta0, DTheta);
-  //G4SubtractionSolid* MountingSection = new G4SubtractionSolid("MountingSection",shell,deletion);
-std::vector<G4TwoVector> polygon(4);
-  G4double halfheight = 1300/2*mm;
-  G4double halfside = 2*halfheight*sin(60/2*degree);
-  polygon[0] = G4TwoVector(-halfside, -halfside);
-  polygon[1] = G4TwoVector(-halfside,  halfside);
-  polygon[2] = G4TwoVector( halfside,  halfside);
-  polygon[3] = G4TwoVector( halfside,  -halfside);
-  G4ExtrudedSolid* solidTarget = new G4ExtrudedSolid("solidTarget",  polygon, halfheight, G4TwoVector(0, 0), 0.00001, G4TwoVector(0, 0), 1);
- 
-  G4LogicalVolume* logicShell = new G4LogicalVolume(shell, matShell, "Shell_log", 0, 0, 0 );
-  //G4LogicalVolume* logicMount = new G4LogicalVolume(deletion, matShell, "Shell_log", 0, 0, 0 );
-  G4ThreeVector TarPos = G4ThreeVector(0, 0, halfheight);
-  TarPos.rotateZ(ModuleEuler[0][0]);
-  TarPos.rotateY(ModuleEuler[0][1]);
-  TarPos.rotateZ(ModuleEuler[0][2]);
-  G4RotationMatrix RotShell = G4RotationMatrix::IDENTITY;
-  RotShell.rotateY( TarPos.getTheta() );
-  RotShell.rotateZ( TarPos.getPhi() );
-  G4IntersectionSolid* combo = new G4IntersectionSolid("combo",shell, solidTarget, G4Transform3D(RotShell, TarPos));
-   G4LogicalVolume* logicCombo = new G4LogicalVolume(combo, matShell, "Shell_log", 0, 0, 0 );
-  Pos = G4ThreeVector(0, 0, 0);
-  if(half == "north" || half == "LH_north")
-    Pos.setX(northOffset);
-  else
-    Pos.setX(-southOffset);
-
-  // new G4PVPlacement(0, Pos, half+"MountingShell", logicShell, theDetector->HallPhys(), false, 0 );
-  //new G4PVPlacement(0, Pos, half+"MountingShell", logicMount, theDetector->HallPhys(), false, 0 );
-  new G4PVPlacement(0, G4ThreeVector(0,0,10*cm), half+"MountingShell", logicCombo, theDetector->HallPhys(), false, 0 );
-
-  G4VisAttributes *pVA = new G4VisAttributes( G4Colour(0.0, 1.0, 1.0) );
-  logicShell->SetVisAttributes( pVA );
-  //logicMount->SetVisAttributes( pVA );
+  return shell;
 
 }

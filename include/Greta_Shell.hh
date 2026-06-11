@@ -69,7 +69,8 @@ public:
     void   setNorthOffset(G4double off){northOffset = off;}
     void   setSouthOffset(G4double off){southOffset = off;}
     void   Placement(G4String);
-    void   HalfShell(G4String);
+    G4SubtractionSolid*   Shell();
+    void Test();
 };
 
 #endif
