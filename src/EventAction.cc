@@ -640,12 +640,15 @@ void EventAction::EndOfEventAction(const G4Event* ev)
     if(ionCollectionID<0)
       ionCollectionID=SDman->GetCollectionID("ionCollection");
 
-    if(!ionCollectionID)
+    // Geant4 collection IDs are 0-based; ID==0 is valid. "Not found" is < 0.
+    if(ionCollectionID < 0){
       G4cout << "Couldn't find ionCollection" << G4endl;
-    
-    TrackerIonHitsCollection* ionCollection 
-      = (TrackerIonHitsCollection*)(HCE->GetHC(ionCollectionID));
-    writeCache(ionCollection);
+    } else if(HCE){
+      TrackerIonHitsCollection* ionCollection
+        = (TrackerIonHitsCollection*)(HCE->GetHC(ionCollectionID));
+      if(ionCollection)
+        writeCache(ionCollection);
+    }
   }
 
 }
