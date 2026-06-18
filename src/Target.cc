@@ -1,6 +1,8 @@
 #ifndef LHTARGET
 #include "Target.hh"
 
+#include "G4RunManager.hh"
+
 Target::Target()
 {
   buildSled=false;
@@ -56,6 +58,8 @@ G4VPhysicalVolume* Target::Construct(G4LogicalVolume* experimentalHall_log)
   Target_log->SetVisAttributes(Vis_6);
 
   if(buildSled) BuildSled();
+
+  if(sourceFrame != "") BuildSourceFrame();
 
   return Target_phys;
 }
@@ -131,15 +135,23 @@ void Target::setPosition(G4double x, G4double y, G4double z)
 //---------------------------------------------------------------------
 void Target::setSourceFrame(G4String sF)
 {
-  if(Target_phys)
-    delete Target_phys;
-  
   sourceFrame = sF;
 
+  // If the geometry has already been constructed (e.g. user calls this after
+  // /run/initialize), force a rebuild so MT worker threads see the new geometry
+  // before /run/beamOn.
+  if(Target_phys && G4RunManager::GetRunManager()) {
+    G4RunManager::GetRunManager()->ReinitializeGeometry();
+  }
+}
+
+//---------------------------------------------------------------------
+void Target::BuildSourceFrame()
+{
   if(sourceFrame == "eu152_Z2707"){
 
     frameMaterial = G4Material::GetMaterial("Al");
-    //    frameThickness = 2.9*mm; // Used prior to 3/2012
+    // frameThickness = 2.9*mm; // Used prior to 3/2012
     frameThickness = 1.2*mm;       // Dirk Weisshaar 3/4/2012
     frameInnerRadius = 3.8*cm/2.0; // Source data sheet
     frameOuterRadius = 5.4*cm/2.0; // Source data sheet
@@ -188,10 +200,12 @@ void Target::setSourceFrame(G4String sF)
     coFrame = new G4Box("coFrame", frameSide_x/2., frameSide_y/2., frameThickness/2.);
     coFrame_log = new G4LogicalVolume(coFrame,frameMaterial,"coFrame_log",0,0,0);
     coFrame_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos),coFrame_log,"coFrame",expHall_log,false,0);
-
+  } else {
+    G4cout<<"----> Warning: unknown source frame '"<<sourceFrame<<"' (no frame will be built)."<< G4endl;
+    return;
   }
 
-  G4cout<<"----> Including source frame: "<<sourceFrame<< G4endl;                 
+  G4cout<<"----> Including source frame: "<<sourceFrame<< G4endl;
 }
 //-------------------------------------------------------------------
 void Target::BuildSled()

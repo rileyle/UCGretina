@@ -1,6 +1,8 @@
 #ifdef LHTARGET
 #include "Target_LH.hh"
 
+#include "G4RunManager.hh"
+
 Target::Target()
 {
   buildSled=false;
@@ -90,6 +92,8 @@ G4VPhysicalVolume* Target::Construct(G4LogicalVolume* experimentalHall_log)
   LHTarget->MakeImprint(expHall_log, *Pos, &LHTargetRot);
 
   if(buildSled) BuildSled();
+
+  if(sourceFrame != "") BuildSourceFrame();
 
   return Target_phys;
 
@@ -1053,6 +1057,14 @@ void Target::setSourceFrame(G4String sF)
 {
   sourceFrame = sF;
 
+  if(Target_phys && G4RunManager::GetRunManager()) {
+    G4RunManager::GetRunManager()->ReinitializeGeometry();
+  }
+}
+
+//---------------------------------------------------------------------
+void Target::BuildSourceFrame()
+{
   if(sourceFrame == "eu152_Z2707"){
 
     frameMaterial = G4Material::GetMaterial("Al");
@@ -1062,7 +1074,7 @@ void Target::setSourceFrame(G4String sF)
     tapeMaterial = G4Material::GetMaterial("G4_POLYETHYLENE");
     tapeThickness = 0.012*cm;
 
-    tape_r = frameInnerRadius - .2*cm; //in order to remove overlap
+    tape_r = frameInnerRadius - .2*cm; // in order to remove overlap
 
     euFrame = new G4Tubs("euFrame",frameInnerRadius,frameOuterRadius,frameThickness/2.,0.,360.*deg);
     euFrame_log = new G4LogicalVolume(euFrame,frameMaterial,"euFrame_log",0,0,0);
@@ -1096,9 +1108,12 @@ void Target::setSourceFrame(G4String sF)
     csTape_log = new G4LogicalVolume(csTape,tapeMaterial,"csTape_log",0,0,0);
     csTape_phys = new G4PVPlacement(G4Transform3D(NoRot,*Pos),csTape_log,"csTape",expHall_log,false,0);
 
+  } else {
+    G4cout<<"----> Warning: unknown source frame '"<<sourceFrame<<"' (no frame will be built)."<< G4endl;
+    return;
   }
 
-  G4cout<<"----> Source frame is set to "<<sourceFrame<< G4endl;                 
+  G4cout<<"----> Including source frame: "<<sourceFrame<< G4endl;
 }
 //-------------------------------------------------------------------
 void Target::BuildSled()
