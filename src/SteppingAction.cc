@@ -176,7 +176,6 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
 	|| volume2->GetName().contains("Chamber")
 	|| volume2->GetName().contains("sled")
 	|| volume2->GetName().contains("Frame")
-	|| volume2->GetName().contains("Tape")
 	|| volume2->GetName().contains("Ring") ){
 	  G4cerr << "Warning: incoming beam has hit "
 		 << volume2->GetName()

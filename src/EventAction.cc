@@ -53,14 +53,6 @@ void EventAction::BeginOfEventAction(const G4Event* ev)
   PrimaryVertexInformation* primaryVertexInfo
     = (PrimaryVertexInformation*)evt->GetPrimaryVertex()->GetUserInformation();
 
-  G4SDManager * SDman = G4SDManager::GetSDMpointer();
-
-  if(gammaCollectionID<0||ionCollectionID<0)
-    {
-      gammaCollectionID=SDman->GetCollectionID("gammaCollection");
-      ionCollectionID=SDman->GetCollectionID("ionCollection");
-    }
-
   // For event filter
   primaryVertexInfo->SetWriteEvent(false);
   
@@ -171,6 +163,11 @@ void EventAction::EndOfEventAction(const G4Event* ev)
   G4HCofThisEvent * HCE = evt->GetHCofThisEvent();
   if(HCE) {
 
+    G4SDManager * SDman = G4SDManager::GetSDMpointer();
+
+    if(gammaCollectionID<0)
+      gammaCollectionID=SDman->GetCollectionID("gammaCollection");
+    
     TrackerGammaHitsCollection* gammaCollection 
       = (TrackerGammaHitsCollection*)(HCE->GetHC(gammaCollectionID));
 
@@ -594,9 +591,21 @@ void EventAction::EndOfEventAction(const G4Event* ev)
   writeSim(timestamp, primaryVertexInfo);
 
   if(cacheOut){
-    TrackerIonHitsCollection* ionCollection 
-      = (TrackerIonHitsCollection*)(HCE->GetHC(ionCollectionID));
-    writeCache(ionCollection);
+    
+    G4SDManager * SDman = G4SDManager::GetSDMpointer();
+
+    if(ionCollectionID<0)
+      ionCollectionID=SDman->GetCollectionID("ionCollection");
+
+    // Geant4 collection IDs are 0-based; ID==0 is valid. "Not found" is < 0.
+    if(ionCollectionID < 0){
+      G4cout << "Couldn't find ionCollection" << G4endl;
+    } else if(HCE){
+      TrackerIonHitsCollection* ionCollection
+        = (TrackerIonHitsCollection*)(HCE->GetHC(ionCollectionID));
+      if(ionCollection)
+        writeCache(ionCollection);
+    }
   }
 
 }
