@@ -1,12 +1,10 @@
-all: s44_1329_histos.root \
-     s44_2150_histos.root \
-     s44_2457_histos.root
-	$(MAKE) -C makeData
+all: s44_1329_histos.root
 	echo "Geant4 simulations done."
 
 # Pattern rules for running Geant4 simulations and sorting the output
 # into Root histograms
 %.dat : %.mac
+	UCGretina_LH $*_cache.mac 2>&1 | tee $*_cache.log
 	UCGretina_LH $*.mac 2>&1 | tee $*.log
 
 %_histos.root : %.dat
@@ -16,5 +14,4 @@ all: s44_1329_histos.root \
 	rm $*.dat
 
 clean:
-	rm -f *.log *.root
-	$(MAKE) -C makeData clean
+	rm -f *.log *.root *.dat *.cache

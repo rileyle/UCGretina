@@ -10,4 +10,4 @@ all:  scan.root
 	root -l -b -q 'ScanSort.C("$*.out")' 2>&1 | tee $*_sort.log
 
 clean:
-	rm *.log *.out *.root
+	rm -f *.log *.out *.root

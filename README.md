@@ -54,9 +54,7 @@ Several examples are in the examples subdirectory, including
 illustrations of fitting simulations to measured source and in-beam
 spectra. Makefiles are provided in the examples for sorting simulated
 mode 2 output with the
-[GRUTinizer](https://github.com/pcbend/GRUTinizer) and
-[GrROOT](https://github.com/wimmer-k/GrROOT)
-packages.
+[GRUTinizer](https://github.com/pcbend/GRUTinizer) package.
 
 ## Selected Macro File Commands ##
 

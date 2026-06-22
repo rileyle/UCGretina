@@ -12,4 +12,4 @@ all:  background_histos.root \
 	rm $*.dat
 
 clean:
-	rm *.log *.root
+	rm -f *.log *.root

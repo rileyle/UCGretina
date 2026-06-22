@@ -16,6 +16,6 @@ all: s44_1329_histos.root \
 	rm $*.dat
 
 clean:
-	rm *.log *.root
+	rm -f *.log *.root
 	$(MAKE) -C makeData clean
 

@@ -13,5 +13,5 @@ all: au197_548_histos.root    simple_279_histos.root
 	rm $*.dat
 
 clean:
-	rm *.log *.root
+	rm -f *.log *.root
 

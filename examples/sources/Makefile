@@ -1,7 +1,10 @@
+# https://stackoverflow.com/questions/17834582/run-make-in-each-subdirectory
+TOPTARGETS := all clean
+
 SUBDIRS := $(wildcard */.)
 
-all: $(SUBDIRS)
+$(TOPTARGETS): $(SUBDIRS)
 $(SUBDIRS):
-	$(MAKE) -C $@
+	$(MAKE) -C $@ $(MAKECMDGOALS)
 
-.PHONY: all $(SUBDIRS)
+.PHONY: $(TOPTARGETS) $(SUBDIRS)

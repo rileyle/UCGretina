@@ -13,4 +13,4 @@ all:  ho166_histos.root
 	rm $*.dat
 
 clean:
-	rm *.log *.dat *.root
+	rm -f *.log *.dat *.root
