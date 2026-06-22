@@ -17,23 +17,12 @@ RunAction::~RunAction()
 void RunAction::BeginOfRunAction(const G4Run* run)
 {
 
+  if(G4Threading::IsMasterThread()){
+    
   G4cout<<" Beginning of run "<<G4endl;
-
-  evaction->SetNTotalevents(run->GetNumberOfEventToBeProcessed());
-  if(run->GetNumberOfEventToBeProcessed() > 1000000)
-    evaction->SetEveryNEvents(10000);
-  else if(run->GetNumberOfEventToBeProcessed() > 1000)
-    evaction->SetEveryNEvents(1000);
-  else if(run->GetNumberOfEventToBeProcessed() > 100)
-    evaction->SetEveryNEvents(100);
-  else
-    evaction->SetEveryNEvents(1);
 
   G4cout << " Simulating " << run->GetNumberOfEventToBeProcessed()
 	 << " events." << G4endl;
-
-  if(BeamIn->getKE()>0)
-    evaction->SetInBeam(true);
   
   if(evaction->EvOut())
     G4cout << " Writing ASCII output to " 
@@ -79,6 +68,23 @@ void RunAction::BeginOfRunAction(const G4Run* run)
     }
   }
   Timer.Start();
+
+  }
+
+  evaction->SetNTotalevents(run->GetNumberOfEventToBeProcessed());
+  if(run->GetNumberOfEventToBeProcessed() > 1000000)
+    evaction->SetEveryNEvents(10000);
+  else if(run->GetNumberOfEventToBeProcessed() > 1000)
+    evaction->SetEveryNEvents(1000);
+  else if(run->GetNumberOfEventToBeProcessed() > 100)
+    evaction->SetEveryNEvents(100);
+  else
+    evaction->SetEveryNEvents(1);
+
+  if(BeamIn->getKE()>0)
+    evaction->SetInBeam(true);
+
+  
 }
 
 
@@ -94,6 +100,8 @@ void RunAction::EndOfRunAction(const G4Run*)
   if(evaction->CacheIn())
     evaction->closeCacheInputFile();
 
+  if(G4Threading::IsMasterThread()){
+    
   Timer.Stop();
 
   G4cout << "                                                     " << G4endl;
@@ -169,6 +177,8 @@ void RunAction::EndOfRunAction(const G4Run*)
   G4cout << "   "
 	 << evaction->GetNTotalevents()/Timer.GetRealElapsed()
 	 << " events/s" << G4endl;
- 
+
+  }
+  
 }
 

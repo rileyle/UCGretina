@@ -152,10 +152,13 @@ Gretina_Array::~Gretina_Array()
 void Gretina_Array::Placement()
 {
 
+  ///// Prep for ConstructSDandField()
   // Sensitive Detector
-  G4RunManager* runManager = G4RunManager::GetRunManager();
-  DetectorConstruction* theDetector  = (DetectorConstruction*) runManager->GetUserDetectorConstruction();
-
+  // G4RunManager* runManager = G4RunManager::GetRunManager();
+  // DetectorConstruction* theDetector  = (DetectorConstruction*) runManager->GetUserDetectorConstruction();
+  //////
+  
+  
   ReadSolidFile();
   ReadClustFile();
   ReadWallsFile();
@@ -172,14 +175,17 @@ void Gretina_Array::Placement()
 
   ConstructTheCapsules();
 
-  G4int depth;
-  if(makeCapsule)
-    depth = 2;
-  else
-    depth = 1;
+  ////// Prep for ConstructSDandField()
+  // G4int depth;
+  // if(makeCapsule)
+  //   depth = 2;
+  // else
+  //   depth = 1;
 
-  theDetector->GetGammaSD()->SetDepth(depth);
+  // theDetector->GetGammaSD()->SetDepth(depth);
+  //////////
 
+  
   ConstructTheClusters();
   PlaceTheClusters();
 
@@ -1254,7 +1260,6 @@ void Gretina_Array::ConstructGeCrystals()
 
     pPg->pDetL->SetVisAttributes( pPg->pDetVA );
     //    pPg->pDetL->SetSensitiveDetector( theDetector->GeSD() );
-    pPg->pDetL->SetSensitiveDetector( theDetector->GetGammaSD() );
     ngen++;
 
     G4double totalV = pPg->pCaps->GetCubicVolume()/cm3;

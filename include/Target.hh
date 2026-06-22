@@ -45,10 +45,12 @@ class Target
   G4VPhysicalVolume* GetTargetPlacement(){return Target_phys;}
   void setTargetReactionDepth(G4double);
   void setPosition(G4double, G4double, G4double);
-  G4double GetTargetThickness(){return Target_thickness;}
-  G4ThreeVector* GetPos(){return Pos;}
+   G4double GetTargetThickness(){return Target_thickness;}
+   G4ThreeVector* GetPos(){return Pos;}
 
-private:
+ private:
+  void BuildSourceFrame();
+
   // dimensions
   G4double Target_side_x;
   G4double Target_side_y;
@@ -152,4 +154,3 @@ private:
 };
 
 #endif
-

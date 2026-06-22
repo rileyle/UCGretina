@@ -5,6 +5,7 @@
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
+#include "G4Threading.hh"
 #include "G4ThreeVector.hh"
 #include "G4SystemOfUnits.hh"
 #include <iomanip>
@@ -84,22 +85,23 @@ class TrackerGammaHit : public G4VHit
 
 typedef G4THitsCollection<TrackerGammaHit> TrackerGammaHitsCollection;
 
-extern G4Allocator<TrackerGammaHit> TrackerGammaHitAllocator;
+extern G4ThreadLocal G4Allocator<TrackerGammaHit>* TrackerGammaHitAllocator;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline void* TrackerGammaHit::operator new(size_t)
 {
-  void *aHit;
-  aHit = (void *) TrackerGammaHitAllocator.MallocSingle();
-  return aHit;
+  if (!TrackerGammaHitAllocator) {
+    TrackerGammaHitAllocator = new G4Allocator<TrackerGammaHit>;
+  }
+  return (void*)TrackerGammaHitAllocator->MallocSingle();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 inline void TrackerGammaHit::operator delete(void *aHit)
 {
-  TrackerGammaHitAllocator.FreeSingle((TrackerGammaHit*) aHit);
+  TrackerGammaHitAllocator->FreeSingle((TrackerGammaHit*)aHit);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

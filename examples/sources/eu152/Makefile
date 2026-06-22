@@ -6,6 +6,9 @@ all:  eu152_gammas_histos.root \
 # into Root histograms
 %.dat : %.mac
 	UCGretina $*.mac 2>&1 | tee $*.log
+ifeq ($(G4MULTITHREADED), 1)
+	./concat.sh $* 2>&1   | tee -a $*.log
+endif
 
 %_histos.root : %.dat
 	grutinizer gvalues.val -qH $*.dat -o /dev/null \

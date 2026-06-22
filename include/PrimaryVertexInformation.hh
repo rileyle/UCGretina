@@ -30,6 +30,7 @@ public:
   void SetExitTime(G4double t){ fExitTime = t; }
   void SetFilterCode(G4int c){ffiltercode = c;}
   void SetWriteEvent(G4bool b){fwrite = b;}
+  void SetReactionDepthZ(G4double z){ fReactionDepthZ = z; fHasReactionDepthZ = true; }
 
   G4double GetEmittedGammaEnergy(G4int i){ return fEmittedGammaEnergies[i]; }
   G4double GetEmittedGammaPosX(G4int i){ return fEmittedGammaPosX[i]; }
@@ -53,6 +54,8 @@ public:
   G4double GetExitTime(){ return fExitTime; }
   G4int    GetFilterCode(){return ffiltercode;}
   G4bool   WriteEvent(){return fwrite;}
+  G4bool   HasReactionDepthZ(){return fHasReactionDepthZ;}
+  G4double GetReactionDepthZ(){return fReactionDepthZ;}
 
 private:
 
@@ -79,6 +82,8 @@ private:
   G4double fExitTime;
   G4int    ffiltercode;
   G4bool   fwrite;
+  G4bool   fHasReactionDepthZ;
+  G4double fReactionDepthZ;
 };
 
 #endif

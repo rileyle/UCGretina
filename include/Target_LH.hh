@@ -71,7 +71,9 @@ class Target
   G4double GetTargetCellDz(){return TargetDz;}
   G4ThreeVector* GetPos(){return Pos;}
 
-private:
+ private:
+  void BuildSourceFrame();
+
   G4String targetCellType;
 
   bool buildSled;
@@ -219,4 +221,3 @@ private:
 };
 
 #endif
-

@@ -174,7 +174,8 @@ class Gretina_Array
   //////////////////////////////////////////
   public:
     void SetCryostats(G4bool stat){cryostatStatus = stat;};
-
+    
+  
   private:
     G4ThreeVector               cryostatPos0;
     G4ThreeVector               cryostatPos;
@@ -332,6 +333,9 @@ public:
   //////////////// inline "get" methods
   ///////////////////////////////////////////
   public:
+    inline std::vector<CpolyhPoints>   GetPgons     () { return pgons;}; 
+  
+  public:
     inline G4double              GetThetaShift      () { return thetaShift;  };
     inline G4double              GetPhiShift        () { return phiShift;    };
     
@@ -344,6 +348,7 @@ public:
   public:
     inline G4bool                GetDrawReadOut     () { return drawReadOut; };
     inline G4bool                GetReadOut         () { return readOut; };
+    inline G4bool                GetMakeCapsule     () { return makeCapsule; };
 };
 
 #include "G4UImessenger.hh"

@@ -6,6 +6,9 @@ all: s44_1329_histos.root
 %.dat : %.mac
 	UCGretina_LH $*_cache.mac 2>&1 | tee $*_cache.log
 	UCGretina_LH $*.mac 2>&1 | tee $*.log
+ifeq ($(G4MULTITHREADED), 1)
+	./concat.sh $* 2>&1   | tee -a $*.log
+endif
 
 %_histos.root : %.dat
 	grutinizer gvalues.val -qH $*.dat -o /dev/null \
@@ -14,4 +17,4 @@ all: s44_1329_histos.root
 	rm $*.dat
 
 clean:
-	rm -f *.log *.root *.dat *.cache
+	rm -f *.log *.dat *.root *.cache
