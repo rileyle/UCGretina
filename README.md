@@ -4,7 +4,7 @@ Cite: [L.A.Riley, D.Weisshaar, H.L.Crawford et al., UCGretina GEANT4 simulation 
 
 ## Compile and Install ##
 
-Install version [Geant4-10.7.4 of the Geant4 libraries](https://geant4.web.cern.ch/download/all). You will need the data files for low energy electromagnetic processes, photon evaporation, and radioactive decay.
+Install version [Geant4-10.7.4 of the Geant4 libraries](https://geant4.web.cern.ch/download/10.7.4.html). You will need the data files for low energy electromagnetic processes, photon evaporation, and radioactive decay.
 
 The model of the GRETINA scanning table uses version 2.0.3 of the external [CADMesh](https://github.com/christopherpoole/cadmesh) package. 
 
@@ -33,8 +33,7 @@ To include nuclear polarization (alignment) of the reaction product in the `Reac
 
     $ make POL=1
 
-(produces the binary `UCGretina_Pol`)
-Implementation and validation of this capability is described here: [C. Morse, H. L. Crawford, A. O. Macchiavelli et al., The polarization sensitivity of GRETINA, Nucl. Instr. Meth. A1025, 166155 (2022)](https://doi.org/10.1016/j.nima.2021.166155)
+This clag can be combined with the `LHTARGET` or the `SCANNING` flag. (produces the binary `UCGretina_Pol` or `UCGretina_LH_Pol` or `UCGretina_Scan_Pol`.) Implementation and validation of this capability is described here: [C. Morse, H. L. Crawford, A. O. Macchiavelli et al., The polarization sensitivity of GRETINA, Nucl. Instr. Meth. A1025, 166155 (2022)](https://doi.org/10.1016/j.nima.2021.166155)
 
 To activate neutron-related processes in the physics list (required for the `neutron` source type:
 
@@ -47,6 +46,12 @@ Executables are automatically installed in
     $G4WORKDIR/bin/$G4SYSTEM
 
 (which is added to your path when you source `geant4make.sh`)
+
+## Multithreading ##
+
+(Implemented by Daniel E.M. Hoff.)
+
+If the geant4.10 toolkit is compiled with multithreading support enabled, the `$G4MULTITHREADED` environment variable is set, and the number of events specified by `/run/beamOn` macro-file command will be divided among a number of threads determined by `G4Threading::G4GetNumberOfCores()`.
 
 ## Examples ##
 
@@ -640,7 +645,7 @@ In-beam simulations involving very thick (tens of mm) targets are significantly 
 
 > (Mandatory) Set name of the cache file to be generated. Trajectories of the beam-like reaction products in the target and S800 data are written to this file.
 
-> *Note: Sometimes events are killed before the reaction product leaves the target (if, for example the reaction product stops in the target frame). When this happens when generating a cache file, the event does not produce an entry in the cache file. The cache file header will not reflect these lost events, and it is necessary to simulate a larger number events than is needed in the cache file to compensate.*
+> *Notes: (a) Sometimes events are killed before the reaction product leaves the target (if, for example the reaction product stops in the target frame). When this happens when generating a cache file, the event does not produce an entry in the cache file. The cache file header will not reflect these lost events, and it is necessary to simulate a larger number events than is needed in the cache file to compensate. (b) When used with multithreading enabled, a separate cache file is written/read by each thread.*
 
 ### Cache Simulations ###
 
