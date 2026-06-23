@@ -15,6 +15,7 @@
 #include "G4TessellatedSolid.hh"
 #include "G4TriangularFacet.hh"
 #include "G4QuadrangularFacet.hh"
+#include "G4AssemblyVolume.hh"
 #include "G4Material.hh"
 #include "G4Sphere.hh"
 #include "G4LogicalVolume.hh"
@@ -61,6 +62,12 @@ private:
   G4RotationMatrix Rot0;
   G4ThreeVector    PosSP[10];
   G4double         ModuleEuler[30][3];
+  G4double         MPosLTriple[8][3];
+  G4double         MPosLDouble[8][3];
+  G4double         MPosRTriple[8][3];
+  G4double         MPosRDouble[8][3];
+  G4double         MPosHexHole[4][3];
+  G4double         MPosTripletHole[4][3];
   G4int            SmallPortStatus[10];
   G4int            ModulePortStatus[30];
 
@@ -69,7 +76,7 @@ public:
     void   setNorthOffset(G4double off){northOffset = off;}
     void   setSouthOffset(G4double off){southOffset = off;}
     void   Placement(G4String);
-    G4SubtractionSolid*   Shell();
+    G4SubtractionSolid*   Shell(G4String);
     void Test();
 };
 
