@@ -24,16 +24,16 @@ Greta_Shell::Greta_Shell()
   PosSP[8] = G4ThreeVector( 484.135*mm, -172.202*mm, -256.924*mm);
   PosSP[9] = G4ThreeVector( 492.891*mm,  145.253*mm,  256.924*mm);
 
-  // North: -1,  Split: 0,  South: 1, Omit: 2
-  SmallPortStatus[0] =  2;
+  // North (Left): -1,  Split: 0,  South (Right): 1, Omit: 2
+  SmallPortStatus[0] =  1;
   SmallPortStatus[1] =  1;
-  SmallPortStatus[2] =  1;
+  SmallPortStatus[2] =  2;
   SmallPortStatus[3] =  2;
   SmallPortStatus[4] =  0;
   SmallPortStatus[5] =  0;
-  SmallPortStatus[6] =  2;
+  SmallPortStatus[6] = -1;
   SmallPortStatus[7] = -1;
-  SmallPortStatus[8] = -1;
+  SmallPortStatus[8] =  2;
   SmallPortStatus[9] =  2;
   //Module LTriple positions
   /*
@@ -258,7 +258,7 @@ Greta_Shell::Greta_Shell()
   ModuleEuler[29][1] =  148.282526*deg;
   ModuleEuler[29][2] =  -90.000000*deg;
 
-  // North: -1,  Split: 0,  South: 1
+  // North (Left): -1,  Split: 0,  South (Right): 1
   ModulePortStatus[0]  = -1;
   ModulePortStatus[1]  = -1;
   ModulePortStatus[2]  = 0;
@@ -357,20 +357,20 @@ void Greta_Shell::Placement(G4String status)
    G4cout << "  Shell material: " << matShell->GetName() << G4endl;
 
 }
-//Forms and places a Greta Shell piece
+//Forms and places the Greta Shell pieces
 void Greta_Shell::Test()
 {
    G4RunManager* runManager = G4RunManager::GetRunManager();
    DetectorConstruction* theDetector = (DetectorConstruction*) runManager->GetUserDetectorConstruction();
    G4SubtractionSolid* shellL = Shell("LEFT");
    G4SubtractionSolid* shellR = Shell("RIGHT");
-   //G4LogicalVolume* logicShell = new G4LogicalVolume(shell, matShell, "Shell_log", 0, 0, 0 );
-   //new G4PVPlacement(0, G4ThreeVector(0,0,0), "MountingShell", logicShell, theDetector->HallPhys(), false, 0 );
    G4double halfheight = 1300/4*mm;
    G4double halfside = 230*mm;
    G4double innercut = 751*mm;
    G4ThreeVector NoShiftR = G4ThreeVector(0, 0, 0);
-   G4RotationMatrix NoRotR = G4RotationMatrix::IDENTITY;;
+   G4RotationMatrix NoRotR = G4RotationMatrix::IDENTITY;
+   
+   //HexHole polygon
    std::vector<G4TwoVector> polygon1(6);
    G4ThreeVector TarPosGlb = G4ThreeVector(0, 0, halfheight);
    G4RotationMatrix RotShellGlb = G4RotationMatrix::IDENTITY;
@@ -381,6 +381,8 @@ void Greta_Shell::Test()
    polygon1[4] = G4TwoVector(halfside,-halfside);
    polygon1[5] = G4TwoVector(-halfside,-halfside);
    G4ExtrudedSolid* solidTarget1 = new G4ExtrudedSolid("solidTarget1",  polygon1, halfheight, G4TwoVector(0, 0), 0.00001, G4TwoVector(0, 0), 1);
+
+   //TripletHole polygon
    std::vector<G4TwoVector> polygon2(6);
    polygon2[0] = G4TwoVector(MPosTripletHole[0][0],MPosTripletHole[0][1]);
    polygon2[1] = G4TwoVector(MPosTripletHole[1][0],MPosTripletHole[1][1]);
@@ -389,7 +391,8 @@ void Greta_Shell::Test()
    polygon2[4] = G4TwoVector((1300/2*mm)*tan(31.717*degree),-halfside);
    polygon2[5] = G4TwoVector(-halfside,-halfside);
    G4ExtrudedSolid* solidTarget2 = new G4ExtrudedSolid("solidTarget2",  polygon2, halfheight, G4TwoVector(0, 0), 0.00001, G4TwoVector(0, 0), 1);
- 
+
+   //HexHole for Hole 10
    G4ThreeVector TarPos10 = G4ThreeVector(0, 0, halfheight);
    TarPos10.rotateZ(ModuleEuler[9][0]);
    TarPos10.rotateY(ModuleEuler[9][1]);
@@ -404,6 +407,7 @@ void Greta_Shell::Test()
    G4IntersectionSolid* bump10 = new G4IntersectionSolid("bump10",shellL, solidTarget1, G4Transform3D(RotShell10, TarPos10));
    G4LogicalVolume* logicbump10 = new G4LogicalVolume(bump10, matShell, "Shell_log", 0, 0, 0 );
 
+   //TripletHole for Hole 30
    G4ThreeVector TarPos30 = G4ThreeVector(0, 0, halfheight);
    TarPos30.rotateZ(ModuleEuler[29][0]);
    TarPos30.rotateY(ModuleEuler[29][1]);
@@ -419,7 +423,8 @@ void Greta_Shell::Test()
    G4IntersectionSolid* bump30 = new G4IntersectionSolid("bump30",cutout10, solidTarget2, G4Transform3D(RotShell30, TarPos30));
    G4LogicalVolume* logicbump30 = new G4LogicalVolume(bump30, matShell, "Shell_log", 0, 0, 0 );
    G4LogicalVolume* logicCutout30 = new G4LogicalVolume(cutout30, matShell, "Shell_log", 0, 0, 0 );
-   
+
+   //HexHole for Hole 23
    G4ThreeVector TarPos23 = G4ThreeVector(0, 0, halfheight);
    TarPos23.rotateZ(ModuleEuler[22][0]);
    TarPos23.rotateY(ModuleEuler[22][1]);
@@ -434,7 +439,8 @@ void Greta_Shell::Test()
    // Goes with the Left hemisphere.
    G4IntersectionSolid* bump23 = new G4IntersectionSolid("bump23", shellR, solidTarget1, G4Transform3D(RotShell23, TarPos23));
    G4LogicalVolume* logicbump23 = new G4LogicalVolume(bump23, matShell, "Shell_log", 0, 0, 0 );
-   
+
+   //TripletHole for Hole 3
    G4ThreeVector TarPos3 = G4ThreeVector(0, 0, halfheight);
    TarPos3.rotateZ(ModuleEuler[2][0]);
    TarPos3.rotateY(ModuleEuler[2][1]);
@@ -453,7 +459,8 @@ void Greta_Shell::Test()
    
    G4ThreeVector NoShiftL = G4ThreeVector(0, 0, 0);
    G4RotationMatrix NoRotL = G4RotationMatrix::IDENTITY;
-   
+
+   //InnerPentaCut polygon
    std::vector<G4TwoVector> polygon3(5);
    polygon3[0] = G4TwoVector(innercut*sin(ModuleEuler[2][1])*cos(ModuleEuler[2][2]),innercut*sin(ModuleEuler[2][1])*sin(ModuleEuler[2][2]));
    polygon3[1] = G4TwoVector(innercut*sin(ModuleEuler[1][1])*cos(ModuleEuler[1][2]),innercut*sin(ModuleEuler[1][1])*sin(ModuleEuler[1][2]));
@@ -468,9 +475,11 @@ void Greta_Shell::Test()
    RotCut.rotateZ(36*degree);
    RotCut.rotateY(180*degree);
    G4SubtractionSolid* DualPentaCut = new G4SubtractionSolid("DualPentaCut", CutPenta, PentaCut, G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
-  G4SubtractionSolid* DualPentaCut2 = new G4SubtractionSolid("DualPentaCut2", CutPenta2, PentaCut, G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
+   G4SubtractionSolid* DualPentaCut2 = new G4SubtractionSolid("DualPentaCut2", CutPenta2, PentaCut, G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
    G4LogicalVolume* logicDualPenta = new G4LogicalVolume(DualPentaCut, matShell, "Shell_log", 0, 0, 0 );
    G4LogicalVolume* logicDualPenta2 = new G4LogicalVolume(DualPentaCut2, matShell, "Shell_log", 0, 0, 0 );
+   
+   //Place Left or Right Hemisphere with full cutouts and bumpouts
    G4AssemblyVolume* LeftHemi = new G4AssemblyVolume();
    LeftHemi->AddPlacedVolume(logicDualPenta2, NoShiftL, &NoRotL);
    LeftHemi->AddPlacedVolume(logicbump23, NoShiftL, &NoRotL);
@@ -484,7 +493,7 @@ void Greta_Shell::Test()
    RightHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
    */
 }
-//Creates and returns the full Greta shell sphere
+//Creates and returns the full or partial Greta shell sphere
 G4SubtractionSolid* Greta_Shell::Shell(G4String half)
 {
   G4double Phi0=0;
