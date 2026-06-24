@@ -75,7 +75,7 @@ public:
     G4int  FindMaterials();
     void   setNorthOffset(G4double off){northOffset = off;}
     void   setSouthOffset(G4double off){southOffset = off;}
-    void   Placement(G4String);
+    void   Placement(G4String, G4boolean, G4boolean);
     G4SubtractionSolid*   Shell(G4String);
     void Test();
 };
