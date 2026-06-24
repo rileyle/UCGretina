@@ -1,11 +1,10 @@
 #include "EventAction.hh"
 #include "RunAction.hh"
 
+
 #include <string>
 
 #include "G4Timer.hh"
-extern G4Timer Timerintern;
-
 #include "G4AutoLock.hh"
 
 namespace{
@@ -40,7 +39,6 @@ EventAction::EventAction()
   evt = NULL;
   fisInBeam = false;
   timeSort = false;
-  Timerintern.Start();
   timerCount = 0;
   eventsPerSecond = 0;
   everyNevents = 1000;
@@ -110,19 +108,32 @@ void EventAction::EndOfEventAction(const G4Event* ev)
 
   G4int event_id=evt->GetEventID();
 
-  if(event_id%everyNevents == 0 && event_id > 0) {
+  //Geant4 does not complete events in order on MT
+  //We need thread-safe atomic<int> to keep track of completed events
+  const G4int completed =
+    stopwatch->completedEvents.fetch_add(1, std::memory_order_relaxed) + 1;
+
+
+  if(completed%everyNevents == 0 && event_id > 0) {
 
     G4AutoLock lock(&outputMutex);
     
     std::ios::fmtflags f( G4cout.flags() );
     G4int prec = G4cout.precision();
 
-    Timerintern.Stop();
-    timerCount++;
-    eventsPerSecond += 
-      ((double)everyNevents/Timerintern.GetRealElapsed() 
-       - eventsPerSecond)/timerCount;
-    G4cout << std::fixed << std::setprecision(0) << std::setw(3) 
+    G4Timer* Timerintern = stopwatch->Timer;
+    
+    Timerintern->Stop();
+
+    G4double realtime = Timerintern->GetRealElapsed();
+
+    if(realtime>0){
+      stopwatch->timerCount = stopwatch->timerCount + 1;
+      stopwatch->rate += everyNevents/realtime;
+      eventsPerSecond = stopwatch->rate/double(stopwatch->timerCount);
+    }
+    
+    std::cout << std::fixed << std::setprecision(0) << std::setw(4) 
 	   << std::setfill(' ')
 	   << (float)event_id/NTotalEvents*100 << " %   "
 	   << eventsPerSecond << " events/s ";
@@ -131,29 +142,29 @@ void EventAction::EndOfEventAction(const G4Event* ev)
     G4double time = (float)(NTotalEvents - event_id)/eventsPerSecond;
     hours = floor(time/3600.0);
     if(hours>0){
-      G4cout << std::setprecision(0) << std::setw(2) 
+      std::cout << std::setprecision(0) << std::setw(2) 
 	     << hours << ":";
-      G4cout << std::setfill('0');
+      std::cout << std::setfill('0');
     } else {
-      G4cout << std::setfill(' ');
+      std::cout << std::setfill(' ');
     }
     minutes = floor(fmod(time,3600.0)/60.0);
     if(minutes>0){
-      G4cout << std::setprecision(0) << std::setw(2) << minutes << ":";
-      G4cout << std::setfill('0');
+      std::cout << std::setprecision(0) << std::setw(2) << minutes << ":";
+      std::cout << std::setfill('0');
     } else {
-      G4cout << std::setfill(' ');
+      std::cout << std::setfill(' ');
     }
     seconds = fmod(time,60.0);
     if(seconds>0)
-      G4cout << std::setprecision(0) << std::setw(2) << seconds;
-    G4cout << std::setfill(' ');
-    G4cout << " remaining       "
+      std::cout << std::setprecision(0) << std::setw(2) << seconds;
+    std::cout << std::setfill(' ');
+    std::cout << " remaining       "
 	   << "\r"<<std::flush;
-    Timerintern.Start();
+    Timerintern->Start();
 
-    G4cout.setf( f );
-    G4cout.precision( prec );
+    std::cout.setf( f );
+    std::cout.precision( prec );
 
   }
   

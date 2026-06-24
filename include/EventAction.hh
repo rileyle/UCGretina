@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "G4Threading.hh"
+#include "Stopwatch.hh"
 
 class EventAction : public G4UserEventAction
 {
@@ -102,6 +103,7 @@ class EventAction : public G4UserEventAction
     void SetPosRes(G4double res){posRes = res;}
     void SetThreshE(G4double e){threshE = e;}
     void SetThreshDE(G4double de){threshDE = de;}
+    void SetStopwatch(Stopwatch* sp){stopwatch = sp;}
   
   private:
     G4String threadSuffix(const G4String& baseName) const;
@@ -156,6 +158,8 @@ class EventAction : public G4UserEventAction
     G4double posRes;
     G4double threshE;
     G4double threshDE;
+
+    Stopwatch* stopwatch;
   
     G4int timerCount;
     G4int everyNevents;

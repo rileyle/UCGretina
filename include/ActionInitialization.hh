@@ -2,6 +2,7 @@
 #define ActionInitialization_h 1
 
 #include "G4VUserActionInitialization.hh"
+#include "Stopwatch.hh"
 
 class DetectorConstruction;
 class Incoming_Beam;
@@ -14,7 +15,7 @@ public:
                        Incoming_Beam* beamIn,
                        Outgoing_Beam* beamOut,
                        bool enableStepping);
-  ~ActionInitialization() override = default;
+  ~ActionInitialization() override {delete stopwatch.Timer;}
 
   void BuildForMaster() const override;
   void Build() const override;
@@ -24,6 +25,8 @@ private:
   Incoming_Beam* fBeamIn;
   Outgoing_Beam* fBeamOut;
   bool fEnableStepping;
+
+  mutable Stopwatch stopwatch;
 };
 
 #endif

@@ -16,20 +16,24 @@ ActionInitialization::ActionInitialization(DetectorConstruction* detector,
                                            Incoming_Beam* beamIn,
                                            Outgoing_Beam* beamOut,
                                            bool enableStepping)
-  : fDetector(detector), fBeamIn(beamIn), fBeamOut(beamOut), fEnableStepping(enableStepping) {}
+  : fDetector(detector), fBeamIn(beamIn), fBeamOut(beamOut), fEnableStepping(enableStepping){
+  stopwatch.Timer = new G4Timer();
+}
 
 void ActionInitialization::BuildForMaster() const {
   // Master does not process events; keep it minimal.
   G4cout << "Building Master" << G4endl;
   auto* eventAction = new EventAction();
   SetUserAction(new RunAction(fDetector, fBeamIn, eventAction));
+  stopwatch.Timer->Start();
 }
 
 void ActionInitialization::Build() const {
   auto* eventAction = new EventAction();
   SetUserAction(eventAction);
   (void)new EventAction_Messenger(eventAction);
-
+  eventAction->SetStopwatch(&stopwatch);
+  
   auto* generatorAction = new PrimaryGeneratorAction(fDetector, fBeamIn, fBeamOut);
   SetUserAction(generatorAction);
   (void)new PrimaryGeneratorAction_Messenger(generatorAction);
