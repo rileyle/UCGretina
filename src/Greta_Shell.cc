@@ -9,8 +9,8 @@ Greta_Shell::Greta_Shell()
 
   smallPortRadius  = 7.0/2.0*2.54*cm;   // DETAIL C, SHEET2
   modulePortRadius = 12.008/2.0*2.54*cm; // DETAIL A, SHEET2
-  northOffset      = 0.;
-  southOffset      = 0.;
+  leftOffset       = 0.;
+  rightOffset      = 0.;
 
   // Small port positions
   PosSP[0] = G4ThreeVector(-492.891*mm, -145.253*mm, -256.924*mm);
@@ -332,270 +332,325 @@ G4int Greta_Shell::FindMaterials()
 }
 
 
-void Greta_Shell::Placement(G4String ShellStatus,G4boolean ForwardShellStatus, G4boolean BackwardShellStatus)
+void Greta_Shell::Placement(G4String shellStatus,
+			    G4bool forwardShellStatus,
+			    G4bool backwardShellStatus)
 {
-  if (ShellStatus != "full" && 
-       status != "GretaLH" &&
-       status != "left" && 
-       status != "right" &&
-       status != "GretaLH_North" && 
-       status != "GretaLH_South"){
-    G4cout << "Shell status " << status << " is not defined." << G4endl;
+
+  G4cout << "**********"
+	 << shellStatus << ", " << forwardShellStatus << ", "
+	 << backwardShellStatus << G4endl;
+  if ( shellStatus != "full" && 
+       shellStatus != "left" && 
+       shellStatus != "right" ){
+    G4cout << "GRETA Shell status " << shellStatus << " is not defined."
+	   << G4endl;
     return;
   }
+
   G4RunManager* runManager = G4RunManager::GetRunManager();
-   DetectorConstruction* theDetector = (DetectorConstruction*) runManager->GetUserDetectorConstruction();
-   if(ShellStatus != "full"){
-     G4SubtractionSolid* shellL = Shell("LEFT");
-     G4SubtractionSolid* shellL = Shell("RIGHT");
-   }
-   else if(ShellStatus == "full"){
-     G4SubtractionSolid* shellF = Shell("FULL");
-   }
-   if(ShellStatus == "left" || ShellStatus == "right") {
-     G4double halfheight = 1300/4*mm;
-     G4double halfside = 230*mm;
-     G4double innercut = 751*mm;
-     G4ThreeVector NoShiftR = G4ThreeVector(0, 0, 0);
-     G4RotationMatrix NoRotR = G4RotationMatrix::IDENTITY;
+  DetectorConstruction* theDetector = (DetectorConstruction*) runManager->GetUserDetectorConstruction();
+
+  G4SubtractionSolid *shellL, *shellR, *shellF;
+  
+  if(shellStatus != "full"){
+    shellL = Shell("LEFT");
+    shellR = Shell("RIGHT");
+  }
+  else if(shellStatus == "full"){
+    shellF = Shell("FULL");
+  }
+  
+  G4double halfheight = 1300/4*mm;
+  G4double halfside = 230*mm;
+  G4double innercut = 751*mm;
+  G4ThreeVector NoShiftR = G4ThreeVector(0, 0, 0);
+  G4RotationMatrix NoRotR = G4RotationMatrix::IDENTITY;
+
+  //LR  if(shellStatus == "left" || shellStatus == "right") {
    
-     //HexHole polygon
-     std::vector<G4TwoVector> polygon1(6);
-     G4ThreeVector TarPosGlb = G4ThreeVector(0, 0, halfheight);
-     G4RotationMatrix RotShellGlb = G4RotationMatrix::IDENTITY;
-     polygon1[0] = G4TwoVector(MPosHexHole[0][0],MPosHexHole[0][1]);
-     polygon1[1] = G4TwoVector(MPosHexHole[1][0],MPosHexHole[1][1]);
-     polygon1[2] = G4TwoVector(MPosHexHole[2][0],MPosHexHole[2][1]);
-     polygon1[3] = G4TwoVector(MPosHexHole[3][0],MPosHexHole[3][1]);
-     polygon1[4] = G4TwoVector(halfside,-halfside);
-     polygon1[5] = G4TwoVector(-halfside,-halfside);
-     G4ExtrudedSolid* solidTarget1 = new G4ExtrudedSolid("solidTarget1",  polygon1, halfheight, G4TwoVector(0, 0), 0.00001, G4TwoVector(0, 0), 1);
+    //HexHole polygon
+    std::vector<G4TwoVector> polygon1(6);
+    G4ThreeVector TarPosGlb = G4ThreeVector(0, 0, halfheight);
+    G4RotationMatrix RotShellGlb = G4RotationMatrix::IDENTITY;
+    polygon1[0] = G4TwoVector(MPosHexHole[0][0],MPosHexHole[0][1]);
+    polygon1[1] = G4TwoVector(MPosHexHole[1][0],MPosHexHole[1][1]);
+    polygon1[2] = G4TwoVector(MPosHexHole[2][0],MPosHexHole[2][1]);
+    polygon1[3] = G4TwoVector(MPosHexHole[3][0],MPosHexHole[3][1]);
+    polygon1[4] = G4TwoVector(halfside,-halfside);
+    polygon1[5] = G4TwoVector(-halfside,-halfside);
+    G4ExtrudedSolid* solidTarget1 = new G4ExtrudedSolid("solidTarget1",  polygon1, halfheight, G4TwoVector(0, 0), 0.00001, G4TwoVector(0, 0), 1);
 
-     //TripletHole polygon
-     std::vector<G4TwoVector> polygon2(6);
-     polygon2[0] = G4TwoVector(MPosTripletHole[0][0],MPosTripletHole[0][1]);
-     polygon2[1] = G4TwoVector(MPosTripletHole[1][0],MPosTripletHole[1][1]);
-     polygon2[2] = G4TwoVector(MPosTripletHole[2][0],MPosTripletHole[2][1]);
-     polygon2[3] = G4TwoVector(MPosTripletHole[3][0],MPosTripletHole[3][1]);
-     polygon2[4] = G4TwoVector((1300/2*mm)*tan(31.717*degree),-halfside);
-     polygon2[5] = G4TwoVector(-halfside,-halfside);
-     G4ExtrudedSolid* solidTarget2 = new G4ExtrudedSolid("solidTarget2",  polygon2, halfheight, G4TwoVector(0, 0), 0.00001, G4TwoVector(0, 0), 1);
+    //TripletHole polygon
+    std::vector<G4TwoVector> polygon2(6);
+    polygon2[0] = G4TwoVector(MPosTripletHole[0][0],MPosTripletHole[0][1]);
+    polygon2[1] = G4TwoVector(MPosTripletHole[1][0],MPosTripletHole[1][1]);
+    polygon2[2] = G4TwoVector(MPosTripletHole[2][0],MPosTripletHole[2][1]);
+    polygon2[3] = G4TwoVector(MPosTripletHole[3][0],MPosTripletHole[3][1]);
+    polygon2[4] = G4TwoVector((1300/2*mm)*tan(31.717*degree),-halfside);
+    polygon2[5] = G4TwoVector(-halfside,-halfside);
+    G4ExtrudedSolid* solidTarget2 = new G4ExtrudedSolid("solidTarget2",  polygon2, halfheight, G4TwoVector(0, 0), 0.00001, G4TwoVector(0, 0), 1);
 
-     //HexHole for Hole 10
-     G4ThreeVector TarPos10 = G4ThreeVector(0, 0, halfheight);
-     TarPos10.rotateZ(ModuleEuler[9][0]);
-     TarPos10.rotateY(ModuleEuler[9][1]);
-     TarPos10.rotateZ(ModuleEuler[9][2]);
-     G4RotationMatrix RotShell10 = G4RotationMatrix::IDENTITY;
-     RotShell10.rotateZ( 0*degree );
-     RotShell10.rotateY( TarPos10.getTheta() );
-     RotShell10.rotateZ( TarPos10.getPhi() );
-     G4SubtractionSolid* cutout10 = new G4SubtractionSolid("cutout10", shellL, solidTarget1, G4Transform3D(RotShell10, TarPos10));
+    //HexHole for Hole 10
+    G4ThreeVector TarPos10 = G4ThreeVector(0, 0, halfheight);
+    TarPos10.rotateZ(ModuleEuler[9][0]);
+    TarPos10.rotateY(ModuleEuler[9][1]);
+    TarPos10.rotateZ(ModuleEuler[9][2]);
+    G4RotationMatrix RotShell10 = G4RotationMatrix::IDENTITY;
+    RotShell10.rotateZ( 0*degree );
+    RotShell10.rotateY( TarPos10.getTheta() );
+    RotShell10.rotateZ( TarPos10.getPhi() );
+    G4SubtractionSolid* cutout10 = new G4SubtractionSolid("cutout10", shellL, solidTarget1, G4Transform3D(RotShell10, TarPos10));
 
-     // Goes with the Right "hemisphere"
-     G4IntersectionSolid* bump10 = new G4IntersectionSolid("bump10",shellL, solidTarget1, G4Transform3D(RotShell10, TarPos10));
-     G4LogicalVolume* logicbump10 = new G4LogicalVolume(bump10, matShell, "Shell_log", 0, 0, 0 );
+    // Goes with the Right "hemisphere"
+    G4IntersectionSolid* bump10 = new G4IntersectionSolid("bump10",shellL, solidTarget1, G4Transform3D(RotShell10, TarPos10));
+    G4LogicalVolume* logicbump10 = new G4LogicalVolume(bump10, matShell, "Shell_log", 0, 0, 0 );
 
-     //TripletHole for Hole 30
-     G4ThreeVector TarPos30 = G4ThreeVector(0, 0, halfheight);
-     TarPos30.rotateZ(ModuleEuler[29][0]);
-     TarPos30.rotateY(ModuleEuler[29][1]);
-     TarPos30.rotateZ(ModuleEuler[29][2]);
-     G4RotationMatrix RotShell30 = G4RotationMatrix::IDENTITY;
-     RotShell30.rotateZ(0*degree );
-     RotShell30.rotateY( TarPos30.getTheta() );
-     RotShell30.rotateZ( TarPos30.getPhi() );
-     // Left hemisphere with both cutouts but not the bumpouts
-     G4SubtractionSolid* cutout30 = new G4SubtractionSolid("cutout30", cutout10, solidTarget2, G4Transform3D(RotShell30, TarPos30));
+    //TripletHole for Hole 30
+    G4ThreeVector TarPos30 = G4ThreeVector(0, 0, halfheight);
+    TarPos30.rotateZ(ModuleEuler[29][0]);
+    TarPos30.rotateY(ModuleEuler[29][1]);
+    TarPos30.rotateZ(ModuleEuler[29][2]);
+    G4RotationMatrix RotShell30 = G4RotationMatrix::IDENTITY;
+    RotShell30.rotateZ(0*degree );
+    RotShell30.rotateY( TarPos30.getTheta() );
+    RotShell30.rotateZ( TarPos30.getPhi() );
+    // Left hemisphere with both cutouts but not the bumpouts
+    G4SubtractionSolid* cutout30 = new G4SubtractionSolid("cutout30", cutout10, solidTarget2, G4Transform3D(RotShell30, TarPos30));
      
-     // Goes with the Right "hemisphere"
-     G4IntersectionSolid* bump30 = new G4IntersectionSolid("bump30",cutout10, solidTarget2, G4Transform3D(RotShell30, TarPos30));
-     G4LogicalVolume* logicbump30 = new G4LogicalVolume(bump30, matShell, "Shell_log", 0, 0, 0 );
-     G4LogicalVolume* logicCutout30 = new G4LogicalVolume(cutout30, matShell, "Shell_log", 0, 0, 0 );
-     
-     //HexHole for Hole 23
-     G4ThreeVector TarPos23 = G4ThreeVector(0, 0, halfheight);
-     TarPos23.rotateZ(ModuleEuler[22][0]);
-     TarPos23.rotateY(ModuleEuler[22][1]);
-     TarPos23.rotateZ(ModuleEuler[22][2]);
-     G4RotationMatrix RotShell23 = G4RotationMatrix::IDENTITY;
-     RotShell23.rotateZ( 0*degree );
-     RotShell23.rotateY( TarPos23.getTheta() );
-     RotShell23.rotateZ( TarPos23.getPhi() );
-     // Right hemisphere with the hole 23 cutout
-     G4SubtractionSolid* cutout23 = new G4SubtractionSolid("cutout23", shellR, solidTarget1, G4Transform3D(RotShell23, TarPos23));
+    // Goes with the Right "hemisphere"
+    G4IntersectionSolid* bump30 = new G4IntersectionSolid("bump30",cutout10, solidTarget2, G4Transform3D(RotShell30, TarPos30));
+    G4LogicalVolume* logicbump30 = new G4LogicalVolume(bump30, matShell, "Shell_log", 0, 0, 0 );
+    G4LogicalVolume* logicCutout30 = new G4LogicalVolume(cutout30, matShell, "Shell_log", 0, 0, 0 );
+    
+    //HexHole for Hole 23
+    G4ThreeVector TarPos23 = G4ThreeVector(0, 0, halfheight);
+    TarPos23.rotateZ(ModuleEuler[22][0]);
+    TarPos23.rotateY(ModuleEuler[22][1]);
+    TarPos23.rotateZ(ModuleEuler[22][2]);
+    G4RotationMatrix RotShell23 = G4RotationMatrix::IDENTITY;
+    RotShell23.rotateZ( 0*degree );
+    RotShell23.rotateY( TarPos23.getTheta() );
+    RotShell23.rotateZ( TarPos23.getPhi() );
+    // Right hemisphere with the hole 23 cutout
+    G4SubtractionSolid* cutout23 = new G4SubtractionSolid("cutout23", shellR, solidTarget1, G4Transform3D(RotShell23, TarPos23));
 
-     // Goes with the Left hemisphere.
-     G4IntersectionSolid* bump23 = new G4IntersectionSolid("bump23", shellR, solidTarget1, G4Transform3D(RotShell23, TarPos23));
-     G4LogicalVolume* logicbump23 = new G4LogicalVolume(bump23, matShell, "Shell_log", 0, 0, 0 );
-
-     //TripletHole for Hole 3
-     G4ThreeVector TarPos3 = G4ThreeVector(0, 0, halfheight);
-     TarPos3.rotateZ(ModuleEuler[2][0]);
-     TarPos3.rotateY(ModuleEuler[2][1]);
-     TarPos3.rotateZ(ModuleEuler[2][2]);
-     G4RotationMatrix RotShell3 = G4RotationMatrix::IDENTITY;
-     RotShell3.rotateZ( 0*degree );
-     RotShell3.rotateY( TarPos3.getTheta() );
-     RotShell3.rotateZ( TarPos3.getPhi() );
-     // Right hemisphere with both cutouts but not the bumpouts
-     G4SubtractionSolid* cutout3 = new G4SubtractionSolid("cutout3", cutout23, solidTarget2, G4Transform3D(RotShell3, TarPos3));
-     G4LogicalVolume* logicCutout3 = new G4LogicalVolume(cutout3, matShell, "Shell_log", 0, 0, 0 );
+    // Goes with the Left hemisphere.
+    G4IntersectionSolid* bump23 = new G4IntersectionSolid("bump23", shellR, solidTarget1, G4Transform3D(RotShell23, TarPos23));
+    G4LogicalVolume* logicbump23 = new G4LogicalVolume(bump23, matShell, "Shell_log", 0, 0, 0 );
+    
+    //TripletHole for Hole 3
+    G4ThreeVector TarPos3 = G4ThreeVector(0, 0, halfheight);
+    TarPos3.rotateZ(ModuleEuler[2][0]);
+    TarPos3.rotateY(ModuleEuler[2][1]);
+    TarPos3.rotateZ(ModuleEuler[2][2]);
+    G4RotationMatrix RotShell3 = G4RotationMatrix::IDENTITY;
+    RotShell3.rotateZ( 0*degree );
+    RotShell3.rotateY( TarPos3.getTheta() );
+    RotShell3.rotateZ( TarPos3.getPhi() );
+    // Right hemisphere with both cutouts but not the bumpouts
+    G4SubtractionSolid* cutout3 = new G4SubtractionSolid("cutout3", cutout23, solidTarget2, G4Transform3D(RotShell3, TarPos3));
+    G4LogicalVolume* logicCutout3 = new G4LogicalVolume(cutout3, matShell, "Shell_log", 0, 0, 0 );
    
-     // Goes with the Left hemisphere
-     G4IntersectionSolid* bump3 = new G4IntersectionSolid("bump3", cutout23, solidTarget2, G4Transform3D(RotShell3, TarPos3));
-     G4LogicalVolume* logicbump3 = new G4LogicalVolume(bump3, matShell, "Shell_log", 0, 0, 0 );
-   
-     G4ThreeVector NoShiftL = G4ThreeVector(0, 0, 0);
-     G4RotationMatrix NoRotL = G4RotationMatrix::IDENTITY;
-   }
-   if(!ForwardShellStatus || !BackwardShellStatus) { 
-     //InnerPentaCut polygon
-     std::vector<G4TwoVector> polygon3(5);
-     polygon3[0] = G4TwoVector(innercut*sin(ModuleEuler[2][1])*cos(ModuleEuler[2][2]),innercut*sin(ModuleEuler[2][1])*sin(ModuleEuler[2][2]));
-     polygon3[1] = G4TwoVector(innercut*sin(ModuleEuler[1][1])*cos(ModuleEuler[1][2]),innercut*sin(ModuleEuler[1][1])*sin(ModuleEuler[1][2]));
-     polygon3[2] = G4TwoVector(innercut*sin(ModuleEuler[0][1])*cos(ModuleEuler[0][2]),innercut*sin(ModuleEuler[0][1])*sin(ModuleEuler[0][2]));
-     polygon3[3] = G4TwoVector(innercut*sin(ModuleEuler[4][1])*cos(ModuleEuler[4][2]),innercut*sin(ModuleEuler[4][1])*sin(ModuleEuler[4][2]));
-     polygon3[4] = G4TwoVector(innercut*sin(ModuleEuler[3][1])*cos(ModuleEuler[3][2]),innercut*sin(ModuleEuler[3][1])*sin(ModuleEuler[3][2]));
-     G4ExtrudedSolid* PentaCut = new G4ExtrudedSolid("PentaCut",  polygon3, halfheight, G4TwoVector(0, 0), 0.00001, G4TwoVector(0, 0), 1);
-     G4LogicalVolume* logicPentaCut = new G4LogicalVolume(PentaCut, matShell, "Shell_log", 0, 0, 0 );
-     G4RotationMatrix RotCut = G4RotationMatrix::IDENTITY;
-     RotCut.rotateZ(36*degree);
-     RotCut.rotateY(180*degree);
-     if(ShellStatus == "left" && !ForwardShellStatus && BackwardShellStatus) {
-       G4SubtractionSolid* CutPentaLFo = new G4SubtractionSolid("CutPentaLFo",cutout3, PentaCut, G4Transform3D(NoRotR,G4ThreeVector(0, 0, halfheight)));
-       G4LogicalVolume* logicPentaLFo = new G4LogicalVolume(CutPentaLFo, matShell, "Shell_log", 0, 0, 0 );
+    // Goes with the Left hemisphere
+    G4IntersectionSolid* bump3 = new G4IntersectionSolid("bump3", cutout23, solidTarget2, G4Transform3D(RotShell3, TarPos3));
+    G4LogicalVolume* logicbump3 = new G4LogicalVolume(bump3, matShell, "Shell_log", 0, 0, 0 );
+    
+    G4ThreeVector NoShiftL = G4ThreeVector(0, 0, 0);
+    G4RotationMatrix NoRotL = G4RotationMatrix::IDENTITY;
+    //LR  }
+  if(!forwardShellStatus || !backwardShellStatus) {
+    G4cout << "No Forward or No Backward ring"
+	 << shellStatus << ", " << forwardShellStatus << ", "
+	 << backwardShellStatus << G4endl;
+    //InnerPentaCut polygon
+    std::vector<G4TwoVector> polygon3(5);
+    polygon3[0] = G4TwoVector(innercut*sin(ModuleEuler[2][1])*cos(ModuleEuler[2][2]),innercut*sin(ModuleEuler[2][1])*sin(ModuleEuler[2][2]));
+    polygon3[1] = G4TwoVector(innercut*sin(ModuleEuler[1][1])*cos(ModuleEuler[1][2]),innercut*sin(ModuleEuler[1][1])*sin(ModuleEuler[1][2]));
+    polygon3[2] = G4TwoVector(innercut*sin(ModuleEuler[0][1])*cos(ModuleEuler[0][2]),innercut*sin(ModuleEuler[0][1])*sin(ModuleEuler[0][2]));
+    polygon3[3] = G4TwoVector(innercut*sin(ModuleEuler[4][1])*cos(ModuleEuler[4][2]),innercut*sin(ModuleEuler[4][1])*sin(ModuleEuler[4][2]));
+    polygon3[4] = G4TwoVector(innercut*sin(ModuleEuler[3][1])*cos(ModuleEuler[3][2]),innercut*sin(ModuleEuler[3][1])*sin(ModuleEuler[3][2]));
+    G4ExtrudedSolid* PentaCut = new G4ExtrudedSolid("PentaCut",  polygon3, halfheight, G4TwoVector(0, 0), 0.00001, G4TwoVector(0, 0), 1);
+    G4LogicalVolume* logicPentaCut = new G4LogicalVolume(PentaCut, matShell, "Shell_log", 0, 0, 0 );
+    G4RotationMatrix RotCut = G4RotationMatrix::IDENTITY;
+    RotCut.rotateZ(36*degree);
+    RotCut.rotateY(180*degree);
+    if(shellStatus == "left" && !forwardShellStatus && backwardShellStatus) {
+      G4cout << "Left No Forward"
+	 << shellStatus << ", " << forwardShellStatus << ", "
+	 << backwardShellStatus << G4endl;
+      G4SubtractionSolid* CutPentaLFo = new G4SubtractionSolid("CutPentaLFo",cutout30, PentaCut, G4Transform3D(NoRotR,G4ThreeVector(0, 0, halfheight)));
+      G4LogicalVolume* logicPentaLFo = new G4LogicalVolume(CutPentaLFo, matShell, "Shell_log", 0, 0, 0 );
        
-       //Place Left Hemisphere with full cutouts, bumpouts, and no forward ring
-       G4AssemblyVolume* LeftHemi = new G4AssemblyVolume();
-       RightHemi->AddPlacedVolume(logicPentaLFo, NoShiftR, &NoRotR);
-       RightHemi->AddPlacedVolume(logicbump23, NoShiftR, &NoRotR);
-       //RightHemi->AddPlacedVolume(logicbump30, NoShiftR, &NoRotR);
-       RightHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
-     }
-     else if(ShellStatus == "left" && !BackwardShellStatus && ForwardShellStatus) {
-       G4SubtractionSolid* CutPentaLBo = new G4SubtractionSolid("CutPentaLBo",cutout30, PentaCut, G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
-       G4LogicalVolume* logicPentaLBo = new G4LogicalVolume(CutPentaLBo, matShell, "Shell_log", 0, 0, 0 );
+      //Place Left Hemisphere with full cutouts, bumpouts, and no forward ring
+      G4AssemblyVolume* LeftHemi = new G4AssemblyVolume();
+      LeftHemi->AddPlacedVolume(logicPentaLFo, NoShiftR, &NoRotR);
+      LeftHemi->AddPlacedVolume(logicbump23, NoShiftR, &NoRotR);
+      //RightHemi->AddPlacedVolume(logicbump30, NoShiftR, &NoRotR);
+      LeftHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
+    }
+    else if(shellStatus == "left" && !backwardShellStatus && forwardShellStatus){
+      G4cout << "Left No Backward"
+	 << shellStatus << ", " << forwardShellStatus << ", "
+	 << backwardShellStatus << G4endl;
+      G4SubtractionSolid* CutPentaLBo = new G4SubtractionSolid("CutPentaLBo",cutout30, PentaCut, G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
+      G4LogicalVolume* logicPentaLBo = new G4LogicalVolume(CutPentaLBo, matShell, "Shell_log", 0, 0, 0 );
        
-       //Place Left Hemisphere with full cutouts, bumpouts, and no backward ring
-       G4AssemblyVolume* LeftHemi = new G4AssemblyVolume();
-       RightHemi->AddPlacedVolume(logicPentaLBo, NoShiftR, &NoRotR);
-       RightHemi->AddPlacedVolume(logicbump23, NoShiftR, &NoRotR);
-       //RightHemi->AddPlacedVolume(logicbump30, NoShiftR, &NoRotR);
-       RightHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
-     }
-     else if(ShellStatus == "left" && !BackwardShellStatus && !ForwardShellStatus) {
-       G4SubtractionSolid* CutPentaLF = new G4SubtractionSolid("CutPentaLF", cutout3, PentaCut, G4TRansform3D(NoRotR,G4ThreeVector(0,0,halfheight)));
-       G4SubtractionSolid* DualPentaCutLFB = new G4SubtractionSolid("DualPentaCutLFB", CutPentaLF, PentaCut, G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
-       G4LogicalVolume* logicDualPentaLFB = new G4LogicalVolume(DualPentaCutLB, matShell, "Shell_log", 0, 0, 0 );
+      //Place Left Hemisphere with full cutouts, bumpouts, and no backward ring
+      G4AssemblyVolume* LeftHemi = new G4AssemblyVolume();
+      LeftHemi->AddPlacedVolume(logicPentaLBo, NoShiftR, &NoRotR);
+      LeftHemi->AddPlacedVolume(logicbump23, NoShiftR, &NoRotR);
+      //RightHemi->AddPlacedVolume(logicbump30, NoShiftR, &NoRotR);
+      LeftHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
+    }
+    else if(shellStatus == "left" && !backwardShellStatus && !forwardShellStatus) {
+      G4cout << "Left No Forward Backward"
+	 << shellStatus << ", " << forwardShellStatus << ", "
+	 << backwardShellStatus << G4endl;
+      G4SubtractionSolid* CutPentaLFB = new G4SubtractionSolid("CutPentaLF", cutout30, PentaCut, G4Transform3D(NoRotR,G4ThreeVector(0,0,halfheight)));
+      G4SubtractionSolid* DualPentaCutLFB = new G4SubtractionSolid("DualPentaCutLFB", CutPentaLFB, PentaCut, G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
+      G4LogicalVolume* logicDualPentaLFB = new G4LogicalVolume(DualPentaCutLFB, matShell, "Shell_log", 0, 0, 0 );
 
-       //Place Left Hemisphere with full cutouts, bumpouts and no forward or backward ring
-       G4AssemblyVolume* LeftHemi = new G4AssemblyVolume();
-       LeftHemi->AddPlacedVolume(logicDualPentaLFB, NoShiftL, &NoRotL);
-       LeftHemi->AddPlacedVolume(logicbump23, NoShiftL, &NoRotL);
-       //LeftHemi->AddPlacedVolume(logicbump3, NoShiftL, &NoRotL);
-       LeftHemi->MakeImprint(theDetector->HallLog(), NoShiftL, &NoRotL, 0);
-     }
-     if(ShellStatus == "right" && !ForwardShellStatus && BackwardShellStatus) {
-       G4SubtractionSolid* CutPentaRFo = new G4SubtractionSolid("CutPentaRFo",cutout3, PentaCut, G4Transform3D(NoRotR,G4ThreeVector(0, 0, halfheight)));
-       G4LogicalVolume* logicPentaRFo = new G4LogicalVolume(CutPentaRFo, matShell, "Shell_log", 0, 0, 0 );
+      //Place Left Hemisphere with full cutouts, bumpouts and no forward or backward ring
+      G4AssemblyVolume* LeftHemi = new G4AssemblyVolume();
+      LeftHemi->AddPlacedVolume(logicDualPentaLFB, NoShiftL, &NoRotL);
+      LeftHemi->AddPlacedVolume(logicbump23, NoShiftL, &NoRotL);
+      //LeftHemi->AddPlacedVolume(logicbump3, NoShiftL, &NoRotL);
+      LeftHemi->MakeImprint(theDetector->HallLog(), NoShiftL, &NoRotL, 0);
+    }
+    if(shellStatus == "right" && !forwardShellStatus && backwardShellStatus) {
+      G4cout << "Right No Forward"
+	 << shellStatus << ", " << forwardShellStatus << ", "
+	 << backwardShellStatus << G4endl;
+      G4SubtractionSolid* CutPentaRFo = new G4SubtractionSolid("CutPentaRFo",cutout3, PentaCut, G4Transform3D(NoRotR,G4ThreeVector(0, 0, halfheight)));
+      G4LogicalVolume* logicPentaRFo = new G4LogicalVolume(CutPentaRFo, matShell, "Shell_log", 0, 0, 0 );
        
-       //Place Right Hemisphere with full cutouts, bumpouts, and no forward ring
-       G4AssemblyVolume* RightHemi = new G4AssemblyVolume();
-       RightHemi->AddPlacedVolume(logicPentaRFo, NoShiftR, &NoRotR);
-       RightHemi->AddPlacedVolume(logicbump23, NoShiftR, &NoRotR);
-       //RightHemi->AddPlacedVolume(logicbump30, NoShiftR, &NoRotR);
-       RightHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
-     }
-     else if(ShellStatus == "right" && !BackwardShellStatus && ForwardShellStatus) {
-       G4SubtractionSolid* CutPentaRBo = new G4SubtractionSolid("CutPentaRBo",cutout30, PentaCut, G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
-       G4LogicalVolume* logicPentaRBo = new G4LogicalVolume(CutPentaRBo, matShell, "Shell_log", 0, 0, 0 );
+      //Place Right Hemisphere with full cutouts, bumpouts, and no forward ring
+      G4AssemblyVolume* RightHemi = new G4AssemblyVolume();
+      RightHemi->AddPlacedVolume(logicPentaRFo, NoShiftR, &NoRotR);
+      RightHemi->AddPlacedVolume(logicbump23, NoShiftR, &NoRotR);
+      //RightHemi->AddPlacedVolume(logicbump30, NoShiftR, &NoRotR);
+      RightHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
+    }
+    else if(shellStatus == "right" && !backwardShellStatus && forwardShellStatus) {
+      G4cout << "Right No Backward"
+	 << shellStatus << ", " << forwardShellStatus << ", "
+	 << backwardShellStatus << G4endl;
+      G4SubtractionSolid* CutPentaRFo = new G4SubtractionSolid("CutPentaRFo",cutout3, PentaCut, G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
+      G4LogicalVolume* logicPentaRFo = new G4LogicalVolume(CutPentaRFo, matShell, "Shell_log", 0, 0, 0 );
+      
+      //Place Right Hemisphere with full cutouts, bumpouts, and no backward ring
+      G4AssemblyVolume* RightHemi = new G4AssemblyVolume();
+      RightHemi->AddPlacedVolume(logicPentaRFo, NoShiftR, &NoRotR);
+      RightHemi->AddPlacedVolume(logicbump23, NoShiftR, &NoRotR);
+      //RightHemi->AddPlacedVolume(logicbump30, NoShiftR, &NoRotR);
+      RightHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
+    }
+    else if(shellStatus == "right" && !backwardShellStatus && !forwardShellStatus) {
+      G4cout << "Right No Forward Backward"
+	 << shellStatus << ", " << forwardShellStatus << ", "
+	 << backwardShellStatus << G4endl;
+      G4SubtractionSolid* CutPentaRF = new G4SubtractionSolid("CutPentaRF", cutout3, PentaCut, G4Transform3D(NoRotR,G4ThreeVector(0,0,halfheight)));
+      G4SubtractionSolid* DualPentaCutRFB = new G4SubtractionSolid("DualPentaCutRFB", CutPentaRF, PentaCut, G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
+      G4LogicalVolume* logicDualPentaRFB = new G4LogicalVolume(DualPentaCutRFB, matShell, "Shell_log", 0, 0, 0 );
+      
+      //Place Right Hemisphere with full cutouts, bumpouts, and no forward or backward ring
+      G4AssemblyVolume* RightHemi = new G4AssemblyVolume();
+      RightHemi->AddPlacedVolume(logicDualPentaRFB, NoShiftR, &NoRotR);
+      RightHemi->AddPlacedVolume(logicbump10, NoShiftR, &NoRotR);
+      //RightHemi->AddPlacedVolume(logicbump30, NoShiftR, &NoRotR);
+      RightHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
+    }
+    if(shellStatus == "full" && !forwardShellStatus && backwardShellStatus) {
+      G4cout << "Full No Forward"
+	 << shellStatus << ", " << forwardShellStatus << ", "
+	 << backwardShellStatus << G4endl;
+      G4SubtractionSolid* CutPentaFFo = new G4SubtractionSolid("CutPentaFFo",shellF, PentaCut, G4Transform3D(NoRotR,G4ThreeVector(0, 0, halfheight)));
+      G4LogicalVolume* logicPentaFFo = new G4LogicalVolume(CutPentaFFo, matShell, "Shell_log", 0, 0, 0 );
+      
+      //Place Full Shell with no forward ring
+      G4AssemblyVolume* FullNF = new G4AssemblyVolume();
+      FullNF->AddPlacedVolume(logicPentaFFo, NoShiftR, &NoRotR);
+      FullNF->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
+    }
+    else if(shellStatus == "full" && !backwardShellStatus && forwardShellStatus) {
+      G4cout << "Full No Backward"
+	 << shellStatus << ", " << forwardShellStatus << ", "
+	 << backwardShellStatus << G4endl;
+      G4SubtractionSolid* CutPentaFBo = new G4SubtractionSolid("CutPentaFBo",shellF, PentaCut, G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
+      G4LogicalVolume* logicPentaFBo = new G4LogicalVolume(CutPentaFBo, matShell, "Shell_log", 0, 0, 0 );
        
-       //Place Right Hemisphere with full cutouts, bumpouts, and no backward ring
-       G4AssemblyVolume* RightHemi = new G4AssemblyVolume();
-       RightHemi->AddPlacedVolume(logicPentaRFo, NoShiftR, &NoRotR);
-       RightHemi->AddPlacedVolume(logicbump23, NoShiftR, &NoRotR);
-       //RightHemi->AddPlacedVolume(logicbump30, NoShiftR, &NoRotR);
-       RightHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
-     }
-     else if(ShellStatus == "right" && !BackwardShellStatus && !ForwardShellStatus) {
-       G4SubtractionSolid* CutPentaRF = new G4SubtractionSolid("CutPentaRF", cutout3, PentaCut, G4TRansform3D(NoRotR,G4ThreeVector(0,0,halfheight)));
-       G4SubtractionSolid* DualPentaCutRFB = new G4SubtractionSolid("DualPentaCutRFB", CutPentaRF, PentaCut, G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
-       G4LogicalVolume* logicDualPentaRFB = new G4LogicalVolume(DualPentaCutRB, matShell, "Shell_log", 0, 0, 0 );
+      //Place Full Shell with no backward ring
+      G4AssemblyVolume* FullNB = new G4AssemblyVolume();
+      FullNB->AddPlacedVolume(logicPentaFBo, NoShiftR, &NoRotR);
+      FullNB->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
+    }
+    else if(shellStatus == "full" && !backwardShellStatus && !forwardShellStatus) {
+      G4cout << "Full No Forward Backward"
+	 << shellStatus << ", " << forwardShellStatus << ", "
+	 << backwardShellStatus << G4endl;
+      G4SubtractionSolid* CutPentaFF = new G4SubtractionSolid("CutPentaFF", shellF, PentaCut, G4Transform3D(NoRotR,G4ThreeVector(0,0,halfheight)));
+      G4SubtractionSolid* DualPentaCutFFB = new G4SubtractionSolid("DualPentaCutFFB", CutPentaFF, PentaCut, G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
+      G4LogicalVolume* logicDualPentaFFB = new G4LogicalVolume(DualPentaCutFFB, matShell, "Shell_log", 0, 0, 0 );
        
-       //Place Right Hemisphere with full cutouts, bumpouts, and no forward or backward ring
-       G4AssemblyVolume* RightHemi = new G4AssemblyVolume();
-       RightHemi->AddPlacedVolume(logicDualPentaRFB, NoShiftR, &NoRotR);
-       RightHemi->AddPlacedVolume(logicbump10, NoShiftR, &NoRotR);
-       //RightHemi->AddPlacedVolume(logicbump30, NoShiftR, &NoRotR);
-       RightHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
-     }
-     if(ShellStatus == "full" && !ForwardShellStatus && BackwardShellStatus) {
-       G4SubtractionSolid* CutPentaFFo = new G4SubtractionSolid("CutPentaFFo",shellF, PentaCut, G4Transform3D(NoRotR,G4ThreeVector(0, 0, halfheight)));
-       G4LogicalVolume* logicPentaFFo = new G4LogicalVolume(CutPentaFFo, matShell, "Shell_log", 0, 0, 0 );
-       
-       //Place Full Shell with no forward ring
-       G4AssemblyVolume* FullNF = new G4AssemblyVolume();
-       FullNF->AddPlacedVolume(logicPentaFFo, NoShiftR, &NoRotR);
-       FullNF->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
-     }
-     else if(ShellStatus == "full" && !BackwardShellStatus && ForwardShellStatus) {
-       G4SubtractionSolid* CutPentaFBo = new G4SubtractionSolid("CutPentaFBo",shellF, PentaCut, G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
-       G4LogicalVolume* logicPentaFBo = new G4LogicalVolume(CutPentaFBo, matShell, "Shell_log", 0, 0, 0 );
-       
-       //Place Full Shell with no backward ring
-       G4AssemblyVolume* FullNB = new G4AssemblyVolume();
-       FullNB->AddPlacedVolume(logicPentaFBo, NoShiftR, &NoRotR);
-       FullNB->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
-     }
-     else if(ShellStatus == "full" && !BackwardShellStatus && !ForwardShellStatus) {
-       G4SubtractionSolid* CutPentaFF = new G4SubtractionSolid("CutPentaFF", shellF, PentaCut, G4TRansform3D(NoRotR,G4ThreeVector(0,0,halfheight)));
-       G4SubtractionSolid* DualPentaCutFFB = new G4SubtractionSolid("DualPentaCutFFB", CutPentaFF, PentaCut, G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
-       G4LogicalVolume* logicDualPentaFFB = new G4LogicalVolume(DualPentaCutFFB, matShell, "Shell_log", 0, 0, 0 );
-       
-       //Place Full Shell with no forward or backward ring
-       G4AssemblyVolume* FullNFB = new G4AssemblyVolume();
-       FullNFB->AddPlacedVolume(logicDualPentaFFB, NoShiftR, &NoRotR);
-       FullNFB->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
-     }     
+      //Place Full Shell with no forward or backward ring
+      G4AssemblyVolume* FullNFB = new G4AssemblyVolume();
+      FullNFB->AddPlacedVolume(logicDualPentaFFB, NoShiftR, &NoRotR);
+      FullNFB->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
+    }     
      
-   }
-   if(ShellStatus == "full") {
-     G4LogicalVolume* logicshellF = new G4LogicalVolume(shellF, matShell, "Shell_log", 0, 0, 0 );
-     new G4Placement(0, G4ThreeVector(0, 0, halfheight), "MountingShell", logicShellF, theDetector->HallPhys(), false, 0 );
-   }
-   else if(ShellStatus == "left") {
-     G4AssemblyVolume* LeftHemi = new G4AssemblyVolume();
-     LeftHemi->AddPlacedVolume(logicCutout30, NoShiftL, &NoRotL);
-     LeftHemi->AddPlacedVolume(logicbump23, NoShiftL, &NoRotL);
-     LeftHemi->AddPlacedVolume(logicbump3, NoShiftL, &NoRotL);
-     LeftHemi->MakeImprint(theDetector->HallLog(), NoShiftL, &NoRotL, 0);
-   }
-    else if(ShellStatus == "right") {
-     G4AssemblyVolume* RightHemi = new G4AssemblyVolume();
-     LeftHemi->AddPlacedVolume(logicCutout3, NoShiftL, &NoRotL);
-     LeftHemi->AddPlacedVolume(logicbump10, NoShiftL, &NoRotL);
-     LeftHemi->AddPlacedVolume(logicbump30, NoShiftL, &NoRotL);
-     LeftHemi->MakeImprint(theDetector->HallLog(), NoShiftL, &NoRotL, 0);
-   }
+  }
+  if(shellStatus == "full" && forwardShellStatus && backwardShellStatus) {
+    G4cout << "full placed"
+	 << shellStatus << ", " << forwardShellStatus << ", "
+	 << backwardShellStatus << G4endl;
+    G4LogicalVolume* logicShellF = new G4LogicalVolume(shellF, matShell, "Shell_log", 0, 0, 0 );
+    new G4PVPlacement(0, G4ThreeVector(0, 0, 0), "MountingShell", logicShellF, theDetector->HallPhys(), false, 0 );
+  }
+  else if(shellStatus == "left" && forwardShellStatus && backwardShellStatus) {
+    G4cout << "left placed"
+	 << shellStatus << ", " << forwardShellStatus << ", "
+	 << backwardShellStatus << G4endl;
+    G4AssemblyVolume* LeftHemi = new G4AssemblyVolume();
+    LeftHemi->AddPlacedVolume(logicCutout30, NoShiftL, &NoRotL);
+    LeftHemi->AddPlacedVolume(logicbump23, NoShiftL, &NoRotL);
+    LeftHemi->AddPlacedVolume(logicbump3, NoShiftL, &NoRotL);
+    LeftHemi->MakeImprint(theDetector->HallLog(), NoShiftL, &NoRotL, 0);
+  }
+  else if(shellStatus == "right" && forwardShellStatus && backwardShellStatus) {
+    G4cout << "right placed"
+	 << shellStatus << ", " << forwardShellStatus << ", "
+	 << backwardShellStatus << G4endl;
+    G4AssemblyVolume* RightHemi = new G4AssemblyVolume();
+    RightHemi->AddPlacedVolume(logicCutout3, NoShiftL, &NoRotL);
+    RightHemi->AddPlacedVolume(logicbump10, NoShiftL, &NoRotL);
+    RightHemi->AddPlacedVolume(logicbump30, NoShiftL, &NoRotL);
+    RightHemi->MakeImprint(theDetector->HallLog(), NoShiftL, &NoRotL, 0);
+  }
+   
+  if(shellStatus == "Greta")
+    G4cout << "Constructed the GRETA mounting shell" << G4endl;
+  else if(shellStatus == "Greta_Left")
+    G4cout << "Constructed the left hemisphere of the GRETA mounting shell"
+	   << G4endl;
+  else if(shellStatus == "Greta_Right")
+    G4cout << "Constructed the right hemisphere of the GRETA mounting shell"
+	   << G4endl;
+  if(!forwardShellStatus && !backwardShellStatus)
+    G4cout << "   omitting the forward and backward rings"
+	   << G4endl;
+  else if(!forwardShellStatus)
+    G4cout << "   omitting the forward ring"
+	   << G4endl;
+  else if(!backwardShellStatus)
+    G4cout << "   omitting the backward ring"
+	   << G4endl;
+  
+  G4cout << "  Shell radius: " << Rmin << " -- " << Rmax << G4endl;
+  G4cout << "  Shell material: " << matShell->GetName() << G4endl;
+  
 }
-   
-  /*
-  if(status == "GretaLH" || status == "GretaLH_North")
-    HalfShell("LH_north");
 
-  if(status == "GretaLH" || status == "GretaLH_South")
-    HalfShell("LH_south");
-  */
-   G4cout << "Constructed the " << status << " shell." << G4endl;
-   G4cout << "  Shell radius: " << Rmin << " -- " << Rmax << G4endl;
-   G4cout << "  Shell material: " << matShell->GetName() << G4endl;
-
-}
-//Forms and places the Greta Shell pieces
-void Greta_Shell::Test()
-{
-   
 //Creates and returns the full or partial Greta shell sphere
 G4SubtractionSolid* Greta_Shell::Shell(G4String half)
 {

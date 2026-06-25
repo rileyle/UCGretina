@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
-// This class provides the GRETINA mounting shell used at the NSCL. 
-// (Lew Riley lriley@ursinus.edu) 
+// This class provides the GRETA mounting shell. 
+// (Blake McNulty) 
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef Greta_Shell_h
@@ -54,8 +54,8 @@ private:
   G4double         Rmax;
   G4double         smallPortRadius;
   G4double         modulePortRadius;
-  G4double         northOffset;
-  G4double         southOffset;
+  G4double         leftOffset;
+  G4double         rightOffset;
   G4ThreeVector    Pos;
   G4ThreeVector    Pos0;
   G4RotationMatrix Rot;
@@ -70,14 +70,16 @@ private:
   G4double         MPosTripletHole[4][3];
   G4int            SmallPortStatus[10];
   G4int            ModulePortStatus[30];
-
+  //  G4String         shellStatus;
+  //  G4bool           forwardStatus;
+  //  G4bool           backwardStatus;
+  
 public:
     G4int  FindMaterials();
-    void   setNorthOffset(G4double off){northOffset = off;}
-    void   setSouthOffset(G4double off){southOffset = off;}
-    void   Placement(G4String, G4boolean, G4boolean);
+    void   SetLeftOffset(G4double off){leftOffset = off;}
+    void   SetRightOffset(G4double off){rightOffset = off;}
+    void   Placement(G4String, G4bool, G4bool);
     G4SubtractionSolid*   Shell(G4String);
-    void Test();
 };
 
 #endif
