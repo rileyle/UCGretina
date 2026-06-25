@@ -25,10 +25,10 @@ Greta_Shell::Greta_Shell()
   PosSP[9] = G4ThreeVector( 492.891*mm,  145.253*mm,  256.924*mm);
 
   // North (Left): -1,  Split: 0,  South (Right): 1, Omit: 2
-  SmallPortStatus[0] =  1;
-  SmallPortStatus[1] =  1;
-  SmallPortStatus[2] =  2;
-  SmallPortStatus[3] =  2;
+  SmallPortStatus[0] =  2;
+  SmallPortStatus[1] =  2;
+  SmallPortStatus[2] =  1;
+  SmallPortStatus[3] =  1;
   SmallPortStatus[4] =  0;
   SmallPortStatus[5] =  0;
   SmallPortStatus[6] = -1;
