@@ -686,3 +686,24 @@ This generates a VRML 2 file named `g4_XX.wrl` which can be viewed with a VRML v
 The macro file `./vis/trajectories.mac` illustrates how to add particle trajectories to visualizations.
 
 Within mayavi2, the python scripts `./vis/mlab.animate.py` and `./vis/mlab.movie.py` can be run (File -> Run Python Script). The former animates the scene, and the latter saves the animation frames as a series of .png files which can be stitched together into an animated png or gif.
+
+## Greta Shell Commands ##
+> Create and place the full Greta Shell with forward and backward rings
+
+  /GRETA/Shell full
+  
+> Create and place the full Left Hemisphere of the Greta Shell with forward and backward rings
+
+  /GRETA/Shell left
+
+> Create and place the full Right Hemisphere of the Greta Shell with forward and backward rings
+
+  /GRETA/Shell right
+
+> Remove forward ring and all detectors associated with it
+  /GRETA/NoForward
+
+> Remove backward ring and all detectors associated with it
+  /GRETA/NoBackward
+
+The previous two commands can be used consecutively to remove both the forward and backward rings.  
