@@ -67,12 +67,9 @@ private:
   G4double         MPosRTriple[8][3];
   G4double         MPosRDouble[8][3];
   G4double         MPosHexHole[4][3];
-  G4double         MPosTripletHole[4][3];
+  G4double         MPosTripleHole[4][3];
   G4int            SmallPortStatus[10];
   G4int            ModulePortStatus[30];
-  //  G4String         shellStatus;
-  //  G4bool           forwardStatus;
-  //  G4bool           backwardStatus;
   
 public:
     G4int  FindMaterials();
