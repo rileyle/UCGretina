@@ -135,11 +135,11 @@ void EventAction::EndOfEventAction(const G4Event* ev)
     
     std::cout << std::fixed << std::setprecision(0) << std::setw(4) 
 	   << std::setfill(' ')
-	   << (float)event_id/NTotalEvents*100 << " %   "
+	   << (float)completed/NTotalEvents*100 << " %   "
 	   << eventsPerSecond << " events/s ";
 
     G4double hours, minutes, seconds;
-    G4double time = (float)(NTotalEvents - event_id)/eventsPerSecond;
+    G4double time = (float)(NTotalEvents - completed)/eventsPerSecond;
     hours = floor(time/3600.0);
     if(hours>0){
       std::cout << std::setprecision(0) << std::setw(2) 

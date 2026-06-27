@@ -25,13 +25,13 @@ void ActionInitialization::BuildForMaster() const {
   G4cout << "Building Master" << G4endl;
   auto* eventAction = new EventAction();
   SetUserAction(new RunAction(fDetector, fBeamIn, eventAction));
-  stopwatch.Timer->Start();
 }
 
 void ActionInitialization::Build() const {
   auto* eventAction = new EventAction();
   SetUserAction(eventAction);
   (void)new EventAction_Messenger(eventAction);
+  stopwatch.Timer->Start();
   eventAction->SetStopwatch(&stopwatch);
   
   auto* generatorAction = new PrimaryGeneratorAction(fDetector, fBeamIn, fBeamOut);
