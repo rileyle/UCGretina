@@ -99,11 +99,14 @@ class EventAction : public G4UserEventAction
     G4int GetNTotalevents(){return NTotalEvents;}
     void SetEveryNEvents(G4int n){everyNevents = n;}
     G4int GetEveryNEvents(){return everyNevents;}
+    G4int GetCompletedEvents(){return CompletedEvents;}
 
     void SetPosRes(G4double res){posRes = res;}
     void SetThreshE(G4double e){threshE = e;}
     void SetThreshDE(G4double de){threshDE = de;}
     void SetStopwatch(Stopwatch* sp){stopwatch = sp;}
+
+    G4String GetCacheOutputFilename(){return cacheOutputFileName;}
   
   private:
     G4String threadSuffix(const G4String& baseName) const;
@@ -155,6 +158,7 @@ class EventAction : public G4UserEventAction
     G4bool fisInBeam;
     G4bool timeSort;
     G4int NTotalEvents;
+    G4int CompletedEvents;
     G4double posRes;
     G4double threshE;
     G4double threshDE;

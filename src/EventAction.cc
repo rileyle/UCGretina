@@ -44,7 +44,9 @@ EventAction::EventAction()
   everyNevents = 1000;
   threshE = 0.;
   threshDE = 0.001*keV;
-
+  NTotalEvents = 0;
+  CompletedEvents = 0;
+  
   // Pre-size large scratch buffers used by writeDecomp(). Keeping these off the
   // stack avoids thread stack overflows (macOS worker threads have small stacks).
   fCrysIps.resize(100*MAX_INTPTS);
@@ -113,7 +115,8 @@ void EventAction::EndOfEventAction(const G4Event* ev)
   const G4int completed =
     stopwatch->completedEvents.fetch_add(1, std::memory_order_relaxed) + 1;
 
-
+  CompletedEvents++;
+  
   if(completed%everyNevents == 0 && event_id > 0) {
 
     G4AutoLock lock(&outputMutex);

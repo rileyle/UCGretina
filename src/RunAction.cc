@@ -3,6 +3,10 @@
 #include "G4Timer.hh"
 extern G4Timer Timer;
 
+#ifdef G4MULTITHREADED
+#include "G4MTRunManager.hh"
+#endif
+
 RunAction::RunAction(DetectorConstruction* detector, Incoming_Beam* BI,EventAction* ev): myDetector(detector), BeamIn(BI), evaction(ev)
 {
 
@@ -30,10 +34,13 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   if(evaction->Mode2Out())
     G4cout << " Writing Mode 2 output to " 
 	   << evaction->GetMode2FileName() << G4endl;
+  Timer.Start();
+
+  }
   if(evaction->CacheOut()){
 #ifdef CACHETEXT
     std::ofstream& cacheOutputFile = evaction->getCacheOutputFile(); 
-    G4int Nevents = run->GetNumberOfEventToBeProcessed();
+    G4int Nevents = run->GetNumberOfEventToBeProcessed(); 
     cacheOutputFile << Nevents << G4endl;
 #else
     std::FILE* cacheOutputFile = evaction->getCacheOutputFile(); 
@@ -60,16 +67,24 @@ void RunAction::BeginOfRunAction(const G4Run* run)
     }
 #endif
     G4cout << Nevents << " events in cache file." << G4endl;
-    if (Nevents < run->GetNumberOfEventToBeProcessed()){
+
+    G4int nThreads = 1;
+
+#ifdef G4MULTITHREADED
+    G4MTRunManager* runManager = G4MTRunManager::GetMasterRunManager();
+    nThreads = runManager->GetNumberOfThreads();
+#endif
+
+    G4int eventsProcessed = float(run->GetNumberOfEventToBeProcessed())/float(nThreads);
+    
+    if (Nevents < eventsProcessed){
       G4cerr << "Error: There are only " << Nevents
 	     << " events in the cache file and the user has requested "
 	     << run->GetNumberOfEventToBeProcessed() << G4endl;
       exit(EXIT_FAILURE);
     }
   }
-  Timer.Start();
 
-  }
 
   evaction->SetNTotalevents(run->GetNumberOfEventToBeProcessed());
   if(run->GetNumberOfEventToBeProcessed() > 1000000)
@@ -89,14 +104,33 @@ void RunAction::BeginOfRunAction(const G4Run* run)
 
 
  
-void RunAction::EndOfRunAction(const G4Run*)
+void RunAction::EndOfRunAction(const G4Run* run)
 {
+
+  if(evaction->CacheOut()){
+    evaction->closeCacheOutputFile(); //close it so we can reopen and rewrite header
+#ifdef CACHETEXT
+    std::fstream cacheOutputFile(evaction->GetCacheOutputFilename(), std::ion::in | std::ion::out);
+    cacheOutputFile.seekp(0, std::ios::beg); 
+    G4int Nevents = evaction->GetCompletedEvents();
+    cacheOutputFile << Nevents << G4endl;
+    cacheOutputFile.close();
+#else
+    std::FILE* cacheOutputFile = std::fopen(evaction->GetCacheOutputFilename(), "r+");
+    std::fseek(cacheOutputFile, 0, SEEK_SET);
+    G4int Nevents = evaction->GetCompletedEvents();
+    fwrite(&Nevents, sizeof(G4int), 1, cacheOutputFile);
+    std::fclose(cacheOutputFile);
+#endif
+  }
+
+  
   if(evaction->EvOut())
     evaction->closeEvfile();
   if(evaction->Mode2Out())
     evaction->closeMode2file();
-  if(evaction->CacheOut())
-    evaction->closeCacheOutputFile();
+  //if(evaction->CacheOut())
+  //  evaction->closeCacheOutputFile();
   if(evaction->CacheIn())
     evaction->closeCacheInputFile();
 
@@ -174,8 +208,9 @@ void RunAction::EndOfRunAction(const G4Run*)
     G4cout << std::setprecision(2) << std::setw(5) << seconds;
   G4cout << std::setfill(' ');
 
+  
   G4cout << "   "
-	 << evaction->GetNTotalevents()/Timer.GetRealElapsed()
+	 << run->GetNumberOfEventToBeProcessed()/Timer.GetRealElapsed()
 	 << " events/s" << G4endl;
 
   }
