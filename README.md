@@ -33,7 +33,7 @@ To include nuclear polarization (alignment) of the reaction product in the `Reac
 
     $ make POL=1
 
-This clag can be combined with the `LHTARGET` or the `SCANNING` flag. (produces the binary `UCGretina_Pol` or `UCGretina_LH_Pol` or `UCGretina_Scan_Pol`.) Implementation and validation of this capability is described here: [C. Morse, H. L. Crawford, A. O. Macchiavelli et al., The polarization sensitivity of GRETINA, Nucl. Instr. Meth. A1025, 166155 (2022)](https://doi.org/10.1016/j.nima.2021.166155)
+This flag can be combined with the `LHTARGET` or the `SCANNING` flag. (produces the binary `UCGretina_Pol` or `UCGretina_LH_Pol` or `UCGretina_Scan_Pol`.) Implementation and validation of this capability is described here: [C. Morse, H. L. Crawford, A. O. Macchiavelli et al., The polarization sensitivity of GRETINA, Nucl. Instr. Meth. A1025, 166155 (2022)](https://doi.org/10.1016/j.nima.2021.166155)
 
 To activate neutron-related processes in the physics list (required for the `neutron` source type:
 
@@ -51,7 +51,17 @@ Executables are automatically installed in
 
 (Implemented by Daniel E.M. Hoff.)
 
-If the geant4.10 toolkit is compiled with multithreading support enabled, the `$G4MULTITHREADED` environment variable is set, and the number of events specified by `/run/beamOn` macro-file command will be divided among a number of threads determined by `G4Threading::G4GetNumberOfCores()`.
+If the Geant4 toolkit is compiled with multithreading support enabled, the `$G4MULTITHREADED` environment variable is set, and the number of events specified by `/run/beamOn` macro-file command will be divided among a number of threads determined by `G4Threading::G4GetNumberOfCores()`. Events are allocated to threads in batches to allow for competition between real and virtual cores.
+
+The `G4RunManager` class provides optional macro file commands both to control the number of threads
+
+    /run/numberOfThreads <number of threads>
+	
+and to specify the number of events to allocated in each batch
+	
+    /run/eventModulo <event batch size per thread>
+	
+> This command sets the batch size. Setting the batch size to the total number of events divided by the number of threads ensures that events are distributed evenly among the threads. This is necessary for cache-file mode. Generally, it is better to omit this and let the threads compete.
 
 ## Examples ##
 
@@ -170,7 +180,7 @@ After issuing the above commands as needed to pre-configure the simulation, the 
 
 ### In-beam Simulations ###
 
-*A note about coordinates: x and y positions here are in geant4 coordinates (y up, z along the beam axis), so the y axis is aligned with the dispersive direction of the S800.*
+*A note about coordinates: x and y positions here are in Geant4 coordinates (y up, z along the beam axis), so the y axis is aligned with the dispersive direction of the S800.*
 
 Mandatory command after all `/BeamOut/` and `/BeamIn/` commands:
 
@@ -479,11 +489,11 @@ Optional commands for the scanning table:
     
     /ScanningTable/SetControllerY <double> <unit>
 
-> Set the horizontal positions of the source collimator relative to the central axis of the GRETINA module. (These positions correspond to those reported by the stepper motor controller. The controller x axis points opposite the geant4 x axis, and the controller y axis points along the geant4 z axis.) The horizontal position of the source should not be set using the usual source positioning commands (`/Experiment/Source/setX` and `/Experiment/Source/setZ`). 
+> Set the horizontal positions of the source collimator relative to the central axis of the GRETINA module. (These positions correspond to those reported by the stepper motor controller. The controller x axis points opposite the Geant4 x axis, and the controller y axis points along the Geant4 z axis.) The horizontal position of the source should not be set using the usual source positioning commands (`/Experiment/Source/setX` and `/Experiment/Source/setZ`). 
 
     /ScanningTable/SetControllerZ <double> <unit>
 
-> Set the vertical position of the slit assembly. (This position corresponds to that reported by the stepper motor controller. The controller z axis corresponds to the geant4 y axis.) 
+> Set the vertical position of the slit assembly. (This position corresponds to that reported by the stepper motor controller. The controller z axis corresponds to the Geant4 y axis.) 
 
     /ScanningTable/SetCloverZ <double> <unit>
 
@@ -645,7 +655,7 @@ In-beam simulations involving very thick (tens of mm) targets are significantly 
 
 > (Mandatory) Set name of the cache file to be generated. Trajectories of the beam-like reaction products in the target and S800 data are written to this file.
 
-> *Notes: (a) Sometimes events are killed before the reaction product leaves the target (if, for example the reaction product stops in the target frame). When this happens when generating a cache file, the event does not produce an entry in the cache file. The cache file header will not reflect these lost events, and it is necessary to simulate a larger number events than is needed in the cache file to compensate. (b) When used with multithreading enabled, a separate cache file is written/read by each thread.*
+> *Notes: (a) Sometimes events are killed before the reaction product leaves the target (if, for example the reaction product stops in the target frame). When this happens while generating a cache file, the event does not produce an entry in the cache file. A warning is issued, and the cache file header will accurately reflect these lost events. In this case it is necessary to simulate a larger number events than is needed in the cache file to compensate. (b) When used with multithreading enabled, a separate cache file is written/read by each thread. The `/run/numberOfThreads` and `/run/eventModulo` commands must be used to ensure an equal distribution of entries among the cache files (see Multithreading above).*
 
 ### Cache Simulations ###
 

@@ -7,6 +7,11 @@
 /Target/Angle 30. deg
 /Target/Construct
 
+# Multithreading settings (ignored without multithreading support) =============
+/run/numberOfThreads 16 # must be <= available threads provided by the CPU 
+/run/eventModulo 6250   # ensures a (necessary) even distribution of events
+                        # among threads and therefore among cache files
+
 # Initialize run manager =======================================================
 /run/initialize
 
@@ -44,4 +49,5 @@
 #/Mode2/Print
 #/Mode2/Filename s44_1329.dat
 /Cache/Output s44_1329.cache
-/run/beamOn 110000
+/run/beamOn 100000
+

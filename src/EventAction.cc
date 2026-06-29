@@ -72,16 +72,16 @@ G4String EventAction::threadSuffix(const G4String& baseName) const {
   const G4String suffix = "_t" + std::to_string(tid);
 
   // Insert suffix before the last '.' in the basename.
-  const std::string s = baseName;
-  const auto slash = s.find_last_of("/\\");
-  const auto dot = s.find_last_of('.');
+  const std::string suff = baseName;
+  const auto slash = suff.find_last_of("/\\");
+  const auto dot = suff.find_last_of('.');
   const bool hasExt = (dot != std::string::npos) && (slash == std::string::npos || dot > slash);
 
   if (!hasExt) {
     return baseName + suffix;
   }
 
-  return s.substr(0, dot) + suffix + s.substr(dot);
+  return suff.substr(0, dot) + suffix + suff.substr(dot);
 }
 
 void EventAction::BeginOfEventAction(const G4Event* ev)

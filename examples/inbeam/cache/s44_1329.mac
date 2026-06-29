@@ -7,11 +7,17 @@
 /Target/Angle 30. deg
 /Target/Construct
 
+# Multithreading settings (ignored without multithreading support) =============
+/run/numberOfThreads 16 # must be <= available threads provided by the CPU 
+/run/eventModulo 6250   # ensures a (necessary) even distribution of events
+                        # among threads and therefore among cache files
+
 # Initialize run manager =======================================================
 /run/initialize
 
 /Cache/Input s44_1329.cache
 /Cache/GammaEnergy 1329 keV
+/Cache/HalfLife 2.4 ps
 
 # Print simulation parameters to stdout ========================================
 /Target/Report
