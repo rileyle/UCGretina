@@ -928,7 +928,9 @@ void EventAction::writeDecomp(long long int ts,
 	       << crys_ips[i].ips[j].x << std::setw(12) 
 	       << crys_ips[i].ips[j].y << std::setw(12) 
 	       << crys_ips[i].ips[j].z << std::setw(12)
+	       << std::scientific
 	       << crys_gts[i*MAX_INTPTS + j]
+	       << std::fixed
 	       << G4endl;
       }
     }
