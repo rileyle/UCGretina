@@ -64,7 +64,7 @@ private:
   G4double         ModuleEuler[30][3];
   G4double         MPosLTriple[8][3];
   G4double         MPosLDouble[8][3];
-  G4double         MPosRTriple[8][3];
+  G4double         MPosRTriple[10][3];
   G4double         MPosRDouble[8][3];
   G4double         MPosHexHole[4][3];
   G4double         MPosTripleHole[4][3];
