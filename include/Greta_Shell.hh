@@ -12,6 +12,7 @@
 #include "G4Box.hh"
 #include "G4SubtractionSolid.hh"
 #include "G4IntersectionSolid.hh"
+#include "G4MultiUnion.hh"
 #include "G4TessellatedSolid.hh"
 #include "G4TriangularFacet.hh"
 #include "G4QuadrangularFacet.hh"
@@ -62,12 +63,9 @@ private:
   G4RotationMatrix Rot0;
   G4ThreeVector    PosSP[10];
   G4double         ModuleEuler[30][3];
-  G4double         MPosLTriple[8][3];
-  G4double         MPosLDouble[8][3];
-  G4double         MPosRTriple[10][3];
-  G4double         MPosRDouble[8][3];
-  G4double         MPosHexHole[4][3];
-  G4double         MPosTripleHole[4][3];
+  G4double         MPosFlats[5][2];
+  G4double         MPosHexHole[4][2];
+  G4double         MPosTripleHole[4][2];
   G4int            SmallPortStatus[10];
   G4int            ModulePortStatus[30];
   

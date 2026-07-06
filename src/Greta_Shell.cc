@@ -12,7 +12,8 @@ Greta_Shell::Greta_Shell()
   leftOffset       = 0.;
   rightOffset      = 0.;
   G4double RBar = (Rmax+Rmin)/2;
-
+  G4double h = 243.697*mm;
+  
   // Small port positions
   PosSP[0] = G4ThreeVector(-492.891*mm, -145.253*mm, -256.924*mm);
   PosSP[1] = G4ThreeVector(-484.135*mm,  172.202*mm,  256.924*mm);
@@ -37,141 +38,60 @@ Greta_Shell::Greta_Shell()
   SmallPortStatus[8] =  2;
   SmallPortStatus[9] =  2;
 
-  /* These arrays should contain 2D positions in the x-y
-     plane in which the G4ExtrudedSolids are defined.
-
-     For now, put in the current values assuming hexagons,
-     and modify the code to use these positions so that
-     when Heather Crawford gives us accurate position, we
-     can just drop them into the MPos ... arrays, and the code
-     should just work.
-     
-  // Left Hemi Triple positions
-  MPosLTriple[0][0]=-230*mm;
-  MPosLTriple[0][1]=0*mm;
-  MPosLTRiple[0][2]=0*mm;
-  MPosLTriple[1][0]=-230*cos(60*degree)*mm;
-  MPosLTriple[1][1]=230*sin(60*degree)*mm;
-  MPosLTriple[1][2]=0*mm;
-  MPosLTriple[2][0]=230*cos(60*degree)*mm;
-  MPosLTriple[2][1]=230*sin(60*degree)*mm;
-  MPosLTriple[2][2]=0*mm;
-  MPosLTriple[3][0]=230*mm;
-  MPosLTriple[3][1]=0*mm;
-  MPosLTriple[3][2]=0*mm;
-  MPosLTriple[4][0]=230*cos(60*degree)*mm;
-  MPosLTriple[4][1]=-230*sin(60*degree)*mm;
-  MPosLTriple[4][2]=0*mm;
-  MPosLTriple[5][0]=0*mm;
-  MPosLTriple[5][1]=0*mm;
-  MPosLTriple[5][2]=0*mm;
-  MPosLTriple[6][0]=0*mm;
-  MPosLTriple[6][1]=0*mm;
-  MPosLTriple[6][2]=0*mm;
-  MPosLTriple[7][0]=0*mm;
-  MPosLTriple[7][1]=0*mm;
-  MPosLTriple[7][2]=0*mm;
-  */
-  // Left Hemi Double positions
-  MPosLDouble[0][0]=-460+(460/2)*std::sqrt(2)*sin(60*degree)*mm;
-  MPosLDouble[0][1]=0*mm;
-  MPosLDouble[0][2]=0*mm;
-  MPosLDouble[1][0]=-460+(460/2)*sin(60*degree)*cos(45*degree)*mm;
-  MPosLDouble[1][1]=(460/2)*sin(60*degree)*sin(45*degree)*mm;
-  MPosLDouble[1][2]=0*mm;
-  MPosLDouble[2][0]=-460*cos(60*degree)*mm;
-  MPosLDouble[2][1]=460*sin(60*degree)*mm;
-  MPosLDouble[2][2]=0*mm;
-  MPosLDouble[3][0]=460*cos(60*degree)*mm;
-  MPosLDouble[3][1]=460*sin(60*degree)*mm;
-  MPosLDouble[3][2]=0*mm;
-  MPosLDouble[4][0]=460*mm;
-  MPosLDouble[4][1]=0*mm;
-  MPosLDouble[4][2]=0*mm;
-  MPosLDouble[5][0]=460*cos(60*degree)*mm;
-  MPosLDouble[5][1]=-460*sin(60*degree)*mm;
-  MPosLDouble[5][2]=0*mm;
-  MPosLDouble[6][0]=-460*cos(60*degree)*mm;
-  MPosLDouble[6][1]=-460*sin(60*degree)*mm;
-  MPosLDouble[6][2]=0*mm;
-  MPosLDouble[7][0]=-460+(460/2)*sin(60*degree)*cos(45*degree)*mm;
-  MPosLDouble[7][1]=-(460/2)*sin(60*degree)*sin(45*degree)*mm;
-  MPosLDouble[7][2]=0*mm;
-  
-  // Right Hemi Triple positions
-  G4double hPrime = 243.697*(RBar/Rmax);
+  // For now, assuming hexagons,until Heather Crawford gives us accurate positions.
+  //Cutout for Flats  positions
+  G4double hPrime = h*(RBar/Rmax);
   G4double d = std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2))*tan(31.717*degree);
-  MPosRTriple[0][0]=-hPrime*mm;
-  MPosRTriple[0][1]=0*mm;
-  MPosRTriple[0][2]=0*mm;
-  MPosRTriple[1][0]=-hPrime*cos(60*degree)*mm;
-  MPosRTriple[1][1]=hPrime*sin(60*degree)*mm;
-  MPosRTriple[1][2]=0*mm;
-  MPosRTriple[2][0]=hPrime*cos(60*degree)*mm;
-  MPosRTriple[2][1]=hPrime*sin(60*degree)*mm;
-  MPosRTriple[2][2]=0*mm;
-  MPosRTriple[3][0]=hPrime*mm;
-  MPosRTriple[3][1]=0*mm;
-  MPosRTriple[3][2]=0*mm;
-  MPosRTriple[4][0]=0*mm;
-  MPosRTriple[4][1]=-d*mm;
-  MPosRTriple[4][2]=0*mm;
-  /*
-  // Right Hemi Double positions
-  MPosRDouble[0][0]=0*mm;
-  MPosRDouble[0][1]=0*mm;
-  MPosRDouble[0][2]=0*mm;
-  MPosRDouble[1][0]=0*mm;
-  MPosRDouble[1][1]=0*mm;
-  MPosRDouble[1][2]=0*mm;
-  MPosRDouble[2][0]=0*mm;
-  MPosRDouble[2][1]=0*mm;
-  MPosRDouble[2][2]=0*mm;
-  MPosRDouble[3][0]=0*mm;
-  MPosRDouble[3][1]=0*mm;
-  MPosRDouble[3][2]=0*mm;
-  MPosRDouble[4][0]=0*mm;
-  MPosRDouble[4][1]=0*mm;
-  MPosRDouble[4][2]=0*mm;
-  MPosRDouble[5][0]=0*mm;
-  MPosRDouble[5][1]=0*mm;
-  MPosRDouble[5][2]=0*mm;
-  MPosRDouble[6][0]=0*mm;
-  MPosRDouble[6][1]=0*mm;
-  MPosRDouble[6][2]=0*mm;
-  MPosRDouble[7][0]=0*mm;
-  MPosRDouble[7][1]=0*mm;
-  MPosRDouble[7][2]=0*mm;
+  /* This orientation of the polygon makes things difficult ...
+  MPosFlats[0][0]=-hPrime*mm;
+  MPosFlats[0][1]=0*mm;
+  MPosFlats[0][2]=0*mm;
+  MPosFlats[1][0]=-hPrime*cos(60*degree)*mm;
+  MPosFlats[1][1]=hPrime*sin(60*degree)*mm;
+  MPosFlats[1][2]=0*mm;
+  MPosFlats[2][0]=hPrime*cos(60*degree)*mm;
+  MPosFlats[2][1]=hPrime*sin(60*degree)*mm;
+  MPosFlats[2][2]=0*mm;
+  MPosFlats[3][0]=hPrime*mm;
+  MPosFlats[3][1]=0*mm;
+  MPosFlats[3][2]=0*mm;
+  MPosFlats[4][0]=0*mm;
+  MPosFlats[4][1]=-d*mm;
+  MPosFlats[4][2]=0*mm;
   */
-
+  // With this orientation of the polygon, we can use the Hole Euler angles
+  // to place the ExtrudedSolid to cut the flats.
+  MPosFlats[0][0]=0*mm;
+  MPosFlats[0][1]=-hPrime*mm;
+  MPosFlats[1][0]=hPrime*sin(60*degree)*mm;
+  MPosFlats[1][1]=-hPrime*cos(60*degree)*mm;
+  MPosFlats[2][0]=hPrime*sin(60*degree)*mm;
+  MPosFlats[2][1]=hPrime*cos(60*degree)*mm;
+  MPosFlats[3][0]=0*mm;
+  MPosFlats[3][1]=hPrime*mm;
+  MPosFlats[4][0]=-d*mm;
+  MPosFlats[4][1]=0*mm;
+  
   //Module HexHole positions
-  MPosHexHole[0][0]=-230*mm;
-  MPosHexHole[0][1]=0*mm;
-  MPosHexHole[0][2]=0*mm;
-  MPosHexHole[1][0]=-230*cos(60*degree)*mm;
-  MPosHexHole[1][1]=230*sin(60*degree)*mm;
-  MPosHexHole[1][2]=0*mm;
-  MPosHexHole[2][0]=230*cos(60*degree)*mm;
-  MPosHexHole[2][1]=230*sin(60*degree)*mm;
-  MPosHexHole[2][2]=0*mm;
-  MPosHexHole[3][0]=230*mm;
-  MPosHexHole[3][1]=0*mm;
-  MPosHexHole[3][2]=0*mm;
+  MPosHexHole[0][0] = -h;
+  MPosHexHole[0][1] = 0;
+  MPosHexHole[1][0] = -h*cos(60*degree);
+  MPosHexHole[1][1] = h*sin(60*degree);
+  MPosHexHole[2][0] = h*cos(60*degree);
+  MPosHexHole[2][1] = h*sin(60*degree);
+  MPosHexHole[3][0] = h;
+  MPosHexHole[3][1] = 0;
 
   //Module TripleHole positions
-  MPosTripleHole[0][0]=-230*mm;
-  MPosTripleHole[0][1]=0*mm;
-  MPosTripleHole[0][2]=0*mm;
-  MPosTripleHole[1][0]=-230*cos(60*degree)*mm;
-  MPosTripleHole[1][1]=230*sin(60*degree)*mm;
-  MPosTripleHole[1][2]=0*mm;
-  MPosTripleHole[2][0]=230*cos(60*degree)*mm;
-  MPosTripleHole[2][1]=230*sin(60*degree)*mm;
-  MPosTripleHole[2][2]=0*mm;
-  MPosTripleHole[3][0]=(1300/2*mm)*tan(31.717*degree);
-  MPosTripleHole[3][1]=0*mm;
-  MPosTripleHole[3][2]=0*mm;
-
+  MPosTripleHole[0][0] = -h;
+  MPosTripleHole[0][1] = 0;
+  MPosTripleHole[1][0] = -h*cos(60*degree);
+  MPosTripleHole[1][1] = h*sin(60*degree);
+  MPosTripleHole[2][0] = h*cos(60*degree);
+  MPosTripleHole[2][1] = h*sin(60*degree);
+  MPosTripleHole[3][0] = (1300/2*mm)*tan(31.717*degree);
+  MPosTripleHole[3][1] = 0;
+  
   // Module Port Euler angles (relative to Slot 0)
   // Psi                                   Slot   Hemisphere
   // Theta
@@ -358,34 +278,21 @@ void Greta_Shell::Placement(G4String shellStatus,
   DetectorConstruction* theDetector = (DetectorConstruction*) runManager->GetUserDetectorConstruction();
   G4double halfheight = 1300/4*mm;
   G4double RBar = (Rmax+Rmin)/2;
-  G4double hPrime = 230*(RBar/Rmax);
+  G4double h = 243.697*mm;
+  G4double hPrime = h*(RBar/Rmax);
+  
   G4SubtractionSolid *shellL, *shellR, *shellF;
-  std::vector<G4TwoVector> polygon5(8);
-  polygon5[0] = G4TwoVector(MPosLDouble[0][0],MPosLDouble[0][1]);
-  polygon5[1] = G4TwoVector(MPosLDouble[1][0],MPosLDouble[1][1]);
-  polygon5[2] = G4TwoVector(MPosLDouble[2][0],MPosLDouble[2][1]);
-  polygon5[3] = G4TwoVector(MPosLDouble[3][0],MPosLDouble[3][1]);
-  polygon5[4] = G4TwoVector(MPosLDouble[4][0],MPosLDouble[4][1]);
-  polygon5[5] = G4TwoVector(MPosLDouble[5][0],MPosLDouble[5][1]);
-  polygon5[6] = G4TwoVector(MPosLDouble[6][0],MPosLDouble[6][1]);
-  polygon5[7] = G4TwoVector(MPosLDouble[7][0],MPosLDouble[7][1]);
-  G4ExtrudedSolid* doubleShape = new G4ExtrudedSolid("doubleShape",  polygon5, halfheight, G4TwoVector(0, 0), 0.00001, G4TwoVector(0, 0), 1);
-  //G4LogicalVolume* logicdoubleShape = new G4LogicalVolume(doubleShape, matShell, "Shell_log", 0, 0, 0 );
-  //new G4PVPlacement(0, G4ThreeVector(0, 0, 0), "MountingShell", logicdoubleShape,theDetector->HallPhys(), false, 0 );
   std::vector<G4TwoVector> polygon6(5);
-  polygon6[0] = G4TwoVector(MPosRTriple[0][0],MPosRTriple[0][1]);
-  polygon6[1] = G4TwoVector(MPosRTriple[1][0],MPosRTriple[1][1]);
-  polygon6[2] = G4TwoVector(MPosRTriple[2][0],MPosRTriple[2][1]);
-  polygon6[3] = G4TwoVector(MPosRTriple[3][0],MPosRTriple[3][1]);
-  polygon6[4] = G4TwoVector(MPosRTriple[4][0],MPosRTriple[4][1]);
+  polygon6[0] = G4TwoVector(MPosFlats[0][0],MPosFlats[0][1]);
+  polygon6[1] = G4TwoVector(MPosFlats[1][0],MPosFlats[1][1]);
+  polygon6[2] = G4TwoVector(MPosFlats[2][0],MPosFlats[2][1]);
+  polygon6[3] = G4TwoVector(MPosFlats[3][0],MPosFlats[3][1]);
+  polygon6[4] = G4TwoVector(MPosFlats[4][0],MPosFlats[4][1]);
   std::vector<G4ExtrudedSolid::ZSection> zsections;
-  //  zsections.push_back(G4ExtrudedSolid::ZSection((Rmax-Rmin+200*mm),G4TwoVector(0,0), 1));
-  //  zsections.push_back(G4ExtrudedSolid::ZSection(Rmin-(Rmax-Rmin),G4TwoVector(0,0), 1));
   zsections.push_back(G4ExtrudedSolid::ZSection(0,G4TwoVector(0,0), 1));
   zsections.push_back(G4ExtrudedSolid::ZSection((Rmin+Rmax)/2,G4TwoVector(0,0), 2));
   G4ExtrudedSolid* tripleShape = new G4ExtrudedSolid("tripleShape",  polygon6, zsections);
-  //G4LogicalVolume* logictripleShape = new G4LogicalVolume(tripleShape, matShell, "Shell_log", 0, 0, 0 );
-  //new G4PVPlacement(0, G4ThreeVector(0, 0, 0), "MountingShell", logictripleShape, theDetector->HallPhys(), false, 0 );
+
   if(shellStatus != "full"){
     shellL = Shell("LEFT");
     shellR = Shell("RIGHT");
@@ -448,11 +355,11 @@ void Greta_Shell::Placement(G4String shellStatus,
   RotShell30.rotateZ( TarPos30.getPhi() );
   // Left hemisphere with both cutouts but not the bumpouts
   G4SubtractionSolid* cutout30 = new G4SubtractionSolid("cutout30", cutout10, solidTarget2, G4Transform3D(RotShell30, TarPos30));
+  G4LogicalVolume* logicCutout30 = new G4LogicalVolume(cutout30, matShell, "Shell_log", 0, 0, 0 );
      
   // bumpout for the Right "hemisphere"
   G4IntersectionSolid* bump30 = new G4IntersectionSolid("bump30",cutout10, solidTarget2, G4Transform3D(RotShell30, TarPos30));
   G4LogicalVolume* logicbump30 = new G4LogicalVolume(bump30, matShell, "Shell_log", 0, 0, 0 );
-  G4LogicalVolume* logicCutout30 = new G4LogicalVolume(cutout30, matShell, "Shell_log", 0, 0, 0 );
   
   //HexHole for Hole 23
   G4ThreeVector TarPos23 = G4ThreeVector(0, 0, halfheight);
@@ -482,7 +389,6 @@ void Greta_Shell::Placement(G4String shellStatus,
   // Right hemisphere with both cutouts but not the bumpouts
   G4SubtractionSolid* cutout3 = new G4SubtractionSolid("cutout3", cutout23, solidTarget2, G4Transform3D(RotShell3, TarPos3));
   G4LogicalVolume* logicCutout3 = new G4LogicalVolume(cutout3, matShell, "Shell_log", 0, 0, 0 );
-
   // bumpout for the Left hemisphere
   G4IntersectionSolid* bump3 = new G4IntersectionSolid("bump3", cutout23, solidTarget2, G4Transform3D(RotShell3, TarPos3));
   G4LogicalVolume* logicbump3 = new G4LogicalVolume(bump3, matShell, "Shell_log", 0, 0, 0 );
@@ -491,7 +397,7 @@ void Greta_Shell::Placement(G4String shellStatus,
   G4RotationMatrix NoRotL = G4RotationMatrix::IDENTITY;
 
   if(!forwardShellStatus || !backwardShellStatus) {
-    //InnerPentaCut polygon
+    //ForwardPentaCut polygon
     std::vector<G4TwoVector> polygon3(5);
     polygon3[0] = G4TwoVector(innercut*sin(ModuleEuler[2][1])*cos(ModuleEuler[2][2]),
 			      innercut*sin(ModuleEuler[2][1])*sin(ModuleEuler[2][2]));
@@ -505,7 +411,20 @@ void Greta_Shell::Placement(G4String shellStatus,
 			      innercut*sin(ModuleEuler[3][1])*sin(ModuleEuler[3][2]));
     G4ExtrudedSolid* PentaCut = new G4ExtrudedSolid("PentaCut",  polygon3, halfheight,
 						    G4TwoVector(0, 0), 0.00001, G4TwoVector(0, 0), 1);
-    // G4LogicalVolume* logicPentaCut = new G4LogicalVolume(PentaCut, matShell, "Shell_log", 0, 0, 0 );
+    //BackwardPentaCut polygon
+    std::vector<G4TwoVector> polygon7(5);
+    polygon7[0] = G4TwoVector(innercut*sin(ModuleEuler[29][1])*cos(ModuleEuler[29][2]),
+			      innercut*sin(ModuleEuler[29][1])*sin(ModuleEuler[29][2]));
+    polygon7[1] = G4TwoVector(innercut*sin(ModuleEuler[28][1])*cos(ModuleEuler[28][2]),
+			      innercut*sin(ModuleEuler[28][1])*sin(ModuleEuler[28][2]));
+    polygon7[2] = G4TwoVector(innercut*sin(ModuleEuler[27][1])*cos(ModuleEuler[27][2]),
+			      innercut*sin(ModuleEuler[27][1])*sin(ModuleEuler[27][2]));
+    polygon7[3] = G4TwoVector(innercut*sin(ModuleEuler[26][1])*cos(ModuleEuler[26][2]),
+			      innercut*sin(ModuleEuler[26][1])*sin(ModuleEuler[26][2]));
+    polygon7[4] = G4TwoVector(innercut*sin(ModuleEuler[25][1])*cos(ModuleEuler[25][2]),
+			      innercut*sin(ModuleEuler[25][1])*sin(ModuleEuler[25][2]));
+    G4ExtrudedSolid* BPentaCut = new G4ExtrudedSolid("BPentaCut",  polygon7, halfheight,
+						     G4TwoVector(0, 0), 1, G4TwoVector(0, 0), 0.00001);
     G4RotationMatrix RotCut = G4RotationMatrix::IDENTITY;
     RotCut.rotateZ(36*degree);
     RotCut.rotateY(180*degree);
@@ -513,35 +432,34 @@ void Greta_Shell::Placement(G4String shellStatus,
       G4SubtractionSolid* CutPentaLFo
 	= new G4SubtractionSolid("CutPentaLFo",cutout30, PentaCut,
 				 G4Transform3D(NoRotR, G4ThreeVector(0, 0, halfheight)));
-      G4LogicalVolume* logicPentaLFo = new G4LogicalVolume(CutPentaLFo, matShell,
-							   "Shell_log", 0, 0, 0 );
-      //      G4ThreeVector TarPos2 =  G4ThreeVector(0, 0, halfheight);
-      G4ThreeVector TarPos2 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
-      TarPos2.rotateZ(ModuleEuler[1][0]);
-      TarPos2.rotateY(ModuleEuler[1][1]);
-      TarPos2.rotateZ(ModuleEuler[1][2]);
-      G4RotationMatrix RotShell2 = G4RotationMatrix::IDENTITY;
-      RotShell2.rotateZ( 270*degree );
-      RotShell2.rotateY( TarPos2.getTheta() );
-      RotShell2.rotateZ( TarPos2.getPhi() );
+
+      // Cut the flats for the (omitted) forward triple
       G4ThreeVector TarPos1 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
-      TarPos1.rotateZ(ModuleEuler[0][0]);
       TarPos1.rotateY(ModuleEuler[0][1]);
       TarPos1.rotateZ(ModuleEuler[0][2]);
       G4RotationMatrix RotShell1 = G4RotationMatrix::IDENTITY;
-      RotShell1.rotateZ( 26*degree );
+      RotShell1.rotateZ(ModuleEuler[0][0]);
       RotShell1.rotateY( TarPos1.getTheta() );
       RotShell1.rotateZ( TarPos1.getPhi() );
+
+      G4ThreeVector TarPos2 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos2.rotateY(ModuleEuler[1][1]);
+      TarPos2.rotateZ(ModuleEuler[1][2]);
+      G4RotationMatrix RotShell2 = G4RotationMatrix::IDENTITY;
+      RotShell2.rotateZ(ModuleEuler[1][0]);
+      RotShell2.rotateY( TarPos2.getTheta() );
+      RotShell2.rotateZ( TarPos2.getPhi() );
+      
       G4ThreeVector TarPos3 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
-      TarPos3.rotateZ(ModuleEuler[2][0]);
       TarPos3.rotateY(ModuleEuler[2][1]);
       TarPos3.rotateZ(ModuleEuler[2][2]);
       G4RotationMatrix RotShell3 = G4RotationMatrix::IDENTITY;
-      RotShell3.rotateZ( -30*degree );
+      RotShell3.rotateZ(ModuleEuler[2][0]);
       RotShell3.rotateY( TarPos3.getTheta() );
       RotShell3.rotateZ( TarPos3.getPhi() );
-      G4SubtractionSolid* cutLTriple = new G4SubtractionSolid("cutLTriple", CutPentaLFo, tripleShape, G4Transform3D(RotShell2, TarPos2));
-      G4SubtractionSolid* cutLTriple2 = new G4SubtractionSolid("cutLTriple", cutLTriple, tripleShape, G4Transform3D(RotShell1, TarPos1));
+
+      G4SubtractionSolid* cutLTriple = new G4SubtractionSolid("cutLTriple", CutPentaLFo, tripleShape, G4Transform3D(RotShell1, TarPos1));
+      G4SubtractionSolid* cutLTriple2 = new G4SubtractionSolid("cutLTriple", cutLTriple, tripleShape, G4Transform3D(RotShell2, TarPos2));
       G4SubtractionSolid* cutLTriple3 = new G4SubtractionSolid("cutLTriple", cutLTriple2, tripleShape, G4Transform3D(RotShell3, TarPos3));
       G4LogicalVolume* logiccutLTriple3 = new G4LogicalVolume(cutLTriple3, matShell, "Shell_log", 0, 0, 0 );
       
@@ -549,31 +467,34 @@ void Greta_Shell::Placement(G4String shellStatus,
       G4AssemblyVolume* LeftHemi = new G4AssemblyVolume();
       LeftHemi->AddPlacedVolume(logiccutLTriple3, NoShiftR, &NoRotR);
       LeftHemi->AddPlacedVolume(logicbump23, NoShiftR, &NoRotR);
-      //RightHemi->AddPlacedVolume(logicbump30, NoShiftR, &NoRotR);
       LeftHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
     }
     else if(shellStatus == "left" && !backwardShellStatus && forwardShellStatus){
       G4SubtractionSolid* CutPentaLBo
 	= new G4SubtractionSolid("CutPentaLBo",cutout30, PentaCut,
 				 G4Transform3D(RotCut, G4ThreeVector(0, 0, -halfheight)));
-      G4LogicalVolume* logicPentaLBo = new G4LogicalVolume(CutPentaLBo, matShell,
-							   "Shell_log", 0, 0, 0 );
-      G4ThreeVector TarPos26 = G4ThreeVector(0, 0, halfheight);
-      TarPos26.rotateZ(ModuleEuler[25][0]);
-      TarPos26.rotateY(ModuleEuler[25][1]);
-      TarPos26.rotateZ(ModuleEuler[25][2]);
+      G4ThreeVector TarPos26 = G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos26.rotateY( ModuleEuler[25][1] );
+      TarPos26.rotateZ( ModuleEuler[25][2] );
       G4RotationMatrix RotShell26 = G4RotationMatrix::IDENTITY;
-      RotShell26.rotateZ( 0*degree );
-      RotShell26.rotateZ( -58.31*degree );
+      RotShell26.rotateZ( ModuleEuler[25][0] ); // Orient the polygon in the plane tangent to the sphere
       RotShell26.rotateY( TarPos26.getTheta() );
       RotShell26.rotateZ( TarPos26.getPhi() );
-      G4SubtractionSolid* cutLDouble = new G4SubtractionSolid("cutLDouble", CutPentaLBo, doubleShape, G4Transform3D(RotShell26, TarPos26));
-      G4LogicalVolume* logiccutLDouble = new G4LogicalVolume(cutLDouble, matShell, "Shell_log", 0, 0, 0 );
+      G4SubtractionSolid* LDoubleFlat = new G4SubtractionSolid("LDoubleFlat", CutPentaLBo, tripleShape, G4Transform3D(RotShell26, TarPos26));
+      G4ThreeVector TarPos27 = G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos27.rotateY( ModuleEuler[26][1] );
+      TarPos27.rotateZ( ModuleEuler[26][2] );
+      G4RotationMatrix RotShell27 = G4RotationMatrix::IDENTITY;
+      RotShell27.rotateZ( ModuleEuler[26][0] ); // Orient the polygon in the plane tangent to the sphere
+      RotShell27.rotateY( TarPos27.getTheta() );
+      RotShell27.rotateZ( TarPos27.getPhi() );
+      G4SubtractionSolid* LDoubleFlat2 = new G4SubtractionSolid("LDoubleFlat2", LDoubleFlat, tripleShape, G4Transform3D(RotShell27, TarPos27));
+      G4LogicalVolume* logicLDoubleFlat2 = new G4LogicalVolume(LDoubleFlat2, matShell, "Shell_log", 0, 0, 0 );
+      
       //Place Left Hemisphere with full cutouts, bumpouts, and no backward ring
       G4AssemblyVolume* LeftHemi = new G4AssemblyVolume();
-      LeftHemi->AddPlacedVolume(logiccutLDouble, NoShiftR, &NoRotR);
+      LeftHemi->AddPlacedVolume(logicLDoubleFlat2, NoShiftR, &NoRotR);
       LeftHemi->AddPlacedVolume(logicbump23, NoShiftR, &NoRotR);
-      //RightHemi->AddPlacedVolume(logicbump30, NoShiftR, &NoRotR);
       LeftHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
     }
     else if(shellStatus == "left" && !backwardShellStatus && !forwardShellStatus) {
@@ -583,35 +504,55 @@ void Greta_Shell::Placement(G4String shellStatus,
       G4SubtractionSolid* DualPentaCutLFB
 	= new G4SubtractionSolid("DualPentaCutLFB", CutPentaLFB, PentaCut,
 				 G4Transform3D(RotCut, G4ThreeVector(0, 0, -halfheight)));
-      G4LogicalVolume* logicDualPentaLFB = new G4LogicalVolume(DualPentaCutLFB, matShell,
-							       "Shell_log", 0, 0, 0 );
-      G4ThreeVector TarPos26 = G4ThreeVector(0, 0, halfheight);
-      TarPos26.rotateZ(ModuleEuler[25][0]);
-      TarPos26.rotateY(ModuleEuler[25][1]);
-      TarPos26.rotateZ(ModuleEuler[25][2]);
+      G4ThreeVector TarPos26 = G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos26.rotateY( ModuleEuler[25][1] );
+      TarPos26.rotateZ( ModuleEuler[25][2] );
       G4RotationMatrix RotShell26 = G4RotationMatrix::IDENTITY;
-      RotShell26.rotateZ( 0*degree );
-      RotShell26.rotateZ( -58.31*degree );
+      RotShell26.rotateZ( ModuleEuler[25][0] ); // Orient the polygon in the plane tangent to the sphere
       RotShell26.rotateY( TarPos26.getTheta() );
       RotShell26.rotateZ( TarPos26.getPhi() );
-      G4SubtractionSolid* cutLDouble = new G4SubtractionSolid("cutLDouble", DualPentaCutLFB, doubleShape, G4Transform3D(RotShell26, TarPos26));
-      G4LogicalVolume* logiccutLDouble = new G4LogicalVolume(cutLDouble, matShell, "Shell_log", 0, 0, 0 );
+      G4SubtractionSolid* LDoubleFlat = new G4SubtractionSolid("LDoubleFlat", DualPentaCutLFB, tripleShape, G4Transform3D(RotShell26, TarPos26));
+      G4ThreeVector TarPos27 = G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos27.rotateY( ModuleEuler[26][1] );
+      TarPos27.rotateZ( ModuleEuler[26][2] );
+      G4RotationMatrix RotShell27 = G4RotationMatrix::IDENTITY;
+      RotShell27.rotateZ( ModuleEuler[26][0] ); // Orient the polygon in the plane tangent to the sphere
+      RotShell27.rotateY( TarPos27.getTheta() );
+      RotShell27.rotateZ( TarPos27.getPhi() );
+      G4SubtractionSolid* LDoubleFlat2 = new G4SubtractionSolid("LDoubleFlat2", LDoubleFlat, tripleShape, G4Transform3D(RotShell27, TarPos27));
 
-      G4ThreeVector TarPos2 = G4ThreeVector(0, 0, halfheight);
-      TarPos2.rotateZ(ModuleEuler[1][0]);
+      G4ThreeVector TarPos1 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos1.rotateY(ModuleEuler[0][1]);
+      TarPos1.rotateZ(ModuleEuler[0][2]);
+      G4RotationMatrix RotShell1 = G4RotationMatrix::IDENTITY;
+      RotShell1.rotateZ(ModuleEuler[0][0]);
+      RotShell1.rotateY( TarPos1.getTheta() );
+      RotShell1.rotateZ( TarPos1.getPhi() );
+
+      G4ThreeVector TarPos2 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
       TarPos2.rotateY(ModuleEuler[1][1]);
       TarPos2.rotateZ(ModuleEuler[1][2]);
       G4RotationMatrix RotShell2 = G4RotationMatrix::IDENTITY;
-      RotShell2.rotateZ( 180*degree );
-      //RotShell26.rotateZ( -58.31*degree );
+      RotShell2.rotateZ(ModuleEuler[1][0]);
       RotShell2.rotateY( TarPos2.getTheta() );
       RotShell2.rotateZ( TarPos2.getPhi() );
-      G4SubtractionSolid* cutLTriple = new G4SubtractionSolid("cutLTriple", cutLDouble, tripleShape, G4Transform3D(RotShell2, TarPos2));
-      G4LogicalVolume* logiccutLTriple = new G4LogicalVolume(cutLTriple, matShell, "Shell_log", 0, 0, 0 );
+      
+      G4ThreeVector TarPos3 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos3.rotateY(ModuleEuler[2][1]);
+      TarPos3.rotateZ(ModuleEuler[2][2]);
+      G4RotationMatrix RotShell3 = G4RotationMatrix::IDENTITY;
+      RotShell3.rotateZ(ModuleEuler[2][0]);
+      RotShell3.rotateY( TarPos3.getTheta() );
+      RotShell3.rotateZ( TarPos3.getPhi() );
+
+      G4SubtractionSolid* LTripleFlat = new G4SubtractionSolid("LTripleFlat", LDoubleFlat2, tripleShape, G4Transform3D(RotShell1, TarPos1));
+      G4SubtractionSolid* LTripleFlat2 = new G4SubtractionSolid("LTripleFlat2", LTripleFlat, tripleShape, G4Transform3D(RotShell2, TarPos2));
+      G4SubtractionSolid* LTripleFlat3 = new G4SubtractionSolid("LTripleFlat3", LTripleFlat2, tripleShape, G4Transform3D(RotShell3, TarPos3));
+      G4LogicalVolume* logicLTripleFlat3 = new G4LogicalVolume(LTripleFlat3, matShell, "Shell_log", 0, 0, 0 );
       
       //Place Left Hemisphere with full cutouts, bumpouts and no forward or backward ring
       G4AssemblyVolume* LeftHemi = new G4AssemblyVolume();
-      LeftHemi->AddPlacedVolume(logiccutLTriple, NoShiftL, &NoRotL);
+      LeftHemi->AddPlacedVolume(logicLTripleFlat3, NoShiftL, &NoRotL);
       LeftHemi->AddPlacedVolume(logicbump23, NoShiftL, &NoRotL);
       LeftHemi->MakeImprint(theDetector->HallLog(), NoShiftL, &NoRotL, 0);
     }
@@ -619,22 +560,27 @@ void Greta_Shell::Placement(G4String shellStatus,
       G4SubtractionSolid* CutPentaRFo
 	= new G4SubtractionSolid("CutPentaRFo",cutout3, PentaCut,
 				 G4Transform3D(NoRotR, G4ThreeVector(0, 0, halfheight)));
-      G4LogicalVolume* logicPentaRFo = new G4LogicalVolume(CutPentaRFo, matShell,
-							   "Shell_log", 0, 0, 0 );
-      G4ThreeVector TarPos4 = G4ThreeVector(0, 0, halfheight);
-      TarPos4.rotateZ(ModuleEuler[3][0]);
+      G4ThreeVector TarPos4 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
       TarPos4.rotateY(ModuleEuler[3][1]);
       TarPos4.rotateZ(ModuleEuler[3][2]);
       G4RotationMatrix RotShell4 = G4RotationMatrix::IDENTITY;
-      RotShell4.rotateZ( 180*degree );
-      RotShell4.rotateZ( 58.31*degree );
+      RotShell4.rotateZ(ModuleEuler[3][0]);
       RotShell4.rotateY( TarPos4.getTheta() );
       RotShell4.rotateZ( TarPos4.getPhi() );
-      G4SubtractionSolid* cutRDouble = new G4SubtractionSolid("cutRDouble", CutPentaRFo, doubleShape, G4Transform3D(RotShell4, TarPos4));
-      G4LogicalVolume* logiccutRDouble = new G4LogicalVolume(cutRDouble, matShell, "Shell_log", 0, 0, 0 );
+      G4SubtractionSolid* RDoubleFlat = new G4SubtractionSolid("RDoubleFlat", CutPentaRFo, tripleShape, G4Transform3D(RotShell4, TarPos4));
+      G4ThreeVector TarPos5 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos5.rotateY(ModuleEuler[4][1]);
+      TarPos5.rotateZ(ModuleEuler[4][2]);
+      G4RotationMatrix RotShell5 = G4RotationMatrix::IDENTITY;
+      RotShell5.rotateZ(ModuleEuler[4][0]);
+      RotShell5.rotateY( TarPos5.getTheta() );
+      RotShell5.rotateZ( TarPos5.getPhi() );
+      G4SubtractionSolid* RDoubleFlat2 = new G4SubtractionSolid("RDoubleFlat2", RDoubleFlat, tripleShape, G4Transform3D(RotShell5, TarPos5));
+      G4LogicalVolume* logicRDoubleFlat2 = new G4LogicalVolume(RDoubleFlat2, matShell, "Shell_log", 0, 0, 0 );
+      
       //Place Right Hemisphere with full cutouts, bumpouts, and no forward ring
       G4AssemblyVolume* RightHemi = new G4AssemblyVolume();
-      RightHemi->AddPlacedVolume(logiccutRDouble, NoShiftR, &NoRotR);
+      RightHemi->AddPlacedVolume(logicRDoubleFlat2, NoShiftR, &NoRotR);
       RightHemi->AddPlacedVolume(logicbump10, NoShiftR, &NoRotR);
       RightHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
     }
@@ -642,12 +588,35 @@ void Greta_Shell::Placement(G4String shellStatus,
       G4SubtractionSolid* CutPentaRBo
 	= new G4SubtractionSolid("CutPentaRBo",cutout3, PentaCut,
 				 G4Transform3D(RotCut, G4ThreeVector(0, 0, -halfheight)));
-      G4LogicalVolume* logicPentaRBo = new G4LogicalVolume(CutPentaRBo, matShell,
-							   "Shell_log", 0, 0, 0 );
+      G4ThreeVector TarPos28 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos28.rotateY(ModuleEuler[27][1]);
+      TarPos28.rotateZ(ModuleEuler[27][2]);
+      G4RotationMatrix RotShell28 = G4RotationMatrix::IDENTITY;
+      RotShell28.rotateZ(ModuleEuler[27][0]);
+      RotShell28.rotateY( TarPos28.getTheta() );
+      RotShell28.rotateZ( TarPos28.getPhi() );
+      G4SubtractionSolid* RTripleFlat = new G4SubtractionSolid("RTripleFlat", CutPentaRBo, tripleShape, G4Transform3D(RotShell28, TarPos28));
+      G4ThreeVector TarPos29 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos29.rotateY(ModuleEuler[28][1]);
+      TarPos29.rotateZ(ModuleEuler[28][2]);
+      G4RotationMatrix RotShell29 = G4RotationMatrix::IDENTITY;
+      RotShell29.rotateZ(ModuleEuler[28][0]);
+      RotShell29.rotateY( TarPos29.getTheta() );
+      RotShell29.rotateZ( TarPos29.getPhi() );
+      G4SubtractionSolid* RTripleFlat2 = new G4SubtractionSolid("RTripleFlat2", RTripleFlat, tripleShape, G4Transform3D(RotShell29, TarPos29));
+      G4ThreeVector TarPos30 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos30.rotateY(ModuleEuler[29][1]);
+      TarPos30.rotateZ(ModuleEuler[29][2]);
+      G4RotationMatrix RotShell30 = G4RotationMatrix::IDENTITY;
+      RotShell30.rotateZ(ModuleEuler[29][0]);
+      RotShell30.rotateY( TarPos30.getTheta() );
+      RotShell30.rotateZ( TarPos30.getPhi() );
+      G4SubtractionSolid* RTripleFlat3 = new G4SubtractionSolid("RTripleFlat3", RTripleFlat2, tripleShape, G4Transform3D(RotShell30, TarPos30));
+      G4LogicalVolume* logicRTripleFlat3 = new G4LogicalVolume(RTripleFlat3, matShell, "Shell_log", 0, 0, 0 );
       
       //Place Right Hemisphere with full cutouts, bumpouts, and no backward ring
       G4AssemblyVolume* RightHemi = new G4AssemblyVolume();
-      RightHemi->AddPlacedVolume(logicPentaRBo, NoShiftR, &NoRotR);
+      RightHemi->AddPlacedVolume(logicRTripleFlat3, NoShiftR, &NoRotR);
       RightHemi->AddPlacedVolume(logicbump10, NoShiftR, &NoRotR);
       RightHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
     }
@@ -658,86 +627,368 @@ void Greta_Shell::Placement(G4String shellStatus,
       G4SubtractionSolid* DualPentaCutRFB
 	= new G4SubtractionSolid("DualPentaCutRFB", CutPentaRF, PentaCut,
 				 G4Transform3D(RotCut, G4ThreeVector(0, 0, -halfheight)));
-      G4LogicalVolume* logicDualPentaRFB = new G4LogicalVolume(DualPentaCutRFB, matShell,
-							       "Shell_log", 0, 0, 0 );
-      G4ThreeVector TarPos4 = G4ThreeVector(0, 0, halfheight);
-      TarPos4.rotateZ(ModuleEuler[3][0]);
+      
+      G4ThreeVector TarPos4 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
       TarPos4.rotateY(ModuleEuler[3][1]);
       TarPos4.rotateZ(ModuleEuler[3][2]);
       G4RotationMatrix RotShell4 = G4RotationMatrix::IDENTITY;
-      RotShell4.rotateZ( 180*degree );
-      RotShell4.rotateZ( 58.31*degree );
+      RotShell4.rotateZ(ModuleEuler[3][0]);
       RotShell4.rotateY( TarPos4.getTheta() );
       RotShell4.rotateZ( TarPos4.getPhi() );
-      G4SubtractionSolid* cutRDouble = new G4SubtractionSolid("cutRDouble", DualPentaCutRFB, doubleShape, G4Transform3D(RotShell4, TarPos4));
-      G4LogicalVolume* logiccutRDouble = new G4LogicalVolume(cutRDouble, matShell, "Shell_log", 0, 0, 0 );
+      G4SubtractionSolid* RDoubleFlat = new G4SubtractionSolid("RDoubleFlat", DualPentaCutRFB, tripleShape, G4Transform3D(RotShell4, TarPos4));
+      G4ThreeVector TarPos5 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos5.rotateY(ModuleEuler[4][1]);
+      TarPos5.rotateZ(ModuleEuler[4][2]);
+      G4RotationMatrix RotShell5 = G4RotationMatrix::IDENTITY;
+      RotShell5.rotateZ(ModuleEuler[4][0]);
+      RotShell5.rotateY( TarPos5.getTheta() );
+      RotShell5.rotateZ( TarPos5.getPhi() );
+      G4SubtractionSolid* RDoubleFlat2 = new G4SubtractionSolid("RDoubleFlat2", RDoubleFlat, tripleShape, G4Transform3D(RotShell5, TarPos5));
+
+      G4ThreeVector TarPos28 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos28.rotateY(ModuleEuler[27][1]);
+      TarPos28.rotateZ(ModuleEuler[27][2]);
+      G4RotationMatrix RotShell28 = G4RotationMatrix::IDENTITY;
+      RotShell28.rotateZ(ModuleEuler[27][0]);
+      RotShell28.rotateY( TarPos28.getTheta() );
+      RotShell28.rotateZ( TarPos28.getPhi() );
+      G4SubtractionSolid* RTripleFlat = new G4SubtractionSolid("RTripleFlat", RDoubleFlat2, tripleShape, G4Transform3D(RotShell28, TarPos28));
+      G4ThreeVector TarPos29 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos29.rotateY(ModuleEuler[28][1]);
+      TarPos29.rotateZ(ModuleEuler[28][2]);
+      G4RotationMatrix RotShell29 = G4RotationMatrix::IDENTITY;
+      RotShell29.rotateZ(ModuleEuler[28][0]);
+      RotShell29.rotateY( TarPos29.getTheta() );
+      RotShell29.rotateZ( TarPos29.getPhi() );
+      G4SubtractionSolid* RTripleFlat2 = new G4SubtractionSolid("RTripleFlat2", RTripleFlat, tripleShape, G4Transform3D(RotShell29, TarPos29));
+      G4ThreeVector TarPos30 =  G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos30.rotateY(ModuleEuler[29][1]);
+      TarPos30.rotateZ(ModuleEuler[29][2]);
+      G4RotationMatrix RotShell30 = G4RotationMatrix::IDENTITY;
+      RotShell30.rotateZ(ModuleEuler[29][0]);
+      RotShell30.rotateY( TarPos30.getTheta() );
+      RotShell30.rotateZ( TarPos30.getPhi() );
+      G4SubtractionSolid* RTripleFlat3 = new G4SubtractionSolid("RTripleFlat3", RTripleFlat2, tripleShape, G4Transform3D(RotShell30, TarPos30));
+      G4LogicalVolume* logicRTripleFlat3 = new G4LogicalVolume(RTripleFlat3, matShell, "Shell_log", 0, 0, 0 );
       
       //Place Right Hemisphere with full cutouts, bumpouts, and no forward or backward ring
       G4AssemblyVolume* RightHemi = new G4AssemblyVolume();
-      RightHemi->AddPlacedVolume(logicDualPentaRFB, NoShiftR, &NoRotR);
+      RightHemi->AddPlacedVolume(logicRTripleFlat3, NoShiftR, &NoRotR);
       RightHemi->AddPlacedVolume(logicbump10, NoShiftR, &NoRotR);
       RightHemi->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
     }
     if(shellStatus == "full" && !forwardShellStatus && backwardShellStatus) {
-      G4SubtractionSolid* CutPentaFFo
-	= new G4SubtractionSolid("CutPentaFFo",shellF, PentaCut,
-				 G4Transform3D(NoRotR,G4ThreeVector(0, 0, halfheight)));
-      G4LogicalVolume* logicPentaFFo = new G4LogicalVolume(CutPentaFFo, matShell,
-							   "Shell_log", 0, 0, 0 );
-      G4ThreeVector TarPos4 = G4ThreeVector(0, 0, halfheight);
-      TarPos4.rotateZ(ModuleEuler[3][0]);
+
+      // Define the transformations for the flats.
+      // (Eventually, this should be a for loop.)
+      G4ThreeVector TarPos1
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos1.rotateY(ModuleEuler[0][1]);
+      TarPos1.rotateZ(ModuleEuler[0][2]);
+      G4RotationMatrix RotShell1 = G4RotationMatrix::IDENTITY;
+      RotShell1.rotateZ(ModuleEuler[0][0]);
+      RotShell1.rotateY( TarPos1.getTheta() );
+      RotShell1.rotateZ( TarPos1.getPhi() );
+
+      G4ThreeVector TarPos2
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos2.rotateY(ModuleEuler[1][1]);
+      TarPos2.rotateZ(ModuleEuler[1][2]);
+      G4RotationMatrix RotShell2 = G4RotationMatrix::IDENTITY;
+      RotShell2.rotateZ(ModuleEuler[1][0]);
+      RotShell2.rotateY( TarPos2.getTheta() );
+      RotShell2.rotateZ( TarPos2.getPhi() );
+      
+      G4ThreeVector TarPos3
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos3.rotateY(ModuleEuler[2][1]);
+      TarPos3.rotateZ(ModuleEuler[2][2]);
+      G4RotationMatrix RotShell3 = G4RotationMatrix::IDENTITY;
+      RotShell3.rotateZ(ModuleEuler[2][0]);
+      RotShell3.rotateY( TarPos3.getTheta() );
+      RotShell3.rotateZ( TarPos3.getPhi() );
+
+      G4ThreeVector TarPos4
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
       TarPos4.rotateY(ModuleEuler[3][1]);
       TarPos4.rotateZ(ModuleEuler[3][2]);
       G4RotationMatrix RotShell4 = G4RotationMatrix::IDENTITY;
-      RotShell4.rotateZ( 180*degree );
-      RotShell4.rotateZ( 58.31*degree );
+      RotShell4.rotateZ(ModuleEuler[3][0]);
       RotShell4.rotateY( TarPos4.getTheta() );
       RotShell4.rotateZ( TarPos4.getPhi() );
-      G4SubtractionSolid* cutRDouble = new G4SubtractionSolid("cutRDouble", CutPentaFFo, doubleShape, G4Transform3D(RotShell4, TarPos4));
-      G4LogicalVolume* logiccutRDouble = new G4LogicalVolume(cutRDouble, matShell, "Shell_log", 0, 0, 0 );
+
+      G4ThreeVector TarPos5
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos5.rotateY(ModuleEuler[4][1]);
+      TarPos5.rotateZ(ModuleEuler[4][2]);
+      G4RotationMatrix RotShell5 = G4RotationMatrix::IDENTITY;
+      RotShell5.rotateZ(ModuleEuler[4][0]);
+      RotShell5.rotateY( TarPos5.getTheta() );
+      RotShell5.rotateZ( TarPos5.getPhi() );
+
+      // Cut the flats first ...
+      G4SubtractionSolid* FTripleFlat
+	= new G4SubtractionSolid("FTripleFlat", shellF, tripleShape,
+				 G4Transform3D(RotShell1, TarPos1));
+      G4SubtractionSolid* FTripleFlat2
+	= new G4SubtractionSolid("FTripleFlat2", FTripleFlat, tripleShape,
+				 G4Transform3D(RotShell2, TarPos2));
+      G4SubtractionSolid* FTripleFlat3
+	= new G4SubtractionSolid("FTripleFlat3", FTripleFlat2, tripleShape,
+				 G4Transform3D(RotShell3, TarPos3));
+      G4SubtractionSolid* FDoubleFlat
+	= new G4SubtractionSolid("FDoubleFlat", FTripleFlat3, tripleShape,
+				 G4Transform3D(RotShell4, TarPos4));
+      G4SubtractionSolid* FDoubleFlat2
+	= new G4SubtractionSolid("FDoubleFlat2", FDoubleFlat, tripleShape,
+				 G4Transform3D(RotShell5, TarPos5));
+
+      // ... then remove the central pentagon.
+      G4SubtractionSolid* FFRingCutPenta
+	= new G4SubtractionSolid("FRingFlat", FDoubleFlat2, PentaCut,
+				 G4Transform3D(NoRotR,
+					       G4ThreeVector(0,0,halfheight)));
+
+      G4LogicalVolume* logicFFRingCutPenta
+	= new G4LogicalVolume(FFRingCutPenta, matShell, "Shell_log", 0, 0, 0 );
       
       //Place Full Shell with no forward ring
       G4AssemblyVolume* FullNF = new G4AssemblyVolume();
-      FullNF->AddPlacedVolume(logiccutRDouble, NoShiftR, &NoRotR);
+      FullNF->AddPlacedVolume(logicFFRingCutPenta, NoShiftR, &NoRotR);
       FullNF->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
     }
     else if(shellStatus == "full" && !backwardShellStatus && forwardShellStatus) {
-      G4SubtractionSolid* CutPentaFBo
-	= new G4SubtractionSolid("CutPentaFBo",shellF, PentaCut,
-				 G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
-      G4LogicalVolume* logicPentaFBo = new G4LogicalVolume(CutPentaFBo, matShell,
-							   "Shell_log", 0, 0, 0 );
-       G4ThreeVector TarPos26 = G4ThreeVector(0, 0, halfheight);
-      TarPos26.rotateZ(ModuleEuler[25][0]);
+
+      // Define the transformations for the flats.
+      // (Eventually, this should be a for loop.)
+      G4ThreeVector TarPos26
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
       TarPos26.rotateY(ModuleEuler[25][1]);
       TarPos26.rotateZ(ModuleEuler[25][2]);
       G4RotationMatrix RotShell26 = G4RotationMatrix::IDENTITY;
-      RotShell26.rotateZ( 0*degree );
-      RotShell26.rotateZ( -58.31*degree );
+      RotShell26.rotateZ(ModuleEuler[25][0]);
       RotShell26.rotateY( TarPos26.getTheta() );
       RotShell26.rotateZ( TarPos26.getPhi() );
-      G4SubtractionSolid* cutLDouble = new G4SubtractionSolid("cutLDouble", CutPentaFBo, doubleShape, G4Transform3D(RotShell26, TarPos26));
-      G4LogicalVolume* logiccutLDouble = new G4LogicalVolume(cutLDouble, matShell, "Shell_log", 0, 0, 0 );
+
+      G4ThreeVector TarPos27
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos27.rotateY(ModuleEuler[26][1]);
+      TarPos27.rotateZ(ModuleEuler[26][2]);
+      G4RotationMatrix RotShell27 = G4RotationMatrix::IDENTITY;
+      RotShell27.rotateZ(ModuleEuler[26][0]);
+      RotShell27.rotateY( TarPos27.getTheta() );
+      RotShell27.rotateZ( TarPos27.getPhi() );
+      
+      G4ThreeVector TarPos28
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos28.rotateY(ModuleEuler[27][1]);
+      TarPos28.rotateZ(ModuleEuler[27][2]);
+      G4RotationMatrix RotShell28 = G4RotationMatrix::IDENTITY;
+      RotShell28.rotateZ(ModuleEuler[27][0]);
+      RotShell28.rotateY( TarPos28.getTheta() );
+      RotShell28.rotateZ( TarPos28.getPhi() );
+
+      G4ThreeVector TarPos29
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos29.rotateY(ModuleEuler[28][1]);
+      TarPos29.rotateZ(ModuleEuler[28][2]);
+      G4RotationMatrix RotShell29 = G4RotationMatrix::IDENTITY;
+      RotShell29.rotateZ(ModuleEuler[28][0]);
+      RotShell29.rotateY( TarPos29.getTheta() );
+      RotShell29.rotateZ( TarPos29.getPhi() );
+
+      G4ThreeVector TarPos30
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos30.rotateY(ModuleEuler[29][1]);
+      TarPos30.rotateZ(ModuleEuler[29][2]);
+      G4RotationMatrix RotShell30 = G4RotationMatrix::IDENTITY;
+      RotShell30.rotateZ(ModuleEuler[29][0]);
+      RotShell30.rotateY( TarPos30.getTheta() );
+      RotShell30.rotateZ( TarPos30.getPhi() );
+
+      // Cut the flats first ...
+      G4SubtractionSolid* BTripleFlat
+	= new G4SubtractionSolid("BTripleFlat", shellF, tripleShape,
+				 G4Transform3D(RotShell26, TarPos26));
+      G4SubtractionSolid* BTripleFlat2
+	= new G4SubtractionSolid("BTripleFlat2", BTripleFlat, tripleShape,
+				 G4Transform3D(RotShell27, TarPos27));
+      G4SubtractionSolid* BTripleFlat3
+	= new G4SubtractionSolid("BTripleFlat3", BTripleFlat2, tripleShape,
+				 G4Transform3D(RotShell28, TarPos28));
+      G4SubtractionSolid* BDoubleFlat
+	= new G4SubtractionSolid("BDoubleFlat", BTripleFlat3, tripleShape,
+				 G4Transform3D(RotShell29, TarPos29));
+      G4SubtractionSolid* BDoubleFlat2
+	= new G4SubtractionSolid("BDoubleFlat2", BDoubleFlat, tripleShape,
+				 G4Transform3D(RotShell30, TarPos30));
+
+      // ... then remove the central pentagon (rotated for the back ring).
+      G4SubtractionSolid* FBRingCutPenta
+	= new G4SubtractionSolid("BRingCutPenta", BDoubleFlat2, BPentaCut,
+				 G4Transform3D(NoRotR,
+					       G4ThreeVector(0,0,-halfheight)));
+
+      G4LogicalVolume* logicFBRingCutPenta
+	= new G4LogicalVolume(FBRingCutPenta, matShell, "Shell_log", 0, 0, 0 );
       
       //Place Full Shell with no backward ring
       G4AssemblyVolume* FullNB = new G4AssemblyVolume();
-      FullNB->AddPlacedVolume(logiccutLDouble, NoShiftR, &NoRotR);
+      FullNB->AddPlacedVolume(logicFBRingCutPenta, NoShiftR, &NoRotR);
       FullNB->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
+
     }
     else if(shellStatus == "full" && !backwardShellStatus && !forwardShellStatus) {
-      G4SubtractionSolid* CutPentaFF
-	= new G4SubtractionSolid("CutPentaFF", shellF, PentaCut,
-				 G4Transform3D(NoRotR,G4ThreeVector(0,0,halfheight)));
-      G4SubtractionSolid* DualPentaCutFFB
-	= new G4SubtractionSolid("DualPentaCutFFB", CutPentaFF, PentaCut,
-				 G4Transform3D(RotCut,G4ThreeVector(0, 0, -halfheight)));
-      G4LogicalVolume* logicDualPentaFFB = new G4LogicalVolume(DualPentaCutFFB, matShell,
-							       "Shell_log", 0, 0, 0 );
-       
-      //Place Full Shell with no forward or backward ring
-      G4AssemblyVolume* FullNFB = new G4AssemblyVolume();
-      FullNFB->AddPlacedVolume(logicDualPentaFFB, NoShiftR, &NoRotR);
-      FullNFB->MakeImprint(theDetector->HallLog(), NoShiftR, &NoRotR, 0);
+
+       G4ThreeVector TarPos1
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos1.rotateY(ModuleEuler[0][1]);
+      TarPos1.rotateZ(ModuleEuler[0][2]);
+      G4RotationMatrix RotShell1 = G4RotationMatrix::IDENTITY;
+      RotShell1.rotateZ(ModuleEuler[0][0]);
+      RotShell1.rotateY( TarPos1.getTheta() );
+      RotShell1.rotateZ( TarPos1.getPhi() );
+
+      G4ThreeVector TarPos2
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos2.rotateY(ModuleEuler[1][1]);
+      TarPos2.rotateZ(ModuleEuler[1][2]);
+      G4RotationMatrix RotShell2 = G4RotationMatrix::IDENTITY;
+      RotShell2.rotateZ(ModuleEuler[1][0]);
+      RotShell2.rotateY( TarPos2.getTheta() );
+      RotShell2.rotateZ( TarPos2.getPhi() );
+      
+      G4ThreeVector TarPos3
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos3.rotateY(ModuleEuler[2][1]);
+      TarPos3.rotateZ(ModuleEuler[2][2]);
+      G4RotationMatrix RotShell3 = G4RotationMatrix::IDENTITY;
+      RotShell3.rotateZ(ModuleEuler[2][0]);
+      RotShell3.rotateY( TarPos3.getTheta() );
+      RotShell3.rotateZ( TarPos3.getPhi() );
+
+      G4ThreeVector TarPos4
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos4.rotateY(ModuleEuler[3][1]);
+      TarPos4.rotateZ(ModuleEuler[3][2]);
+      G4RotationMatrix RotShell4 = G4RotationMatrix::IDENTITY;
+      RotShell4.rotateZ(ModuleEuler[3][0]);
+      RotShell4.rotateY( TarPos4.getTheta() );
+      RotShell4.rotateZ( TarPos4.getPhi() );
+
+      G4ThreeVector TarPos5
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos5.rotateY(ModuleEuler[4][1]);
+      TarPos5.rotateZ(ModuleEuler[4][2]);
+      G4RotationMatrix RotShell5 = G4RotationMatrix::IDENTITY;
+      RotShell5.rotateZ(ModuleEuler[4][0]);
+      RotShell5.rotateY( TarPos5.getTheta() );
+      RotShell5.rotateZ( TarPos5.getPhi() );
+      
+      G4ThreeVector TarPos26
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos26.rotateY(ModuleEuler[25][1]);
+      TarPos26.rotateZ(ModuleEuler[25][2]);
+      G4RotationMatrix RotShell26 = G4RotationMatrix::IDENTITY;
+      RotShell26.rotateZ(ModuleEuler[25][0]);
+      RotShell26.rotateY( TarPos26.getTheta() );
+      RotShell26.rotateZ( TarPos26.getPhi() );
+
+      G4ThreeVector TarPos27
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos27.rotateY(ModuleEuler[26][1]);
+      TarPos27.rotateZ(ModuleEuler[26][2]);
+      G4RotationMatrix RotShell27 = G4RotationMatrix::IDENTITY;
+      RotShell27.rotateZ(ModuleEuler[26][0]);
+      RotShell27.rotateY( TarPos27.getTheta() );
+      RotShell27.rotateZ( TarPos27.getPhi() );
+      
+      G4ThreeVector TarPos28
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos28.rotateY(ModuleEuler[27][1]);
+      TarPos28.rotateZ(ModuleEuler[27][2]);
+      G4RotationMatrix RotShell28 = G4RotationMatrix::IDENTITY;
+      RotShell28.rotateZ(ModuleEuler[27][0]);
+      RotShell28.rotateY( TarPos28.getTheta() );
+      RotShell28.rotateZ( TarPos28.getPhi() );
+
+      G4ThreeVector TarPos29
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos29.rotateY(ModuleEuler[28][1]);
+      TarPos29.rotateZ(ModuleEuler[28][2]);
+      G4RotationMatrix RotShell29 = G4RotationMatrix::IDENTITY;
+      RotShell29.rotateZ(ModuleEuler[28][0]);
+      RotShell29.rotateY( TarPos29.getTheta() );
+      RotShell29.rotateZ( TarPos29.getPhi() );
+
+      G4ThreeVector TarPos30
+	= G4ThreeVector(0, 0, std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2)));
+      TarPos30.rotateY(ModuleEuler[29][1]);
+      TarPos30.rotateZ(ModuleEuler[29][2]);
+      G4RotationMatrix RotShell30 = G4RotationMatrix::IDENTITY;
+      RotShell30.rotateZ(ModuleEuler[29][0]);
+      RotShell30.rotateY( TarPos30.getTheta() );
+      RotShell30.rotateZ( TarPos30.getPhi() );
+
+      // Remove the forward central pentagon.
+      G4SubtractionSolid* FCutPenta
+	= new G4SubtractionSolid("FCutPenta", shellF, PentaCut,
+				 G4Transform3D(NoRotR,
+					       G4ThreeVector(0,0,halfheight)));
+      // Remove the backward central pentagon.
+      G4SubtractionSolid* FBCutPenta
+	= new G4SubtractionSolid("FBCutPenta", FCutPenta, BPentaCut,
+				 G4Transform3D(NoRotR,
+					       G4ThreeVector(0,0,-halfheight)));
+      
+      // Make the forward flats.
+      G4MultiUnion* FRingFlats = new G4MultiUnion("FRingFlats");
+      G4Transform3D tr1 = G4Transform3D(RotShell1, TarPos1);
+      FRingFlats->AddNode(*tripleShape, tr1);
+      G4Transform3D tr2 = G4Transform3D(RotShell2, TarPos2);
+      FRingFlats->AddNode(*tripleShape, tr2);
+      G4Transform3D tr3 = G4Transform3D(RotShell3, TarPos3);
+      FRingFlats->AddNode(*tripleShape, tr3);
+      G4Transform3D tr4 = G4Transform3D(RotShell4, TarPos4);
+      FRingFlats->AddNode(*tripleShape, tr4);
+      G4Transform3D tr5 = G4Transform3D(RotShell5, TarPos5);
+      FRingFlats->AddNode(*tripleShape, tr5);
+      FRingFlats->Voxelize();
+
+      // Cut the forward flats.
+      G4SubtractionSolid* FBCutPentaFFlats
+	= new G4SubtractionSolid("FRingCut", FBCutPenta, FRingFlats,
+				 G4Transform3D(NoRotR,
+					       G4ThreeVector(0,0,0)));
+            
+      // Make the backward flats.
+      G4MultiUnion* BRingFlats = new G4MultiUnion("BRingFlats");
+      
+      G4Transform3D tr30 = G4Transform3D(RotShell30, TarPos30);
+      BRingFlats->AddNode(*tripleShape, tr30);
+      G4Transform3D tr29 = G4Transform3D(RotShell29, TarPos29);
+      BRingFlats->AddNode(*tripleShape, tr29);
+      G4Transform3D tr28 = G4Transform3D(RotShell28, TarPos28);
+      BRingFlats->AddNode(*tripleShape, tr28);
+      G4Transform3D tr27 = G4Transform3D(RotShell27, TarPos27);
+      BRingFlats->AddNode(*tripleShape, tr27);
+      G4Transform3D tr26 = G4Transform3D(RotShell26, TarPos26);
+      BRingFlats->AddNode(*tripleShape, tr26);
+
+      BRingFlats->Voxelize();
+
+      // Cut the backward flats.
+      G4SubtractionSolid* FBCutPentaFBFlats
+      	= new G4SubtractionSolid("FBCutPentaFBFlats", FBCutPentaFFlats, BRingFlats,
+      				 G4Transform3D(NoRotR,
+      					       G4ThreeVector(0,0,0)));
+
+      G4LogicalVolume* logicFBCutPentaFBFlats
+	= new G4LogicalVolume(FBCutPentaFBFlats, matShell, "Shell_log", 0, 0, 0 );
+
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), "MountingShell", logicFBCutPentaFBFlats,
+      			theDetector->HallPhys(), false, 0 );
+
     }     
      
   }
@@ -788,7 +1039,7 @@ void Greta_Shell::Placement(G4String shellStatus,
   
 }
 
-//Creates and returns the full or partial Greta shell sphere
+//Creates and returns the full or partial Greta shell
 G4SubtractionSolid* Greta_Shell::Shell(G4String half)
 {
   G4double Phi0=0;
@@ -815,56 +1066,88 @@ G4SubtractionSolid* Greta_Shell::Shell(G4String half)
     G4Exception("Greta_Shell::Shell()", "Error", FatalException,
 		"half argument must be set to LEFT or RIGHT or FULL");
 
+  G4ThreeVector Origin = G4ThreeVector(0, 0, 0);
+  G4RotationMatrix NoRot = G4RotationMatrix::IDENTITY;
+  
   G4Sphere* solidShell = new G4Sphere( "solidShell", Rmin, Rmax,
-				       Phi0, dPhi, 0., 180.*deg);
+  				       Phi0, dPhi, 0., 180.*deg);
 
-  // Beam Port  
-  G4Tubs* beamPort = new G4Tubs( "beamPort", 0., smallPortRadius, 1.1*Rmax,
-				 0.*deg, 360.*deg);
+  G4Tubs* smallPort = new G4Tubs("smallPort", 0, smallPortRadius,
+  				 1.5*Rmax,
+  				 0., 360.*deg);
 
+  // Beam ports
   G4SubtractionSolid* shell
-    = new G4SubtractionSolid("Shell", solidShell, beamPort,
-			     G4Transform3D(Rot, G4ThreeVector(0.0, 0.0, 0.0)));
+    = new G4SubtractionSolid("Shell", solidShell, smallPort,
+  			     G4Transform3D(Rot, Origin));
 
-  // Subtract the small ports from the shell.
-  G4Tubs* smallPort = new G4Tubs("smallPort", 0, smallPortRadius, 1.5*(Rmax-Rmin)/2.,
-				 0., 360.*deg);
+  // Other small ports
+  
+  // Opposites
+  // 1 : 10
+  // 2 :  9
+  // 3 :  8
+  // 4 :  7
+  // 5 :  6
 
   G4int iMin = 0;
-  G4int iMax = 10;
+  G4int iMax = 5;
 
   for(G4int i = iMin; i<iMax; i++){
-    Rot = G4RotationMatrix::IDENTITY;
-    Rot.rotateY( PosSP[i].getTheta() );
-    Rot.rotateZ( PosSP[i].getPhi() );
     if( abs(SmallPortStatus[i] <= 1 )) {
+      Rot = G4RotationMatrix::IDENTITY;
+      Rot.rotateY( PosSP[i].getTheta() );
+      Rot.rotateZ( PosSP[i].getPhi() );
       shell = new G4SubtractionSolid ("Shell", shell, smallPort,
-				      G4Transform3D(Rot, PosSP[i]));
+				      G4Transform3D(Rot, Origin));
+
     }
   }
 
-  // Subtract the module ports from the shell.
+  // Module ports
   G4Tubs* modulePort
-    = new G4Tubs("modulePort", 0, modulePortRadius, 1.5*(Rmax-Rmin)/2.,
-		 0., 360.*deg);
+    = new G4Tubs("modulePort", 0, modulePortRadius, 1.5*Rmax,
+		   0., 360.*deg);
+
+  // L 1,2,3S 6,7,     11,12,13,14,15, 21,22,23S, 26,27
+  // R 4,5    8,9,10S, 16,17,18,19,20, 24,25,     28,29,30S
+
+  // Opposites
+  //  3 : 30
+  //  2 : 29
+  //  1 : 28
+  //  4 : 26
+  //  5 : 27
+  
+  //  6 : 24
+  //  7 : 25
+  //  8 : 21
+  //  9 : 22
+  // 10 : 23
+  
+  // 11 : 16
+  // 12 : 17
+  // 13 : 18
+  // 14 : 19
+  // 15 : 20
 
   iMin = 0;
-  iMax = 30;
+  iMax = 15;
 
   for(G4int i = iMin; i<iMax; i++){
-    Pos = Pos0;
-    Pos.rotateZ(ModuleEuler[i][0]);
-    Pos.rotateY(ModuleEuler[i][1]);
-    Pos.rotateZ(ModuleEuler[i][2]);
-    Rot = G4RotationMatrix::IDENTITY;
-    Rot.rotateY( Pos.getTheta() );
-    Rot.rotateZ( Pos.getPhi() );
-
     if( ( ModulePortStatus[i] <= 0 ) || ( ModulePortStatus[i] >= 0 ) ) {
-          shell = new G4SubtractionSolid ("Shell", shell, modulePort,
-					  G4Transform3D(Rot, Pos));
+      Pos = Pos0;
+      Pos.rotateZ(ModuleEuler[i][0]);
+      Pos.rotateY(ModuleEuler[i][1]);
+      Pos.rotateZ(ModuleEuler[i][2]);
+      Rot = G4RotationMatrix::IDENTITY;
+      Rot.rotateY( Pos.getTheta() );
+      Rot.rotateZ( Pos.getPhi() );
+      shell = new G4SubtractionSolid ("Shell", shell, modulePort,
+				      G4Transform3D(Rot, Origin));
     }
   }
+  
   return shell;
 
 }
