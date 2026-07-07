@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
-// This class provides the GRETINA mounting shell used at the NSCL. 
-// (Lew Riley lriley@ursinus.edu) 
+// This class provides the GRETA mounting shell. 
+// (Blake McNulty) 
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef Greta_Shell_h
@@ -12,6 +12,11 @@
 #include "G4Box.hh"
 #include "G4SubtractionSolid.hh"
 #include "G4IntersectionSolid.hh"
+#include "G4MultiUnion.hh"
+#include "G4TessellatedSolid.hh"
+#include "G4TriangularFacet.hh"
+#include "G4QuadrangularFacet.hh"
+#include "G4AssemblyVolume.hh"
 #include "G4Material.hh"
 #include "G4Sphere.hh"
 #include "G4LogicalVolume.hh"
@@ -50,23 +55,26 @@ private:
   G4double         Rmax;
   G4double         smallPortRadius;
   G4double         modulePortRadius;
-  G4double         northOffset;
-  G4double         southOffset;
+  G4double         leftOffset;
+  G4double         rightOffset;
   G4ThreeVector    Pos;
   G4ThreeVector    Pos0;
   G4RotationMatrix Rot;
   G4RotationMatrix Rot0;
   G4ThreeVector    PosSP[10];
   G4double         ModuleEuler[30][3];
+  G4double         MPosFlats[5][2];
+  G4double         MPosHexHole[4][2];
+  G4double         MPosTripleHole[4][2];
   G4int            SmallPortStatus[10];
   G4int            ModulePortStatus[30];
-
+  
 public:
     G4int  FindMaterials();
-    void   setNorthOffset(G4double off){northOffset = off;}
-    void   setSouthOffset(G4double off){southOffset = off;}
-    void   Placement(G4String);
-    void   HalfShell(G4String);
+    void   SetLeftOffset(G4double off){leftOffset = off;}
+    void   SetRightOffset(G4double off){rightOffset = off;}
+    void   Placement(G4String, G4bool, G4bool);
+    G4SubtractionSolid*   Shell(G4String);
 };
 
 #endif

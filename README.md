@@ -133,21 +133,37 @@ Optional commands for setting GRETA chamber geometry:
     
     /GretaChamber/R_max <double> <unit>
 
-Optional commands for including GRETINA-related passive material:
+Optional commands for including Gretina mounting shell:
 
     /Gretina/detector/enableCapsules
     
     /Gretina/detector/enableCryostats
     
-    /Gretina/Shell < full || north || south || Greta || GretaLH || Greta_North || Greta_South || GretaLH_North || GretaLH_South >
+    /Gretina/Shell < full || north || south >
 
-Optional commands setting the offset of the north and south halves of the mounting shell (positive values correspond to backing away from the target):
+Optional commands setting the offset of the north and south halves of the Gretina mounting shell (positive values correspond to backing away from the target):
 
     /Gretina/NorthOffset <double> <unit>
     
     /Gretina/SouthOffset <double> <unit>
 
-Optional command to omit the GRETINA detectors:
+Optional commands for including the GRETA mounting shell:
+
+    /GRETA/Shell <full || left || right>
+
+> The forward and backward rings of the GRETA shell can optionally be omitted with either or both of the commands:
+
+    /GRETA/NoForward
+
+    /GRETA/NoBackward
+
+Optional commands setting the offsets of the left and right hemispheres of the GRETA mounting shell (positive values correspond to backing away from the target):
+
+    /GRETA/LeftOffset <double> <unit>
+    
+    /GRETA/RightOffset <double> <unit>
+
+Optional command to omit the GRETINA/GRETA detectors:
 
     /Gretina/NoDetectors
 

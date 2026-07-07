@@ -92,8 +92,13 @@ public:
 
 #ifndef SCANNING
   void SetShellStatus(G4String stat){shellStatus = stat;}
+  void SetGRETAShellStatus(G4String stat){GRETAShellStatus = stat;}
+  void SetForwardGRETAShellStatus(G4bool stat){forwardShellStatus = stat;}
+  void SetBackwardGRETAShellStatus(G4bool stat){backwardShellStatus = stat;}
   void SetNorthOffset(G4double off){northOffset = off;}
   void SetSouthOffset(G4double off){southOffset = off;}
+  void SetLeftOffset(G4double off){leftOffset = off;}
+  void SetRightOffset(G4double off){rightOffset = off;}
   void SetS800Status(G4bool stat){s800Status = stat;}
   void SetLaBrStatus(G4bool stat){laBrStatus = stat;}
 #endif
@@ -139,6 +144,11 @@ private:
   G4String shellStatus;
   G4double northOffset;
   G4double southOffset;
+  G4String GRETAShellStatus;
+  G4bool   forwardShellStatus;
+  G4bool   backwardShellStatus;
+  G4double leftOffset;
+  G4double rightOffset;
   G4bool   s800Status;
   S800*    the_S800;
   G4bool   laBrStatus;
@@ -173,7 +183,7 @@ private:
 #endif
 };
 
-
+#include "G4UIdirectory.hh"
 #include "G4UImessenger.hh"
 #include "G4UIcmdWithoutParameter.hh"
 #include "G4UIcmdWithAString.hh"
@@ -188,6 +198,7 @@ private:
   DetectorConstruction*        myTarget;
   
 private:
+  G4UIdirectory*               GRETADir;
   G4UIcmdWithoutParameter*     UpdateCmd;
   G4UIcmdWithoutParameter*     TargetCmd;
   G4UIcmdWithoutParameter*     NoGretCmd;
@@ -195,6 +206,11 @@ private:
   G4UIcmdWithAString*          ShellCmd;
   G4UIcmdWithADoubleAndUnit*   NorthOffCmd;
   G4UIcmdWithADoubleAndUnit*   SouthOffCmd;
+  G4UIcmdWithAString*          GRETAShellCmd;
+  G4UIcmdWithoutParameter*     GRETANoForwardShellCmd;
+  G4UIcmdWithoutParameter*     GRETANoBackwardShellCmd;
+  G4UIcmdWithADoubleAndUnit*   GRETALeftOffCmd;
+  G4UIcmdWithADoubleAndUnit*   GRETARightOffCmd;
   G4UIcmdWithoutParameter*     S800Cmd;
   G4UIcmdWithoutParameter*     LaBrCmd;
 #endif
