@@ -147,15 +147,11 @@ Optional commands setting the offset of the north and south halves of the Gretin
     
     /Gretina/SouthOffset <double> <unit>
 
-Optional commands for including the GRETA mounting shell:
+Optional commands for including and configuring the GRETA mounting shell:
 
-    /GRETA/Shell <full || left || right>
+    /GRETA/Shell <full || left || right || NoForward || NoBackward>
 
-> The forward and backward rings of the GRETA shell can optionally be omitted with either or both of the commands:
-
-    /GRETA/NoForward
-
-    /GRETA/NoBackward
+> The NoForward and NoBackward options are used to omit the forward (holes 1-5) and backward (holes 26-30) portions of the frame. They are specified by including separate /Greta/Shell command(s).
 
 Optional commands setting the offsets of the left and right hemispheres of the GRETA mounting shell (positive values correspond to backing away from the target):
 
