@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "git_hash": "632068",
+    "git_branch": "geant4.10",
+    "cpu": "12th Gen Intel(R) Core(TM) i5-1240P"
+  },
+  "sources_eu152": 4035,
+  "sources_co60": 6337,
+  "sources_ho166": 8388,
+  "inbeam_standard": 4018,
+  "inbeam_lh": 3289,
+  "inbeam_pol": 3492,
+  "inbeam_cache_run": 3095,
+  "background": 2502,
+  "scanning": 5480
+}

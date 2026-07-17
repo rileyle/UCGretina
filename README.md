@@ -711,3 +711,19 @@ This generates a VRML 2 file named `g4_XX.wrl` which can be viewed with a VRML v
 The macro file `./vis/trajectories.mac` illustrates how to add particle trajectories to visualizations.
 
 Within mayavi2, the python scripts `./vis/mlab.animate.py` and `./vis/mlab.movie.py` can be run (File -> Run Python Script). The former animates the scene, and the latter saves the animation frames as a series of .png files which can be stitched together into an animated png or gif.
+
+## Tests ##
+
+There are several targets in the `GNUmakefile` that run tests using selected example macro files as templates. 
+
+    $ make test
+	
+runs 1000-event simulations of all of the functionality tests and compares output-file line counts to baselines stored in `./tests/baselines.json`. (This file is automatically created if it is not present.) These baselines should agree across hardware and platforms within statistical variation.
+
+    $ make test-smoke
+	
+runs the functionality tests with 100 events for quick testing.
+
+    $ make test-benchmark
+
+runs benchmarking tests and collects event rates from 10000-event simulations in the `benchmark.log` file. (These benchmarks are hardware and context dependent.)

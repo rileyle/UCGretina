@@ -12,3 +12,4 @@ tmp*
 *.cache
 .vscode
 git_hash
+__pycache__
