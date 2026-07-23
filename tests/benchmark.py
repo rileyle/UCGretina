@@ -16,7 +16,7 @@ TESTS_DIR = os.path.join(PROJECT_ROOT, "tests")
 #MACROS_DIR = os.path.join(TESTS_DIR, "macros")
 TMP_DIR = os.path.join(TESTS_DIR, "tmp")
 BASELINES_FILE = os.path.join(TESTS_DIR, "baselines.json")
-BENCHMARK_LOG = os.path.join(PROJECT_ROOT, "benchmark.log")
+FUNCTIONAL_LOG = os.path.join(PROJECT_ROOT, "functional_tests.log")
 
 # # Geant4 data environment variable names and their expected subdirectory names
 # _G4_DATA_VARS = {
@@ -180,25 +180,72 @@ def check_fatal(stdout, stderr):
     return any(p in combined for p in fatal_patterns)
 
 
-def count_lines(filepath):
-    """Return line count of a file using wc -l."""
-    result = subprocess.run(["wc", "-l", filepath], capture_output=True, text=True)
-    if result.returncode != 0:
-        return 0
-    return int(result.stdout.strip().split()[0])
+def count_detected_and_simulated(filepath):
+    """Count detected and simulated events in a UCGretina output file.
+
+    Each line beginning with 'E' corresponds to one simulated event
+    (one beam particle fired). Each line beginning with 'D' corresponds
+    to one detected event (at least one gamma registered in GRETINA).
+
+    Args:
+        filepath: Absolute path to the simulation output file.
+
+    Returns:
+        Tuple of (n_detected, n_simulated) as integers.
+        Returns (0, 0) if the file cannot be read.
+    """
+    n_detected = 0
+    n_simulated = 0
+    try:
+        with open(filepath, "r") as f:
+            for line in f:
+                if line.startswith("D"):
+                    n_detected += 1
+                elif line.startswith("E"):
+                    n_simulated += 1
+    except OSError:
+        return 0, 0
+    return n_detected, n_simulated
+
+
+def compute_ratio(n_detected, n_simulated):
+    """Compute the detection ratio and its Poisson uncertainty.
+
+    ratio = n_detected / n_simulated
+    sigma = sqrt(n_detected) / n_simulated
+
+    The uncertainty follows from treating n_detected as a Poisson count:
+    the standard deviation of a Poisson count N is sqrt(N), so the
+    fractional uncertainty on the ratio is sqrt(N_detected) / N_simulated.
+
+    Args:
+        n_detected: Number of detected events (D lines in output).
+        n_simulated: Number of simulated events (E lines in output).
+
+    Returns:
+        Tuple of (ratio, sigma) as floats. Returns (0.0, 0.0) if
+        n_simulated is zero.
+    """
+    if n_simulated == 0:
+        return 0.0, 0.0
+    ratio = n_detected / n_simulated
+    sigma = math.sqrt(n_detected) / n_simulated
+    return ratio, sigma
 
 
 def load_baselines():
     """Load baselines.json; return {} if absent.
 
-    Strips the '_meta' key so callers only see test-name → count entries.
+    Strips the '_meta' key so callers only see test-name -> baseline entries.
+    Only returns entries whose value is a dict (ratio+sigma baselines);
+    stale integer line-count entries are silently skipped.
     """
     if not os.path.isfile(BASELINES_FILE):
         return {}
     with open(BASELINES_FILE) as f:
         data = json.load(f)
     data.pop("_meta", None)
-    return data
+    return {k: v for k, v in data.items() if isinstance(v, dict)}
 
 
 def save_baselines(data):
@@ -216,27 +263,6 @@ def save_baselines(data):
     with open(BASELINES_FILE, "w") as f:
         json.dump(out, f, indent=2)
         f.write("\n")
-
-
-def check_baseline(name, observed, baselines):
-    """Check observed line count against baseline with 2*sqrt(N) tolerance.
-
-    Returns (passed: bool, message: str).
-    If no baseline exists, sets it and returns (True, '[BASELINE SET] ...').
-    """
-    if name not in baselines:
-        baselines[name] = observed
-        return True, f"[BASELINE SET] {name}: {observed} lines"
-
-    baseline = baselines[name]
-    tolerance = 2 * math.sqrt(baseline)
-    if abs(observed - baseline) <= tolerance:
-        return True, (f"[PASS] {name:<30} output lines={observed}  "
-                      f"baseline={baseline}  tolerance=±{tolerance:.0f}")
-    else:
-        return False, (f"[FAIL] {name:<30} output lines={observed}  "
-                       f"baseline={baseline}  tolerance=±{tolerance:.0f}  "
-                       f"** out of range **")
 
 
 def get_git_info():
@@ -287,11 +313,21 @@ def get_cpu_info():
     return socket.gethostname()
 
 
-def append_benchmark_log(rows):
-    """Append rows to benchmark.log (TSV). Write header if file is new."""
-    header = "date\tgit_hash\tgit_branch\tcpu\tvariant\tevents\tevents_per_sec\n"
-    write_header = not os.path.isfile(BENCHMARK_LOG)
-    with open(BENCHMARK_LOG, "a") as f:
+def append_functional_log(rows):
+    """Append functional test results to functional_tests.log (TSV).
+
+    Writes a header line the first time the file is created.
+    Each row is a tuple of values that will be joined with tabs.
+    Columns: date, git_hash, git_branch, cpu, test_name, events,
+             events_per_sec, ratio, sigma, baseline_ratio, baseline_sigma,
+             n_sigma, verdict.
+    """
+    header = (
+        "date\tgit_hash\tgit_branch\tcpu\ttest_name\tevents\t"
+        "events_per_sec\tratio\tsigma\tbaseline_ratio\tbaseline_sigma\tn_sigma\tverdict\n"
+    )
+    write_header = not os.path.isfile(FUNCTIONAL_LOG)
+    with open(FUNCTIONAL_LOG, "a") as f:
         if write_header:
             f.write(header)
         for row in rows:
@@ -311,7 +347,7 @@ def main():
     args = parser.parse_args()
 
     if args.update_baselines:
-        update_baselines()
+        update_baselines(args.events)
         return
 
     if args.mode is None:
@@ -406,7 +442,7 @@ def _check_run_criteria(test_name, stdout, stderr, returncode):
     return True, f"[PASS] {test_name:<30} {eps:.0f} events/s"
 
 
-FUNCTIONAL_EVENTS = 1000
+FUNCTIONAL_EVENTS = 10000
 
 # Maps mode -> list of (test_name, binary_name, macro_file, example_path, support_files, output_filename)
 FUNCTIONAL_CASES = {
@@ -462,9 +498,34 @@ FUNCTIONAL_CASES = {
 
 
 def run_functional(mode):
+    """Run functional tests and compare detection ratios against baselines.
+
+    For each scenario:
+      1. Runs FUNCTIONAL_EVENTS events.
+      2. Parses the output file to compute the detection ratio and its
+         Poisson uncertainty (sqrt(detected) / simulated).
+      3. Looks up the baseline ratio from baselines.json.
+         If no baseline exists, prints [NO BASELINE] and skips comparison.
+      4. Computes the number of standard deviations between the test ratio
+         and the baseline:
+           n_sigma = |ratio_test - ratio_baseline|
+                     / sqrt(sigma_test^2 + sigma_baseline^2)
+      5. Verdict:
+           n_sigma < 2           -> [PASS]
+           2 <= n_sigma < 3      -> [MARGINAL PASS]
+           n_sigma >= 3          -> [FAIL]
+
+    Exits 1 if any test fails (3 sigma or more) or if the simulation
+    crashes. Marginal passes do not cause a non-zero exit.
+    Appends all results to functional_tests.log.
+    """
     print(f"\n=== test-{mode} ({FUNCTIONAL_EVENTS} events) ===")
     baselines = load_baselines()
     failures = 0
+    log_rows = []
+    git_hash, git_branch = get_git_info()
+    cpu = get_cpu_info()
+    today = datetime.date.today().isoformat()
 
     for test_name, binary_name, macro_file, example_path, support_files, out_file in FUNCTIONAL_CASES[mode]:
         binary = find_binary_optional(binary_name)
@@ -479,30 +540,78 @@ def run_functional(mode):
         wrapper = os.path.join(workdir, "run.mac")
         write_run_macro(macro_file, FUNCTIONAL_EVENTS, wrapper)
         stdout, stderr, returncode = run_sim(binary, wrapper, workdir)
+
         ok, msg = _check_run_criteria(test_name, stdout, stderr, returncode)
         if not ok:
             print(msg)
             failures += 1
             continue
 
+        eps = parse_events_per_sec(stdout)
+
         output_path = os.path.join(workdir, out_file)
         if not os.path.isfile(output_path):
-            msg = f"[FAIL] {test_name:<30} output file not created: {output_path}"
-            print(msg)
+            print(f"[FAIL] {test_name:<30} output file not created: {output_path}")
             failures += 1
             continue
-        observed = count_lines(output_path)
-        passed, msg = check_baseline(test_name, observed, baselines)
-        print(msg)
-        if not passed:
+
+        # Compute detection ratio for this test run.
+        n_detected, n_simulated = count_detected_and_simulated(output_path)
+        ratio, sigma = compute_ratio(n_detected, n_simulated)
+
+        # Baselines are keyed by functional test name.
+        baseline_entry = baselines.get(test_name)
+
+        if baseline_entry is None:
+            # No baseline established yet — cannot compare.
+            print(f"[NO BASELINE] {test_name:<30} "
+                  f"ratio={ratio:.6f}\u00b1{sigma:.6f}  "
+                  f"(run make test-benchmark to set baseline)")
+            log_rows.append((
+                today, git_hash, git_branch, cpu, test_name, FUNCTIONAL_EVENTS,
+                f"{eps:.0f}", f"{ratio:.6f}", f"{sigma:.6f}",
+                "N/A", "N/A", "N/A", "NO BASELINE",
+            ))
+            continue
+
+        ratio_base = baseline_entry["ratio"]
+        sigma_base = baseline_entry["sigma"]
+
+        # Combined uncertainty from both the test run and the baseline.
+        combined_sigma = math.sqrt(sigma**2 + sigma_base**2)
+        if combined_sigma == 0:
+            n_sigma = 0.0
+        else:
+            n_sigma = abs(ratio - ratio_base) / combined_sigma
+
+        ratio_str = f"ratio={ratio:.4f}\u00b1{sigma:.4f}"
+        base_str = f"baseline={ratio_base:.4f}\u00b1{sigma_base:.4f}"
+
+        if n_sigma < 2:
+            verdict = "[PASS]"
+        elif n_sigma < 3:
+            verdict = "[MARGINAL PASS]"
+        else:
+            verdict = "[FAIL]"
             failures += 1
 
-    # Run cache pipeline as part of inbeam mode
-    if mode == "inbeam":
-        cache_failures = run_cache_pipeline(baselines)
-        failures += cache_failures
+        print(f"{verdict:<16} {test_name:<30} {ratio_str}  {base_str}  {n_sigma:.2f}\u03c3")
 
-    save_baselines(baselines)
+        log_rows.append((
+            today, git_hash, git_branch, cpu, test_name, FUNCTIONAL_EVENTS,
+            f"{eps:.0f}", f"{ratio:.6f}", f"{sigma:.6f}",
+            f"{ratio_base:.6f}", f"{sigma_base:.6f}",
+            f"{n_sigma:.4f}", verdict[1:-1],
+            ))
+
+        # Run cache pipeline as part of inbeam mode.
+    if mode == "inbeam":
+        cache_failures, cache_rows = run_cache_pipeline(baselines, today, git_hash, git_branch, cpu)
+        failures += cache_failures
+        log_rows.extend(cache_rows)
+
+    if log_rows:
+        append_functional_log(log_rows)
 
     if failures:
         print(f"\n{failures} FAILED")
@@ -511,9 +620,14 @@ def run_functional(mode):
         print(f"\nAll {mode} tests passed.\n")
 
 
-def run_cache_pipeline(baselines):
-    """Run two-step cache pipeline: generation then playback. Returns failure count."""
+def run_cache_pipeline(baselines, today, git_hash, git_branch, cpu):
+    """Run two-step cache pipeline: generation then playback.
+
+    Returns:
+        Tuple of (failure_count: int, log_rows: list).
+    """
     failures = 0
+    log_rows = []
 
     # Step 1: Cache generation — requires UCGretina_LH; skip if unavailable
     gen_name = "inbeam_cache_gen"
@@ -521,10 +635,10 @@ def run_cache_pipeline(baselines):
     if gen_binary is None:
         print(f"[SKIP] {gen_name:<30} binary UCGretina_LH not found")
         print(f"[SKIP] {'inbeam_cache_run':<30} skipped (no cache file: step 1 skipped)")
-        return failures
+        return failures, log_rows
 
     example_path = "examples/inbeam/cache/s44_1329_cache.mac"
-    support_files = ["aclust", "aeuler", "aslice", "asolid", "awalls", 
+    support_files = ["aclust", "aeuler", "aslice", "asolid", "awalls",
                      "crmat.LINUX", "z16.a44.lvldata"]
     gen_workdir = setup_workdir(gen_name, example_path, support_files)
     macro_file = "func_inbeam_cache_gen.mac"
@@ -535,12 +649,12 @@ def run_cache_pipeline(baselines):
     ok, msg = _check_run_criteria(gen_name, stdout, stderr, returncode)
     print(msg)
     if not ok:
-        return failures + 1
+        return failures + 1, log_rows
 
     cache_file = os.path.join(gen_workdir, "cache_gen.cache")
     if not os.path.isfile(cache_file) or os.path.getsize(cache_file) == 0:
         print(f"[FAIL] {gen_name:<30} cache file missing or empty: {cache_file}")
-        return failures + 1
+        return failures + 1, log_rows
 
     # Step 2: Cache playback — uses UCGretina_LH (same binary as gen;
     # LH target geometry commands in the macro require the LH binary)
@@ -548,17 +662,16 @@ def run_cache_pipeline(baselines):
     run_binary = find_binary_optional("UCGretina_LH")
     if run_binary is None:
         print(f"[SKIP] {run_name:<30} binary UCGretina_LH not found")
-        return failures
+        return failures, log_rows
 
-    #    run_geom = os.path.join(PROJECT_ROOT, "Geometry/GretinaLH/G120C4")
     example_path = "examples/inbeam/cache/s44_1329.mac"
-    support_files = ["aclust", "aeuler", "aslice", "asolid", "awalls", 
+    support_files = ["aclust", "aeuler", "aslice", "asolid", "awalls",
                      "crmat.LINUX", "z16.a44.lvldata"]
     run_workdir = setup_workdir(run_name, example_path, support_files)
 
     # Playback needs the generated cache file
     shutil.move(os.path.join(gen_workdir, "cache_gen.cache"), run_workdir)
-    
+
     write_base_macro("func_inbeam_cache_run.mac", example_path,
                      "/Output/Filename output.out", run_workdir)
     run_wrapper = os.path.join(run_workdir, "run.mac")
@@ -566,123 +679,200 @@ def run_cache_pipeline(baselines):
     # Write wrapper: execute base macro, inject Cache/Input, then beamOn
     with open(run_wrapper, "w") as f:
         f.write("/control/execute func_inbeam_cache_run.mac\n")
-        #        f.write(f"/Cache/Input {cache_file}\n")
         f.write(f"/run/beamOn {FUNCTIONAL_EVENTS}\n")
 
     stdout, stderr, returncode = run_sim(run_binary, run_wrapper, run_workdir)
     ok, msg = _check_run_criteria(run_name, stdout, stderr, returncode)
     if not ok:
         print(msg)
-        return failures + 1
+        return failures + 1, log_rows
+
+    eps = parse_events_per_sec(stdout)
 
     output_path = os.path.join(run_workdir, "output.out")
     if not os.path.isfile(output_path):
         msg = f"[FAIL] {run_name:<30} output file not created: {output_path}"
         print(msg)
-        return failures + 1
-    observed = count_lines(output_path)
-    passed, msg = check_baseline(run_name, observed, baselines)
-    print(msg)
-    if not passed:
+        return failures + 1, log_rows
+
+    # Compute detection ratio for cache_run.
+    n_detected, n_simulated = count_detected_and_simulated(output_path)
+    ratio, sigma = compute_ratio(n_detected, n_simulated)
+
+    baseline_entry = baselines.get(run_name)
+
+    if baseline_entry is None:
+        print(f"[NO BASELINE] {run_name:<30} "
+              f"ratio={ratio:.6f}\u00b1{sigma:.6f}  "
+              f"(run make test-benchmark to set baseline)")
+        log_rows.append((
+            today, git_hash, git_branch, cpu, run_name, FUNCTIONAL_EVENTS,
+            f"{eps:.0f}", f"{ratio:.6f}", f"{sigma:.6f}",
+            "N/A", "N/A", "N/A", "NO BASELINE",
+        ))
+        return failures, log_rows
+
+    ratio_base = baseline_entry["ratio"]
+    sigma_base = baseline_entry["sigma"]
+    combined_sigma = math.sqrt(sigma**2 + sigma_base**2)
+    if combined_sigma == 0:
+        n_sigma = 0.0
+    else:
+        n_sigma = abs(ratio - ratio_base) / combined_sigma
+
+    ratio_str = f"ratio={ratio:.4f}\u00b1{sigma:.4f}"
+    base_str = f"baseline={ratio_base:.4f}\u00b1{sigma_base:.4f}"
+
+    if n_sigma < 2:
+        verdict = "[PASS]"
+    elif n_sigma < 3:
+        verdict = "[MARGINAL PASS]"
+    else:
+        verdict = "[FAIL]"
         failures += 1
 
-    return failures
+    print(f"{verdict:<16} {run_name:<30} {ratio_str}  {base_str}  {n_sigma:.2f}\u03c3")
+
+    log_rows.append((
+        today, git_hash, git_branch, cpu, run_name, FUNCTIONAL_EVENTS,
+        f"{eps:.0f}", f"{ratio:.6f}", f"{sigma:.6f}",
+        f"{ratio_base:.6f}", f"{sigma_base:.6f}",
+        f"{n_sigma:.4f}", verdict[1:-1],
+    ))
+
+    return failures, log_rows
 
 
 # (variant_label, binary_name, macro_file, geometry_prefix)
 BENCHMARK_CASES = [
     ("UCGretina",      "UCGretina",      "bench_standard.mac",
      "examples/inbeam/fit/s44_1329.mac",
-     ["aclust", "aeuler", "aslice", "asolid", "awalls", 
+     ["aclust", "aeuler", "aslice", "asolid", "awalls",
       "crmat.LINUX", "z16.a44.lvldata"]),
     ("UCGretina_LH",   "UCGretina_LH",   "bench_lh.mac",
      "examples/inbeam/fitLH/s44_1329.mac",
-     ["aclust", "aeuler", "aslice", "asolid", "awalls", 
+     ["aclust", "aeuler", "aslice", "asolid", "awalls",
       "crmat.LINUX", "z16.a44.lvldata"]),
     ("UCGretina_Pol",  "UCGretina_Pol",  "bench_pol.mac",
      "examples/inbeam/angdist/s44_1329.mac",
-     ["aclust", "aeuler", "aslice", "asolid", "awalls", 
+     ["aclust", "aeuler", "aslice", "asolid", "awalls",
       "crmat.LINUX", "z16.a44.lvldata"]),
     ("UCGretina_Scan", "UCGretina_Scan", "bench_scan.mac",
      "examples/scan/scan.mac",
      ["aclust", "aeuler", "aslice", "asolid", "awalls"]),
+    ("sources_eu152",  "UCGretina",  "bench_sources_eu152.mac",
+     "examples/sources/eu152/eu152.mac",
+     ["aclust", "aeuler", "aslice", "asolid", "awalls",
+      "crmat.LINUX", "z62.a152.lvldata", "z64.a152.lvldata"]),
+    ("sources_co60",   "UCGretina",  "bench_sources_co60.mac",
+     "examples/sources/co60/co60.mac",
+     ["aclust", "aeuler", "aslice", "asolid", "awalls",
+      "crmat.LINUX", "z28.a60.lvldata"]),
+    ("sources_ho166",  "UCGretina",  "bench_sources_ho166.mac",
+     "examples/sources/ho166/ho166.mac",
+     ["aclust", "aeuler", "aslice", "asolid", "awalls",
+      "crmat.LINUX", "z67.a166.decaydata", "z68.a166.lvldata"]),
+    ("background",     "UCGretina",  "bench_background.mac",
+     "examples/background/background.mac",
+     ["aclust", "aeuler", "aslice", "asolid", "awalls",
+      "crmat.LINUX"]),
 ]
+
+
+# Maps benchmark variant label -> functional test name (key in baselines.json).
+BENCHMARK_TO_FUNCTIONAL = {
+    "UCGretina":      "inbeam_standard",
+    "UCGretina_LH":   "inbeam_lh",
+    "UCGretina_Pol":  "inbeam_pol",
+    "UCGretina_Scan": "scanning",
+    "sources_eu152":  "sources_eu152",
+    "sources_co60":   "sources_co60",
+    "sources_ho166":  "sources_ho166",
+    "background":     "background",
+}
 
 
 def run_benchmark(n_events):
     git_hash, git_branch = get_git_info()
     cpu = get_cpu_info()
     today = datetime.date.today().isoformat()
+    # LH variants are ~30x slower; cap their event count to avoid multi-hour runs.
+    lh_events = min(n_events, 100000)
+
     print(f"\n=== Benchmark ({n_events} events, commit {git_hash}, branch {git_branch}) ===")
     print(f"CPU: {cpu}")
-    print(f"{'Variant':<20} {'Events/sec':>12}")
-    print("-" * 34)
+    if lh_events < n_events:
+        print(f"(LH variants: {lh_events} events)")
+    print(f"{'Variant':<20} {'Events/sec':>12}  {'Ratio':>10}  {'Sigma':>10}")
+    print("-" * 58)
 
-    rows = []
+    baselines = load_baselines()
 
-    # Standard variants
     for variant, binary_name, macro_file, example_path, support_files in BENCHMARK_CASES:
         binary = find_binary_optional(binary_name)
         if binary is None:
             print(f"  {variant:<20} {'[SKIP]':>12}")
-            rows.append((today, git_hash, git_branch, cpu, variant, n_events, "SKIP"))
             continue
+
+        # Use reduced event count for LH binary (much slower physics).
+        this_events = lh_events if binary_name == "UCGretina_LH" else n_events
+
         workdir = setup_workdir(f"bench_{variant}", example_path, support_files)
         write_base_macro(macro_file, example_path,
-                         "/Mode2/Filename output.dat", workdir)
+                         "/Output/Filename output.out", workdir)
         wrapper = os.path.join(workdir, "run.mac")
-        write_run_macro(macro_file, n_events, wrapper)
+        write_run_macro(macro_file, this_events, wrapper)
         stdout, stderr, returncode = run_sim(binary, wrapper, workdir)
 
         eps = parse_events_per_sec(stdout)
         if eps is None or returncode != 0:
             print(f"  {variant:<20} {'ERROR':>12}")
-            eps = 0
-        else:
-            print(f"  {variant:<20} {eps:>12.0f}")
+            continue
 
-        rows.append((today, git_hash, git_branch, cpu, variant, n_events, f"{eps:.0f}"))
+        output_path = os.path.join(workdir, "output.out")
+        n_detected, n_simulated = count_detected_and_simulated(output_path)
+        ratio, sigma = compute_ratio(n_detected, n_simulated)
+
+        print(f"  {variant:<20} {eps:>12.0f}  {ratio:>10.6f}  {sigma:>10.6f}")
+
+        # Store ratio baseline keyed by functional test name.
+        functional_name = BENCHMARK_TO_FUNCTIONAL.get(variant)
+        if functional_name:
+            baselines[functional_name] = {"ratio": ratio, "sigma": sigma}
 
     # Cache pipeline benchmark
-    cache_gen_eps, cache_run_eps = _run_cache_benchmark(n_events, today,
+    cache_gen_eps, cache_run_eps = _run_cache_benchmark(lh_events, today,
                                                         git_hash, git_branch,
-                                                        cpu, rows)
+                                                        cpu, baselines)
 
     # Cache speedup factor
     if cache_gen_eps and cache_gen_eps > 0:
         speedup = cache_run_eps / cache_gen_eps
         print(f"  {'cache_speedup':<20} {speedup:>11.1f}x")
-        rows.append((today, git_hash, git_branch, cpu, "cache_speedup", "\u2014", f"{speedup:.1f}x"))
     else:
         print(f"  {'cache_speedup':<20} {'N/A':>12}")
-        # cache rows already written as SKIP/N/A in _run_cache_benchmark
 
-    append_benchmark_log(rows)
-    print(f"\nResults appended to benchmark.log")
+    save_baselines(baselines)
+    print(f"\nBaselines updated in tests/baselines.json")
 
 
-def _run_cache_benchmark(n_events, today, git_hash, git_branch, cpu, rows):
-    """Run cache gen + cache run benchmarks. Appends rows. Returns (gen_eps, run_eps)."""
-    # Cache generation — requires UCGretina_LH; skip gracefully if unavailable
+def _run_cache_benchmark(n_events, today, git_hash, git_branch, cpu, baselines):
+    """Run cache gen + cache run benchmarks. Returns (gen_eps, run_eps).
+
+    Also stores the cache_run detection ratio in baselines["inbeam_cache_run"].
+    Both cache stages use UCGretina_LH; n_events should already be the LH-capped value.
+    """
     gen_binary = find_binary_optional("UCGretina_LH")
     if gen_binary is None:
         print(f"  {'cache_gen':<20} {'[SKIP]':>12}")
         print(f"  {'cache_run':<20} {'[SKIP]':>12}")
-        rows.append((today, git_hash, git_branch, cpu, "cache_gen", n_events,
-                     "SKIP"))
-        rows.append((today, git_hash, git_branch, cpu, "cache_run", n_events,
-                     "SKIP"))
-        rows.append((today, git_hash, git_branch, cpu, "cache_speedup",
-                     "\u2014", "N/A"))
         return 0, 0
 
-    # gen_geom = os.path.join(PROJECT_ROOT, "Geometry/GretinaLH/G120C4")
     example_path = "examples/inbeam/cache/s44_1329_cache.mac"
-    support_files = ["aclust", "aeuler", "aslice", "asolid", "awalls", 
+    support_files = ["aclust", "aeuler", "aslice", "asolid", "awalls",
                      "crmat.LINUX", "z16.a44.lvldata"]
     gen_workdir = setup_workdir("bench_cache_gen", example_path, support_files)
-    write_base_macro("bench_cache_gen.mac", example_path,
-                     "", gen_workdir)
+    write_base_macro("bench_cache_gen.mac", example_path, "", gen_workdir)
     gen_wrapper = os.path.join(gen_workdir, "run.mac")
     write_run_macro("bench_cache_gen.mac", n_events, gen_wrapper)
     stdout, stderr, returncode = run_sim(gen_binary, gen_wrapper, gen_workdir)
@@ -691,30 +881,23 @@ def _run_cache_benchmark(n_events, today, git_hash, git_branch, cpu, rows):
         print(f"  {'cache_gen':<20} {'ERROR':>12}")
         return 0, 0
     print(f"  {'cache_gen':<20} {gen_eps:>12.0f}")
-    rows.append((today, git_hash, git_branch, cpu, "cache_gen", n_events, f"{gen_eps:.0f}"))
 
-    cache_file = os.path.join(gen_workdir, "cache_gen.cache")
-
-    # Cache playback — uses UCGretina_LH (LH target geometry commands in macro)
     run_binary = find_binary_optional("UCGretina_LH")
     if run_binary is None:
         print(f"  {'cache_run':<20} {'[SKIP]':>12}")
         return gen_eps, 0
 
     example_path = "examples/inbeam/cache/s44_1329.mac"
-    support_files = ["aclust", "aeuler", "aslice", "asolid", "awalls", 
+    support_files = ["aclust", "aeuler", "aslice", "asolid", "awalls",
                      "crmat.LINUX", "z16.a44.lvldata"]
     run_workdir = setup_workdir("bench_cache_run", example_path, support_files)
-
-    # Playback needs the generated cache file
     shutil.move(os.path.join(gen_workdir, "cache_gen.cache"), run_workdir)
-    
+
     write_base_macro("bench_cache_run.mac", example_path,
-                     "/Mode2/Filename output.dat", run_workdir)
+                     "/Output/Filename output.out", run_workdir)
     run_wrapper = os.path.join(run_workdir, "run.mac")
     with open(run_wrapper, "w") as f:
         f.write(f"/control/execute bench_cache_run.mac\n")
-        #f.write(f"/Cache/Input {cache_file}\n")
         f.write(f"/run/beamOn {n_events}\n")
 
     stdout, stderr, returncode = run_sim(run_binary, run_wrapper, run_workdir)
@@ -722,28 +905,36 @@ def _run_cache_benchmark(n_events, today, git_hash, git_branch, cpu, rows):
     if run_eps is None or returncode != 0:
         print(f"  {'cache_run':<20} {'ERROR':>12}")
         return gen_eps, 0
-    print(f"  {'cache_run':<20} {run_eps:>12.0f}")
-    rows.append((today, git_hash, git_branch, cpu, "cache_run", n_events, f"{run_eps:.0f}"))
+
+    output_path = os.path.join(run_workdir, "output.out")
+    n_detected, n_simulated = count_detected_and_simulated(output_path)
+    ratio, sigma = compute_ratio(n_detected, n_simulated)
+
+    print(f"  {'cache_run':<20} {run_eps:>12.0f}  {ratio:>10.6f}  {sigma:>10.6f}")
+
+    # Store ratio baseline for the cache_run functional test.
+    baselines["inbeam_cache_run"] = {"ratio": ratio, "sigma": sigma}
 
     return gen_eps, run_eps
 
 
-def update_baselines():
-    """Re-run all functional tests and reset baselines to observed values."""
-    print("Resetting all baselines...")
-    # Save old baselines in case we need to restore on failure
+def update_baselines(n_events):
+    """Reset all detection ratio baselines by re-running the benchmark.
+
+    Wipes ratio entries from baselines.json first, then runs the benchmark
+    to establish fresh ratio+sigma baselines. If the benchmark fails
+    mid-run, the original baselines are restored.
+    """
+    print("Resetting all baselines (running benchmark)...")
     old_content = None
     if os.path.isfile(BASELINES_FILE):
         with open(BASELINES_FILE) as f:
             old_content = f.read()
-    # Wipe existing baselines so every test triggers [BASELINE SET]
-    if os.path.isfile(BASELINES_FILE):
-        os.remove(BASELINES_FILE)
+    # Wipe existing ratio entries so benchmark sets them fresh.
+    save_baselines({})
     try:
-        for mode in ["sources", "inbeam", "scanning", "background"]:
-            run_functional(mode)
-    except SystemExit:
-        # Restore old baselines if update failed partway through
+        run_benchmark(n_events)
+    except Exception:
         if old_content is not None:
             with open(BASELINES_FILE, "w") as f:
                 f.write(old_content)

@@ -716,14 +716,14 @@ Within mayavi2, the python scripts `./vis/mlab.animate.py` and `./vis/mlab.movie
 
 There are several targets in the `GNUmakefile` that run tests using selected example macro files as templates. 
 
-    $ make test
-	
-runs 1000-event simulations of all of the functionality tests and compares output-file line counts to baselines stored in `./tests/baselines.json`. (This file is automatically created if it is not present.) These baselines should agree across hardware and platforms within statistical variation.
+    $ make test-functional
+
+runs functionality tests and collects event rates and detection ratios from 10,000-event simulations in the `functional_tests.log` file. Detection ratios are compared with benchmarks from 1,000,000-event simulations (100,000 events for LH target simulations) stored in ./tests/baselines.json. (Note that event rates are hardware and context dependent.) This target consolidates the individual targets: `test-sources`, `test-inbeam`, `test-scanning`, and `test-background` which can be used for more focused testing.
 
     $ make test-smoke
 	
 runs the functionality tests with 100 events for quick testing.
 
-    $ make test-benchmark
+    $ make test-baselines
 
-runs benchmarking tests and collects event rates from 10000-event simulations in the `benchmark.log` file. (These benchmarks are hardware and context dependent.)
+runs 1,000,000-event simulations (100,000 events for LH target simulations) and writes detection ratios to `./tests/baselines.json` for comparison with future functionality tests. These baselines should not change, within statistical uncertainties, unless the code is changed in a way that affects the total counts registering in the array.

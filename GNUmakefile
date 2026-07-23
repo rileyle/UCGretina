@@ -103,7 +103,7 @@ endif
 
 FORCE:
 
-.PHONY: test-smoke test-sources test-inbeam test-scanning test-background test-benchmark test
+.PHONY: test-smoke test-sources test-inbeam test-scanning test-background test-benchmark test test-functional test-baselines
 
 test-smoke:
 	python3 tests/benchmark.py --mode smoke
@@ -120,9 +120,9 @@ test-scanning:
 test-background:
 	python3 tests/benchmark.py --mode background
 
-test-benchmark:
-	python3 tests/benchmark.py --mode benchmark --events $(or $(BENCH_EVENTS),10000)
+test-functional: test-sources test-inbeam test-background test-scanning
 
-test: test-smoke test-sources test-inbeam test-background test-scanning
+test-baselines:
+	python3 tests/benchmark.py --update-baselines --events $(or $(BENCH_EVENTS),1000000)
 
 include $(G4INSTALL)/config/binmake.gmk
