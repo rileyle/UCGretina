@@ -42,55 +42,6 @@ Greta_Shell::Greta_Shell()
   //Cutout for Flats  positions
   G4double hPrime = h*(RBar/Rmax);
   G4double d = std::sqrt(std::pow(RBar,2)-std::pow(hPrime,2))*tan(31.717*degree);
-  /* This orientation of the polygon makes things difficult ...
-  MPosFlats[0][0]=-hPrime*mm;
-  MPosFlats[0][1]=0*mm;
-  MPosFlats[0][2]=0*mm;
-  MPosFlats[1][0]=-hPrime*cos(60*degree)*mm;
-  MPosFlats[1][1]=hPrime*sin(60*degree)*mm;
-  MPosFlats[1][2]=0*mm;
-  MPosFlats[2][0]=hPrime*cos(60*degree)*mm;
-  MPosFlats[2][1]=hPrime*sin(60*degree)*mm;
-  MPosFlats[2][2]=0*mm;
-  MPosFlats[3][0]=hPrime*mm;
-  MPosFlats[3][1]=0*mm;
-  MPosFlats[3][2]=0*mm;
-  MPosFlats[4][0]=0*mm;
-  MPosFlats[4][1]=-d*mm;
-  MPosFlats[4][2]=0*mm;
-  */
-  // With this orientation of the polygon, we can use the Hole Euler angles
-  // to place the ExtrudedSolid to cut the flats.
-  MPosFlats[0][0]=0*mm;
-  MPosFlats[0][1]=-hPrime*mm;
-  MPosFlats[1][0]=hPrime*sin(60*degree)*mm;
-  MPosFlats[1][1]=-hPrime*cos(60*degree)*mm;
-  MPosFlats[2][0]=hPrime*sin(60*degree)*mm;
-  MPosFlats[2][1]=hPrime*cos(60*degree)*mm;
-  MPosFlats[3][0]=0*mm;
-  MPosFlats[3][1]=hPrime*mm;
-  MPosFlats[4][0]=-d*mm;
-  MPosFlats[4][1]=0*mm;
-  
-  //Module HexHole positions
-  MPosHexHole[0][0] = -h;
-  MPosHexHole[0][1] = 0;
-  MPosHexHole[1][0] = -h*cos(60*degree);
-  MPosHexHole[1][1] = h*sin(60*degree);
-  MPosHexHole[2][0] = h*cos(60*degree);
-  MPosHexHole[2][1] = h*sin(60*degree);
-  MPosHexHole[3][0] = h;
-  MPosHexHole[3][1] = 0;
-
-  //Module TripleHole positions
-  MPosTripleHole[0][0] = -h;
-  MPosTripleHole[0][1] = 0;
-  MPosTripleHole[1][0] = -h*cos(60*degree);
-  MPosTripleHole[1][1] = h*sin(60*degree);
-  MPosTripleHole[2][0] = h*cos(60*degree);
-  MPosTripleHole[2][1] = h*sin(60*degree);
-  MPosTripleHole[3][0] = (1300/2*mm)*tan(31.717*degree);
-  MPosTripleHole[3][1] = 0;
   
   // Module Port Euler angles (relative to Slot 0)
   // Psi                                   Slot   Hemisphere
@@ -265,7 +216,6 @@ void Greta_Shell::Placement(G4String shellStatus,
 			    G4bool forwardShellStatus,
 			    G4bool backwardShellStatus)
 {
-
   if ( shellStatus != "full" && 
        shellStatus != "left" && 
        shellStatus != "right" ){
@@ -274,25 +224,91 @@ void Greta_Shell::Placement(G4String shellStatus,
     return;
   }
 
+   // Using LTM2_2 - LTM2_5 to find the plane of the flat
+  G4double e1 = 0;
+  G4double e2 = 31.717473*deg;
+  G4double e3 = 18.000000*deg;
+
+  // Geant4 x = Drawing y; Geant4 y = - Drawing x
+  G4ThreeVector CADPosFlats[8];
+  CADPosFlats[0] = G4ThreeVector(270.000,   87.728, 459.351); // LTM2_0
+  CADPosFlats[1] = G4ThreeVector(237.173,  -77.062, 509.936); // LTM2_1
+  CADPosFlats[2] = G4ThreeVector(330.754, -107.476, 460.736); // LTM2_2
+  CADPosFlats[3] = G4ThreeVector(456.809,   66.984, 353.509); // LTM2_3
+  CADPosFlats[4] = G4ThreeVector(389.558,  220.803, 363.662); // LTM2_4
+  CADPosFlats[5] = G4ThreeVector(204.406,  281.366, 460.737); // LTM2_5
+  CADPosFlats[6] = G4ThreeVector(146.581,  201.751, 509.936); // LTM2_6
+  CADPosFlats[7] = G4ThreeVector(0,0,626.3); //center of forward beam port
+ 
+  for(G4int i=0; i<8; i++){
+    CADPosFlats[i].rotateZ(-e3);
+    CADPosFlats[i].rotateY(-e2);
+    CADPosFlats[i].rotateZ(-e1);
+  }
+
+  G4double e231 = -90.000000*deg;
+  G4double e232 = 121.717473*deg;
+  G4double e233 = 90.000000*deg;
+
+  // Geant4 x = Drawing y; Geant4 y = - Drawing x
+  G4ThreeVector CADPosHex[4];
+  CADPosHex[0] = G4ThreeVector(1.57,   626.5, -120.58); // L23_0
+  CADPosHex[1] = G4ThreeVector(-200.94,  560.64, -228.81); // L23_1
+  CADPosHex[2] = G4ThreeVector(-219.62, 457.68, -386.44); // L23_2
+  CADPosHex[3] = G4ThreeVector(0.41,   388.95, -505.73); // L23_3
+
+  for(G4int i=0; i<4; i++){
+    CADPosHex[i].rotateZ(-e233);
+    CADPosHex[i].rotateY(-e232);
+    CADPosHex[i].rotateZ(-e231);
+  }
+
+  G4double e31 = 0*deg;
+  G4double e32 = 31.717473*deg;
+  G4double e33 = 90.000000*deg;
+
+  // Geant4 x = Drawing y; Geant4 y = - Drawing x
+  G4ThreeVector CADPosTriplet[4];
+  CADPosTriplet[0] = G4ThreeVector(0,   0, 626.3); // LT_0
+  CADPosTriplet[1] = G4ThreeVector(-224.635,  315.287, 507.126); // LT_1
+  CADPosTriplet[2] = G4ThreeVector(-101.364, 484.47, 402.565); // LT_2
+  CADPosTriplet[3] = G4ThreeVector(87.199, 500.329, 386.149); // LT_3
+ 
+  for(G4int i=0; i<4; i++){
+    CADPosTriplet[i].rotateZ(-e33);
+    CADPosTriplet[i].rotateY(-e32);
+    CADPosTriplet[i].rotateZ(-e31);
+  }
+  
   G4RunManager* runManager = G4RunManager::GetRunManager();
   DetectorConstruction* theDetector = (DetectorConstruction*) runManager->GetUserDetectorConstruction();
   G4double halfheight = 1300/4*mm;
   G4double RBar = (Rmax+Rmin)/2;
   G4double h = 243.697*mm;
   G4double hPrime = h*(RBar/Rmax);
-  
   G4SubtractionSolid *shellL, *shellR, *shellF;
   std::vector<G4TwoVector> polygon6(5);
-  polygon6[0] = G4TwoVector(MPosFlats[0][0],MPosFlats[0][1]);
-  polygon6[1] = G4TwoVector(MPosFlats[1][0],MPosFlats[1][1]);
-  polygon6[2] = G4TwoVector(MPosFlats[2][0],MPosFlats[2][1]);
-  polygon6[3] = G4TwoVector(MPosFlats[3][0],MPosFlats[3][1]);
-  polygon6[4] = G4TwoVector(MPosFlats[4][0],MPosFlats[4][1]);
+  polygon6[0] = G4TwoVector(CADPosFlats[2].x(),CADPosFlats[2].y());
+  polygon6[1] = G4TwoVector(CADPosFlats[3].x(),CADPosFlats[3].y());
+  polygon6[2] = G4TwoVector(CADPosFlats[4].x(),CADPosFlats[4].y());
+  polygon6[3] = G4TwoVector(CADPosFlats[5].x(),CADPosFlats[5].y());
+  polygon6[4] = G4TwoVector(CADPosFlats[7].x(),CADPosFlats[7].y());
+  std::vector<G4TwoVector> polygon1(4);
+  polygon1[0] = G4TwoVector(CADPosHex[0].x(),CADPosHex[0].y());
+  polygon1[1] = G4TwoVector(CADPosHex[1].x(),CADPosHex[1].y());
+  polygon1[2] = G4TwoVector(CADPosHex[2].x(),CADPosHex[2].y());
+  polygon1[3] = G4TwoVector(CADPosHex[3].x(),CADPosHex[3].y());
+  std::vector<G4TwoVector> polygon2(4);
+  polygon2[0] = G4TwoVector(CADPosTriplet[0].x(),CADPosTriplet[0].y());
+  polygon2[1] = G4TwoVector(CADPosTriplet[1].x(),CADPosTriplet[1].y());
+  polygon2[2] = G4TwoVector(CADPosTriplet[2].x(),CADPosTriplet[2].y());
+  polygon2[3] = G4TwoVector(CADPosTriplet[3].x(),CADPosTriplet[3].y());
+  
   std::vector<G4ExtrudedSolid::ZSection> zsections;
-  zsections.push_back(G4ExtrudedSolid::ZSection(0,G4TwoVector(0,0), 1));
-  zsections.push_back(G4ExtrudedSolid::ZSection((Rmin+Rmax)/2,G4TwoVector(0,0), 2));
+  zsections.push_back(G4ExtrudedSolid::ZSection(0,G4TwoVector(0,0), 1.1));
+  zsections.push_back(G4ExtrudedSolid::ZSection((Rmin+Rmax)/2,G4TwoVector(0,0), 3));
   G4ExtrudedSolid* tripleShape = new G4ExtrudedSolid("tripleShape",  polygon6, zsections);
-
+  
   if(shellStatus != "full"){
     shellL = Shell("LEFT");
     shellR = Shell("RIGHT");
@@ -307,35 +323,17 @@ void Greta_Shell::Placement(G4String shellStatus,
   G4ThreeVector NoShiftR = G4ThreeVector(0, 0, 0);
   G4RotationMatrix NoRotR = G4RotationMatrix::IDENTITY;
    
-  //HexHole polygon
-  std::vector<G4TwoVector> polygon1(6);
-  G4ThreeVector TarPosGlb = G4ThreeVector(0, 0, halfheight);
-  G4RotationMatrix RotShellGlb = G4RotationMatrix::IDENTITY;
-  polygon1[0] = G4TwoVector(MPosHexHole[0][0],MPosHexHole[0][1]);
-  polygon1[1] = G4TwoVector(MPosHexHole[1][0],MPosHexHole[1][1]);
-  polygon1[2] = G4TwoVector(MPosHexHole[2][0],MPosHexHole[2][1]);
-  polygon1[3] = G4TwoVector(MPosHexHole[3][0],MPosHexHole[3][1]);
-  polygon1[4] = G4TwoVector(halfside,-halfside);
-  polygon1[5] = G4TwoVector(-halfside,-halfside);
   G4ExtrudedSolid* solidTarget1 = new G4ExtrudedSolid("solidTarget1",  polygon1, halfheight, G4TwoVector(0, 0), 0.00001, G4TwoVector(0, 0), 1);
 
-  //TripleHole polygon
-  std::vector<G4TwoVector> polygon2(6);
-  polygon2[0] = G4TwoVector(MPosTripleHole[0][0],MPosTripleHole[0][1]);
-  polygon2[1] = G4TwoVector(MPosTripleHole[1][0],MPosTripleHole[1][1]);
-  polygon2[2] = G4TwoVector(MPosTripleHole[2][0],MPosTripleHole[2][1]);
-  polygon2[3] = G4TwoVector(MPosTripleHole[3][0],MPosTripleHole[3][1]);
-  polygon2[4] = G4TwoVector((1300/2*mm)*tan(31.717*degree),-halfside);
-  polygon2[5] = G4TwoVector(-halfside,-halfside);
   G4ExtrudedSolid* solidTarget2 = new G4ExtrudedSolid("solidTarget2",  polygon2, halfheight, G4TwoVector(0, 0), 0.00001, G4TwoVector(0, 0), 1);
-
+ 
   //HexHole for Hole 10
   G4ThreeVector TarPos10 = G4ThreeVector(0, 0, halfheight);
   TarPos10.rotateZ(ModuleEuler[9][0]);
   TarPos10.rotateY(ModuleEuler[9][1]);
   TarPos10.rotateZ(ModuleEuler[9][2]);
   G4RotationMatrix RotShell10 = G4RotationMatrix::IDENTITY;
-  RotShell10.rotateZ( 0*degree );
+  RotShell10.rotateZ( -90*degree );
   RotShell10.rotateY( TarPos10.getTheta() );
   RotShell10.rotateZ( TarPos10.getPhi() );
   G4SubtractionSolid* cutout10 = new G4SubtractionSolid("cutout10", shellL, solidTarget1, G4Transform3D(RotShell10, TarPos10));
@@ -350,7 +348,7 @@ void Greta_Shell::Placement(G4String shellStatus,
   TarPos30.rotateY(ModuleEuler[29][1]);
   TarPos30.rotateZ(ModuleEuler[29][2]);
   G4RotationMatrix RotShell30 = G4RotationMatrix::IDENTITY;
-  RotShell30.rotateZ(0*degree );
+  RotShell30.rotateZ( 7*degree );
   RotShell30.rotateY( TarPos30.getTheta() );
   RotShell30.rotateZ( TarPos30.getPhi() );
   // Left hemisphere with both cutouts but not the bumpouts
@@ -367,7 +365,7 @@ void Greta_Shell::Placement(G4String shellStatus,
   TarPos23.rotateY(ModuleEuler[22][1]);
   TarPos23.rotateZ(ModuleEuler[22][2]);
   G4RotationMatrix RotShell23 = G4RotationMatrix::IDENTITY;
-  RotShell23.rotateZ( 0*degree );
+  RotShell23.rotateZ( -90*degree );
   RotShell23.rotateY( TarPos23.getTheta() );
   RotShell23.rotateZ( TarPos23.getPhi() );
   // Right hemisphere with the hole 23 cutout
@@ -383,7 +381,7 @@ void Greta_Shell::Placement(G4String shellStatus,
   TarPos3.rotateY(ModuleEuler[2][1]);
   TarPos3.rotateZ(ModuleEuler[2][2]);
   G4RotationMatrix RotShell3 = G4RotationMatrix::IDENTITY;
-  RotShell3.rotateZ( 0*degree );
+  RotShell3.rotateZ( 7*degree );
   RotShell3.rotateY( TarPos3.getTheta() );
   RotShell3.rotateZ( TarPos3.getPhi() );
   // Right hemisphere with both cutouts but not the bumpouts
