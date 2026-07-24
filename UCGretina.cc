@@ -1,4 +1,9 @@
+#ifdef G4MULTITHREADED
+#include "G4MTRunManager.hh"
+#include "G4Threading.hh"
+#else
 #include "G4RunManager.hh"
+#endif
 #include "G4UImanager.hh"
 
 #include "G4UIterminal.hh"
@@ -10,13 +15,7 @@
 
 #include "DetectorConstruction.hh"
 #include "PhysicsList.hh"
-#include "PrimaryGeneratorAction.hh"
-#include "PrimaryGeneratorAction_Messenger.hh"
-#include "TrackingAction.hh"
-#include "SteppingAction.hh"
-#include "EventAction.hh"
-#include "EventAction_Messenger.hh"
-#include "RunAction.hh"
+#include "ActionInitialization.hh"
 #include "Incoming_Beam.hh"
 #include "Incoming_Beam_Messenger.hh"
 #include "Outgoing_Beam.hh"
@@ -36,12 +35,18 @@ int main(int argc,char** argv)
 {
   
   // Construct the default run manager
+#ifdef G4MULTITHREADED
+  G4MTRunManager* runManager = new G4MTRunManager;
+  runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores());
+#else
   G4RunManager* runManager = new G4RunManager;
+#endif
 
+  G4cout << "Executable: " << argv[0] << G4endl;
   G4cout << "Git commit: " << GIT_HASH << G4endl;
   G4cout << "Git branch: " << GIT_BRANCH << G4endl;
   
-  cout << "Instantiating DetectorConstruction ..." << endl;
+  G4cout << "Instantiating DetectorConstruction ..." << G4endl;
   // set mandatory initialization classes
   DetectorConstruction* detector = new DetectorConstruction();
   runManager->SetUserInitialization(detector);
@@ -49,7 +54,7 @@ int main(int argc,char** argv)
   PhysicsList *physicsList = new PhysicsList(detector);
   runManager->SetUserInitialization(physicsList);
 
-  cout << "... Done" << endl;
+  G4cout << "... Done" << G4endl;
 
   // Construct incoming and outgoing beams
   Incoming_Beam* BeamIn = new Incoming_Beam();
@@ -60,23 +65,7 @@ int main(int argc,char** argv)
   physicsList->SetOutgoingBeam(BeamOut);
   Outgoing_Beam_Messenger* OutgoingBeamMessenger = new Outgoing_Beam_Messenger(BeamOut);
 
-  // set mandatory user action class
-  EventAction* eventAction = new EventAction();
-  EventAction_Messenger* eventActionMessenger = new EventAction_Messenger(eventAction);
-  runManager->SetUserAction(eventAction);
-
-  PrimaryGeneratorAction* generatorAction = new PrimaryGeneratorAction(detector,BeamIn,BeamOut);
-  PrimaryGeneratorAction_Messenger* generatorActionMessenger = new PrimaryGeneratorAction_Messenger(generatorAction);
-
-  runManager->SetUserAction(generatorAction);
-  RunAction* runAction = new RunAction(detector,BeamIn,eventAction);
-  runManager->SetUserAction(runAction);
-
-  TrackingAction* trackingAction = new TrackingAction(eventAction);
-  runManager->SetUserAction(trackingAction);
-
-  SteppingAction* steppingAction = new SteppingAction();
-  runManager->SetUserAction(steppingAction);
+  runManager->SetUserInitialization(new ActionInitialization(detector, BeamIn, BeamOut, /*enableStepping=*/true));
 
   G4UIsession* session=0;
 
@@ -90,10 +79,10 @@ int main(int argc,char** argv)
 
 #ifdef G4VIS_USE
       // visualization manager
-      cout << "Starting visualization...";
+      G4cout << "Starting visualization...";
       visManager = new VisManager; 
       visManager->Initialize();
-      cout << "Done!" << endl;
+      G4cout << "Done!" << G4endl;
 #endif
 
 // G4UIterminal is a (dumb) terminal.
@@ -106,10 +95,10 @@ int main(int argc,char** argv)
     }
 
   // Initialize G4 kernel
-  // cout << "*** Initializing runManager" << endl;
+  // G4cout << "*** Initializing runManager" << G4endl;
   // //  runManager->SetVerboseLevel(2);
   // runManager->Initialize();
-  // cout << "*** Initialized runManager" << endl;
+  // G4cout << "*** Initialized runManager" << G4endl;
 
   // get the pointer to the UI manager and set verbosities
   G4UImanager* UI = G4UImanager::GetUIpointer();
@@ -120,7 +109,7 @@ int main(int argc,char** argv)
       delete session;
     }
   else           // Batch mode
-    { 
+    {
       G4String command = "/control/execute ";
       G4String fileName = argv[1];
       UI->ApplyCommand(command+fileName);
@@ -142,10 +131,6 @@ int main(int argc,char** argv)
   delete BeamOut;
 
   delete OutgoingBeamMessenger;
-
-  delete eventActionMessenger;
-
-  delete generatorActionMessenger;
 
   return 0;
 }

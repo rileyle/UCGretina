@@ -5,7 +5,7 @@
 
 # Need this for writing output files larger than 2GB on 32-bit Linux
 # (untested on other systems)
-CPPFLAGS := -D_FILE_OFFSET_BITS=64
+CPPFLAGS := -D_FILE_OFFSET_BITS=64 -g
 
 # Use -D to define LHTARGET, AD, SCANNING, NEUTRONS macros
 # for the C preprocesssor
@@ -80,7 +80,7 @@ ifndef G4INSTALL
 endif
 
 # Collect the git branch and commit hash.
-GIT_HASH := $(shell git rev-parse HEAD)
+GIT_HASH := $(shell git describe --always --abbrev=6 --exclude '*')
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 ifneq ("$(wildcard git_hash)","")
 PREV_GIT_HASH := $(shell cat git_hash)
@@ -102,5 +102,27 @@ ifneq ($(PREV_GIT_HASH),$(GIT_HASH))
 endif
 
 FORCE:
+
+.PHONY: test-smoke test-sources test-inbeam test-scanning test-background test-benchmark test test-functional test-baselines
+
+test-smoke:
+	python3 tests/benchmark.py --mode smoke
+
+test-sources:
+	python3 tests/benchmark.py --mode sources
+
+test-inbeam:
+	python3 tests/benchmark.py --mode inbeam
+
+test-scanning:
+	python3 tests/benchmark.py --mode scanning
+
+test-background:
+	python3 tests/benchmark.py --mode background
+
+test-functional: test-sources test-inbeam test-background test-scanning
+
+test-baselines:
+	python3 tests/benchmark.py --update-baselines --events $(or $(BENCH_EVENTS),1000000)
 
 include $(G4INSTALL)/config/binmake.gmk

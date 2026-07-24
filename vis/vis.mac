@@ -1,6 +1,8 @@
 /Gretina/detector/enableCapsules
 /Gretina/detector/enableCryostats
-/Gretina/Shell full
+/GRETA/Shell full
+/GRETA/NoForward
+/GRETA/NoBackward
 /Target/Construct
 /Target/Sled
 /BeamTube/Construct

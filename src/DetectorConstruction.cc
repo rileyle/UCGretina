@@ -37,12 +37,14 @@ DetectorConstruction::DetectorConstruction()
 
   materials = new Materials();
 
-  TrackerIon = new TrackerIonSD("IonTracker");
-  TrackerIonSDMessenger = new TrackerIonSD_Messenger(TrackerIon);
+  ////////// Prepping for ConstructSDandField()
+  // TrackerIon = new TrackerIonSD("IonTracker");
+  // TrackerIonSDMessenger = new TrackerIonSD_Messenger(TrackerIon);
 
-  TrackerGamma = new TrackerGammaSD("GammaTracker");
-  TrackerGammaSDMessenger = new TrackerGammaSD_Messenger(TrackerGamma);
-
+  // TrackerGamma = new TrackerGammaSD("GammaTracker");
+  // TrackerGammaSDMessenger = new TrackerGammaSD_Messenger(TrackerGamma);
+  //////////////
+  
   ExperimentalHall = new Experimental_Hall();
   ExperimentalHallMessenger = new Experimental_Hall_Messenger(ExperimentalHall);
   
@@ -94,8 +96,12 @@ DetectorConstruction::~DetectorConstruction()
 {
   delete ExperimentalHallMessenger;
   delete TargetMessenger;
-  delete TrackerIonSDMessenger;
-  delete TrackerGammaSDMessenger;
+
+  ///// Prepping for ConstructSDandField()
+  // delete TrackerIonSDMessenger;
+  // delete TrackerGammaSDMessenger;
+  /////
+  
 #ifndef LHTARGET
 #ifndef SCANNING
   delete BeamTubeMessenger;
@@ -109,15 +115,17 @@ DetectorConstruction::~DetectorConstruction()
 G4VPhysicalVolume* DetectorConstruction::Construct()
 {
 
+  ////////// Prep for ConstructSDandField()
   // Tracker for ions in the target
 
-  G4SDManager* SDman = G4SDManager::GetSDMpointer();
-  SDman->AddNewDetector( TrackerIon );
+  // G4SDManager* SDman = G4SDManager::GetSDMpointer();
+  // SDman->AddNewDetector( TrackerIon );
 
   // Tracker for gammas in GRETINA
 
-  SDman->AddNewDetector( TrackerGamma );
-
+  //SDman->AddNewDetector( TrackerGamma );
+  /////////
+  
   // Experimental Hall
 
   ExpHall_phys = ExperimentalHall->Construct();
@@ -161,29 +169,19 @@ void DetectorConstruction::Placement()
     leftClover = new Clover_Detector(ExpHall_log, "left");
     leftClover->setY(scanningTable->GetCloverZ());
     leftClover->Construct();
-    leftClover->MakeSensitive(TrackerGamma);
   }
-  if( cloverStatus == "right" || cloverStatus == "both" ){
-    G4cout << "Constructing right clover detector." << G4endl;
-    rightClover = new Clover_Detector(ExpHall_log, "right");
-    rightClover->setY(scanningTable->GetCloverZ());
-    rightClover->Construct();
-    rightClover->MakeSensitive(TrackerGamma);
-  }
-  
-  // Position the source horizontally using scanning-table controller position
-  G4RunManager* runManager = G4RunManager::GetRunManager();
-  PrimaryGeneratorAction* generatorAction
-    = (PrimaryGeneratorAction*)runManager->GetUserPrimaryGeneratorAction();
-  generatorAction->SetSourceX(-scanningTable->GetControllerX());
-  generatorAction->SetSourceZ( scanningTable->GetControllerY());
+   if( cloverStatus == "right" || cloverStatus == "both" ){
+     G4cout << "Constructing right clover detector." << G4endl;
+     rightClover = new Clover_Detector(ExpHall_log, "right");
+     rightClover->setY(scanningTable->GetCloverZ());
+     rightClover->Construct();
+   }
 #endif
 #endif
 
   // Target
   if( targetStatus ){
     aTarget->Construct(ExpHall_log);
-    aTarget->GetTargetLog()->SetSensitiveDetector(TrackerIon);
   }
 
 #ifndef SCANNING
@@ -207,7 +205,6 @@ void DetectorConstruction::Placement()
   }
   if( laBrStatus ){
     the_LaBr->Construct(ExpHall_log);
-    the_LaBr->MakeSensitive(TrackerGamma);
   }
 #endif
 
@@ -218,6 +215,69 @@ void DetectorConstruction::Placement()
 #endif
     the_Gretina_Array->Placement();
   }
+}
+
+#ifdef SCANNING
+G4double DetectorConstruction::GetScanningTableControllerX() const {
+  return scanningTable->GetControllerX();
+}
+
+G4double DetectorConstruction::GetScanningTableControllerY() const {
+  return scanningTable->GetControllerY();
+}
+#endif
+
+void DetectorConstruction::ConstructSDandField(){
+  
+  auto *sdMan = G4SDManager::GetSDMpointer();
+
+  auto *TrackerIon = new TrackerIonSD("IonTracker");
+  auto *TrackerIonSDMessenger = new TrackerIonSD_Messenger(TrackerIon);
+  sdMan->AddNewDetector(TrackerIon);
+  
+  auto *TrackerGamma = new TrackerGammaSD("GammaTracker");
+  auto *TrackerGammaSDMessenger = new TrackerGammaSD_Messenger(TrackerGamma);
+  sdMan->AddNewDetector(TrackerGamma);
+  
+  
+  G4int depth;
+  auto makeCapsule = the_Gretina_Array->GetMakeCapsule();
+
+  if(makeCapsule)
+    depth = 2;
+  else
+    depth = 1;
+
+  TrackerGamma->SetDepth(depth);
+
+  for(auto pPg: the_Gretina_Array->GetPgons() ){
+    pPg.pDetL->SetSensitiveDetector(TrackerGamma);
+  }
+  
+  if( targetStatus ){
+    aTarget->GetTargetLog()->SetSensitiveDetector(TrackerIon);
+  }
+
+
+#ifndef LHTARGET
+  #ifndef SCANNING
+  #else
+  if( cloverStatus == "left"  || cloverStatus == "both" ){
+    leftClover->MakeSensitive(TrackerGamma);
+  }
+  if( cloverStatus == "right" || cloverStatus == "both" ){
+    rightClover->MakeSensitive(TrackerGamma);
+  }
+  #endif
+#endif
+  
+
+#ifndef SCANNING
+  if( laBrStatus){
+    the_LaBr->MakeSensitive(TrackerGamma);
+  }
+#endif
+  
 }
 
 ///////////////////
@@ -296,20 +356,8 @@ DetectorConstruction_Messenger::DetectorConstruction_Messenger(DetectorConstruct
   commandName = "/GRETA/Shell";
   aLine = commandName.c_str();
   GRETAShellCmd = new G4UIcmdWithAString(aLine, this);
-  GRETAShellCmd->SetGuidance("Construct the GRETA mounting shell (full/left/right).");
+  GRETAShellCmd->SetGuidance("Construct the GRETA mounting shell (full/left/right/NoForward/NoBackward).");
   GRETAShellCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-  commandName = "/GRETA/NoForward";
-  aLine = commandName.c_str();
-  GRETANoForwardShellCmd = new G4UIcmdWithoutParameter(aLine, this);
-  GRETANoForwardShellCmd->SetGuidance("Omit the forward ring of the GRETA Shell.");
-  GRETANoForwardShellCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-  commandName = "/GRETA/NoBackward";
-  aLine = commandName.c_str();
-  GRETANoBackwardShellCmd = new G4UIcmdWithoutParameter(aLine, this);
-  GRETANoBackwardShellCmd->SetGuidance("Omit the backward ring of the GRETA Shell.");
-  GRETANoBackwardShellCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
   
   commandName = "/GRETA/LeftOffset";
   aLine = commandName.c_str();
@@ -348,8 +396,6 @@ DetectorConstruction_Messenger::~DetectorConstruction_Messenger()
   delete SouthOffCmd;
   delete GRETAShellCmd;
   delete GRETALeftOffCmd;
-  delete GRETANoForwardShellCmd;
-  delete GRETANoBackwardShellCmd;
   delete GRETARightOffCmd;
   delete S800Cmd;
   delete LaBrCmd;
@@ -402,13 +448,12 @@ void DetectorConstruction_Messenger::SetNewValue(G4UIcommand* command,G4String n
     myTarget->SetSouthOffset(SouthOffCmd->GetNewDoubleValue(newValue));
   }
   if( command == GRETAShellCmd ) {
-    myTarget->SetGRETAShellStatus(newValue);
-  }
-  if( command == GRETANoForwardShellCmd ) {
-    myTarget->SetForwardGRETAShellStatus(false);
-  }
-  if( command == GRETANoBackwardShellCmd ) {
-    myTarget->SetBackwardGRETAShellStatus(false);
+    if(newValue == "full" || newValue == "left" || newValue == "right")
+      myTarget->SetGRETAShellStatus(newValue);
+    else if(newValue == "NoForward")
+      myTarget->SetForwardGRETAShellStatus(false);
+    else if(newValue == "NoBackward")
+      myTarget->SetBackwardGRETAShellStatus(false);
   }
   if( command == GRETALeftOffCmd ) {
     myTarget->SetLeftOffset(GRETALeftOffCmd->GetNewDoubleValue(newValue));

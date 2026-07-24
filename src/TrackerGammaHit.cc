@@ -6,7 +6,7 @@
 #include "G4Colour.hh"
 #include "G4VisAttributes.hh"
 
-G4Allocator<TrackerGammaHit> TrackerGammaHitAllocator;
+G4ThreadLocal G4Allocator<TrackerGammaHit>* TrackerGammaHitAllocator = nullptr;
 
 
 TrackerGammaHit::TrackerGammaHit() {}
@@ -123,4 +123,3 @@ void TrackerGammaHit::Print()
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-

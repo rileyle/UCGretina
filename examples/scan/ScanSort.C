@@ -1,8 +1,3 @@
-#include "Riostream.h"
-#include "iostream"
-#include "TRandom.h"
-#include "TFile.h"
-
 TH1F *clover;
 TH1F *crystal[12];
 TH2F *crys_xy[12];
@@ -242,7 +237,7 @@ void loadSim(TString fileName) {
   while( fp >> sBuffer ){
 
     nBuffer++;
-    if(nBuffer%100000 == 0) {
+    if(nBuffer%10000 == 0) {
       cout << "Processed " << nBuffer << " events ...\r";
       flush(cout);
     }
@@ -256,7 +251,7 @@ void loadSim(TString fileName) {
     //    cout << "Ndecomp = " << Ndecomp << "  eventID = " << eventID << endl;
 
     Float_t ElabAB = 0;
-    Float_t x,   y, z;
+    Float_t x,   y, z, t;
     Float_t xs, ys, zs;
     Float_t EdepMax = 0;
 
@@ -275,12 +270,12 @@ void loadSim(TString fileName) {
       Nip = iBuffer[1];
 
       //      cout << sBuffer 
-      //	   << " detNum[" << k << "] = " << detNum[k] 
-      //	   << "  Nip = " << Nip << endl;
+      //      	   << " detNum[" << k << "] = " << detNum[k] 
+      //      	   << "  Nip = " << Nip << endl;
 
       for(Int_t j = 0; j < Nip; j++){
 
-	fp >> iBuffer[0] >> Edeposited >> x >> y >> z;
+	fp >> iBuffer[0] >> Edeposited >> x >> y >> z >> t;
 
 	//	cout << "Edeposited = " << Edeposited 
 	//	     << "  x = " << x
@@ -437,11 +432,11 @@ void ScanSort(TString simFile){
   TString sourceType = simFile.Copy();
   sourceType.Replace(sourceType.Index(".out",4),4,"",0);
 
-  cout << "... sorting events in " << simFile << " ...\n" << endl;
+  cout << "\n... sorting events in " << simFile << " ...\n" << endl;
 
   loadSim(simFile);
 
-  cout << "... writing spectra to " << rootFile << " ...\n" << endl;
+  cout << "\n... writing spectra to " << rootFile << " ...\n" << endl;
 
   rF->Write();
 

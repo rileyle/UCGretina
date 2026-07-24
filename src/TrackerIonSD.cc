@@ -2,12 +2,13 @@
 
 //--------------------------------------------------------------------
 TrackerIonSD::TrackerIonSD(G4String name)
-  :G4VSensitiveDetector(name)
+  :G4VSensitiveDetector(name), fHCID(-1)
 {
   G4String HCname;
   collectionName.insert(HCname="ionCollection");
   print=false; //LR (formerly not initialized)
- 
+
+  
 }
 
 //--------------------------------------------------------------------
@@ -19,12 +20,14 @@ TrackerIonSD::TrackerIonSD(G4String name)
 
 //--------------------------------------------------------------------
 
-void TrackerIonSD::Initialize(G4HCofThisEvent*)
+void TrackerIonSD::Initialize(G4HCofThisEvent* hce)
 { 
  
 
     ionCollection = new TrackerIonHitsCollection
-                          (SensitiveDetectorName,collectionName[0]);  
+                          (SensitiveDetectorName,collectionName[0]);
+
+    
   
 }
 //--------------------------------------------------------------------
@@ -170,12 +173,11 @@ void TrackerIonSD::EndOfEvent(G4HCofThisEvent* HCE)
      
     }  
  
- static G4int HCID = -1;
-  if(HCID<0)
-  { HCID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]); }
-  HCE->AddHitsCollection( HCID, ionCollection ); 
- }
+  if(fHCID < 0) {
+    fHCID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
+  }
+  HCE->AddHitsCollection(fHCID, ionCollection);
+  }
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-

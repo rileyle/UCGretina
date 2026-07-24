@@ -8,6 +8,9 @@ all: s44_1329_histos.root \
 # into Root histograms
 %.dat : %.mac
 	UCGretina $*.mac 2>&1 | tee $*.log
+ifeq ($(G4MULTITHREADED), 1)
+	./concat.sh $* 2>&1   | tee -a $*.log
+endif
 
 %_histos.root : %.dat
 	grutinizer gvalues.val -qH $*.dat -o /dev/null \
@@ -23,4 +26,4 @@ s44_spectrum.root : makeSpec.C \
 	cp s44_spectrum.root ..
 
 clean:
-	rm *.log *.root
+	rm -f *.log *.dat *.root

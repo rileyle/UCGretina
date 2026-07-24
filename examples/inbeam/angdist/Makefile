@@ -6,6 +6,9 @@ all: s44_1329_histos.root s44_1329_iso_histos.root \
 # into Root histograms
 %.dat : %.mac
 	UCGretina_Pol $*.mac 2>&1 | tee $*.log
+ifeq ($(G4MULTITHREADED), 1)
+	./concat.sh $* 2>&1   | tee -a $*.log
+endif
 
 %_histos.root : %.dat
 	grutinizer gvalues.val -qH $*.dat -o /dev/null \
@@ -14,4 +17,4 @@ all: s44_1329_histos.root s44_1329_iso_histos.root \
 	rm $*.dat
 
 clean:
-	rm *.log *.root
+	rm -f *.log *.dat *.root

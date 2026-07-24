@@ -22,6 +22,10 @@
 #include <fstream>
 #include <string>
 #include <fcntl.h>
+#include <vector>
+
+#include "G4Threading.hh"
+#include "Stopwatch.hh"
 
 class EventAction : public G4UserEventAction
 {
@@ -95,12 +99,24 @@ class EventAction : public G4UserEventAction
     G4int GetNTotalevents(){return NTotalEvents;}
     void SetEveryNEvents(G4int n){everyNevents = n;}
     G4int GetEveryNEvents(){return everyNevents;}
+    G4int GetCompletedEvents(){return CompletedEvents;}
 
     void SetPosRes(G4double res){posRes = res;}
     void SetThreshE(G4double e){threshE = e;}
     void SetThreshDE(G4double de){threshDE = de;}
+    void SetStopwatch(Stopwatch* sp){stopwatch = sp;}
+
+    G4String GetCacheOutputFilename(){return cacheOutputFileName;}
   
   private:
+    G4String threadSuffix(const G4String& baseName) const;
+
+    // Large writeDecomp scratch buffers live on the heap (per EventAction / per worker)
+    // to avoid overflowing the small per-thread stack on macOS.
+    std::vector<CRYS_IPS> fCrysIps;
+    std::vector<G4double> fCrysGts; // flattened [decomp*MAX_INTPTS + ip]
+    std::vector<G4int> fProcessed;
+
     G4int ionCollectionID;
     G4int gammaCollectionID;
     G4String outFileName;
@@ -142,9 +158,12 @@ class EventAction : public G4UserEventAction
     G4bool fisInBeam;
     G4bool timeSort;
     G4int NTotalEvents;
+    G4int CompletedEvents;
     G4double posRes;
     G4double threshE;
     G4double threshDE;
+
+    Stopwatch* stopwatch;
   
     G4int timerCount;
     G4int everyNevents;

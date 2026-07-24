@@ -1,0 +1,43 @@
+{
+  "_meta": {
+    "git_hash": "b76461",
+    "git_branch": "geant4.10",
+    "cpu": "12th Gen Intel(R) Core(TM) i5-1240P"
+  },
+  "inbeam_standard": {
+    "ratio": 0.3028,
+    "sigma": 0.005502726596879041
+  },
+  "inbeam_lh": {
+    "ratio": 0.1724,
+    "sigma": 0.004152107898405339
+  },
+  "inbeam_pol": {
+    "ratio": 0.206,
+    "sigma": 0.004538722287164086
+  },
+  "scanning": {
+    "ratio": 0.713,
+    "sigma": 0.00844393273303382
+  },
+  "sources_eu152": {
+    "ratio": 0.2659,
+    "sigma": 0.005156549233741495
+  },
+  "sources_co60": {
+    "ratio": 0.5041,
+    "sigma": 0.0071
+  },
+  "sources_ho166": {
+    "ratio": 0.6727,
+    "sigma": 0.00820182906430023
+  },
+  "background": {
+    "ratio": 0.1028,
+    "sigma": 0.0032062439083762797
+  },
+  "inbeam_cache_run": {
+    "ratio": 0.1744,
+    "sigma": 0.00417612260356422
+  }
+}

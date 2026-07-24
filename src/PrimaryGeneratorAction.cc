@@ -47,6 +47,14 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   particleTable = G4ParticleTable::GetParticleTable();
   ionTable = G4IonTable::GetIonTable();
   BeamOut->SetReactionFlag(-1);
+
+#ifdef SCANNING
+  // Keep per-thread generator state in sync with the scan-table controller.
+  // Doing this here (instead of DetectorConstruction) avoids MT crashes where
+  // the generator action is not yet constructed during geometry setup.
+  sourcePosition.setX(-myDetector->GetScanningTableControllerX());
+  sourcePosition.setZ( myDetector->GetScanningTableControllerY());
+#endif
   
   if(source)
     {
@@ -226,7 +234,10 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       
       // Z position of the reaction point
       depth=TC+TT*(G4UniformRand()-0.5);
-      myDetector->setTargetReactionDepth(depth);
+      // Store per-event reaction depth on the primary vertex info.
+      // In MT runs, using a shared Target UserLimits here causes cross-thread
+      // races (one event's depth affects another).
+      const G4double reactionDepthZ = depth;
 
       // G4cout << "**** center = " << TC
       // 	     << ", direction = " << direction
@@ -239,6 +250,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       PrimaryVertexInformation* primaryVertexInfo
 	= new PrimaryVertexInformation;
       anEvent->GetPrimaryVertex()->SetUserInformation(primaryVertexInfo);
+      primaryVertexInfo->SetReactionDepthZ(reactionDepthZ);
 
     }
   else if(cache)

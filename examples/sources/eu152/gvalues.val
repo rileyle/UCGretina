@@ -1,0 +1,23 @@
+RESOLUTION_PAR_1 {
+  Value: 1.2
+}
+
+RESOLUTION_PAR_2 {
+  Value: 0.0005
+}
+
+GRETINA_X_OFFSET {
+  Value: 0.0
+}
+
+GRETINA_Y_OFFSET {
+  Value: 0.0
+}
+
+GRETINA_Z_OFFSET {
+  Value: 0.0
+}
+
+BETA {
+  Value: 0.0
+}

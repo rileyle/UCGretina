@@ -1,6 +1,9 @@
 #include "Reaction.hh"
 #include "Reaction_Messenger.hh"
 
+#include "G4RunManager.hh"
+#include "PrimaryVertexInformation.hh"
+
 Reaction::Reaction(Outgoing_Beam* BO, const G4String& aName)
   : G4VProcess(aName), BeamOut(BO)
 {
@@ -200,7 +203,24 @@ G4double Reaction::PostStepGetPhysicalInteractionLength(
       return 0;
     }
 
-    G4double ZReaction=pUserLimits->GetUserMinRange(aTrack);
+    // In MT, the reaction depth must be per-event. Prefer PrimaryVertexInformation
+    // (set by PrimaryGeneratorAction) and fall back to UserLimits if absent.
+    G4double ZReaction = 0.0;
+    bool haveDepth = false;
+
+    if (auto* evt = G4RunManager::GetRunManager()->GetCurrentEvent()) {
+      if (auto* pv = evt->GetPrimaryVertex()) {
+        auto* info = static_cast<PrimaryVertexInformation*>(pv->GetUserInformation());
+        if (info && info->HasReactionDepthZ()) {
+          ZReaction = info->GetReactionDepthZ();
+          haveDepth = true;
+        }
+      }
+    }
+
+    if (!haveDepth && pUserLimits) {
+      ZReaction = pUserLimits->GetUserMinRange(aTrack);
+    }
     G4double ZCurrent=aTrack.GetPosition().getZ();
     G4double Z=ZReaction-ZCurrent;
     if(Z<0){
