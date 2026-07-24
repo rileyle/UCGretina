@@ -11,6 +11,8 @@ import subprocess
 import sys
 import shutil
 
+IS_MT = bool(os.environ.get("G4MULTITHREADED"))
+
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TESTS_DIR = os.path.join(PROJECT_ROOT, "tests")
 #MACROS_DIR = os.path.join(TESTS_DIR, "macros")
@@ -129,10 +131,14 @@ def write_base_macro(base_macro_path, example_path, output_command, workdir):
                 line = "/Cache/Output cache_gen.cache\n"
             if "/Cache/Input" in line:
                 line = "/Cache/Input cache_gen.cache\n"
-            # Omit the output file and beamOn commands.
+            # Omit the output file, beamOn, and thread-count commands.
+            # Thread count is injected by the test suite (write_cache_wrapper)
+            # so that gen and playback always use the same value.
             if ("/Output/Filename" not in line) \
                and ("/Mode2/Filename" not in line) \
-               and ("/run/beamOn" not in line):
+               and ("/run/beamOn" not in line) \
+               and ("/run/numberOfThreads" not in line) \
+               and ("/run/eventModulo" not in line):
                 f.write(line)
         f.write(output_command)
 
@@ -152,6 +158,111 @@ def run_sim(binary, macro_path, workdir):
         text=True,
     )
     return result.stdout, result.stderr, result.returncode
+
+
+def collect_ascii_output(workdir, basename):
+    """Merge per-thread ASCII output files into a single file (MT mode).
+
+    In MT mode, /Output/Filename foo.out produces foo_t0.out, foo_t1.out, etc.
+    This function concatenates all foo_t*.out files (sorted) into foo.out and
+    removes the per-thread files. In serial mode no _t* files exist, so this
+    is a no-op.
+
+    Args:
+        workdir:  Absolute path to the working directory.
+        basename: Stem without extension, e.g. "output" for "output.out".
+    """
+    import glob as _glob
+    pattern = os.path.join(workdir, f"{basename}_t*.out")
+    thread_files = sorted(_glob.glob(pattern))
+    if not thread_files:
+        return
+    dest = os.path.join(workdir, f"{basename}.out")
+    with open(dest, "wb") as out_f:
+        for tf in thread_files:
+            with open(tf, "rb") as in_f:
+                shutil.copyfileobj(in_f, out_f)
+    for tf in thread_files:
+        os.remove(tf)
+
+
+def collect_cache_files(src_dir, basename, dst_dir):
+    """Move per-thread cache files from src_dir to dst_dir.
+
+    In MT mode, /Cache/Output foo.cache produces foo_t0.cache, foo_t1.cache,
+    etc. Each file must remain separate (not concatenated) because each worker
+    thread reads its own file during cache playback via threadSuffix().
+
+    In serial mode, moves the single foo.cache file.
+
+    Args:
+        src_dir:  Source directory containing the generated cache file(s).
+        basename: Stem without extension, e.g. "cache_gen" for "cache_gen.cache".
+        dst_dir:  Destination directory for the cache file(s).
+
+    Returns:
+        Number of files moved (0 if none found).
+    """
+    import glob as _glob
+    thread_files = sorted(
+        tf for tf in _glob.glob(os.path.join(src_dir, f"{basename}_t*.cache"))
+        if os.path.getsize(tf) > 0
+    )
+    if thread_files:
+        for tf in thread_files:
+            shutil.move(tf, dst_dir)
+        return len(thread_files)
+    single = os.path.join(src_dir, f"{basename}.cache")
+    if os.path.isfile(single) and os.path.getsize(single) > 0:
+        shutil.move(single, dst_dir)
+        return 1
+    return 0
+
+
+def write_cache_wrapper(wrapper_path, base_macro, n_events, gen=False):
+    """Write a wrapper macro for cache gen/playback with controlled thread count.
+
+    Injects /run/numberOfThreads and /run/eventModulo so that gen and playback
+    always use the same thread count, regardless of what the example macro says.
+    The thread count commands must come before /control/execute because
+    /run/initialize (inside the base macro) must see the thread count first.
+
+    In MT mode with gen=True, /run/beamOn uses a count rounded up to the nearest
+    multiple of n_threads so that every thread writes a cache file with exactly
+    event_modulo entries.  Playback (gen=False) uses the original n_events so
+    that exactly the requested number of events is replayed; the extra entries
+    in the cache files are simply never read.
+
+    In serial mode (IS_MT is False), emits no thread-count commands.
+
+    Args:
+        wrapper_path: Absolute path to write the wrapper .mac to.
+        base_macro:   Filename of the base macro to execute (relative path used
+                      in the Geant4 /control/execute command).
+        n_events:     Number of events to simulate (playback) or at least generate
+                      (gen — actual count may be slightly higher).
+        gen:          True for cache-generation runs, False for playback runs.
+    """
+    import math as _math
+    with open(wrapper_path, "w") as f:
+        if IS_MT:
+            n_threads = min(os.cpu_count(), n_events)
+            # Round up so n_events is exactly divisible by n_threads.
+            # Each thread writes exactly event_modulo entries to its cache file.
+            # Playback uses the original n_events; extra cache entries are unused.
+            adjusted = _math.ceil(n_events / n_threads) * n_threads
+            event_modulo = adjusted // n_threads
+            f.write(f"/run/numberOfThreads {n_threads}\n")
+            f.write(f"/run/eventModulo {event_modulo}\n")
+            f.write(f"/control/execute {base_macro}\n")
+            # Gen: use adjusted (rounded up) so every thread writes event_modulo entries.
+            # Playback: round down to nearest multiple of n_threads so no thread
+            # requests more events than its cache file contains.
+            beamon = adjusted if gen else (n_events // n_threads) * n_threads
+            f.write(f"/run/beamOn {beamon}\n")
+        else:
+            f.write(f"/control/execute {base_macro}\n")
+            f.write(f"/run/beamOn {n_events}\n")
 
 
 def parse_events_per_sec(stdout):
@@ -415,6 +526,7 @@ def run_smoke():
         write_run_macro(macro_file, SMOKE_EVENTS, wrapper)
 
         stdout, stderr, returncode = run_sim(binary, wrapper, workdir)
+        collect_ascii_output(workdir, "output")
 
         ok, msg = _check_run_criteria(test_name, stdout, stderr, returncode)
         print(msg)
@@ -540,6 +652,7 @@ def run_functional(mode):
         wrapper = os.path.join(workdir, "run.mac")
         write_run_macro(macro_file, FUNCTIONAL_EVENTS, wrapper)
         stdout, stderr, returncode = run_sim(binary, wrapper, workdir)
+        collect_ascii_output(workdir, "output")
 
         ok, msg = _check_run_criteria(test_name, stdout, stderr, returncode)
         if not ok:
@@ -644,16 +757,11 @@ def run_cache_pipeline(baselines, today, git_hash, git_branch, cpu):
     macro_file = "func_inbeam_cache_gen.mac"
     write_base_macro(macro_file, example_path, "", gen_workdir)
     gen_wrapper = os.path.join(gen_workdir, "run.mac")
-    write_run_macro(macro_file, FUNCTIONAL_EVENTS, gen_wrapper)
+    write_cache_wrapper(gen_wrapper, macro_file, FUNCTIONAL_EVENTS, gen=True)
     stdout, stderr, returncode = run_sim(gen_binary, gen_wrapper, gen_workdir)
     ok, msg = _check_run_criteria(gen_name, stdout, stderr, returncode)
     print(msg)
     if not ok:
-        return failures + 1, log_rows
-
-    cache_file = os.path.join(gen_workdir, "cache_gen.cache")
-    if not os.path.isfile(cache_file) or os.path.getsize(cache_file) == 0:
-        print(f"[FAIL] {gen_name:<30} cache file missing or empty: {cache_file}")
         return failures + 1, log_rows
 
     # Step 2: Cache playback — uses UCGretina_LH (same binary as gen;
@@ -669,19 +777,20 @@ def run_cache_pipeline(baselines, today, git_hash, git_branch, cpu):
                      "crmat.LINUX", "z16.a44.lvldata"]
     run_workdir = setup_workdir(run_name, example_path, support_files)
 
-    # Playback needs the generated cache file
-    shutil.move(os.path.join(gen_workdir, "cache_gen.cache"), run_workdir)
+    # Move per-thread cache files (MT) or single cache file (serial) to run_workdir.
+    # Cache files must never be concatenated: each worker thread reads its own file.
+    n_moved = collect_cache_files(gen_workdir, "cache_gen", run_workdir)
+    if n_moved == 0:
+        print(f"[FAIL] {gen_name:<30} no cache files found in {gen_workdir}")
+        return failures + 1, log_rows
 
     write_base_macro("func_inbeam_cache_run.mac", example_path,
                      "/Output/Filename output.out", run_workdir)
     run_wrapper = os.path.join(run_workdir, "run.mac")
-
-    # Write wrapper: execute base macro, inject Cache/Input, then beamOn
-    with open(run_wrapper, "w") as f:
-        f.write("/control/execute func_inbeam_cache_run.mac\n")
-        f.write(f"/run/beamOn {FUNCTIONAL_EVENTS}\n")
+    write_cache_wrapper(run_wrapper, "func_inbeam_cache_run.mac", FUNCTIONAL_EVENTS)
 
     stdout, stderr, returncode = run_sim(run_binary, run_wrapper, run_workdir)
+    collect_ascii_output(run_workdir, "output")
     ok, msg = _check_run_criteria(run_name, stdout, stderr, returncode)
     if not ok:
         print(msg)
@@ -823,6 +932,7 @@ def run_benchmark(n_events):
         wrapper = os.path.join(workdir, "run.mac")
         write_run_macro(macro_file, this_events, wrapper)
         stdout, stderr, returncode = run_sim(binary, wrapper, workdir)
+        collect_ascii_output(workdir, "output")
 
         eps = parse_events_per_sec(stdout)
         if eps is None or returncode != 0:
@@ -874,7 +984,7 @@ def _run_cache_benchmark(n_events, today, git_hash, git_branch, cpu, baselines):
     gen_workdir = setup_workdir("bench_cache_gen", example_path, support_files)
     write_base_macro("bench_cache_gen.mac", example_path, "", gen_workdir)
     gen_wrapper = os.path.join(gen_workdir, "run.mac")
-    write_run_macro("bench_cache_gen.mac", n_events, gen_wrapper)
+    write_cache_wrapper(gen_wrapper, "bench_cache_gen.mac", n_events, gen=True)
     stdout, stderr, returncode = run_sim(gen_binary, gen_wrapper, gen_workdir)
     gen_eps = parse_events_per_sec(stdout)
     if gen_eps is None or returncode != 0:
@@ -891,16 +1001,18 @@ def _run_cache_benchmark(n_events, today, git_hash, git_branch, cpu, baselines):
     support_files = ["aclust", "aeuler", "aslice", "asolid", "awalls",
                      "crmat.LINUX", "z16.a44.lvldata"]
     run_workdir = setup_workdir("bench_cache_run", example_path, support_files)
-    shutil.move(os.path.join(gen_workdir, "cache_gen.cache"), run_workdir)
+    n_moved = collect_cache_files(gen_workdir, "cache_gen", run_workdir)
+    if n_moved == 0:
+        print(f"  {'cache_run':<20} {'ERROR: no cache files':>12}")
+        return gen_eps, 0
 
     write_base_macro("bench_cache_run.mac", example_path,
                      "/Output/Filename output.out", run_workdir)
     run_wrapper = os.path.join(run_workdir, "run.mac")
-    with open(run_wrapper, "w") as f:
-        f.write(f"/control/execute bench_cache_run.mac\n")
-        f.write(f"/run/beamOn {n_events}\n")
+    write_cache_wrapper(run_wrapper, "bench_cache_run.mac", n_events)
 
     stdout, stderr, returncode = run_sim(run_binary, run_wrapper, run_workdir)
+    collect_ascii_output(run_workdir, "output")
     run_eps = parse_events_per_sec(stdout)
     if run_eps is None or returncode != 0:
         print(f"  {'cache_run':<20} {'ERROR':>12}")
