@@ -58,6 +58,7 @@ private:
   G4double         modulePortRadius;
   G4double         leftOffset;
   G4double         rightOffset;
+  G4double         flatHeight;
   G4ThreeVector    Pos;
   G4ThreeVector    Pos0;
   G4RotationMatrix Rot;
@@ -69,7 +70,9 @@ private:
   G4double         MPosTripleHole[4][2];
   G4int            SmallPortStatus[10];
   G4int            ModulePortStatus[30];
-  
+  G4TwoVector      CADPosFlats[5];
+  G4TwoVector      CADPosHex[6];
+
 public:
     G4int  FindMaterials();
     void   SetLeftOffset(G4double off){leftOffset = off;}
