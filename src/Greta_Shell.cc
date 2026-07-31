@@ -240,294 +240,40 @@ void Greta_Shell::Placement(G4String shellStatus,
 			    G4bool forwardShellStatus,
 			    G4bool backwardShellStatus)
 {
-  
+
+  G4ThreeVector NoShift = G4ThreeVector(0, 0, 0);
+  G4RotationMatrix NoRot = G4RotationMatrix::IDENTITY;
+
   G4RunManager* runManager = G4RunManager::GetRunManager();
   DetectorConstruction* theDetector
     = (DetectorConstruction*) runManager->GetUserDetectorConstruction();
 
-  // Half the height of the extruded solids that cut fully through the shell.
-  // We want these to extend beyond Rmax. The solids have twice the thickness
-  // of the shell.
-  G4double halfheight = Rmax - Rmin; // = 1300/4*mm;
-  // Radial shift of these extruded solids
-  G4double shift = (Rmin+Rmax)/2;
-  // Scaling of the lower polygons of these extruded solids
-  G4double scaling
-    = ((Rmin+Rmax)/2 - (Rmax - Rmin))/((Rmin+Rmax)/2 + (Rmax - Rmin));
-
-  G4double innercut = 751*mm;
-  
-  G4ThreeVector NoShift = G4ThreeVector(0, 0, 0);
-  G4RotationMatrix NoRot = G4RotationMatrix::IDENTITY;
-  
-  std::vector<G4int> fFlats; // stores slot numbers of forward flats to cut
-  std::vector<G4int> bFlats; // stores slot numbers of backward flats to cut
-  G4int bumps[2] = {-1, -1};
-  G4int cuts[2]  = {-1, -1};
-  
-  if(shellStatus == "left"){
-    bumps[0] = 22;
-    bumps[1] = 2;
-    cuts[0]  = 9;
-    cuts[1]  = 29;
-    if(!forwardShellStatus){
-      fFlats.push_back(0);
-      fFlats.push_back(1);
-      fFlats.push_back(2);
-    }
-    if(!backwardShellStatus){
-      bFlats.push_back(25);
-      bFlats.push_back(26);
-      bFlats.push_back(29);
-    }
-  } else if(shellStatus == "right"){
-    bumps[0] = 9;
-    bumps[1] = 29;
-    cuts[0]  = 22;
-    cuts[1]  = 2;
-  if(!forwardShellStatus){
-      fFlats.push_back(2);
-      fFlats.push_back(3);
-      fFlats.push_back(4);
-    }
-    if(!backwardShellStatus){
-      bFlats.push_back(27);
-      bFlats.push_back(28);
-      bFlats.push_back(29);
-    }
-  } else if(shellStatus == "full"){
-    if(!forwardShellStatus){
-      fFlats.push_back(0);
-      fFlats.push_back(1);
-      fFlats.push_back(2);
-      fFlats.push_back(3);
-      fFlats.push_back(4);
-    }
-    if(!backwardShellStatus){
-      bFlats.push_back(25);
-      bFlats.push_back(26);
-      bFlats.push_back(27);
-      bFlats.push_back(28);
-      bFlats.push_back(29);
-    }
-  } else
-    G4cout << "GRETA Shell status " << shellStatus << " is not defined."
-	   << G4endl;
-
-  G4AssemblyVolume* MountingShell = new G4AssemblyVolume();
-  
-  G4SubtractionSolid *shell = Shell(shellStatus);
-
-  // We define flatPoly in this scope, because it describes both flats and
-  // forward/backward cutouts and bumpouts (holes 3 and 30).
-  std::vector<G4TwoVector> flatPoly(5);
-  flatPoly[0] = G4TwoVector(CADPosFlats[0].x(),CADPosFlats[0].y());
-  flatPoly[1] = G4TwoVector(CADPosFlats[1].x(),CADPosFlats[1].y());
-  flatPoly[2] = G4TwoVector(CADPosFlats[2].x(),CADPosFlats[2].y());
-  flatPoly[3] = G4TwoVector(CADPosFlats[3].x(),CADPosFlats[3].y());
-  flatPoly[4] = G4TwoVector(CADPosFlats[4].x(),CADPosFlats[4].y());
-  
-  // Remove forward / backward rings as requested.
-  if(!forwardShellStatus || !backwardShellStatus){
-    if(!forwardShellStatus){
-      // Subtract forward pentagon
-      std::vector<G4TwoVector> pentagon(5);
-      for(G4int i=0; i<5; i++)
-	pentagon[i]
-	  = G4TwoVector(innercut*sin(ModuleEuler[i][1])*cos(ModuleEuler[i][2]),
-			innercut*sin(ModuleEuler[i][1])*sin(ModuleEuler[i][2]));
-      G4ExtrudedSolid* PentaCut
-	= new G4ExtrudedSolid("PentaCut", pentagon, halfheight,
-			      G4TwoVector(0, 0), scaling, G4TwoVector(0, 0), 1);
-      shell = new G4SubtractionSolid("shell", shell, PentaCut,
-				     G4Transform3D(NoRot,
-						   G4ThreeVector(0, 0,
-								 shift)));
-    }
-    if(!backwardShellStatus){
-      // Subtract backward pentagon
-      std::vector<G4TwoVector> pentagon(5);
-      for(G4int i=0; i<5; i++)
-	pentagon[i]
-	  = G4TwoVector(innercut*sin(ModuleEuler[i+25][1])*cos(ModuleEuler[i+25][2]),
-			innercut*sin(ModuleEuler[i+25][1])*sin(ModuleEuler[i+25][2]));
-      G4RotationMatrix RotBackPenta = G4RotationMatrix::IDENTITY;
-      RotBackPenta.rotateY(180*degree);
-      G4ExtrudedSolid* PentaCut
-	= new G4ExtrudedSolid("PentaCut", pentagon, halfheight,
-			      G4TwoVector(0, 0), scaling, G4TwoVector(0, 0), 1);
-      shell = new G4SubtractionSolid("shell", shell, PentaCut,
-				     G4Transform3D(RotBackPenta,
-						   G4ThreeVector(0, 0,
-								 -shift)));
-    }
-
-    // Subtract the flats
-    std::vector<G4ExtrudedSolid::ZSection> zsections;
-    zsections.push_back(G4ExtrudedSolid::ZSection(0,
-						  G4TwoVector(0,0), 1));
-    zsections.push_back(G4ExtrudedSolid::ZSection(Rmax - Rmin,
-						  G4TwoVector(0,0),
-						  (flatHeight + Rmax - Rmin)/flatHeight));
-    G4ExtrudedSolid* flatShape
-      = new G4ExtrudedSolid("flatShape", flatPoly, zsections);
-
-    std::vector<G4ExtrudedSolid::ZSection> zsections2;
-    zsections2.push_back(G4ExtrudedSolid::ZSection(-(Rmax - Rmin),
-						   G4TwoVector(0,0),
-						   (flatHeight - (Rmax - Rmin))/flatHeight));
-    zsections2.push_back(G4ExtrudedSolid::ZSection(Rmax - Rmin,
-						   G4TwoVector(0,0),
-						   (flatHeight + Rmax - Rmin)/flatHeight));
-    G4ExtrudedSolid* doubleHoleShape
-      = new G4ExtrudedSolid("doubleHoleShape", flatPoly, zsections2);
-    
-    if(!forwardShellStatus){
-      G4MultiUnion* forwardFlats = new G4MultiUnion("ForwardFlats");
-      for(auto i: fFlats){
-	G4ThreeVector PosFlat = G4ThreeVector(0, 0, flatHeight);
-	PosFlat.rotateY(ModuleEuler[i][1]);
-	PosFlat.rotateZ(ModuleEuler[i][2]);
-	G4RotationMatrix RotFlat = G4RotationMatrix::IDENTITY;
-	RotFlat.rotateZ(ModuleEuler[i][0]);
-	RotFlat.rotateY( PosFlat.getTheta() );
-	RotFlat.rotateZ( PosFlat.getPhi() );
-	G4Transform3D tr = G4Transform3D(RotFlat, PosFlat);
-	if((shellStatus == "right" || shellStatus == "full") && i == 2)
-	  forwardFlats->AddNode(*doubleHoleShape, tr);
-	else
-	  forwardFlats->AddNode(*flatShape, tr);
-      }
-      forwardFlats->Voxelize();
-      shell
-	= new G4SubtractionSolid("shell", shell, forwardFlats,
-				 G4Transform3D(NoRot, NoShift));
-    }
-    if(!backwardShellStatus){
-      G4MultiUnion* backwardFlats = new G4MultiUnion("BackwardFlats");
-      for(auto i: bFlats){
-	G4ThreeVector PosFlat = G4ThreeVector(0, 0, flatHeight);
-	PosFlat.rotateY(ModuleEuler[i][1]);
-	PosFlat.rotateZ(ModuleEuler[i][2]);
-	G4RotationMatrix RotFlat = G4RotationMatrix::IDENTITY;
-	RotFlat.rotateZ(ModuleEuler[i][0]);
-	RotFlat.rotateY( PosFlat.getTheta() );
-	RotFlat.rotateZ( PosFlat.getPhi() );
-	G4Transform3D tr = G4Transform3D(RotFlat, PosFlat);
-	if((shellStatus == "left"  || shellStatus == "full") && i == 29)
-	  backwardFlats->AddNode(*doubleHoleShape, tr);
-	else
-	  backwardFlats->AddNode(*flatShape, tr);
-      }
-      backwardFlats->Voxelize();
-      shell
-	= new G4SubtractionSolid("shell", shell, backwardFlats,
-				 G4Transform3D(NoRot, NoShift));
-    }
-    
-  }
-
-  // Bumpouts and cutouts
-  G4IntersectionSolid* bump1, *bump2;
-  G4LogicalVolume* logicBump1, *logicBump2; 
-  if(shellStatus == "left" || shellStatus == "right"){
-    std::vector<G4TwoVector> hexagon(6);
-    hexagon[0] = G4TwoVector(CADPosHex[0].x(), CADPosHex[0].y());
-    hexagon[1] = G4TwoVector(CADPosHex[1].x(), CADPosHex[1].y());
-    hexagon[2] = G4TwoVector(CADPosHex[2].x(), CADPosHex[2].y());
-    hexagon[3] = G4TwoVector(CADPosHex[3].x(), CADPosHex[3].y());
-    hexagon[4] = G4TwoVector(CADPosHex[4].x(), CADPosHex[4].y());
-    hexagon[5] = G4TwoVector(CADPosHex[5].x(), CADPosHex[5].y());
-
-    // Middle cutout
-    G4ExtrudedSolid* extrudedHexagon
-      = new G4ExtrudedSolid("extrudedHexagon", hexagon, halfheight,
-			    G4TwoVector(0, 0), scaling, G4TwoVector(0, 0), 1);
-
-    G4ThreeVector PosHex = G4ThreeVector(0, 0, shift);
-    PosHex.rotateZ(ModuleEuler[cuts[0]][0]);
-    PosHex.rotateY(ModuleEuler[cuts[0]][1]);
-    PosHex.rotateZ(ModuleEuler[cuts[0]][2]);
-    G4RotationMatrix RotHex = G4RotationMatrix::IDENTITY;
-    RotHex.rotateZ( ModuleEuler[cuts[0]][0] );
-    RotHex.rotateY( PosHex.getTheta() );
-    RotHex.rotateZ( PosHex.getPhi() );
-    shell = new G4SubtractionSolid("shell", shell, extrudedHexagon,
-				   G4Transform3D(RotHex, PosHex));
-
-    // Middle bumpout
-    G4SubtractionSolid* otherShell;
-    if(shellStatus == "left")
-      otherShell = Shell("right");
-    else
-      otherShell = Shell("left");
-
-    G4ThreeVector PosBump1 = G4ThreeVector(0, 0, shift);
-    PosBump1.rotateZ(ModuleEuler[bumps[0]][0]);
-    PosBump1.rotateY(ModuleEuler[bumps[0]][1]);
-    PosBump1.rotateZ(ModuleEuler[bumps[0]][2]);
-    G4RotationMatrix RotBump1 = G4RotationMatrix::IDENTITY;
-    RotBump1.rotateZ( ModuleEuler[bumps[0]][0] );
-    RotBump1.rotateY( PosBump1.getTheta() );
-    RotBump1.rotateZ( PosBump1.getPhi() );
-
-    bump1 = new G4IntersectionSolid("bump1", otherShell, extrudedHexagon,
-				    G4Transform3D(RotBump1, PosBump1));
-    logicBump1 = new G4LogicalVolume(bump1, matShell, "Bump1_log", 0, 0, 0 );
-
-    MountingShell->AddPlacedVolume(logicBump1, NoShift, &NoRot);
-    
-    // Forward/backward cutout
-    G4ExtrudedSolid* extrudedPentagon
-      = new G4ExtrudedSolid("extrudedPentagon", flatPoly, halfheight,
-			    G4TwoVector(0, 0), scaling, G4TwoVector(0, 0), 1);
-
-    G4ThreeVector PosPent = G4ThreeVector(0, 0, shift);
-    PosPent.rotateZ(ModuleEuler[cuts[1]][0]);
-    PosPent.rotateY(ModuleEuler[cuts[1]][1]);
-    PosPent.rotateZ(ModuleEuler[cuts[1]][2]);
-    G4RotationMatrix RotPent = G4RotationMatrix::IDENTITY;
-    RotPent.rotateZ( ModuleEuler[cuts[1]][0] );
-    RotPent.rotateY( PosPent.getTheta() );
-    RotPent.rotateZ( PosPent.getPhi() );
-    shell = new G4SubtractionSolid("shell", shell, extrudedPentagon,
-				   G4Transform3D(RotPent, PosPent));
-
-    // Forward/backward bumpout
-    if( (bumps[1] <= 4  &&  forwardShellStatus) ||
-	(bumps[1] >= 25 && backwardShellStatus) ){
-      G4ThreeVector PosBump2 = G4ThreeVector(0, 0, shift);
-      PosBump2.rotateZ(ModuleEuler[bumps[1]][0]);
-      PosBump2.rotateY(ModuleEuler[bumps[1]][1]);
-      PosBump2.rotateZ(ModuleEuler[bumps[1]][2]);
-      G4RotationMatrix RotBump2 = G4RotationMatrix::IDENTITY;
-      RotBump2.rotateZ( ModuleEuler[bumps[1]][0] );
-      RotBump2.rotateY( PosBump2.getTheta() );
-      RotBump2.rotateZ( PosBump2.getPhi() );
-
-      bump2 = new G4IntersectionSolid("bump2", otherShell, extrudedPentagon,
-				      G4Transform3D(RotBump2, PosBump2));
-      logicBump2 = new G4LogicalVolume(bump2, matShell, "Bump1_log", 0, 0, 0 );
-
-      MountingShell->AddPlacedVolume(logicBump2, NoShift, &NoRot);
-    }
-  }
-  
-  G4LogicalVolume* logicShell
-    = new G4LogicalVolume(shell, matShell, "Shell_log", 0, 0, 0 );
-
-
-  MountingShell->AddPlacedVolume(logicShell, NoShift, &NoRot);
-  MountingShell->MakeImprint(theDetector->HallLog(), NoShift, &NoRot, 0);
-
-  if(shellStatus == "full")
+  if(shellStatus == "full") {
+    Hemi("left",
+	 forwardShellStatus,
+	 backwardShellStatus)->MakeImprint(theDetector->HallLog(),
+					   NoShift, &NoRot, 0);
+    Hemi("right",
+	 forwardShellStatus,
+	 backwardShellStatus)->MakeImprint(theDetector->HallLog(),
+					   NoShift, &NoRot, 0);
     G4cout << "Constructed the GRETA mounting shell" << G4endl;
-  else if(shellStatus == "left")
+  } else if(shellStatus == "left"){
+    Hemi("left",
+	 forwardShellStatus,
+	 backwardShellStatus)->MakeImprint(theDetector->HallLog(),
+					   NoShift, &NoRot, 0);
     G4cout << "Constructed the left hemisphere of the GRETA mounting shell"
 	   << G4endl;
-  else if(shellStatus == "right")
+  } else if(shellStatus == "right"){
+    Hemi("right",
+	 forwardShellStatus,
+	 backwardShellStatus)->MakeImprint(theDetector->HallLog(),
+					   NoShift, &NoRot, 0);
     G4cout << "Constructed the right hemisphere of the GRETA mounting shell"
 	   << G4endl;
+  }
+
   if(!forwardShellStatus && !backwardShellStatus)
     G4cout << "   omitting the forward and backward rings"
 	   << G4endl;
@@ -543,7 +289,8 @@ void Greta_Shell::Placement(G4String shellStatus,
   
 }
 
-//Creates and returns the full or partial Greta shell
+// Creates and returns a sphere or hemisphere with module ports
+// and small ports.
 G4SubtractionSolid* Greta_Shell::Shell(G4String half)
 {
   G4double Phi0=0;
@@ -552,9 +299,6 @@ G4SubtractionSolid* Greta_Shell::Shell(G4String half)
 
   if( FindMaterials() ) return NULL;
  
-  //////////////////////////////////////////////////
-  // The GRETA mounting shell
-  //////////////////////////////////////////////////
   if(half == "left"){
     Phi0 = -90.*deg;
     dPhi = 180.*deg;
@@ -653,5 +397,291 @@ G4SubtractionSolid* Greta_Shell::Shell(G4String half)
   }
   
   return shell;
+
+}
+
+// Builds the left or right hemisphere with cutouts and bumpouts
+// and optional removal of the forward and/or backward ring.
+G4AssemblyVolume* Greta_Shell::Hemi(G4String half,
+				    G4bool forwardShellStatus,
+				    G4bool backwardShellStatus)
+{
+  // Half the height of the extruded solids that cut fully through the shell.
+  // We want these to extend beyond Rmax. The solids have twice the thickness
+  // of the shell.
+  G4double halfheight = Rmax - Rmin; // = 1300/4*mm;
+  // Radial shift of these extruded solids
+  G4double shift = (Rmin+Rmax)/2;
+  // Scaling of the lower polygons of these extruded solids
+  G4double scaling
+    = ((Rmin+Rmax)/2 - (Rmax - Rmin))/((Rmin+Rmax)/2 + (Rmax - Rmin));
+
+  G4double innercut = 751*mm;
+  
+  G4ThreeVector NoShift = G4ThreeVector(0, 0, 0);
+  G4RotationMatrix NoRot = G4RotationMatrix::IDENTITY;
+  
+  std::vector<G4int> fFlats; // stores slot numbers of forward flats to cut
+  std::vector<G4int> bFlats; // stores slot numbers of backward flats to cut
+  G4int bumps[2] = {-1, -1};
+  G4int cuts[2]  = {-1, -1};
+  
+  if(half == "left"){
+    bumps[0] = 22;
+    bumps[1] = 2;
+    cuts[0]  = 9;
+    cuts[1]  = 29;
+    if(!forwardShellStatus){
+      fFlats.push_back(0);
+      fFlats.push_back(1);
+      fFlats.push_back(2);
+    }
+    if(!backwardShellStatus){
+      bFlats.push_back(25);
+      bFlats.push_back(26);
+      bFlats.push_back(29);
+    }
+  } else if(half == "right"){
+    bumps[0] = 9;
+    bumps[1] = 29;
+    cuts[0]  = 22;
+    cuts[1]  = 2;
+  if(!forwardShellStatus){
+      fFlats.push_back(2);
+      fFlats.push_back(3);
+      fFlats.push_back(4);
+    }
+    if(!backwardShellStatus){
+      bFlats.push_back(27);
+      bFlats.push_back(28);
+      bFlats.push_back(29);
+    }
+  }
+  /*else if(shellStatus == "full"){
+    if(!forwardShellStatus){
+      fFlats.push_back(0);
+      fFlats.push_back(1);
+      fFlats.push_back(2);
+      fFlats.push_back(3);
+      fFlats.push_back(4);
+    }
+    if(!backwardShellStatus){
+      bFlats.push_back(25);
+      bFlats.push_back(26);
+      bFlats.push_back(27);
+      bFlats.push_back(28);
+      bFlats.push_back(29);
+    }
+    } */
+  else
+    G4cout << "Greta_Shell::Hemi half parameter " << half << " is not defined "
+	   << "(expecting left or right)."
+	   << G4endl;
+
+  G4AssemblyVolume* Hemisphere = new G4AssemblyVolume();
+  
+  G4SubtractionSolid *shell = Shell(half);
+
+  // We define flatPoly in this scope, because it describes both flats and
+  // forward/backward cutouts and bumpouts (holes 3 and 30).
+  std::vector<G4TwoVector> flatPoly(5);
+  flatPoly[0] = G4TwoVector(CADPosFlats[0].x(),CADPosFlats[0].y());
+  flatPoly[1] = G4TwoVector(CADPosFlats[1].x(),CADPosFlats[1].y());
+  flatPoly[2] = G4TwoVector(CADPosFlats[2].x(),CADPosFlats[2].y());
+  flatPoly[3] = G4TwoVector(CADPosFlats[3].x(),CADPosFlats[3].y());
+  flatPoly[4] = G4TwoVector(CADPosFlats[4].x(),CADPosFlats[4].y());
+  
+  // Remove forward / backward rings as requested.
+  if(!forwardShellStatus || !backwardShellStatus){
+    if(!forwardShellStatus){
+      // Subtract forward pentagon
+      std::vector<G4TwoVector> pentagon(5);
+      for(G4int i=0; i<5; i++)
+	pentagon[i]
+	  = G4TwoVector(innercut*sin(ModuleEuler[i][1])*cos(ModuleEuler[i][2]),
+			innercut*sin(ModuleEuler[i][1])*sin(ModuleEuler[i][2]));
+      G4ExtrudedSolid* PentaCut
+	= new G4ExtrudedSolid("PentaCut", pentagon, halfheight,
+			      G4TwoVector(0, 0), scaling, G4TwoVector(0, 0), 1);
+      shell = new G4SubtractionSolid("shell", shell, PentaCut,
+				     G4Transform3D(NoRot,
+						   G4ThreeVector(0, 0,
+								 shift)));
+    }
+    if(!backwardShellStatus){
+      // Subtract backward pentagon
+      std::vector<G4TwoVector> pentagon(5);
+      for(G4int i=0; i<5; i++)
+	pentagon[i]
+	  = G4TwoVector(innercut*sin(ModuleEuler[i+25][1])*cos(ModuleEuler[i+25][2]),
+			innercut*sin(ModuleEuler[i+25][1])*sin(ModuleEuler[i+25][2]));
+      G4RotationMatrix RotBackPenta = G4RotationMatrix::IDENTITY;
+      RotBackPenta.rotateY(180*degree);
+      G4ExtrudedSolid* PentaCut
+	= new G4ExtrudedSolid("PentaCut", pentagon, halfheight,
+			      G4TwoVector(0, 0), scaling, G4TwoVector(0, 0), 1);
+      shell = new G4SubtractionSolid("shell", shell, PentaCut,
+				     G4Transform3D(RotBackPenta,
+						   G4ThreeVector(0, 0,
+								 -shift)));
+    }
+
+    // Subtract the flats
+    std::vector<G4ExtrudedSolid::ZSection> zsections;
+    zsections.push_back(G4ExtrudedSolid::ZSection(0,
+						  G4TwoVector(0,0), 1));
+    zsections.push_back(G4ExtrudedSolid::ZSection(Rmax - Rmin,
+						  G4TwoVector(0,0),
+						  (flatHeight + Rmax - Rmin)/flatHeight));
+    G4ExtrudedSolid* flatShape
+      = new G4ExtrudedSolid("flatShape", flatPoly, zsections);
+
+    std::vector<G4ExtrudedSolid::ZSection> zsections2;
+    zsections2.push_back(G4ExtrudedSolid::ZSection(-(Rmax - Rmin),
+						   G4TwoVector(0,0),
+						   (flatHeight - (Rmax - Rmin))/flatHeight));
+    zsections2.push_back(G4ExtrudedSolid::ZSection(Rmax - Rmin,
+						   G4TwoVector(0,0),
+						   (flatHeight + Rmax - Rmin)/flatHeight));
+    G4ExtrudedSolid* doubleHoleShape
+      = new G4ExtrudedSolid("doubleHoleShape", flatPoly, zsections2);
+    
+    if(!forwardShellStatus){
+      G4MultiUnion* forwardFlats = new G4MultiUnion("ForwardFlats");
+      for(auto i: fFlats){
+	G4ThreeVector PosFlat = G4ThreeVector(0, 0, flatHeight);
+	PosFlat.rotateY(ModuleEuler[i][1]);
+	PosFlat.rotateZ(ModuleEuler[i][2]);
+	G4RotationMatrix RotFlat = G4RotationMatrix::IDENTITY;
+	RotFlat.rotateZ(ModuleEuler[i][0]);
+	RotFlat.rotateY( PosFlat.getTheta() );
+	RotFlat.rotateZ( PosFlat.getPhi() );
+	G4Transform3D tr = G4Transform3D(RotFlat, PosFlat);
+	if(half == "right" && i == 2)
+	  forwardFlats->AddNode(*doubleHoleShape, tr);
+	else
+	  forwardFlats->AddNode(*flatShape, tr);
+      }
+      forwardFlats->Voxelize();
+      shell
+	= new G4SubtractionSolid("shell", shell, forwardFlats,
+				 G4Transform3D(NoRot, NoShift));
+    }
+    if(!backwardShellStatus){
+      G4MultiUnion* backwardFlats = new G4MultiUnion("BackwardFlats");
+      for(auto i: bFlats){
+	G4ThreeVector PosFlat = G4ThreeVector(0, 0, flatHeight);
+	PosFlat.rotateY(ModuleEuler[i][1]);
+	PosFlat.rotateZ(ModuleEuler[i][2]);
+	G4RotationMatrix RotFlat = G4RotationMatrix::IDENTITY;
+	RotFlat.rotateZ(ModuleEuler[i][0]);
+	RotFlat.rotateY( PosFlat.getTheta() );
+	RotFlat.rotateZ( PosFlat.getPhi() );
+	G4Transform3D tr = G4Transform3D(RotFlat, PosFlat);
+	if(half == "left" && i == 29)
+	  backwardFlats->AddNode(*doubleHoleShape, tr);
+	else
+	  backwardFlats->AddNode(*flatShape, tr);
+      }
+      backwardFlats->Voxelize();
+      shell
+	= new G4SubtractionSolid("shell", shell, backwardFlats,
+				 G4Transform3D(NoRot, NoShift));
+    }
+    
+  }
+
+  // Bumpouts and cutouts
+  G4IntersectionSolid* bump1, *bump2;
+  G4LogicalVolume* logicBump1, *logicBump2; 
+  if(half == "left" || half == "right"){
+    std::vector<G4TwoVector> hexagon(6);
+    hexagon[0] = G4TwoVector(CADPosHex[0].x(), CADPosHex[0].y());
+    hexagon[1] = G4TwoVector(CADPosHex[1].x(), CADPosHex[1].y());
+    hexagon[2] = G4TwoVector(CADPosHex[2].x(), CADPosHex[2].y());
+    hexagon[3] = G4TwoVector(CADPosHex[3].x(), CADPosHex[3].y());
+    hexagon[4] = G4TwoVector(CADPosHex[4].x(), CADPosHex[4].y());
+    hexagon[5] = G4TwoVector(CADPosHex[5].x(), CADPosHex[5].y());
+
+    // Middle cutout
+    G4ExtrudedSolid* extrudedHexagon
+      = new G4ExtrudedSolid("extrudedHexagon", hexagon, halfheight,
+			    G4TwoVector(0, 0), scaling, G4TwoVector(0, 0), 1);
+
+    G4ThreeVector PosHex = G4ThreeVector(0, 0, shift);
+    PosHex.rotateZ(ModuleEuler[cuts[0]][0]);
+    PosHex.rotateY(ModuleEuler[cuts[0]][1]);
+    PosHex.rotateZ(ModuleEuler[cuts[0]][2]);
+    G4RotationMatrix RotHex = G4RotationMatrix::IDENTITY;
+    RotHex.rotateZ( ModuleEuler[cuts[0]][0] );
+    RotHex.rotateY( PosHex.getTheta() );
+    RotHex.rotateZ( PosHex.getPhi() );
+    shell = new G4SubtractionSolid("shell", shell, extrudedHexagon,
+				   G4Transform3D(RotHex, PosHex));
+
+    // Middle bumpout
+    G4SubtractionSolid* otherShell;
+    if(half == "left")
+      otherShell = Shell("right");
+    else
+      otherShell = Shell("left");
+
+    G4ThreeVector PosBump1 = G4ThreeVector(0, 0, shift);
+    PosBump1.rotateZ(ModuleEuler[bumps[0]][0]);
+    PosBump1.rotateY(ModuleEuler[bumps[0]][1]);
+    PosBump1.rotateZ(ModuleEuler[bumps[0]][2]);
+    G4RotationMatrix RotBump1 = G4RotationMatrix::IDENTITY;
+    RotBump1.rotateZ( ModuleEuler[bumps[0]][0] );
+    RotBump1.rotateY( PosBump1.getTheta() );
+    RotBump1.rotateZ( PosBump1.getPhi() );
+
+    bump1 = new G4IntersectionSolid("bump1", otherShell, extrudedHexagon,
+				    G4Transform3D(RotBump1, PosBump1));
+    logicBump1 = new G4LogicalVolume(bump1, matShell, "Bump1_log", 0, 0, 0 );
+
+    Hemisphere->AddPlacedVolume(logicBump1, NoShift, &NoRot);
+    
+    // Forward/backward cutout
+    G4ExtrudedSolid* extrudedPentagon
+      = new G4ExtrudedSolid("extrudedPentagon", flatPoly, halfheight,
+			    G4TwoVector(0, 0), scaling, G4TwoVector(0, 0), 1);
+
+    G4ThreeVector PosPent = G4ThreeVector(0, 0, shift);
+    PosPent.rotateZ(ModuleEuler[cuts[1]][0]);
+    PosPent.rotateY(ModuleEuler[cuts[1]][1]);
+    PosPent.rotateZ(ModuleEuler[cuts[1]][2]);
+    G4RotationMatrix RotPent = G4RotationMatrix::IDENTITY;
+    RotPent.rotateZ( ModuleEuler[cuts[1]][0] );
+    RotPent.rotateY( PosPent.getTheta() );
+    RotPent.rotateZ( PosPent.getPhi() );
+    shell = new G4SubtractionSolid("shell", shell, extrudedPentagon,
+				   G4Transform3D(RotPent, PosPent));
+
+    // Forward/backward bumpout
+    if( (bumps[1] <= 4  &&  forwardShellStatus) ||
+	(bumps[1] >= 25 && backwardShellStatus) ){
+      G4ThreeVector PosBump2 = G4ThreeVector(0, 0, shift);
+      PosBump2.rotateZ(ModuleEuler[bumps[1]][0]);
+      PosBump2.rotateY(ModuleEuler[bumps[1]][1]);
+      PosBump2.rotateZ(ModuleEuler[bumps[1]][2]);
+      G4RotationMatrix RotBump2 = G4RotationMatrix::IDENTITY;
+      RotBump2.rotateZ( ModuleEuler[bumps[1]][0] );
+      RotBump2.rotateY( PosBump2.getTheta() );
+      RotBump2.rotateZ( PosBump2.getPhi() );
+
+      bump2 = new G4IntersectionSolid("bump2", otherShell, extrudedPentagon,
+				      G4Transform3D(RotBump2, PosBump2));
+      logicBump2 = new G4LogicalVolume(bump2, matShell, "Bump1_log", 0, 0, 0 );
+
+      Hemisphere->AddPlacedVolume(logicBump2, NoShift, &NoRot);
+    }
+  }
+  
+  G4LogicalVolume* logicShell
+    = new G4LogicalVolume(shell, matShell, "Shell_log", 0, 0, 0 );
+
+  Hemisphere->AddPlacedVolume(logicShell, NoShift, &NoRot);
+
+  return Hemisphere;
 
 }

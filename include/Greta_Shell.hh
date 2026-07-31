@@ -79,6 +79,7 @@ public:
     void   SetRightOffset(G4double off){rightOffset = off;}
     void   Placement(G4String, G4bool, G4bool);
     G4SubtractionSolid*   Shell(G4String);
+    G4AssemblyVolume*     Hemi(G4String, G4bool, G4bool);
 };
 
 #endif
