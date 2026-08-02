@@ -210,8 +210,17 @@ void DetectorConstruction::Placement()
 
   if(gretinaStatus){
 #ifndef SCANNING
-    the_Gretina_Array->SetNorthOffset(northOffset);
-    the_Gretina_Array->SetSouthOffset(southOffset);
+    // Keeping backwards compatibility with Gretina_Shell class
+    if(northOffset !=0 || southOffset !=0){
+      the_Gretina_Array->SetNorthOffset(northOffset);
+      the_Gretina_Array->SetSouthOffset(southOffset);
+    }
+    // GRETA_Shell class uses left/right instead of north/south
+    if(leftOffset !=0 || rightOffset !=0){
+      the_Gretina_Array->SetNorthOffset(leftOffset);
+      the_Gretina_Array->SetSouthOffset(rightOffset);
+    }
+    
 #endif
     the_Gretina_Array->Placement();
   }

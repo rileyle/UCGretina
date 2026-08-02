@@ -153,7 +153,7 @@ Optional commands for including and configuring the GRETA mounting shell:
 
 > The NoForward and NoBackward options are used to omit the forward (holes 1-5) and backward (holes 26-30) portions of the frame. They are specified by including separate /Greta/Shell command(s).
 
-Optional commands setting the offsets of the left and right hemispheres of the GRETA mounting shell (positive values correspond to backing away from the target):
+Optional commands setting the offsets of the left and right hemispheres of GRETA (positive values correspond to backing away from the target):
 
     /GRETA/LeftOffset <double> <unit>
     

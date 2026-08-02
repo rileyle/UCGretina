@@ -166,8 +166,8 @@ class Gretina_Array
   /// halves of the mounting shell and corresponding modules
   ////////////////////////////////////////////////////////////////
   private:
-    G4double                    northOffset;
-    G4double                    southOffset;
+    G4double                    northOffset;  // Gretina_Shell
+    G4double                    southOffset;  // Gretina_Shell
   
   ///////////////////////////////////////////
   /// Cryostats             
@@ -313,6 +313,8 @@ class Gretina_Array
     void SetPosShift            ( G4ThreeVector );
     void SetNorthOffset         ( G4double );
     void SetSouthOffset         ( G4double );
+    void SetLeftOffset          ( G4double );
+    void SetRightOffset         ( G4double );
     void SetThetaPrisma         ( G4double );
 
   public:      

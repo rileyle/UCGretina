@@ -122,6 +122,9 @@ void Gretina_Array::InitData()
   stepHasChanged     = false;
 
   printVolumes       = false;
+
+  northOffset        = 0;
+  southOffset        = 0;
   
   myMessenger        = new Gretina_Array_Messenger(this);
 
@@ -1936,8 +1939,6 @@ void Gretina_Array::ConstructSegments()
             break;
           }
           ppseg->pPoly  = new CConvexPolyhedron( G4String(sName1), ppseg->vertex, ppseg->nfaces, ppseg->ifaces);
-	  //          ppseg->pDetL  = new G4LogicalVolume( ppseg->pPoly, matCryst, G4String(sName2), 0, 0, 0 );
-	  // LR: segment volumes were too large (sum > crystal volume). Intersect with crystal.
 	  G4RotationMatrix rm;
 	  rm.set(0,0,0);
 	  ppseg->pCaps  = new G4IntersectionSolid( G4String(sName1), ppseg->pPoly, ppgerm->pCaps, G4Transform3D( rm, G4ThreeVector() ) );
@@ -2091,9 +2092,13 @@ void Gretina_Array::PlaceTheClusters()
 
       indexP = 1000 * nGe + maxSolids * nGe;
 
-      if(abs(pEc->ph/deg) <= 90.) // Northern half of the mounting shell
+      G4cout << ">>>>>>>> " << nGe << G4endl;
+
+      // Northern/Left half of the mounting shell
+      if(abs(pEc->ph/deg) < 90. || nGe == 22 || nGe == 2) 
 	rotatedPos += G4ThreeVector( northOffset, 0, 0);
-      else                        // Southern half of the mounting shell
+      // Southern/Right half of the mounting shell
+      else if(abs(pEc->ph/deg) > 90. || nGe == 9 || nGe == 29) 
       	rotatedPos += G4ThreeVector(-southOffset, 0, 0);
       
       transf = G4Transform3D( rm, rotatedPos );
@@ -2109,9 +2114,11 @@ void Gretina_Array::PlaceTheClusters()
 	cryostatRot.rotateY( cryostatPos.getTheta() );
 	cryostatRot.rotateZ( cryostatPos.getPhi() );
 
-	if(abs(pEc->ph/deg) <= 90.) // Northern half of the mounting shell
+	// Northern half of the mounting shell
+	if(abs(pEc->ph/deg) < 90. || nGe == 22 || nGe == 2) 
 	  cryostatPos += G4ThreeVector( northOffset, 0, 0);
-	else                        // Southern half of the mounting shell
+	// Southern half of the mounting shell
+	else if(abs(pEc->ph/deg) > 90. || nGe == 9 || nGe == 29) 
 	  cryostatPos += G4ThreeVector(-southOffset, 0, 0);
 	
 	new G4PVPlacement(G4Transform3D(cryostatRot,cryostatPos), logicCryostat, "Cryostat", theDetector->HallLog(), false, 0 );
@@ -3482,7 +3489,7 @@ void Gretina_Array::SetNorthOffset( G4double off )
 
   G4int prec = G4cout.precision(4);
   G4cout.setf(ios::fixed);
-  G4cout  << " --> The northern hemisphere will be offset by "
+  G4cout  << " --> Quads and cryostats in the north/left hemisphere will be offset by "
           << std::setw(8) << northOffset/mm <<" mm" << G4endl;
   G4cout.unsetf(ios::fixed);
   G4cout.precision(prec);
@@ -3494,7 +3501,7 @@ void Gretina_Array::SetSouthOffset( G4double off )
 
   G4int prec = G4cout.precision(4);
   G4cout.setf(ios::fixed);
-  G4cout  << " --> The southern hemisphere will be offset by "
+  G4cout  << " --> Quads and cryostats in the south/left hemisphere will be offset by "
           << std::setw(8) << southOffset/mm <<" mm" << G4endl;
   G4cout.unsetf(ios::fixed);
   G4cout.precision(prec);

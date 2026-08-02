@@ -241,7 +241,8 @@ void Greta_Shell::Placement(G4String shellStatus,
 			    G4bool backwardShellStatus)
 {
 
-  G4ThreeVector NoShift = G4ThreeVector(0, 0, 0);
+  G4ThreeVector ShiftL = G4ThreeVector(leftOffset, 0, 0);
+  G4ThreeVector ShiftR = G4ThreeVector(-rightOffset, 0, 0);
   G4RotationMatrix NoRot = G4RotationMatrix::IDENTITY;
 
   G4RunManager* runManager = G4RunManager::GetRunManager();
@@ -252,25 +253,33 @@ void Greta_Shell::Placement(G4String shellStatus,
     Hemi("left",
 	 forwardShellStatus,
 	 backwardShellStatus)->MakeImprint(theDetector->HallLog(),
-					   NoShift, &NoRot, 0);
+					   ShiftL, &NoRot, 0);
     Hemi("right",
 	 forwardShellStatus,
 	 backwardShellStatus)->MakeImprint(theDetector->HallLog(),
-					   NoShift, &NoRot, 0);
+					   ShiftR, &NoRot, 0);
     G4cout << "Constructed the GRETA mounting shell" << G4endl;
+    G4cout << "   left hemisphere offset " << leftOffset*mm << " mm"
+	   << G4endl;
+    G4cout << "   right hemisphere offset " << rightOffset*mm << " mm"
+	   << G4endl;
   } else if(shellStatus == "left"){
     Hemi("left",
 	 forwardShellStatus,
 	 backwardShellStatus)->MakeImprint(theDetector->HallLog(),
-					   NoShift, &NoRot, 0);
+					   ShiftL, &NoRot, 0);
     G4cout << "Constructed the left hemisphere of the GRETA mounting shell"
+	   << G4endl;
+    G4cout << "   left hemisphere offset " << leftOffset*mm << " mm"
 	   << G4endl;
   } else if(shellStatus == "right"){
     Hemi("right",
 	 forwardShellStatus,
 	 backwardShellStatus)->MakeImprint(theDetector->HallLog(),
-					   NoShift, &NoRot, 0);
+					   ShiftR, &NoRot, 0);
     G4cout << "Constructed the right hemisphere of the GRETA mounting shell"
+	   << G4endl;
+    G4cout << "   right hemisphere offset " << rightOffset*mm << " mm"
 	   << G4endl;
   }
 
