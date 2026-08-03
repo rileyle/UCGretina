@@ -173,10 +173,10 @@ Greta_Shell::Greta_Shell()
   // forward/backward ring cutouts/bumpouts (holes 3 and 30).
   //
   // (Geant4 x = Drawing y; Geant4 y = - Drawing x)
-  CADPosFlats[0] = G4TwoVector(     0, -207.0); //    0, -210.0
-  CADPosFlats[1] = G4TwoVector( 203.2,  -79.8); //203.2,  -84.4 
-  CADPosFlats[2] = G4TwoVector( 183.6,   92.7); //183.6,   94.6
-  CADPosFlats[3] = G4TwoVector(     0,  210.0); //    0,  210.0); 
+  CADPosFlats[0] = G4TwoVector(     0, -207.0); 
+  CADPosFlats[1] = G4TwoVector( 203.2,  -79.8); 
+  CADPosFlats[2] = G4TwoVector( 183.6,   92.7); 
+  CADPosFlats[3] = G4TwoVector(     0,  210.0); 
   CADPosFlats[4] = G4TwoVector(-flatHeight*tan(31.717473*deg), 0); 
 
   // The corners of the polygon bounding holes 23 and 10 were used
@@ -418,12 +418,12 @@ G4AssemblyVolume* Greta_Shell::Hemi(G4String half,
   // Half the height of the extruded solids that cut fully through the shell.
   // We want these to extend beyond Rmax. The solids have twice the thickness
   // of the shell.
-  G4double halfheight = Rmax - Rmin; // = 1300/4*mm;
+  G4double halfheight = Rmax - Rmin;
   // Radial shift of these extruded solids
   G4double shift = (Rmin+Rmax)/2;
   // Scaling of the lower polygons of these extruded solids
   G4double scaling
-    = ((Rmin+Rmax)/2 - (Rmax - Rmin))/((Rmin+Rmax)/2 + (Rmax - Rmin));
+    = ((Rmin+Rmax)/2 - halfheight)/((Rmin+Rmax)/2 + halfheight);
 
   G4double innercut = 751*mm;
   
@@ -466,22 +466,6 @@ G4AssemblyVolume* Greta_Shell::Hemi(G4String half,
       bFlats.push_back(29);
     }
   }
-  /*else if(shellStatus == "full"){
-    if(!forwardShellStatus){
-      fFlats.push_back(0);
-      fFlats.push_back(1);
-      fFlats.push_back(2);
-      fFlats.push_back(3);
-      fFlats.push_back(4);
-    }
-    if(!backwardShellStatus){
-      bFlats.push_back(25);
-      bFlats.push_back(26);
-      bFlats.push_back(27);
-      bFlats.push_back(28);
-      bFlats.push_back(29);
-    }
-    } */
   else
     G4cout << "Greta_Shell::Hemi half parameter " << half << " is not defined "
 	   << "(expecting left or right)."
@@ -494,11 +478,11 @@ G4AssemblyVolume* Greta_Shell::Hemi(G4String half,
   // We define flatPoly in this scope, because it describes both flats and
   // forward/backward cutouts and bumpouts (holes 3 and 30).
   std::vector<G4TwoVector> flatPoly(5);
-  flatPoly[0] = G4TwoVector(CADPosFlats[0].x(),CADPosFlats[0].y());
-  flatPoly[1] = G4TwoVector(CADPosFlats[1].x(),CADPosFlats[1].y());
-  flatPoly[2] = G4TwoVector(CADPosFlats[2].x(),CADPosFlats[2].y());
-  flatPoly[3] = G4TwoVector(CADPosFlats[3].x(),CADPosFlats[3].y());
-  flatPoly[4] = G4TwoVector(CADPosFlats[4].x(),CADPosFlats[4].y());
+  flatPoly[0] = G4TwoVector(CADPosFlats[0].x(), CADPosFlats[0].y());
+  flatPoly[1] = G4TwoVector(CADPosFlats[1].x(), CADPosFlats[1].y());
+  flatPoly[2] = G4TwoVector(CADPosFlats[2].x(), CADPosFlats[2].y());
+  flatPoly[3] = G4TwoVector(CADPosFlats[3].x(), CADPosFlats[3].y());
+  flatPoly[4] = G4TwoVector(CADPosFlats[4].x(), CADPosFlats[4].y());
   
   // Remove forward / backward rings as requested.
   if(!forwardShellStatus || !backwardShellStatus){
@@ -541,17 +525,17 @@ G4AssemblyVolume* Greta_Shell::Hemi(G4String half,
 						  G4TwoVector(0,0), 1));
     zsections.push_back(G4ExtrudedSolid::ZSection(Rmax - Rmin,
 						  G4TwoVector(0,0),
-						  (flatHeight + Rmax - Rmin)/flatHeight));
+						  (flatHeight + halfheight)/flatHeight));
     G4ExtrudedSolid* flatShape
       = new G4ExtrudedSolid("flatShape", flatPoly, zsections);
 
     std::vector<G4ExtrudedSolid::ZSection> zsections2;
-    zsections2.push_back(G4ExtrudedSolid::ZSection(-(Rmax - Rmin),
+    zsections2.push_back(G4ExtrudedSolid::ZSection(-halfheight,
 						   G4TwoVector(0,0),
-						   (flatHeight - (Rmax - Rmin))/flatHeight));
-    zsections2.push_back(G4ExtrudedSolid::ZSection(Rmax - Rmin,
+						   (flatHeight - halfheight)/flatHeight));
+    zsections2.push_back(G4ExtrudedSolid::ZSection(halfheight,
 						   G4TwoVector(0,0),
-						   (flatHeight + Rmax - Rmin)/flatHeight));
+						   (flatHeight + halfheight)/flatHeight));
     G4ExtrudedSolid* doubleHoleShape
       = new G4ExtrudedSolid("doubleHoleShape", flatPoly, zsections2);
     
@@ -652,10 +636,11 @@ G4AssemblyVolume* Greta_Shell::Hemi(G4String half,
     
     // Forward/backward cutout
     G4ExtrudedSolid* extrudedPentagon
-      = new G4ExtrudedSolid("extrudedPentagon", flatPoly, halfheight,
-			    G4TwoVector(0, 0), scaling, G4TwoVector(0, 0), 1);
+      = new G4ExtrudedSolid("extrudedPentagon", flatPoly, flatHeight,
+			    G4TwoVector(0, 0), (flatHeight - halfheight)/flatHeight,
+			    G4TwoVector(0, 0), (flatHeight + halfheight)/flatHeight);
 
-    G4ThreeVector PosPent = G4ThreeVector(0, 0, shift);
+    G4ThreeVector PosPent = G4ThreeVector(0, 0, flatHeight);// shift);
     PosPent.rotateZ(ModuleEuler[cuts[1]][0]);
     PosPent.rotateY(ModuleEuler[cuts[1]][1]);
     PosPent.rotateZ(ModuleEuler[cuts[1]][2]);
@@ -669,7 +654,7 @@ G4AssemblyVolume* Greta_Shell::Hemi(G4String half,
     // Forward/backward bumpout
     if( (bumps[1] <= 4  &&  forwardShellStatus) ||
 	(bumps[1] >= 25 && backwardShellStatus) ){
-      G4ThreeVector PosBump2 = G4ThreeVector(0, 0, shift);
+      G4ThreeVector PosBump2 = G4ThreeVector(0, 0, flatHeight); //shift);
       PosBump2.rotateZ(ModuleEuler[bumps[1]][0]);
       PosBump2.rotateY(ModuleEuler[bumps[1]][1]);
       PosBump2.rotateZ(ModuleEuler[bumps[1]][2]);
