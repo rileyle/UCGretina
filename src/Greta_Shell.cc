@@ -416,17 +416,10 @@ G4AssemblyVolume* Greta_Shell::Hemi(G4String half,
 				    G4bool backwardShellStatus)
 {
   // Half the height of the extruded solids that cut fully through the shell.
-  // We want these to extend beyond Rmax. The solids have twice the thickness
-  // of the shell.
+  // We want these to extend from within Rmin to beyond Rmax. The solids have
+  // twice the thickness of the shell.
   G4double halfheight = Rmax - Rmin;
-  // Radial shift of these extruded solids
-  G4double shift = (Rmin+Rmax)/2;
-  // Scaling of the lower polygons of these extruded solids
-  G4double scaling
-    = ((Rmin+Rmax)/2 - halfheight)/((Rmin+Rmax)/2 + halfheight);
 
-  G4double innercut = 751*mm;
-  
   G4ThreeVector NoShift = G4ThreeVector(0, 0, 0);
   G4RotationMatrix NoRot = G4RotationMatrix::IDENTITY;
   
@@ -486,6 +479,7 @@ G4AssemblyVolume* Greta_Shell::Hemi(G4String half,
   
   // Remove forward / backward rings as requested.
   if(!forwardShellStatus || !backwardShellStatus){
+    G4double innercut = 751*mm;
     if(!forwardShellStatus){
       // Subtract forward pentagon
       std::vector<G4TwoVector> pentagon(5);
@@ -495,11 +489,13 @@ G4AssemblyVolume* Greta_Shell::Hemi(G4String half,
 			innercut*sin(ModuleEuler[i][1])*sin(ModuleEuler[i][2]));
       G4ExtrudedSolid* PentaCut
 	= new G4ExtrudedSolid("PentaCut", pentagon, halfheight,
-			      G4TwoVector(0, 0), scaling, G4TwoVector(0, 0), 1);
+			      G4TwoVector(0, 0),
+			      ((Rmin+Rmax)/2 - halfheight)/((Rmin+Rmax)/2 + halfheight),
+			      G4TwoVector(0, 0), 1);
       shell = new G4SubtractionSolid("shell", shell, PentaCut,
 				     G4Transform3D(NoRot,
 						   G4ThreeVector(0, 0,
-								 shift)));
+								 (Rmin+Rmax)/2)));
     }
     if(!backwardShellStatus){
       // Subtract backward pentagon
@@ -512,11 +508,13 @@ G4AssemblyVolume* Greta_Shell::Hemi(G4String half,
       RotBackPenta.rotateY(180*degree);
       G4ExtrudedSolid* PentaCut
 	= new G4ExtrudedSolid("PentaCut", pentagon, halfheight,
-			      G4TwoVector(0, 0), scaling, G4TwoVector(0, 0), 1);
+			      G4TwoVector(0, 0),
+			      ((Rmin+Rmax)/2 - halfheight)/((Rmin+Rmax)/2 + halfheight),
+			      G4TwoVector(0, 0), 1);
       shell = new G4SubtractionSolid("shell", shell, PentaCut,
 				     G4Transform3D(RotBackPenta,
 						   G4ThreeVector(0, 0,
-								 -shift)));
+								 -(Rmin+Rmax)/2)));
     }
 
     // Subtract the flats
@@ -599,9 +597,11 @@ G4AssemblyVolume* Greta_Shell::Hemi(G4String half,
     // Middle cutout
     G4ExtrudedSolid* extrudedHexagon
       = new G4ExtrudedSolid("extrudedHexagon", hexagon, halfheight,
-			    G4TwoVector(0, 0), scaling, G4TwoVector(0, 0), 1);
+			    G4TwoVector(0, 0),
+			    ((Rmin+Rmax)/2 - halfheight)/((Rmin+Rmax)/2 + halfheight),
+			    G4TwoVector(0, 0), 1);
 
-    G4ThreeVector PosHex = G4ThreeVector(0, 0, shift);
+    G4ThreeVector PosHex = G4ThreeVector(0, 0, (Rmin+Rmax)/2);
     PosHex.rotateZ(ModuleEuler[cuts[0]][0]);
     PosHex.rotateY(ModuleEuler[cuts[0]][1]);
     PosHex.rotateZ(ModuleEuler[cuts[0]][2]);
@@ -619,7 +619,7 @@ G4AssemblyVolume* Greta_Shell::Hemi(G4String half,
     else
       otherShell = Shell("left");
 
-    G4ThreeVector PosBump1 = G4ThreeVector(0, 0, shift);
+    G4ThreeVector PosBump1 = G4ThreeVector(0, 0, (Rmin+Rmax)/2);
     PosBump1.rotateZ(ModuleEuler[bumps[0]][0]);
     PosBump1.rotateY(ModuleEuler[bumps[0]][1]);
     PosBump1.rotateZ(ModuleEuler[bumps[0]][2]);
@@ -640,7 +640,7 @@ G4AssemblyVolume* Greta_Shell::Hemi(G4String half,
 			    G4TwoVector(0, 0), (flatHeight - halfheight)/flatHeight,
 			    G4TwoVector(0, 0), (flatHeight + halfheight)/flatHeight);
 
-    G4ThreeVector PosPent = G4ThreeVector(0, 0, flatHeight);// shift);
+    G4ThreeVector PosPent = G4ThreeVector(0, 0, flatHeight);
     PosPent.rotateZ(ModuleEuler[cuts[1]][0]);
     PosPent.rotateY(ModuleEuler[cuts[1]][1]);
     PosPent.rotateZ(ModuleEuler[cuts[1]][2]);
@@ -654,7 +654,7 @@ G4AssemblyVolume* Greta_Shell::Hemi(G4String half,
     // Forward/backward bumpout
     if( (bumps[1] <= 4  &&  forwardShellStatus) ||
 	(bumps[1] >= 25 && backwardShellStatus) ){
-      G4ThreeVector PosBump2 = G4ThreeVector(0, 0, flatHeight); //shift);
+      G4ThreeVector PosBump2 = G4ThreeVector(0, 0, flatHeight);
       PosBump2.rotateZ(ModuleEuler[bumps[1]][0]);
       PosBump2.rotateY(ModuleEuler[bumps[1]][1]);
       PosBump2.rotateZ(ModuleEuler[bumps[1]][2]);
