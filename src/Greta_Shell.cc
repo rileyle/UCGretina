@@ -241,6 +241,8 @@ void Greta_Shell::Placement(G4String shellStatus,
 			    G4bool backwardShellStatus)
 {
 
+  G4cout << "GRETA Shell Status = " << shellStatus << G4endl;
+  
   G4ThreeVector ShiftL = G4ThreeVector(leftOffset, 0, 0);
   G4ThreeVector ShiftR = G4ThreeVector(-rightOffset, 0, 0);
   G4RotationMatrix NoRot = G4RotationMatrix::IDENTITY;
@@ -280,6 +282,20 @@ void Greta_Shell::Placement(G4String shellStatus,
     G4cout << "Constructed the right hemisphere of the GRETA mounting shell"
 	   << G4endl;
     G4cout << "   right hemisphere offset " << rightOffset*mm << " mm"
+	   << G4endl;
+  } else if(shellStatus == "simple"){
+    if(!forwardShellStatus || ! backwardShellStatus){
+      G4cerr << "Error: The forward and backward rings cannot be omitted from the simple model of the GRETA mounting shell." << G4endl;
+      exit(EXIT_FAILURE);
+    }
+    G4SubtractionSolid* shell = Shell("full");
+    G4LogicalVolume* logicShell
+      = new G4LogicalVolume(shell, matShell, "Shell_log", 0, 0, 0 );
+    new G4PVPlacement(0,  G4ThreeVector(0, 0, 0),
+		      "MountingShell", logicShell,
+		      theDetector->HallPhys(), false, 0 );
+
+    G4cout << "Constructed the simple model of the full GRETA mounting shell"
 	   << G4endl;
   }
 

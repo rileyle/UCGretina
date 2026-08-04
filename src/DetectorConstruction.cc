@@ -192,9 +192,10 @@ void DetectorConstruction::Placement()
     Shell->setNorthOffset(northOffset);
     Shell->setSouthOffset(southOffset);
     Shell->Placement(shellStatus);
-  } else if ( GRETAShellStatus == "full" ||
-	      GRETAShellStatus == "left" ||
-	      GRETAShellStatus == "right"){
+  } else if ( GRETAShellStatus == "full"  ||
+	      GRETAShellStatus == "left"  ||
+	      GRETAShellStatus == "right" ||
+	      GRETAShellStatus == "simple" ){
     Greta_Shell* Shell = new Greta_Shell();
     Shell->SetLeftOffset(leftOffset); 
     Shell->SetRightOffset(rightOffset);
@@ -457,7 +458,8 @@ void DetectorConstruction_Messenger::SetNewValue(G4UIcommand* command,G4String n
     myTarget->SetSouthOffset(SouthOffCmd->GetNewDoubleValue(newValue));
   }
   if( command == GRETAShellCmd ) {
-    if(newValue == "full" || newValue == "left" || newValue == "right")
+    if(newValue == "full" || newValue == "left" || newValue == "right"
+       || newValue == "simple")
       myTarget->SetGRETAShellStatus(newValue);
     else if(newValue == "NoForward")
       myTarget->SetForwardGRETAShellStatus(false);
