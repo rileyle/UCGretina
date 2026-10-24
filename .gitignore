@@ -13,3 +13,4 @@ tmp*
 .vscode
 git_hash
 __pycache__
+graphify-out/
