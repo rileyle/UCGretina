@@ -1,3 +1,4 @@
+#include "UCGCompatibility.hh"
 #include "TrackingAction.hh"
 
 TrackingAction::TrackingAction(EventAction* evt){
@@ -118,13 +119,13 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
   // (by de-exciting the nucleus)
 
   if( def->GetParticleType() == "nucleus" &&
-      G4StrUtil::contains(aTrack->GetParticleDefinition()->GetParticleName(), '[') )
+      UCG::contains(aTrack->GetParticleDefinition()->GetParticleName(), '[') )
     primaryVertexInfo->AddBeta(aTrack->GetStep()->GetPostStepPoint()->GetBeta(),
 			       aTrack->GetTrackID());
   
   // if( def->GetParticleType() == "nucleus" &&
   //     aTrack->GetParentID() > 0 &&
-  //     G4StrUtil::contains(aTrack->GetParticleDefinition()->GetParticleName(), '[') )
+  //     UCG::contains(aTrack->GetParticleDefinition()->GetParticleName(), '[') )
   //   primaryVertexInfo->AddBeta(aTrack->GetStep()->GetPostStepPoint()->GetBeta(),
   // 		       aTrack->GetTrackID());
 

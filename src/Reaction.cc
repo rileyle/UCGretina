@@ -1,3 +1,4 @@
+#include "UCGCompatibility.hh"
 #include "Reaction.hh"
 #include "Reaction_Messenger.hh"
 
@@ -92,7 +93,11 @@ G4VParticleChange* Reaction::PostStepDoIt(
 	    = G4NuclearLevelData::GetInstance()->GetLevelManager(Z,A);
 	  size_t index = 0;
 	  index = lman->NearestLevelIndex(Ex,index);
+#ifdef G4V11
 	  G4int twoJ = std::abs(lman->TwoSpinParity(index));
+#else
+	  G4int twoJ = std::abs(lman->SpinTwo(index));
+#endif
 	
 	  if(substates.size() != (size_t)twoJ+1){
 	    //G4cerr << "Error: Reaction population parameter count != 2J+1."
@@ -197,7 +202,7 @@ G4double Reaction::PostStepGetPhysicalInteractionLength(
     // Target excitations:
     // Stop and kill the decay product once it reaches its ground state.
     if( target_reaction &&
-	!G4StrUtil::contains(aTrack.GetDynamicParticle()->GetParticleDefinition()->GetParticleName(), '[') && BeamOut->GetReactionFlag()==1){
+	!UCG::contains(aTrack.GetDynamicParticle()->GetParticleDefinition()->GetParticleName(), '[') && BeamOut->GetReactionFlag()==1){
       ground_state = true;
       target_reaction = false;  //Reset for next decay
       return 0;
@@ -270,7 +275,7 @@ G4VParticleChange* Reaction::AtRestDoIt(
 
   aParticleChange.Initialize(aTrack);
     
-  if( !G4StrUtil::contains(aTrack.GetDynamicParticle()->GetParticleDefinition()->GetParticleName(), '[') ) { 
+  if( !UCG::contains(aTrack.GetDynamicParticle()->GetParticleDefinition()->GetParticleName(), '[') ) { 
 
     // G4cout << "************************* AtRestDoIt: terminating track in "
     // 	   << aStep.GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetName()

@@ -15,7 +15,11 @@ using namespace std;
 #include "G4RandomDirection.hh"
 #include "G4Decay.hh"
 #include "G4RadioactiveDecay.hh"
+#ifdef G4V11
 #include "G4RadioactiveDecayMessenger.hh"
+#else
+#include "G4RadioactiveDecaymessenger.hh"
+#endif
 
 #include "G4NuclearLevelData.hh"
 #include "G4LevelManager.hh"

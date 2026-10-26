@@ -48,7 +48,11 @@
 #include "G4EmLowEPPhysics.hh"
 
 #ifdef POL
+#ifdef G4V11
 #include "G4PolarizedPhotoElectric.hh"
+#else
+#include "G4PolarizedPhotoElectricEffect.hh"
+#endif
 #include "G4PolarizedCompton.hh"
 #include "G4PolarizedGammaConversion.hh"
 #endif
@@ -169,7 +173,7 @@ void PhysicsList::ConstructProcess()
   
   // Electromagnetic physics list
   //
-#ifdef POL
+#if defined(POL) && defined(G4V11)
   if(usePolar){
     // Geant4 11 bundles phot/compt/conv into a single G4GammaGeneralProcess
     // ("GammaGeneralProc").  The individual processes must be registered for
@@ -190,7 +194,11 @@ void PhysicsList::ConstructProcess()
       G4String pname = (*pv)[i]->GetProcessName();
       if(pname=="phot"){
 	gpMan->RemoveProcess((*pv)[i]);
+#ifdef G4V11
 	gpMan->AddDiscreteProcess(new G4PolarizedPhotoElectric);
+#else
+	gpMan->AddDiscreteProcess(new G4PolarizedPhotoElectricEffect);
+#endif
       }
       else if(pname=="compt"){
 	gpMan->RemoveProcess((*pv)[i]);
@@ -362,7 +370,9 @@ void PhysicsList::AddRadioactiveDecay()
   // Geant4 10 had no such cut-off, and UCGretina's stationary-source mode
   // relies on long-lived isotopes decaying (e.g. 60Co, 152Eu).  Raise the
   // cut-off so the Geant4 10 behaviour is preserved.
+#ifdef G4V11
   radioactiveDecay->SetThresholdForVeryLongDecayTime(1.0e60*year);
+#endif
 
   G4bool ARMflag = true;
   radioactiveDecay->SetARM(ARMflag);                //Atomic Rearangement

@@ -1,3 +1,4 @@
+#include "UCGCompatibility.hh"
 #include "EventAction.hh"
 #include "RunAction.hh"
 
@@ -1267,14 +1268,14 @@ void EventAction::writeCache(TrackerIonHitsCollection* ionCollection){
   G4int Nwrite = 0;
   for(G4int i = 0; i < Npoints; i++){
     // Find the reaction step.
-    if( G4StrUtil::contains((*ionCollection)[i]->GetParticleID(), "[")
+    if( UCG::contains((*ionCollection)[i]->GetParticleID(), "[")
 	&& !reactionOccurence) {
       reactionOccurence = true;
     }
     // We need to add in a time offset for any steps in the target after
     // a gamma-ray is emitted.
     // (The proper time clock resets with each particle change.)
-    if( !G4StrUtil::contains((*ionCollection)[i]->GetParticleID(), "[")
+    if( !UCG::contains((*ionCollection)[i]->GetParticleID(), "[")
 	&& reactionOccurence &&!emissionOccurence) {
       emissionOccurence = true;
       timeOffset = (*ionCollection)[i-1]->GetTime();

@@ -1,4 +1,5 @@
 
+#include "UCGCompatibility.hh"
 #include "TrackerGammaSD.hh"
 #include "G4RunManager.hh"
 #include "PrimaryVertexInformation.hh"
@@ -65,7 +66,7 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
     detCode = 0;
     detNum  = 132;
   }
-  else if(G4StrUtil::contains(name, "Leaf")){ // Clover
+  else if(UCG::contains(name, "Leaf")){ // Clover
     detCode = theTouchable->GetReplicaNumber(0);
     detNum = detCode%1000;
   }
@@ -190,28 +191,28 @@ G4bool TrackerGammaSD::ProcessHits(G4Step* aStep,G4TouchableHistory*)
       }
       segCode = sector + 6 * slice;
     }
-  } else if( G4StrUtil::contains(name, "Leaf") ){ // Clover
+  } else if( UCG::contains(name, "Leaf") ){ // Clover
     // Crystal/segment labels follow
     // Eurysys CLOVER 4X50X80 SEG2 manual p. 18
-    if( G4StrUtil::contains(name, "pv_0") ){ // Crystal 1
+    if( UCG::contains(name, "pv_0") ){ // Crystal 1
       if(posSol.getX() > 0)
     	segCode = 1; // L
       else if(posSol.getX() < 0)
     	segCode = 2; // M
     }
-    if( G4StrUtil::contains(name, "pv_1") ){ // Crystal 2
+    if( UCG::contains(name, "pv_1") ){ // Crystal 2
       if(posSol.getY() > 0)
     	segCode = 3; // R
       else if(posSol.getY() < 0)
     	segCode = 2; // M
     }
-    if( G4StrUtil::contains(name, "pv_2") ){ // Crystal 3
+    if( UCG::contains(name, "pv_2") ){ // Crystal 3
       if(posSol.getX() > 0)
     	segCode = 3; // R
       else if(posSol.getX() < 0)
     	segCode = 2; // M
     }
-    if( G4StrUtil::contains(name, "pv_3") ){ // Crystal 4
+    if( UCG::contains(name, "pv_3") ){ // Crystal 4
       if(posSol.getY() > 0)
     	segCode = 1; // L
       else if(posSol.getY() < 0)

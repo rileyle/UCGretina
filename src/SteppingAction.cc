@@ -31,6 +31,7 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+#include "UCGCompatibility.hh"
 #include "SteppingAction.hh"
 
 #include "EventAction.hh"
@@ -100,7 +101,7 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
       = aStep->GetPostStepPoint()->GetTouchableHandle()->GetVolume();
 
     // Record S800 data as the reaction product leaves the target
-    if(   G4StrUtil::contains(volume1->GetName(), "Target")
+    if(   UCG::contains(volume1->GetName(), "Target")
        && volume2->GetName() == "expHall" ){
 
       G4ThreeVector pDir = aStep->GetTrack()->GetMomentumDirection();
@@ -133,16 +134,16 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
     }
     // Kill a reaction product once it hits the chamber or beamline
     // as long it has already emitted its gamma(s)
-    else if( ( G4StrUtil::contains(volume1->GetName(), "BeamTube")
-	       || G4StrUtil::contains(volume1->GetName(), "BeamTee")
-	       || G4StrUtil::contains(volume1->GetName(), "Cell")
-	       || G4StrUtil::contains(volume1->GetName(), "Bar")
-	       || G4StrUtil::contains(volume1->GetName(), "Chamber")
-	       || G4StrUtil::contains(volume1->GetName(), "sled")
-	       || G4StrUtil::contains(volume1->GetName(), "Frame")
-	       || G4StrUtil::contains(volume1->GetName(), "Tape")
-	       || G4StrUtil::contains(volume1->GetName(), "Ring") )
-	     && !G4StrUtil::contains(aStep->GetTrack()->GetParticleDefinition()->GetParticleName(), '[') ){
+    else if( ( UCG::contains(volume1->GetName(), "BeamTube")
+	       || UCG::contains(volume1->GetName(), "BeamTee")
+	       || UCG::contains(volume1->GetName(), "Cell")
+	       || UCG::contains(volume1->GetName(), "Bar")
+	       || UCG::contains(volume1->GetName(), "Chamber")
+	       || UCG::contains(volume1->GetName(), "sled")
+	       || UCG::contains(volume1->GetName(), "Frame")
+	       || UCG::contains(volume1->GetName(), "Tape")
+	       || UCG::contains(volume1->GetName(), "Ring") )
+	     && !UCG::contains(aStep->GetTrack()->GetParticleDefinition()->GetParticleName(), '[') ){
 
            // G4cout << "************************* SteppingAction: terminating track in "
       	   //   << volume1->GetName()
@@ -169,14 +170,14 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
     // get the final volume of the current step
     G4VPhysicalVolume* volume2
       = aStep->GetPostStepPoint()->GetTouchableHandle()->GetVolume();
-    if( G4StrUtil::contains(volume2->GetName(), "BeamTube")
-	|| G4StrUtil::contains(volume2->GetName(), "BeamTee")
-	|| G4StrUtil::contains(volume2->GetName(), "Cell")
-	|| G4StrUtil::contains(volume2->GetName(), "Bar")
-	|| G4StrUtil::contains(volume2->GetName(), "Chamber")
-	|| G4StrUtil::contains(volume2->GetName(), "sled")
-	|| G4StrUtil::contains(volume2->GetName(), "Frame")
-	|| G4StrUtil::contains(volume2->GetName(), "Ring") ){
+    if( UCG::contains(volume2->GetName(), "BeamTube")
+	|| UCG::contains(volume2->GetName(), "BeamTee")
+	|| UCG::contains(volume2->GetName(), "Cell")
+	|| UCG::contains(volume2->GetName(), "Bar")
+	|| UCG::contains(volume2->GetName(), "Chamber")
+	|| UCG::contains(volume2->GetName(), "sled")
+	|| UCG::contains(volume2->GetName(), "Frame")
+	|| UCG::contains(volume2->GetName(), "Ring") ){
 	  G4cerr << "Warning: incoming beam has hit "
 		 << volume2->GetName()
 	         << ". Killing this track."
