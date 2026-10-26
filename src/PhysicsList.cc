@@ -47,9 +47,11 @@
 #include "G4EmPenelopePhysics.hh"
 #include "G4EmLowEPPhysics.hh"
 
+#ifdef POL
 #include "G4PolarizedPhotoElectric.hh"
 #include "G4PolarizedCompton.hh"
 #include "G4PolarizedGammaConversion.hh"
+#endif
 
 #include "DetectorConstruction.hh"
 
@@ -167,26 +169,40 @@ void PhysicsList::ConstructProcess()
   
   // Electromagnetic physics list
   //
+#ifdef POL
+  if(usePolar){
+    // Geant4 11 bundles phot/compt/conv into a single G4GammaGeneralProcess
+    // ("GammaGeneralProc").  The individual processes must be registered for
+    // the polarized replacements below to be able to find them.
+    G4EmParameters::Instance()->SetGeneralProcessActive(false);
+  }
+#endif
+
   fEmPhysicsList->ConstructProcess();
   
+#ifdef POL
   if(usePolar){
     G4ProcessManager *gpMan = G4Gamma::Gamma()->GetProcessManager();
     G4ProcessVector* pv = gpMan->GetProcessList();
-    for(unsigned int i=0;i<pv->entries();i++){
-      if((*pv)[i]->GetProcessName()=="phot"){
+    // Iterate backwards: RemoveProcess() shrinks the vector, so a forward
+    // loop would skip entries.
+    for(G4int i=pv->entries()-1;i>=0;i--){
+      G4String pname = (*pv)[i]->GetProcessName();
+      if(pname=="phot"){
 	gpMan->RemoveProcess((*pv)[i]);
 	gpMan->AddDiscreteProcess(new G4PolarizedPhotoElectric);
       }
-      if((*pv)[i]->GetProcessName()=="compt"){
+      else if(pname=="compt"){
 	gpMan->RemoveProcess((*pv)[i]);
 	gpMan->AddDiscreteProcess(new G4PolarizedCompton());
       }
-      if((*pv)[i]->GetProcessName()=="conv"){
+      else if(pname=="conv"){
 	gpMan->RemoveProcess((*pv)[i]);
 	gpMan->AddDiscreteProcess(new G4PolarizedGammaConversion);
       }
     }
   }
+#endif
   
   // Beam Reaction
   AddReaction();
