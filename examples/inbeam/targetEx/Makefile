@@ -9,6 +9,13 @@ ifeq ($(G4MULTITHREADED), 1)
 	./concat.sh $* 2>&1   | tee -a $*.log
 endif
 
+simple_%_histos.root: simple_%.dat
+	grutinizer gvalues.val -qH simple_$*.dat -o /dev/null \
+	${GRUTSYS}/lib/libMakeHistosSourcesSim.so \
+	--hist-output simple_$*_histos.root \
+	2>&1 | tee simple_$*_histos_grut.log
+	rm simple_$*.dat
+
 %_histos.root : %.dat
 	grutinizer gvalues.val -qH $*.dat -o /dev/null \
 	${GRUTSYS}/lib/libMakeHistosInBeam.so \
