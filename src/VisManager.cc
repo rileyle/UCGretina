@@ -9,10 +9,8 @@
 #include "G4ASCIITree.hh"
 #include "G4DAWNFILE.hh"
 //LR #include "G4GAGTree.hh"
-#include "G4HepRepFile.hh"
-#include "G4HepRep.hh"
+//G4V11: G4HepRepFile/G4HepRep/G4VRML1File removed in Geant4 v11
 #include "G4RayTracer.hh"
-#include "G4VRML1File.hh"
 #include "G4VRML2File.hh"
 
 // Needing external packages or libraries...
@@ -61,10 +59,8 @@ void VisManager::RegisterGraphicsSystems () {
   RegisterGraphicsSystem (new G4ASCIITree);
   RegisterGraphicsSystem (new G4DAWNFILE);
   //LR RegisterGraphicsSystem (new G4GAGTree);
-  RegisterGraphicsSystem (new G4HepRepFile);
-  RegisterGraphicsSystem (new G4HepRep);
+  //G4V11: G4HepRepFile/G4HepRep/G4VRML1File removed in Geant4 v11
   RegisterGraphicsSystem (new G4RayTracer);
-  RegisterGraphicsSystem (new G4VRML1File);
   RegisterGraphicsSystem (new G4VRML2File);
 
   // Graphics systems needing external packages or libraries...

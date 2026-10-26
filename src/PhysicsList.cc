@@ -47,7 +47,7 @@
 #include "G4EmPenelopePhysics.hh"
 #include "G4EmLowEPPhysics.hh"
 
-#include "G4PolarizedPhotoElectricEffect.hh"
+#include "G4PolarizedPhotoElectric.hh"
 #include "G4PolarizedCompton.hh"
 #include "G4PolarizedGammaConversion.hh"
 
@@ -175,7 +175,7 @@ void PhysicsList::ConstructProcess()
     for(unsigned int i=0;i<pv->entries();i++){
       if((*pv)[i]->GetProcessName()=="phot"){
 	gpMan->RemoveProcess((*pv)[i]);
-	gpMan->AddDiscreteProcess(new G4PolarizedPhotoElectricEffect);
+	gpMan->AddDiscreteProcess(new G4PolarizedPhotoElectric);
       }
       if((*pv)[i]->GetProcessName()=="compt"){
 	gpMan->RemoveProcess((*pv)[i]);

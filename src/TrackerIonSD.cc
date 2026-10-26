@@ -22,7 +22,7 @@ TrackerIonSD::TrackerIonSD(G4String name)
 
 void TrackerIonSD::Initialize(G4HCofThisEvent* hce)
 { 
- 
+  (void)hce;
 
     ionCollection = new TrackerIonHitsCollection
                           (SensitiveDetectorName,collectionName[0]);

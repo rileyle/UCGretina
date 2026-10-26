@@ -984,9 +984,7 @@ void Gretina_Array:: ReadSliceFile()
 void Gretina_Array::ConstructGeCrystals()
 {
   
-  G4RunManager* runManager = G4RunManager::GetRunManager();
 
-  DetectorConstruction* theDetector  = (DetectorConstruction*) runManager->GetUserDetectorConstruction();
   
   if( !matCryst ) {
     G4cout << G4endl << "----> Missing material, cannot build the crystals!" << G4endl;
@@ -1321,7 +1319,7 @@ void Gretina_Array::ConstructTheCapsules()
 {
   G4int    nPg, nSid, nGe;
   //  G4int    nPg, nGe;
-  G4bool   movePlane;
+  // G4V11: MovePlane() return values are not used
   G4double dist1 = 0.;
   G4double dist2 = 0.;
   char     sName[128];
@@ -1363,7 +1361,7 @@ void Gretina_Array::ConstructTheCapsules()
 	pPv->pPoly  = new CConvexPolyhedron(G4String(sName), pPg->vertex);
         //      for( nSid=0; nSid<pPg->pPoly->GetnPlanes()-2; nSid++ )
 	for( nSid=2; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
-	  movePlane = pPv->pPoly->MovePlane( nSid, pPg->guardThick[nSid%4] );
+	  (void) pPv->pPoly->MovePlane( nSid, pPg->guardThick[nSid%4] );
 	pPv->whichGe = nGe;
 	sprintf(sName, "plaPolyL%2.2d", nGe);
 	pPv->pDetL = new G4LogicalVolume( pPv->pPoly, matCryst, G4String(sName), 0, 0, 0 ); 
@@ -1376,7 +1374,7 @@ void Gretina_Array::ConstructTheCapsules()
 	pPc->pPoly  = new CConvexPolyhedron(G4String(sName), pPg->vertex);
         //	for( nSid=0; nSid<pPg->pPoly->GetnPlanes()-2; nSid++ )
 	for( nSid=2; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
-	  movePlane = pPc->pPoly->MovePlane( nSid, pPg->guardThick[nSid%4] );
+	  (void) pPc->pPoly->MovePlane( nSid, pPg->guardThick[nSid%4] );
 	pPc->whichGe = nGe;
 	sprintf(sName, "plbPolyL%2.2d", nGe);
 	pPc->pDetL = new G4LogicalVolume( pPc->pPoly, matCryst, G4String(sName), 0, 0, 0 );
@@ -1393,7 +1391,7 @@ void Gretina_Array::ConstructTheCapsules()
 	pPv->pPoly  = new CConvexPolyhedron(G4String(sName), pPg->vertex);
         //      for( nSid=0; nSid<pPg->pPoly->GetnPlanes()-2; nSid++ )
 	for( nSid=2; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
-	  movePlane = pPv->pPoly->MovePlane( nSid, pPg->guardThick[nSid%4] );
+	  (void) pPv->pPoly->MovePlane( nSid, pPg->guardThick[nSid%4] );
 	pPv->whichGe = nGe;
 	sprintf(sName, "plaPolyL%2.2d", nGe);
 	pPv->pDetL = new G4LogicalVolume( pPv->pPoly, matCryst, G4String(sName), 0, 0, 0 ); 
@@ -1536,7 +1534,7 @@ void Gretina_Array::ConstructTheCapsules()
 	sprintf(sName, "cryPoly%2.2d", nGe);
 	pPv->pPoly  = new CConvexPolyhedron(G4String(sName), pPg->vertex);
 	for( nSid=0; nSid<pPg->pPoly->GetnPlanes(); nSid++ )
-	  movePlane = pPv->pPoly->MovePlane( nSid, dist1 );
+	  (void) pPv->pPoly->MovePlane( nSid, dist1 );
 	pPv->whichGe = nGe;
 	sprintf(sName, "cryPolyL%2.2d", nGe);
 	pPv->pDetL = new G4LogicalVolume( pPv->pPoly, matHole, G4String(sName), 0, 0, 0 ); 
@@ -1723,7 +1721,7 @@ G4int Gretina_Array::CalculateSegments(G4int iPg)
   G4int nsegs    = nsides * nslices;
    
   // vertices of inner and outer face of crystal
-#ifdef G4V10
+#if defined(G4V10) || defined(G4V11)
   G4Point3D* vertexF1;
   G4Point3D* vertexF2;
   vertexF1= new G4Point3D[nsides];
@@ -3253,7 +3251,7 @@ void Gretina_Array::CalculateVolumeAndCenter(G4int iPg, G4int start, G4int nsegs
 ////////////////////////////////////////////////////////////////////
 void Gretina_Array::SetSolidFile(G4String nome)
 {
-  if( nome(0) == '/' )
+  if( nome[0] == '/' )
     solidFile = nome;
   else {
     if( nome.find( "./", 0 ) != string::npos ) {
@@ -3270,7 +3268,7 @@ void Gretina_Array::SetSolidFile(G4String nome)
   
 void Gretina_Array::SetAngleFile(G4String nome)
 {
-  if( nome(0) == '/' )
+  if( nome[0] == '/' )
     eulerFile = nome;
   else {
     if( nome.find( "./", 0 ) != string::npos ) {
@@ -3287,7 +3285,7 @@ void Gretina_Array::SetAngleFile(G4String nome)
     
 void Gretina_Array::SetWallsFile(G4String nome)
 {
-  if( nome(0) == '/' )
+  if( nome[0] == '/' )
     wallsFile = nome;
   else {
     if( nome.find( "./", 0 ) != string::npos ) {
@@ -3304,7 +3302,7 @@ void Gretina_Array::SetWallsFile(G4String nome)
     
 void Gretina_Array::SetClustFile(G4String nome)
 {
-  if( nome(0) == '/' )
+  if( nome[0] == '/' )
     clustFile = nome;
   else {
     if( nome.find( "./", 0 ) != string::npos ) {
@@ -3321,7 +3319,7 @@ void Gretina_Array::SetClustFile(G4String nome)
 
 void Gretina_Array::SetSliceFile(G4String nome)
 {
-  if( nome(0) == '/' )
+  if( nome[0] == '/' )
     sliceFile = nome;
   else {
     if( nome.find( "./", 0 ) != string::npos ) {
