@@ -357,6 +357,13 @@ void PhysicsList::AddRadioactiveDecay()
 
   G4Radioactivation* radioactiveDecay = new G4Radioactivation();
 
+  // Geant4 11 treats nuclei whose mean life exceeds a cut-off as stable
+  // (default: 1 year, G4VRadioactiveDecay::fThresholdForVeryLongDecayTime).
+  // Geant4 10 had no such cut-off, and UCGretina's stationary-source mode
+  // relies on long-lived isotopes decaying (e.g. 60Co, 152Eu).  Raise the
+  // cut-off so the Geant4 10 behaviour is preserved.
+  radioactiveDecay->SetThresholdForVeryLongDecayTime(1.0e60*year);
+
   G4bool ARMflag = true;
   radioactiveDecay->SetARM(ARMflag);                //Atomic Rearangement
 

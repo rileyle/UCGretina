@@ -368,6 +368,7 @@ def save_baselines(data):
             "git_hash": git_hash,
             "git_branch": git_branch,
             "cpu": cpu,
+            "geant4_version": get_g4_version(),
         }
     }
     out.update(data)
@@ -424,6 +425,23 @@ def get_cpu_info():
     return socket.gethostname()
 
 
+def get_g4_version():
+    """Return the Geant4 version string (e.g. '11.4.3'), or 'unknown'.
+
+    The version is recorded alongside baselines and printed in test headers so
+    that results from different Geant4 releases can be told apart.
+    """
+    try:
+        version = subprocess.check_output(
+            ["geant4-config", "--version"], text=True
+        ).strip()
+        if version:
+            return version
+    except (OSError, subprocess.CalledProcessError):
+        pass
+    return "unknown"
+
+
 def append_functional_log(rows):
     """Append functional test results to functional_tests.log (TSV).
 
@@ -463,6 +481,13 @@ def main():
 
     if args.mode is None:
         parser.error("--mode is required unless --update-baselines is specified")
+
+    # Binaries are looked up in $G4WORKDIR/bin/$G4SYSTEM.  Without the Geant4
+    # environment every case would be skipped silently and the mode could
+    # report success without having run anything.
+    missing = [v for v in ("G4WORKDIR", "G4SYSTEM") if not os.environ.get(v)]
+    if missing:
+        parser.error(f"{', '.join(missing)} not set; source the Geant4 environment first")
 
     os.makedirs(TMP_DIR, exist_ok=True)
 
@@ -510,9 +535,20 @@ SMOKE_CASES = [
 ]
 
 
+# Physics checks for smoke runs: required and forbidden stdout substrings.
+# Polarized builds must really register the polarized gamma processes; a build
+# in which the POL replacements silently fell back to standard EM would still
+# run to completion, so exit status alone cannot catch that regression.
+SMOKE_PHYSICS_CHECKS = {
+    "smoke_pol": (["Polarized-Compton", "Polarized-PhotoElectric"], []),
+    "smoke_standard": ([], ["Polarized-Compton", "Polarized-PhotoElectric"]),
+}
+
+
 def run_smoke():
-    print(f"\n=== test-smoke ({SMOKE_EVENTS} events) ===")
+    print(f"\n=== test-smoke ({SMOKE_EVENTS} events, Geant4 {get_g4_version()}) ===")
     failures = 0
+    ran = 0
     for test_name, binary_name, macro_file, example_path, support_files in SMOKE_CASES:
         binary = find_binary_optional(binary_name)
         if binary is None:
@@ -529,9 +565,30 @@ def run_smoke():
         collect_ascii_output(workdir, "output")
 
         ok, msg = _check_run_criteria(test_name, stdout, stderr, returncode)
-        print(msg)
         if not ok:
+            print(msg)
             failures += 1
+            continue
+
+        required, forbidden = SMOKE_PHYSICS_CHECKS.get(test_name, ([], []))
+        missing = [s for s in required if s not in stdout]
+        unexpected = [s for s in forbidden if s in stdout]
+        if missing or unexpected:
+            detail = []
+            if missing:
+                detail.append("missing " + ", ".join(missing))
+            if unexpected:
+                detail.append("unexpected " + ", ".join(unexpected))
+            print(f"[FAIL] {test_name:<30} physics check: {'; '.join(detail)}")
+            failures += 1
+            continue
+
+        print(msg)
+        ran += 1
+
+    if ran == 0 and failures == 0:
+        print("\n[FAIL] no smoke cases ran (missing binaries?)")
+        sys.exit(1)
 
     if failures:
         print(f"\n{failures} FAILED")
@@ -631,9 +688,10 @@ def run_functional(mode):
     crashes. Marginal passes do not cause a non-zero exit.
     Appends all results to functional_tests.log.
     """
-    print(f"\n=== test-{mode} ({FUNCTIONAL_EVENTS} events) ===")
+    print(f"\n=== test-{mode} ({FUNCTIONAL_EVENTS} events, Geant4 {get_g4_version()}) ===")
     baselines = load_baselines()
     failures = 0
+    ran = 0
     log_rows = []
     git_hash, git_branch = get_git_info()
     cpu = get_cpu_info()
@@ -653,6 +711,7 @@ def run_functional(mode):
         write_run_macro(macro_file, FUNCTIONAL_EVENTS, wrapper)
         stdout, stderr, returncode = run_sim(binary, wrapper, workdir)
         collect_ascii_output(workdir, "output")
+        ran += 1
 
         ok, msg = _check_run_criteria(test_name, stdout, stderr, returncode)
         if not ok:
@@ -725,6 +784,10 @@ def run_functional(mode):
 
     if log_rows:
         append_functional_log(log_rows)
+
+    if ran == 0:
+        print(f"\n[FAIL] no {mode} cases ran (missing binaries?)")
+        sys.exit(1)
 
     if failures:
         print(f"\n{failures} FAILED")
@@ -908,7 +971,8 @@ def run_benchmark(n_events):
     # LH variants are ~30x slower; cap their event count to avoid multi-hour runs.
     lh_events = min(n_events, 100000)
 
-    print(f"\n=== Benchmark ({n_events} events, commit {git_hash}, branch {git_branch}) ===")
+    print(f"\n=== Benchmark ({n_events} events, commit {git_hash}, branch {git_branch}, "
+          f"Geant4 {get_g4_version()}) ===")
     print(f"CPU: {cpu}")
     if lh_events < n_events:
         print(f"(LH variants: {lh_events} events)")

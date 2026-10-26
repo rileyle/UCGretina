@@ -16,7 +16,7 @@
 
 # Stationary 166Ho source
 # Modified decay data file: treat the 5.696 keV isomer as the ground state
-/grdm/setRadioactiveDecayFile 67 166 z67.a166.decaydata
+/process/had/rdm/setRadioactiveDecayFile 67 166 z67.a166.decaydata
 /BeamOut/Source
 /BeamIn/A 166
 /BeamIn/Z 67

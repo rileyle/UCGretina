@@ -2,7 +2,8 @@
   "_meta": {
     "git_hash": "524d38",
     "git_branch": "geant4.10",
-    "cpu": "Intel(R) Core(TM) i7-14700"
+    "cpu": "Intel(R) Core(TM) i7-14700",
+    "geant4_version": "10.7.4"
   },
   "inbeam_standard": {
     "ratio": 0.294374,

@@ -38,6 +38,7 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
       &&
       ( aTrack->GetParentID() == 0 ||
 	aTrack->GetCreatorProcess()->GetProcessName() == "Radioactivation" ||
+	aTrack->GetCreatorProcess()->GetProcessName() == "RadioactiveDecay" ||
 	aTrack->GetCreatorProcess()->GetProcessName() == "Reaction" ) ){
 
     //    G4cout << "> Event ID = " << eventAction->GetEvent()->GetEventID() << G4endl;
