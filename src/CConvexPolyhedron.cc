@@ -1011,3 +1011,30 @@ G4NURBS* CConvexPolyhedron::CreateNURBS () const
   return 0;
 }
 #endif
+
+void CConvexPolyhedron::BoundingLimits(G4ThreeVector& pMin, G4ThreeVector& pMax) const
+{
+  if (nPoints <= 0 || fPoints == nullptr) {
+    G4VSolid::BoundingLimits(pMin, pMax);
+    return;
+  }
+
+  G4double xmin = fPoints[0].x();
+  G4double ymin = fPoints[0].y();
+  G4double zmin = fPoints[0].z();
+  G4double xmax = xmin;
+  G4double ymax = ymin;
+  G4double zmax = zmin;
+
+  for (G4int i = 1; i < nPoints; ++i) {
+    if (fPoints[i].x() < xmin) xmin = fPoints[i].x();
+    if (fPoints[i].y() < ymin) ymin = fPoints[i].y();
+    if (fPoints[i].z() < zmin) zmin = fPoints[i].z();
+    if (fPoints[i].x() > xmax) xmax = fPoints[i].x();
+    if (fPoints[i].y() > ymax) ymax = fPoints[i].y();
+    if (fPoints[i].z() > zmax) zmax = fPoints[i].z();
+  }
+
+  pMin.set(xmin, ymin, zmin);
+  pMax.set(xmax, ymax, zmax);
+}

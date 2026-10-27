@@ -108,7 +108,8 @@ class CConvexPolyhedron : public G4CSGSolid
   public:
     G4bool MovePlane(const G4int nn, const G4double dist);   //> shifts the plane along its normal (+ --> outwards)
     G4bool CalculateExtent( const EAxis pAxis, const G4VoxelLimits& pVoxelLimit,
-                                  const G4AffineTransform& pTransform, G4double& pMin, G4double& pMax ) const;    
+                                  const G4AffineTransform& pTransform, G4double& pMin, G4double& pMax ) const;
+    void BoundingLimits(G4ThreeVector& pMin, G4ThreeVector& pMax) const;    
         
   public:
     EInside Inside( const G4ThreeVector& p ) const;
