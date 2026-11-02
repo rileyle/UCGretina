@@ -468,7 +468,7 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
 
 // Elastic processes:
 #include "G4HadronElasticProcess.hh"
-#include "G4HadronCaptureProcess.hh"
+#include "G4NeutronCaptureProcess.hh"
 #include "G4HadronElastic.hh"
 #include "G4ChipsElasticModel.hh"
 #include "G4ElasticHadrNucleusHE.hh"
@@ -485,19 +485,7 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
 #include "G4CrossSectionElastic.hh"
 
 // Inelastic processes:
-#include "G4PionPlusInelasticProcess.hh"
-#include "G4PionMinusInelasticProcess.hh"
-#include "G4KaonPlusInelasticProcess.hh"
-#include "G4KaonZeroSInelasticProcess.hh"
-#include "G4KaonZeroLInelasticProcess.hh"
-#include "G4KaonMinusInelasticProcess.hh"
-#include "G4ProtonInelasticProcess.hh"
-#include "G4AntiProtonInelasticProcess.hh"
-#include "G4NeutronInelasticProcess.hh"
-#include "G4AntiNeutronInelasticProcess.hh"
-#include "G4DeuteronInelasticProcess.hh"
-#include "G4TritonInelasticProcess.hh"
-#include "G4AlphaInelasticProcess.hh"
+#include "G4HadronInelasticProcess.hh"
 
 // FTFP + BERT model
 #include "G4TheoFSGenerator.hh"
@@ -614,7 +602,7 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
           theElasticProcess->RegisterMe( elastic_he );
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
-	  G4PionPlusInelasticProcess* theInelasticProcess = new G4PionPlusInelasticProcess("inelastic");
+          G4HadronInelasticProcess* theInelasticProcess = new G4HadronInelasticProcess( "inelastic", G4PionPlus::Definition() );
           theInelasticProcess->AddDataSet( new G4BGGPionInelasticXS( G4PionPlus::Definition() ) );
 	  theInelasticProcess->RegisterMe( theFTFModel1 );
           theInelasticProcess->RegisterMe( theBERTModel0 );
@@ -629,7 +617,7 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
           theElasticProcess->RegisterMe( elastic_he );
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
-	  G4PionMinusInelasticProcess* theInelasticProcess = new G4PionMinusInelasticProcess("inelastic");
+          G4HadronInelasticProcess* theInelasticProcess = new G4HadronInelasticProcess( "inelastic", G4PionMinus::Definition() );	  
           theInelasticProcess->AddDataSet( new G4BGGPionInelasticXS( G4PionMinus::Definition() ) );
 	  theInelasticProcess->RegisterMe( theFTFModel1 );
           theInelasticProcess->RegisterMe( theBERTModel0 );
@@ -644,7 +632,8 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
           theElasticProcess->AddDataSet( G4CrossSectionDataSetRegistry::Instance()->GetCrossSectionDataSet(G4ChipsKaonPlusElasticXS::Default_Name()));
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
-          G4KaonPlusInelasticProcess* theInelasticProcess = new G4KaonPlusInelasticProcess("inelastic");
+          G4HadronInelasticProcess* theInelasticProcess = new G4HadronInelasticProcess( "inelastic", G4KaonPlus::Definition() );
+	  
           theInelasticProcess->AddDataSet( G4CrossSectionDataSetRegistry::Instance()->GetCrossSectionDataSet(G4ChipsKaonPlusInelasticXS::Default_Name()));
 	  theInelasticProcess->RegisterMe( theFTFModel1 );
           theInelasticProcess->RegisterMe( theBERTModel0 );
@@ -659,7 +648,7 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
           theElasticProcess->AddDataSet( G4CrossSectionDataSetRegistry::Instance()->GetCrossSectionDataSet(G4ChipsKaonZeroElasticXS::Default_Name()));
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
-          G4KaonZeroSInelasticProcess* theInelasticProcess = new G4KaonZeroSInelasticProcess("inelastic");
+	  G4HadronInelasticProcess* theInelasticProcess = new G4HadronInelasticProcess( "inelastic", G4KaonZeroShort::Definition() );
           theInelasticProcess->AddDataSet( G4CrossSectionDataSetRegistry::Instance()->GetCrossSectionDataSet(G4ChipsKaonZeroInelasticXS::Default_Name()));
 	  theInelasticProcess->RegisterMe( theFTFModel1 );
           theInelasticProcess->RegisterMe( theBERTModel0 );
@@ -674,7 +663,8 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
           theElasticProcess->AddDataSet( G4CrossSectionDataSetRegistry::Instance()->GetCrossSectionDataSet(G4ChipsKaonZeroElasticXS::Default_Name()));
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
-          G4KaonZeroLInelasticProcess* theInelasticProcess = new G4KaonZeroLInelasticProcess("inelastic");
+          //G4KaonZeroLInelasticProcess* theInelasticProcess = new G4KaonZeroLInelasticProcess("inelastic");
+	  G4HadronInelasticProcess* theInelasticProcess = new G4HadronInelasticProcess( "inelastic", G4KaonZeroLong::Definition() );
           theInelasticProcess->AddDataSet( G4CrossSectionDataSetRegistry::Instance()->GetCrossSectionDataSet(G4ChipsKaonZeroInelasticXS::Default_Name()));
 	  theInelasticProcess->RegisterMe( theFTFModel1 );
           theInelasticProcess->RegisterMe( theBERTModel0 ); 
@@ -689,7 +679,7 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
           theElasticProcess->AddDataSet( G4CrossSectionDataSetRegistry::Instance()->GetCrossSectionDataSet(G4ChipsKaonMinusElasticXS::Default_Name()));
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
-          G4KaonMinusInelasticProcess* theInelasticProcess = new G4KaonMinusInelasticProcess("inelastic");
+	  G4HadronInelasticProcess* theInelasticProcess = new G4HadronInelasticProcess( "inelastic", G4KaonMinus::Definition() );
           theInelasticProcess->AddDataSet( G4CrossSectionDataSetRegistry::Instance()->GetCrossSectionDataSet(G4ChipsKaonMinusInelasticXS::Default_Name()));
 	  theInelasticProcess->RegisterMe( theFTFModel1 );
           theInelasticProcess->RegisterMe( theBERTModel0 );
@@ -705,7 +695,7 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
           theElasticProcess->RegisterMe( elastic_chip );
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
-          G4ProtonInelasticProcess* theInelasticProcess =  new G4ProtonInelasticProcess("inelastic");
+	  G4HadronInelasticProcess* theInelasticProcess = new G4HadronInelasticProcess( "inelastic", G4Proton::Definition() );
           theInelasticProcess->AddDataSet( new G4BGGNucleonInelasticXS( G4Proton::Proton() ) );
 	  theInelasticProcess->RegisterMe( theFTFModel1 );
           theInelasticProcess->RegisterMe( theBERTModel0 );
@@ -721,7 +711,7 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
           theElasticProcess->RegisterMe( elastic_anuc );
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
-          G4AntiProtonInelasticProcess* theInelasticProcess = new G4AntiProtonInelasticProcess("inelastic");
+	  G4HadronInelasticProcess* theInelasticProcess = new G4HadronInelasticProcess( "inelastic", G4AntiProton::Definition() );
           theInelasticProcess->AddDataSet( theAntiNucleonData );
 	  theInelasticProcess->RegisterMe( theFTFModel0 );
 	  pmanager->AddDiscreteProcess( theInelasticProcess );
@@ -741,7 +731,7 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
 	theElasticProcess->AddDataSet( new G4ParticleHPElasticData );
 	pmanager->AddDiscreteProcess( theElasticProcess );
 	// inelastic scattering
-	G4NeutronInelasticProcess* theInelasticProcess = new G4NeutronInelasticProcess("inelastic");
+	G4HadronInelasticProcess* theInelasticProcess = new G4HadronInelasticProcess( "inelastic", G4Neutron::Definition() );
         theInelasticProcess->AddDataSet( new G4BGGNucleonInelasticXS( G4Neutron::Neutron() ) );
 	theInelasticProcess->RegisterMe( theFTFModel1 );
         theInelasticProcess->RegisterMe( theBERTModel1 );
@@ -752,13 +742,12 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
 	theInelasticProcess->AddDataSet( new G4ParticleHPInelasticData );
 	pmanager->AddDiscreteProcess(theInelasticProcess);
 	// capture
-	G4HadronCaptureProcess* theCaptureProcess = new G4HadronCaptureProcess;
+	G4NeutronCaptureProcess* theCaptureProcess = new G4NeutronCaptureProcess;
 	G4ParticleHPCapture * theNeutronCaptureHPModel = new G4ParticleHPCapture;
         theNeutronCaptureHPModel->SetMinEnergy( theHPMin );
         theNeutronCaptureHPModel->SetMaxEnergy( theHPMax );
 	G4NeutronRadCapture* theNeutronRadCapture = new G4NeutronRadCapture(); 
- 	theNeutronRadCapture->SetMinEnergy(theHPMax*0.99);
-	theNeutronRadCapture->InitialiseModel(); 
+ 	theNeutronRadCapture->SetMinEnergy(theHPMax*0.99); 
 	theCaptureProcess->RegisterMe( theNeutronCaptureHPModel );
 	theCaptureProcess->RegisterMe( theNeutronRadCapture);
 	theCaptureProcess->AddDataSet( new G4ParticleHPCaptureData );
@@ -774,7 +763,7 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
           theElasticProcess->RegisterMe( elastic_anuc );
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
-	  G4AntiNeutronInelasticProcess* theInelasticProcess = new G4AntiNeutronInelasticProcess("inelastic");
+	  G4HadronInelasticProcess* theInelasticProcess = new G4HadronInelasticProcess( "inelastic", G4AntiNeutron::Definition() );
           theInelasticProcess->AddDataSet( theAntiNucleonData );
 	  theInelasticProcess->RegisterMe( theFTFModel0 );
 	  pmanager->AddDiscreteProcess( theInelasticProcess );
@@ -788,7 +777,7 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
           theElasticProcess->AddDataSet( theGGNuclNuclData );
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
-	  G4DeuteronInelasticProcess* theInelasticProcess = new G4DeuteronInelasticProcess("inelastic");
+	  G4HadronInelasticProcess* theInelasticProcess = new G4HadronInelasticProcess( "inelastic", G4Deuteron::Definition() );	  
           theInelasticProcess->AddDataSet( theGGNuclNuclData );
 	  theInelasticProcess->RegisterMe( theFTFModel1 );
 	  theInelasticProcess->RegisterMe( theIonBC );
@@ -803,7 +792,7 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
           theElasticProcess->AddDataSet( theGGNuclNuclData );
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
-	  G4TritonInelasticProcess* theInelasticProcess = new G4TritonInelasticProcess("inelastic");
+	  G4HadronInelasticProcess* theInelasticProcess = new G4HadronInelasticProcess( "inelastic", G4Triton::Definition() );	  
           theInelasticProcess->AddDataSet( theGGNuclNuclData );
 	  theInelasticProcess->RegisterMe( theFTFModel1 );
 	  theInelasticProcess->RegisterMe( theIonBC );
@@ -818,7 +807,7 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
           theElasticProcess->AddDataSet( theGGNuclNuclData );
 	  pmanager->AddDiscreteProcess( theElasticProcess );
           // Inelastic scattering
-	  G4AlphaInelasticProcess* theInelasticProcess = new G4AlphaInelasticProcess("inelastic");
+	  G4HadronInelasticProcess* theInelasticProcess = new G4HadronInelasticProcess( "inelastic", G4Alpha::Definition() );	  
           theInelasticProcess->AddDataSet( theGGNuclNuclData );
 	  theInelasticProcess->RegisterMe( theFTFModel1 );
 	  theInelasticProcess->RegisterMe( theIonBC );
@@ -829,4 +818,5 @@ void PhysicsList::SetUsePolarizedPhysics(bool use){
   // Add stopping processes with builder
   stoppingPhysics->ConstructProcess();
 }
+
 #endif

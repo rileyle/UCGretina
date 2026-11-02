@@ -4,7 +4,7 @@ Cite: [L.A.Riley, D.Weisshaar, H.L.Crawford et al., UCGretina GEANT4 simulation 
 
 ## Compile and Install ##
 
-Install version [Geant4-11.4.3 of the Geant4 libraries](https://geant4.web.cern.ch/download/11.4.3.html). (Version [Geant4-10.7.4 of the libraries](https://geant4.web.cern.ch/download/10.7.4.html) can also be used by commenting out the `CPPFLAGS += -DG4V11` line and uncommenting the `CPPFLAGS += -DG4V10` line in the `GNUmakefile`.) You will need the data files for low energy electromagnetic processes, photon evaporation, and radioactive decay.
+Install version [Geant4-11.4.3 of the Geant4 libraries](https://geant4.web.cern.ch/download/11.4.3.html). You will need the data files for low energy electromagnetic processes, photon evaporation, and radioactive decay.
 
 The model of the GRETINA scanning table uses version 2.0.3 of the external [CADMesh](https://github.com/christopherpoole/cadmesh) package. 
 
