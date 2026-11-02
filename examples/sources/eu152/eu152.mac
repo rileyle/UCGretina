@@ -31,10 +31,8 @@
 # Load level schemes of the daughters (152Sm, 152Gd).
 /BeamOut/DA 0
 /BeamOut/DZ -1
-/BeamOut/LevelDataFile z62.a152.lvldata
 /BeamOut/DA 0
 /BeamOut/DZ +1
-/BeamOut/LevelDataFile z64.a152.lvldata
 
 /BeamOut/Update
 

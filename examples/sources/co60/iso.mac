@@ -34,7 +34,6 @@
 # Load excited states of the daughter (60Ni) into the particle table.
 /BeamOut/DA 0
 /BeamOut/DZ +1
-/BeamOut/LevelDataFile z28.a60.lvldata
 
 /BeamOut/Update
 

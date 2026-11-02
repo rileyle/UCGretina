@@ -35,14 +35,14 @@ void eu152Fit(TString simFileName, Int_t rebin) {
 
   TString specFileName = "data/run020_cal_histos.root";
   TFile *spF = new TFile(specFileName);
-  TH1F* spec;
+  GH1F* spec;
   spF->GetObject("egam", spec);
   spectrum = (GH1D*)spec->Clone();
   spectrum->Rebin(rebin);
   
   TString bgFileName   = "data/run007_cal_histos.root";
   TFile *bgF = new TFile(bgFileName);
-  TH1F* back;
+  GH1F* back;
   bgF->GetObject("egam", back);
   backGround = (GH1D*)back->Clone();
   backGround->Rebin(rebin);

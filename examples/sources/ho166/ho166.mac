@@ -32,7 +32,6 @@
 # Load excited states of the daughter (166Er) into the particle table.
 /BeamOut/DA 0
 /BeamOut/DZ +1
-/BeamOut/LevelDataFile z68.a166.lvldata
 
 /BeamOut/Update
 
